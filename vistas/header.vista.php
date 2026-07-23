@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Repotools - Escaner para Repositores | Gestion de Stock e Inventario</title>
+    <meta property="og:title" content="Repotools - Escaner para Repositores">
+    <meta property="og:description" content="Escanea productos y gestiona stock facilmente. Herramienta eficiente para repositores.">
+    <meta property="og:image" content="https://repotools.online/img/logo.png">
+    <meta property="og:url" content="https://repotools.online/">
+    <meta property="og:type" content="website">
+
+    <meta name="description" content="Optimiza tu trabajo como repositor con Repotools: escanea codigos de barras y gestiona tu stock sin cargar productos. Facil, rapido y eficiente.">
+    <meta name="keywords" content="repositores, escaneo de codigos de barras, gestion de stock, inventario, productos, logistica, scanner de codigos, administracion de inventario, manejo de stock">
+    <meta name="robots" content="index, follow">
+    <link rel="shortcut icon" href="img/logo.ico" type="image/x-icon">
+    <script src="https://kit.fontawesome.com/d9b377fc7f.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
+    <link href="css/normalize.css" rel="stylesheet" type="text/css">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link href="css/contador.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <header>
+      <div class="header-contenedor">
+        <a class="logo" href="./" aria-label="Inicio Repotools"><p>REPOTOOLS</p></a>
+
+        <nav class="nav" aria-label="Navegacion principal">
+          <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
+          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
+          <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
+          <a href="#contacto"><i class="fa-solid fa-address-book"></i>CONTACTO</a>
+        </nav>
+
+        <nav class="nav-celular" id="nav-celular" aria-label="Navegacion movil">
+          <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
+          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
+          <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
+          <a href="#contacto"><i class="fa-solid fa-address-book"></i>CONTACTO</a>
+        </nav>
+
+        <button id="btn.nav-celular" class="botonMenu" type="button" aria-label="Abrir menu">
+          <i id="btn-nav-celularA" class="fa-solid fa-angle-left"></i>
+        </button>
+      </div>
+    </header>

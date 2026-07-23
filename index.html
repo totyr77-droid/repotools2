@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Repotools - Escaner para Repositores | Gestion de Stock e Inventario</title>
+    <meta property="og:title" content="Repotools - Escaner para Repositores">
+    <meta property="og:description" content="Escanea productos y gestiona stock facilmente. Herramienta eficiente para repositores.">
+    <meta property="og:image" content="https://repotools.online/img/logo.png">
+    <meta property="og:url" content="https://repotools.online/">
+    <meta property="og:type" content="website">
+
+    <meta name="description" content="Optimiza tu trabajo como repositor con Repotools: escanea codigos de barras y gestiona tu stock sin cargar productos. Facil, rapido y eficiente.">
+    <meta name="keywords" content="repositores, escaneo de codigos de barras, gestion de stock, inventario, productos, logistica, scanner de codigos, administracion de inventario, manejo de stock">
+    <meta name="robots" content="index, follow">
+    <link rel="shortcut icon" href="img/logo.ico" type="image/x-icon">
+    <script src="https://kit.fontawesome.com/d9b377fc7f.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
+    <link href="css/normalize.css" rel="stylesheet" type="text/css">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link href="css/contador.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <header>
+      <div class="header-contenedor">
+        <a class="logo" href="./" aria-label="Inicio Repotools"><p>REPOTOOLS</p></a>
+
+        <nav class="nav" aria-label="Navegacion principal">
+          <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
+          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
+          <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
+          <a href="#contacto"><i class="fa-solid fa-address-book"></i>CONTACTO</a>
+        </nav>
+
+        <nav class="nav-celular" id="nav-celular" aria-label="Navegacion movil">
+          <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
+          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
+          <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
+          <a href="#contacto"><i class="fa-solid fa-address-book"></i>CONTACTO</a>
+        </nav>
+
+        <button id="btn.nav-celular" class="botonMenu" type="button" aria-label="Abrir menu">
+          <i id="btn-nav-celularA" class="fa-solid fa-angle-left"></i>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="contenedor-main">
+        <div class="app-resumen">
+          <p class="app-resumen__eyebrow">Scanner rapido para reposicion</p>
+          <h1>Escanea, guarda y comparte codigos EAN</h1>
+          <p>Tu lista queda en este dispositivo y se puede compartir cuando termines el recorrido.</p>
+        </div>
+
+        <button id="boton" type="button"><i class="fa-solid fa-barcode"></i>ESCANEAR</button>
+
+        <div class="box-tools" id="resultados">
+          <button class="resultados-box" id="ver" type="button" aria-label="Ver codigos escaneados">
+            <p><i class="fa-solid fa-box-open"></i><span id="cantidad"></span></p>
+          </button>
+          <button class="compartir" id="compartir" type="button" aria-label="Compartir codigos">
+            <i class="fa-solid fa-share-from-square"></i>
+          </button>
+        </div>
+
+        <button class="borrar-box" id="borrarD" type="button"><i class="fa-solid fa-trash"></i>BORRAR TODOS</button>
+      </div>
+
+      <div class="info">
+        <div class="info-contenedor">
+          <div class="infotitulo">
+            <p><i class="fa-solid fa-circle-info"></i>INFORMACION DE ESCANEOS</p>
+          </div>
+          <div class="infobox">
+            <div class="infocontador">
+              <p><span id="contadorGlobal">0</span> TOTALES</p>
+            </div>
+            <div class="infocontador">
+              <p><span id="sM">0</span> TUYOS</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="div" id="contenedormax">
+      <div class="ver-logo">
+        <p>REPOTOOLS</p>
+      </div>
+
+      <button id="conterdormaxc" type="button" aria-label="Cerrar scanner">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+
+      <div id="contenedor"></div>
+
+      <div id="cartelScaner">
+        <div class="cartelscaner-box">
+          <div class="cartelscaner-box-titulo">
+            <i class="fa-solid fa-circle-check"></i>ESCANEADO
+          </div>
+
+          <div class="cartelscaner-box-info">
+            <div class="resultado-box">
+              <div class="resultado-title">
+                <i class="fa-solid fa-barcode"></i><p id="resultado"></p>
+              </div>
+              <div class="resultado-api"></div>
+            </div>
+
+            <button id="rescancelar" type="button"><i class="fa-solid fa-trash"></i> CANCELAR</button>
+
+            <div class="CsBH">
+              <button class="cantidadbox" type="button" aria-label="Ver resultados">
+                <i class="fa-solid fa-box-open"></i><span id="cantidadScan"></span>
+              </button>
+              <button class="copybox" id="copy" type="button" aria-label="Copiar codigo">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="cartelscaner-box-select">
+            <button class="btnScaner" id="rescanear" type="button">
+              <i class="fa-solid fa-barcode"></i> ESCANEAR OTRO
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="verb" id="verb">
+      <button class="verc" id="verc" type="button" aria-label="Cerrar resultados">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+
+      <div class="verb-contenedor">
+        <div class="ver-logoD">
+          <p>REPOTOOLS</p>
+        </div>
+        <div class="ver-resultado">
+          <p>RESULTADOS</p>
+          <svg id="barcode"></svg>
+          <div id="veri"></div>
+        </div>
+
+        <button class="compartir" id="compartirD" type="button" aria-label="Compartir resultados">
+          <i class="fa-solid fa-share-from-square"></i>
+        </button>
+
+        <div class="verpag">
+          <button id="vera" class="vera" type="button" aria-label="Codigo anterior">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <button id="vers" class="vers" type="button" aria-label="Codigo siguiente">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" id="contacto">
+      <div class="footer__texto">
+        <p>&copy; 2023 - 2026</p>
+        <p>Derechos reservados para GR Diseno y Repotools</p>
+
+        <div class="footer__texto__redes">
+          <a target="_blank" rel="noopener" href="https://www.instagram.com/greeyes_/" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a target="_blank" rel="noopener" href="https://wa.me/message/CFL7IWQ6XWPRM1" aria-label="WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <div class="alerta">
+      <div class="alerta-contenedor">
+        <div class="alertabox">
+          <div class="alerta-titulo">
+            <i class="fa-solid fa-circle-info"></i><p id="alertaTitulo"></p>
+          </div>
+          <div class="alerta-info">
+            <div id="alertaInfo"></div>
+          </div>
+        </div>
+      </div>
+      <p class="alerta-cerrar"><i class="fa-solid fa-xmark"></i> CERRAR</p>
+    </div>
+
+    <div class="cookies" id="cookies">
+      <div class="cookies-box">
+        <div class="cookies-img">
+          <img src="https://www.svgrepo.com/show/30963/cookie.svg" alt="Galleta">
+        </div>
+        <p>Usamos almacenamiento local para guardar tus escaneos.</p>
+        <p>Al continuar, aceptas su uso.</p>
+        <p id="aceptarCookies">Aceptar</p>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/botones.js"></script>
+  </body>
+</html>
