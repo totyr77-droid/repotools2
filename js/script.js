@@ -43,6 +43,7 @@ let ultimoCodigo = null;
 let contadorCoincidencias = 0;
 let ultimoAgregado = null;
 let resultadoActual = "";
+let scanResultRevision = 0;
 
 inicializar();
 
@@ -211,6 +212,7 @@ function abrirScanner() {
 }
 
 function iniciarScanner() {
+  scanResultRevision++;
   if (!window.Quagga) {
     alertaGeneral("ERROR", "No se pudo cargar el lector de codigos.");
     return;
@@ -264,6 +266,7 @@ function detenerScanner() {
 }
 
 function cerrarScanner() {
+  scanResultRevision++;
   detenerScanner();
   els.contenedor.style.display = "none";
   els.contenedormax.style.display = "none";
@@ -291,6 +294,7 @@ async function procesarDeteccion(data) {
 }
 
 async function mostrarResultadoEscaneo(codigo) {
+  const revision = ++scanResultRevision;
   registrarEscaneoTop(codigo);
   const esDuplicado = lista.includes(codigo);
   resultadoActual = codigo;
@@ -302,13 +306,15 @@ async function mostrarResultadoEscaneo(codigo) {
   }
 
   els.cartelScaner.style.display = "flex";
-  els.resultado.textContent = esDuplicado ? `${codigo} DUPLICADO` : codigo;
+  els.resultado.textContent = codigo;
+  const heading = document.getElementById("scanResultHeading");
+  if (heading) heading.textContent = esDuplicado ? "Ya está en tu lista" : "Producto guardado";
   els.rescancelar.style.display = esDuplicado ? "none" : "block";
   actualizarContadores();
 
-  const loading = iniciarTextoCarga(els.resultadoApi);
+  els.resultadoApi.textContent = "Buscando producto…";
   const resultadoAPI = await buscarProductoPorEAN(codigo);
-  loading();
+  if (revision !== scanResultRevision) return;
   els.resultadoApi.textContent = resultadoAPI;
 }
 
@@ -340,18 +346,6 @@ async function registrarEscaneoTop(codigo) {
   }
 }
 
-function iniciarTextoCarga(elemento) {
-  let dots = 0;
-  elemento.textContent = "Buscando";
-
-  const intervalo = setInterval(() => {
-    dots = (dots + 1) % 4;
-    elemento.textContent = `Buscando${".".repeat(dots)}`;
-  }, 400);
-
-  return () => clearInterval(intervalo);
-}
-
 function resetDeteccion() {
   ultimoCodigo = null;
   contadorCoincidencias = 0;
@@ -359,13 +353,15 @@ function resetDeteccion() {
 
 function cancelarUltimoEscaneo() {
   if (!ultimoAgregado) return;
+  scanResultRevision++;
 
   lista = lista.filter((codigo) => codigo !== ultimoAgregado);
   ultimoAgregado = null;
   guardarLista();
   actualizarContadores();
-  els.resultado.textContent = "ELIMINADO";
-  els.resultadoApi.textContent = "El codigo se quito de tu lista.";
+  const heading = document.getElementById("scanResultHeading");
+  if (heading) heading.textContent = "Producto quitado";
+  els.resultadoApi.textContent = "El código se quitó de tu lista.";
   els.rescancelar.style.display = "none";
 }
 
@@ -438,8 +434,7 @@ async function fallbackCompartir(link) {
 async function buscarProductoPorEAN(ean) {
   try {
     const product = await window.RepoProductInfo.get(ean);
-    if (!product) return "No hay información para este producto.";
-    return [product.name, product.brand, product.quantity].filter(Boolean).join(" · ") || "Producto sin datos cargados.";
+    return window.RepoProductInfo.summary(product);
   } catch (error) {
     return "No pudimos cargar la información del producto.";
   }

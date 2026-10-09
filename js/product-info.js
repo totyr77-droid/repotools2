@@ -74,5 +74,9 @@
       if (activeRequests.get(container) === token) container.setAttribute('aria-busy', 'false');
     }
   }
-  window.RepoProductInfo = { get, show };
+  function summary(product) {
+    if (!product) return 'Producto sin información';
+    return `${product.name || 'Nombre no disponible'} | ${product.quantity || 'Presentación no disponible'}`;
+  }
+  window.RepoProductInfo = { get, show, summary };
 })();

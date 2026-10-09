@@ -13,7 +13,7 @@
   <div id="cartelScaner">
     <div class="cartelscaner-box">
       <div class="cartelscaner-box-titulo">
-        <i class="fa-solid fa-circle-check"></i>ESCANEADO
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i><span id="scanResultHeading">Producto guardado</span>
       </div>
 
       <div class="cartelscaner-box-info">
@@ -21,19 +21,18 @@
           <div class="resultado-title">
             <i class="fa-solid fa-barcode"></i><p id="resultado"></p>
           </div>
-          <div class="resultado-api"></div>
+          <div class="resultado-api" role="status"></div>
         </div>
-
-        <button id="rescancelar" type="button"><i class="fa-solid fa-trash"></i> CANCELAR</button>
 
         <div class="CsBH">
           <button class="cantidadbox" type="button" aria-label="Ver resultados">
-            <i class="fa-solid fa-box-open"></i><span id="cantidadScan"></span>
+            <i class="fa-solid fa-box-open" aria-hidden="true"></i>Ver lista (<span id="cantidadScan"></span>)
           </button>
           <button class="copybox" id="copy" type="button" aria-label="Copiar codigo">
-            <i class="fa-solid fa-copy"></i>
+            <i class="fa-solid fa-copy" aria-hidden="true"></i>Copiar EAN
           </button>
         </div>
+        <button id="rescancelar" type="button"><i class="fa-solid fa-trash" aria-hidden="true"></i> Quitar de la lista</button>
       </div>
 
       <div class="cartelscaner-box-select">

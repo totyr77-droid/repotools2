@@ -1,0 +1,44 @@
+#cartelScaner { padding: 84px 16px 24px; overflow-y: auto; }
+.cartelscaner-box {
+    width: min(460px, 100%);
+    height: auto;
+    margin: auto 0;
+    padding: 20px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+    filter: none;
+    flex-shrink: 0;
+}
+.cartelscaner-box-titulo { min-height: 32px; padding: 0; justify-content: flex-start; border-radius: 0; background: transparent; color: #28704d; font-size: .9rem; }
+.cartelscaner-box-info { padding: 16px 0 0; gap: 16px; background: transparent; text-align: left; }
+.resultado-box { width: 100%; align-items: flex-start; gap: 10px; }
+.resultado-title { color: #626b7a; font-size: .9rem; justify-content: flex-start; }
+.resultado-title p { user-select: text; }
+.cartelscaner-box .resultado-api { color: #27187e; font-size: 1.15rem; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.cartelscaner-box .CsBH { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.cartelscaner-box .cantidadbox, .cartelscaner-box .copybox {
+    width: 100%;
+    min-height: 48px;
+    height: auto;
+    padding: 12px 8px;
+    gap: 4px;
+    border-radius: 10px;
+    background: #e9e6f5;
+    color: #27187e;
+    font-size: .9rem;
+    flex-wrap: wrap;
+}
+.cartelscaner-box .cantidadbox i { margin-right: 4px; }
+.cartelscaner-box .cartelscaner-box-select { padding: 0; margin-top: 12px; }
+.cartelscaner-box .btnScaner { min-height: 54px; padding: 14px; border-radius: 10px; font-size: 1rem; background: #27187e; color: white; }
+.cartelscaner-box #rescancelar { width: 100%; min-height: 44px; padding: 10px; background: transparent; color: #a32d2d; font-size: .9rem; margin: 0; border-radius: 10px; }
+@media (hover: hover) {
+    .cartelscaner-box .cantidadbox:hover, .cartelscaner-box .copybox:hover { background: #dfd9f0; transform: none; }
+    .cartelscaner-box .btnScaner:hover { background: #4930d9; transform: none; }
+    .cartelscaner-box #rescancelar:hover { background: #fff0f0; transform: none; }
+}
+@media (max-width: 768px) {
+    #cartelScaner { padding-top: calc(84px + env(safe-area-inset-top, 0px)); padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 360px) { .cartelscaner-box { padding: 16px; } .cartelscaner-box .cantidadbox, .cartelscaner-box .copybox { font-size: .8rem; } }

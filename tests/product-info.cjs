@@ -16,6 +16,9 @@ const service = context.window.RepoProductInfo;
 (async () => {
   const [first, second] = await Promise.all([service.get('7791234567898'), service.get('7791234567898')]);
   assert.equal(calls, 1); assert.equal(first, second); assert.equal(first.name, 'Agua');
+  assert.equal(service.summary(first), 'Agua | 1 L');
+  assert.equal(service.summary({ name: 'Agua', brand: 'Marca' }), 'Agua | Presentación no disponible');
+  assert.equal(service.summary(null), 'Producto sin información');
   const container = new Element('section'); await service.show(container, '7791234567898');
   assert.equal(container.children[0].textContent, 'Agua'); assert.equal(container.attrs['aria-busy'], 'false');
   fetcher = async () => ({ ok: true, json: async () => ({ status: 0 }) });
