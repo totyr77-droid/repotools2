@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "repotools_palets_v1";
+  const STORAGE_KEY = `repotools_palets_v1_user_${window.repotoolsUserId}`;
   const EAN = /^(?:\d{8}|\d{13})$/;
   const els = {
     escanearPalet: document.getElementById("escanearPalet"),

@@ -30,23 +30,11 @@
   <p class="alerta-cerrar"><i class="fa-solid fa-xmark"></i> CERRAR</p>
 </div>
 
-<!-- COOKIES -->
-<div class="cookies" id="cookies">
-  <div class="cookies-box">
-    <div class="cookies-img">
-      <img src="https://www.svgrepo.com/show/30963/cookie.svg" alt="Galleta">
-    </div>
-    <p>Usamos almacenamiento local para guardar tus escaneos.</p>
-    <p>Al continuar, aceptas su uso.</p>
-    <p id="aceptarCookies">Aceptar</p>
-  </div>
-</div>
-
 <!-- SCRIPTS -->
 <?php if (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/stock.js"></script>
-<?php else: ?>
+<?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>

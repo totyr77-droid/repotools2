@@ -1389,6 +1389,14 @@ canvas.drawingBuffer {
     font-size: 1.2rem;
     font-weight: 800;
 }
+.stock-scanner .stock-scanner__logo {
+    position: absolute;
+    top: 34px;
+    left: 50%;
+    margin: 0;
+    font-size: 1.45rem;
+    transform: translateX(-50%);
+}
 .stock-scanner__manual {
     width: min(600px, 100%);
     margin-top: 20px;
@@ -1444,51 +1452,72 @@ canvas.drawingBuffer {
 .stock-close {
     position: absolute;
     top: 18px;
-    right: 18px;
+    left: 18px;
 }
 .palet-editor.activo {
     display: block;
     overflow-y: auto;
-    padding: 18px;
-    background: rgba(10, 15, 30, .78);
+    padding: 0;
+    background: #000;
+    animation: fadeSlideIn .5s ease-out;
 }
 .palet-editor__panel {
     width: min(720px, 100%);
-    min-height: calc(100dvh - 36px);
+    min-height: 100dvh;
     margin: auto;
-    padding: 22px;
-    border-radius: 14px;
-    background: #f4f7fb;
+    padding: 105px 18px 36px;
+    background: #000;
+}
+.palet-editor__logo {
+    position: absolute;
+    top: 34px;
+    left: 50%;
+    color: #fff;
+    font-size: 1.45rem;
+    font-weight: 800;
+    transform: translateX(-50%);
+}
+.palet-editor__close {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+    color: #fff;
+    font-size: 1.7rem;
+    cursor: pointer;
 }
 .palet-editor__header {
     display: flex;
     justify-content: space-between;
     gap: 16px;
     align-items: flex-start;
+    padding: 18px;
+    border-radius: 12px 12px 0 0;
+    background: var(--color1);
+    color: #fff;
 }
 .palet-editor__header span {
-    color: var(--color4);
+    color: #c8d3ff;
     font-size: .8rem;
     font-weight: 800;
 }
 .palet-editor__header h2 {
     overflow-wrap: anywhere;
-    color: #171243;
-}
-.palet-editor__header button {
-    flex: 0 0 48px;
-    background: #e4e8ee;
-    color: #172033;
+    color: #fff;
 }
 .palet-editor__actions {
-    margin: 22px 0;
+    margin: 0 0 22px;
     padding: 18px;
-    border-radius: 10px;
+    border-radius: 0 0 12px 12px;
     background: #fff;
 }
 .palet-editor__subtitle {
     margin-bottom: 10px;
-    color: #172033;
+    color: #fff;
     font-weight: 800;
 }
 .producto-form {
@@ -1532,6 +1561,7 @@ canvas.drawingBuffer {
     padding: 24px;
     border: 1px dashed #bcc6d3;
     border-radius: 10px;
+    background: #fff;
     color: #637083;
     text-align: center;
 }
@@ -1551,7 +1581,7 @@ canvas.drawingBuffer {
     }
     .palet-editor__panel {
         min-height: 100dvh;
-        padding: 18px 14px;
+        padding: 95px 14px 28px;
         border-radius: 0;
     }
     .producto-form__row {
@@ -1561,3 +1591,18 @@ canvas.drawingBuffer {
         align-items: stretch;
     }
 }
+
+/* Cuentas */
+.account-main { min-height: 75vh; padding: 125px 20px 40px; }
+.account-panel { max-width: 440px; margin: auto; padding: 28px; border-radius: 18px; background: #f4f3ff; color: #27187e; }
+.account-panel h1 { margin: 0 0 15px; }
+.account-panel p { line-height: 1.5; margin-bottom: 18px; }
+.account-panel label { display: block; margin: 16px 0; }
+.account-panel input { display: block; width: 100%; margin-top: 8px; padding: 12px; border: 1px solid #758bfd; border-radius: 8px; background: white; user-select: text; }
+.account-panel button { width: 100%; padding: 14px; border: 0; border-radius: 8px; background: #27187e; color: white; cursor: pointer; }
+.account-panel a { display: block; margin-top: 18px; color: #27187e; }
+.account-error { padding: 12px; background: #ffe6e6; color: #8a1919; border-radius: 8px; }
+.account-notice { font-size: .9rem; line-height: 1.5; margin: 20px 0; }
+.account-bar { position: relative; top: 85px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; background: #f4f3ff; color: #27187e; }
+.account-bar button { background: transparent; border: 1px solid #27187e; border-radius: 6px; padding: 8px; color: #27187e; cursor: pointer; }
+.static-notice { margin: 100px 20px 0; padding: 12px; background: #f4f3ff; color: #27187e; line-height: 1.5; }

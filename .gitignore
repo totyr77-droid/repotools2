@@ -1,0 +1,7 @@
+/data/*.sqlite*
+/.vscode/
+/.agents/
+/.codex/
+/.aws/
+/.env
+/tmp/

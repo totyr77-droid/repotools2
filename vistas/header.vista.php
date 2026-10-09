@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . "/../includes/auth.php"; ?>
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -29,14 +30,14 @@
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
           <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
-          <a href="#contacto"><i class="fa-solid fa-address-book"></i>CONTACTO</a>
+          <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
         <nav class="nav-celular" id="nav-celular" aria-label="Navegacion movil">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
           <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
-          <a href="#contacto"><i class="fa-solid fa-address-book"></i>CONTACTO</a>
+          <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
         <button id="btn.nav-celular" class="botonMenu" type="button" aria-label="Abrir menu">
@@ -44,3 +45,6 @@
         </button>
       </div>
     </header>
+    <?php if (current_user()): ?>
+    <div class="account-bar"><span>Hola, <?= escape(current_user()['name']) ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit">Cerrar sesión</button></form></div>
+    <?php endif; ?>

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . "/includes/auth.php";
+require_account();
 $paginaStock = true;
 include 'vistas/header.vista.php';
 ?>
@@ -10,6 +12,8 @@ include 'vistas/header.vista.php';
       <p>Escanea el QR de un palet. Si existe podrás editarlo; si es nuevo, se creará automáticamente.</p>
     </div>
 
+    <p class="account-notice">Gestión de palets en desarrollo. Por ahora se guardan en este navegador, separados por cuenta; todavía no se sincronizan.</p>
+    <script>window.repotoolsUserId = <?= (int) current_user()["id"] ?>;</script>
     <button id="escanearPalet" type="button" class="stock-primary">
       <i class="fa-solid fa-qrcode"></i> ESCANEAR PALET
     </button>
@@ -25,8 +29,9 @@ include 'vistas/header.vista.php';
 
 <div class="stock-scanner" id="stockScanner" aria-hidden="true">
   <button id="cerrarStockScanner" class="stock-close" type="button" aria-label="Cerrar lector">
-    <i class="fa-solid fa-xmark"></i>
+    <i class="fa-solid fa-circle-xmark"></i>
   </button>
+  <p class="stock-scanner__logo">REPOTOOLS</p>
   <p id="stockScannerTitulo">Escanea el QR del palet</p>
   <div id="stockReader"></div>
   <div class="stock-scanner__manual" id="paletManualScanner">
@@ -40,14 +45,15 @@ include 'vistas/header.vista.php';
 
 <div class="palet-editor" id="paletEditor" aria-hidden="true">
   <div class="palet-editor__panel">
+    <button id="cerrarPaletEditor" class="palet-editor__close" type="button" aria-label="Cerrar palet">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+    <p class="palet-editor__logo">REPOTOOLS</p>
     <div class="palet-editor__header">
       <div>
         <span>PALET</span>
         <h2 id="paletCodigo"></h2>
       </div>
-      <button id="cerrarPaletEditor" type="button" aria-label="Cerrar palet">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
     </div>
 
     <div class="palet-editor__actions">
