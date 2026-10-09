@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 $paginaCuenta = true;
+$mostrarCreditos = true;
 $register = ($_GET['mode'] ?? '') === 'registro';
 $next = in_array($_GET['next'] ?? '', ['stock', 'tops'], true) ? $_GET['next'] : '';
 $error = '';
