@@ -45,10 +45,16 @@
     const version = ++revision; active = null; form.reset(); form.hidden = true; status.textContent = 'Cargando…';
     if (!dialog.open) dialog.showModal();
     try {
-      const [config, product] = await Promise.all([request(), window.RepoProductInfo.get(ean).catch(() => null)]);
+      const [config, lookup] = await Promise.all([request(), window.RepoProductInfo.get(ean).then(product => ({ product, missing: product === null })).catch(() => ({ product: null, missing: false }))]);
+      const { product, missing } = lookup;
       if (version !== revision || !dialog.open) return;
       active = { ean, csrf: config.csrf, key: crypto.randomUUID() };
       document.getElementById('productReportEan').textContent = `EAN ${ean}`;
+      document.getElementById('productReportTitle').textContent = missing ? 'Agregar producto' : 'Reportar producto';
+      document.getElementById('reportProblem').hidden = missing;
+      form.elements.description.disabled = missing; form.elements.description.required = !missing;
+      form.elements.name.required = missing;
+      document.getElementById('reportInstructions').textContent = missing ? 'Completa los datos del producto. Un moderador los revisará.' : 'Propón los datos correctos. Un moderador los revisará.';
       for (const field of ['name', 'quantity', 'brand', 'category', 'packaging']) form.elements[field].value = product?.[field] || '';
       document.getElementById('reportPhotos').disabled = !config.photos_enabled;
       document.getElementById('reportPhotosNote').textContent = config.photos_enabled ? '' : 'Las fotos todavía no están habilitadas. Puedes reportar igual.';
@@ -57,7 +63,7 @@
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); });
   dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
-  dialog.addEventListener('close', () => { ++revision; active = null; });
+  dialog.addEventListener('close', () => { if (!dialog.open) { ++revision; active = null; } });
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (!active || busy) return;
     busy = true; send.disabled = true; close.disabled = true; status.textContent = 'Enviando…';

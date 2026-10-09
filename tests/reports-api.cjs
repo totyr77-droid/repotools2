@@ -65,4 +65,11 @@ async function create(request, more = {}) {
     const cleanup = spawnSync(php, [...options, '-r', `require 'includes/database.php'; require 'includes/reports.php'; foreach (database()->query('SELECT object_key FROM report_photos')->fetchAll(PDO::FETCH_COLUMN) as $key) report_object('DELETE', $key);`], { env, encoding: 'utf8' }); assert.equal(cleanup.status, 0, cleanup.stderr);
   }
   console.log('OK: API de tickets, CSRF, privacidad, rechazo de archivos falsos, moderación, TOPs públicos e invitados sin puntos.');
+  assert.equal((await user('api/reportes.php', { ...fields, csrf: userCsrf, submission_key: randomUUID(), description: '' })).status, 422);
+  const missing = await create(guest, { ean: '96385074', description: '' });
+  assert.equal(missing.report.description, 'Solicitud de alta de producto.'); assert.equal(missing.report.original, null);
+  assert.equal((await mod('api/reportes.php', { ...review, id: missing.report.id, revision: 0 })).status, 200);
+  assert.equal((await guest('api/reportes.php', missing.data)).json().report.id, missing.report.id);
+  assert.equal((await guest('api/reportes.php', { ...missing.data, ean: '12345670', submission_key: randomUUID(), name: '' })).status, 422);
+  console.log('OK: producto nuevo sin explicación, nombre obligatorio, correcciones con motivo y reintentos después de aprobar.');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => server.kill());

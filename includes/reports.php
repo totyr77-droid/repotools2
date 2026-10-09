@@ -37,13 +37,17 @@ function submit_product_report(PDO $db, ?array $user, string $owner, array $inpu
     $storage ??= 'report_object';
     $key = $input['submission_key'] ?? ''; $ean = $input['ean'] ?? ''; $description = $input['description'] ?? '';
     if (!is_string($key) || !preg_match('/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/D', $key) || !is_string($ean) || !valid_product_ean($ean)) throw new CatalogException('Revisa el EAN del reporte.', 422);
-    if (!is_string($description) || mb_strlen(trim($description)) < 5 || mb_strlen($description) > 1000) throw new CatalogException('Explica qué dato está mal (5 a 1000 caracteres).', 422);
-    $fields = report_fields($input);
     $existing = $db->prepare('SELECT id, owner_key FROM product_reports WHERE submission_key = ?'); $existing->execute([$key]);
     if ($row = $existing->fetch()) {
         if (!hash_equals($row['owner_key'], $owner)) throw new CatalogException('Solicitud no válida.', 409);
         return report_detail($db, (int) $row['id'], $owner, false);
     }
+    $fields = report_fields($input);
+    if (is_string($description) && trim($description) === '' && catalog_product($db, $ean) === null) {
+        if ($fields['name'] === '') throw new CatalogException('Escribe el nombre del producto.', 422);
+        $description = 'Solicitud de alta de producto.';
+    }
+    if (!is_string($description) || mb_strlen(trim($description)) < 5 || mb_strlen($description) > 1000) throw new CatalogException('Explica qué dato está mal (5 a 1000 caracteres).', 422);
     $objects = []; $saved = false;
     try {
         foreach (['ean', 'product'] as $kind) if (isset($photos[$kind])) {
