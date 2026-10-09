@@ -8,7 +8,7 @@ include __DIR__ . '/vistas/header.vista.php';
   <section class="library-app">
     <div class="library-heading"><div><h1>Biblioteca</h1><p>Organiza productos en colecciones.</p></div><button id="newCollection" class="library-primary" type="button">+ Crear</button></div>
     <p id="libraryStatus" class="library-status" role="status"></p>
-    <p class="library-status">Versión de prueba: las colecciones pueden perderse si el servidor reinicia.</p>
+    <?php if (!getenv('DATABASE_URL')): ?><p class="library-status">Versión de prueba: las colecciones pueden perderse si el servidor reinicia.</p><?php endif; ?>
     <div id="collectionList" class="library-collections" aria-label="Tus colecciones"></div>
     <section id="collectionPanel" hidden>
       <div class="library-heading"><h2 id="collectionTitle"></h2><button id="renameCollection" class="library-secondary" type="button">Renombrar</button></div>

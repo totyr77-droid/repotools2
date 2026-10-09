@@ -55,7 +55,7 @@ try {
                     }
                 }
                 if ($action === 'add_product') {
-                    $db->prepare('INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO UPDATE SET name = CASE WHEN excluded.name != "" THEN excluded.name ELSE library_products.name END')->execute([$id, $ean, $name]);
+                    $db->prepare("INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO UPDATE SET name = CASE WHEN excluded.name != '' THEN excluded.name ELSE library_products.name END")->execute([$id, $ean, $name]);
                 } else {
                     $db->prepare('DELETE FROM library_products WHERE library_id = ? AND ean = ?')->execute([$id, $ean]);
                 }
@@ -81,5 +81,5 @@ try {
     library_response(200, ['libraries' => $libraries]);
 } catch (PDOException $exception) {
     if (isset($db) && $db->inTransaction()) $db->rollBack();
-    library_response($exception->getCode() === '23000' ? 409 : 503, ['error' => $exception->getCode() === '23000' ? 'Ya tienes una colección con ese nombre.' : 'No pudimos guardar los cambios. Intenta nuevamente.']);
+    library_response(is_unique_violation($exception) ? 409 : 503, ['error' => is_unique_violation($exception) ? 'Ya tienes una colección con ese nombre.' : 'No pudimos guardar los cambios. Intenta nuevamente.']);
 }

@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
                 $error = 'Demasiados intentos. Espera 15 minutos antes de volver a intentar.';
             } else {
                 $db->prepare('DELETE FROM login_attempts WHERE started < ?')->execute([time() - 900]);
-                $db->prepare('INSERT INTO login_attempts (key, attempts, started) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET attempts = attempts + 1')->execute([$key, time()]);
+                $db->prepare('INSERT INTO login_attempts (key, attempts, started) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET attempts = login_attempts.attempts + 1')->execute([$key, time()]);
                 if ($register) {
                     $stmt = $db->prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)');
                     $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT)]);
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
                 $error = 'El correo o la contraseña no son correctos.';
             }
         } catch (PDOException $exception) {
-            $error = $exception->getCode() === '23000' ? 'No se pudo crear la cuenta con ese correo. Intenta iniciar sesión.' : 'No pudimos acceder a las cuentas. Intenta más tarde.';
+            $error = is_unique_violation($exception) ? 'No se pudo crear la cuenta con ese correo. Intenta iniciar sesión.' : 'No pudimos acceder a las cuentas. Intenta más tarde.';
         }
     }
 }

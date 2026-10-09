@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'repotools-test-'));
 const server = spawn(process.env.PHP_BIN || 'C:/xampp/php/php.exe', ['-d', `session.save_path=${dir}`, '-S', '127.0.0.1:18743', '-t', path.resolve(__dirname, '..')], {
-  env: { ...process.env, REPOTOOLS_DB_PATH: path.join(dir, 'accounts.sqlite') }, stdio: 'ignore'
+  env: { ...process.env, DATABASE_URL: '', REPOTOOLS_REQUIRE_DATABASE_URL: '0', REPOTOOLS_DB_PATH: path.join(dir, 'accounts.sqlite') }, stdio: 'ignore'
 });
 let cookie = '';
 const request = async (url, data) => {

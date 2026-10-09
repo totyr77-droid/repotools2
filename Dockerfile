@@ -1,8 +1,8 @@
 FROM php:8.3-apache
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libsqlite3-dev libonig-dev \
-    && docker-php-ext-install pdo_sqlite mbstring \
+    && apt-get install -y --no-install-recommends libsqlite3-dev libonig-dev libpq-dev \
+    && docker-php-ext-install pdo_sqlite pdo_pgsql mbstring \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
@@ -13,5 +13,6 @@ RUN printf '<Directory /var/www/html>\nAllowOverride All\nRequire all granted\n<
     && chown -R www-data:www-data /var/lib/repotools
 
 ENV REPOTOOLS_DB_PATH=/var/lib/repotools/accounts.sqlite
+ENV REPOTOOLS_REQUIRE_DATABASE_URL=1
 EXPOSE 80
 CMD ["sh", "-c", "chown www-data:www-data /var/lib/repotools && exec apache2-foreground"]

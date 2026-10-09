@@ -8,24 +8,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-function database(): PDO {
-    static $db = null;
-    if ($db instanceof PDO) return $db;
-    $path = getenv('REPOTOOLS_DB_PATH') ?: dirname(__DIR__) . '/data/accounts.sqlite';
-    $db = new PDO('sqlite:' . $path, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-    $db->exec('PRAGMA busy_timeout = 5000');
-    $db->exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)');
-    $db->exec('CREATE TABLE IF NOT EXISTS login_attempts (key TEXT PRIMARY KEY, attempts INTEGER NOT NULL, started INTEGER NOT NULL)');
-    $columns = $db->query('PRAGMA table_info(users)')->fetchAll(PDO::FETCH_COLUMN, 1);
-    if (!in_array('role', $columns, true)) {
-        $db->exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'usuario'");
-    }
-    $db->exec('CREATE TABLE IF NOT EXISTS scan_events (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id), event_key TEXT NOT NULL, code TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, event_key))');
-    $db->exec('CREATE INDEX IF NOT EXISTS scans_user_code ON scan_events(user_id, code)');
-    $db->exec('CREATE TABLE IF NOT EXISTS libraries (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id), name TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, name))');
-    $db->exec('CREATE TABLE IF NOT EXISTS library_products (id INTEGER PRIMARY KEY AUTOINCREMENT, library_id INTEGER NOT NULL REFERENCES libraries(id), ean TEXT NOT NULL, name TEXT NOT NULL DEFAULT "", created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(library_id, ean))');
-    return $db;
-}
+require_once __DIR__ . '/database.php';
 
 function current_user(): ?array {
     return $_SESSION['user'] ?? null;
