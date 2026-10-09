@@ -8,9 +8,8 @@ include 'vistas/header.vista.php';
   <?php endif; ?>
   <div class="contenedor-main">
     <div class="app-resumen">
-      <p class="app-resumen__eyebrow">Scanner rapido para reposicion</p>
-      <h1>Escanea, guarda y comparte codigos EAN</h1>
-      <p>Tu lista queda en este dispositivo y se puede compartir cuando termines el recorrido.</p>
+      <h1>Escanea tus productos</h1>
+      <p>Tu lista se guarda en este dispositivo.</p>
       <?php if (current_user()): ?><p id="scanStatsStatus" class="scan-stats-status" role="status">Tus escaneos también cuentan para TOPs.</p><?php endif; ?>
     </div>
 

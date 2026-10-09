@@ -69,7 +69,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <a href="index.php">Volver al escáner</a>
     <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
-    <p>El escáner es libre. Para gestionar palets necesitas una cuenta.</p>
+    <p>Usa palets y participa en TOPs.</p>
     <?php if ($error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
     <form method="post">
       <input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>">
@@ -77,12 +77,12 @@ include __DIR__ . '/vistas/header.vista.php';
       <label>Correo electrónico<input type="email" name="email" autocomplete="email" maxlength="254" required value="<?= escape($email) ?>"></label>
       <label>Contraseña<input type="password" name="password" autocomplete="<?= $register ? 'new-password' : 'current-password' ?>" <?= $register ? 'minlength="10" maxlength="72"' : '' ?> required></label>
       <button class="password-toggle" type="button" aria-pressed="false">Mostrar contraseña</button>
-      <?php if ($register): ?><p>Usa al menos 10 caracteres. Guardamos tu contraseña protegida mediante un hash.</p><?php endif; ?>
+      <?php if ($register): ?><p>Contraseña: mínimo 10 caracteres.</p><?php endif; ?>
       <button type="submit"><?= $register ? 'CREAR CUENTA' : 'ENTRAR' ?></button>
     </form>
     <a href="cuenta.php?mode=<?= $register ? 'login' : 'registro' ?>&amp;next=<?= escape($next) ?>"><?= $register ? 'Ya tengo cuenta' : 'Crear una cuenta' ?></a>
     <a href="index.php">Continuar sin cuenta</a>
-    <p class="account-notice">Los escaneos se guardan en este navegador. Al iniciar sesión usamos una cookie necesaria para mantener tu acceso.</p>
+    <p class="account-notice">Usamos una cookie para mantener tu sesión.</p>
     <?php endif; ?>
   </section>
 </main>

@@ -27,7 +27,7 @@ const token = html => html.match(/name="csrf" value="([^"]+)"/)[1];
   assert.equal((await request('stock.php')).location, 'cuenta.php?next=stock');
   const publicEmptyTop = await request('tops.php');
   assert.equal(publicEmptyTop.status, 200);
-  assert.match(publicEmptyTop.text, /El ranking es público/);
+  assert.match(publicEmptyTop.text, /para participar/);
   assert.doesNotMatch(publicEmptyTop.text, /class="tops-stats"/);
   assert.equal((await request('api/escaneos.php', { code: '7791234567898' })).status, 401);
   const form = await request('cuenta.php?mode=registro&next=stock');

@@ -21,17 +21,17 @@ include __DIR__ . '/vistas/header.vista.php';
 ?>
 <main class="tops-main">
   <section class="tops-panel">
-    <p class="app-resumen__eyebrow">TOPs · Acumulado hasta hoy</p>
+    <p class="app-resumen__eyebrow">TOPs · Histórico</p>
     <h1>Más códigos escaneados</h1>
-    <p>Cada código distinto suma una vez por persona. Repetirlo aumenta tus escaneos totales, pero no tu puntuación en el TOP.</p>
+    <p>Código nuevo: +1 al TOP. Repetido: solo suma al total.</p>
     <?php if ($viewer): ?>
     <div class="tops-stats"><p><strong><?= (int) $stats['unique_codes'] ?></strong> códigos únicos</p><p><strong><?= (int) $stats['total_scans'] ?></strong> escaneos totales</p></div>
     <?php else: ?>
-    <p>El ranking es público. <a href="cuenta.php?mode=registro&amp;next=tops">Crea una cuenta</a> o <a href="cuenta.php?next=tops">inicia sesión</a> para que tus escaneos también cuenten.</p>
+    <p><a href="cuenta.php?mode=registro&amp;next=tops">Crea una cuenta</a> o <a href="cuenta.php?next=tops">entra</a> para participar.</p>
     <?php endif; ?>
-    <p>Contamos los escaneos realizados con sesión iniciada desde que se habilitó TOPs. Borrar tu lista no reinicia tus estadísticas.</p>
+    <p>Solo cuentan escaneos con sesión iniciada. Borrar la lista no borra tus puntos.</p>
     <?php if ($error): ?><p role="alert"><?= escape($error) ?></p>
-    <?php elseif (!$leaders): ?><p class="tops-empty">Todavía no hay participantes. Los primeros escaneos con cuenta aparecerán aquí.</p>
+    <?php elseif (!$leaders): ?><p class="tops-empty">Todavía no hay participantes.</p>
     <?php else: ?>
     <div class="tops-table-wrap"><table class="tops-table"><thead><tr><th scope="col">Puesto</th><th scope="col">Usuario</th><th scope="col">Códigos únicos</th><th scope="col">Escaneos totales</th></tr></thead><tbody>
     <?php $position = 0; $previous = null; foreach ($leaders as $index => $leader):

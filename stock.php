@@ -7,12 +7,11 @@ include 'vistas/header.vista.php';
 <main class="stock-main">
   <div class="contenedor-main stock-app">
     <div class="app-resumen">
-      <p class="app-resumen__eyebrow">Stock / Palets</p>
-      <h1>Gestiona el contenido de tus palets</h1>
-      <p>Escanea el QR de un palet. Si existe podrás editarlo; si es nuevo, se creará automáticamente.</p>
+      <h1>Tus palets</h1>
+      <p>Escanea un QR para crear o abrir un palet.</p>
     </div>
 
-    <p class="account-notice">Gestión de palets en desarrollo. Por ahora se guardan en este navegador, separados por cuenta; todavía no se sincronizan.</p>
+    <p class="account-notice">En desarrollo. Tus palets se guardan solo en este dispositivo.</p>
     <script>window.repotoolsUserId = <?= (int) current_user()["id"] ?>;</script>
     <button id="escanearPalet" type="button" class="stock-primary">
       <i class="fa-solid fa-qrcode"></i> ESCANEAR PALET
