@@ -6,11 +6,11 @@ $next = in_array($_GET['next'] ?? '', ['stock', 'tops'], true) ? $_GET['next'] :
 $error = '';
 $name = '';
 $email = '';
-if (current_user()) {
-    header('Location: ' . ($next ? $next . '.php' : 'index.php'));
+if (current_user() && $next) {
+    header('Location: ' . $next . '.php');
     exit;
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
     $name = trim(is_string($_POST['name'] ?? null) ? $_POST['name'] : '');
     $email = strtolower(trim(is_string($_POST['email'] ?? null) ? $_POST['email'] : ''));
     $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
@@ -59,6 +59,14 @@ include __DIR__ . '/vistas/header.vista.php';
 ?>
 <main class="account-main">
   <section class="account-panel">
+    <?php if (current_user()): ?>
+    <h1>Mi cuenta</h1>
+    <p>Hola, <?= escape(current_user()['name']) ?>.</p>
+    <p class="account-email"><?= escape(current_user()['email']) ?></p>
+    <a href="tops.php">Ver mis estadísticas y TOPs</a>
+    <a href="stock.php">Gestionar palets</a>
+    <a href="index.php">Volver al escáner</a>
+    <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
     <p>El escáner es libre. Para gestionar palets necesitas una cuenta.</p>
     <?php if ($error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
@@ -67,12 +75,14 @@ include __DIR__ . '/vistas/header.vista.php';
       <?php if ($register): ?><label>Nombre<input name="name" autocomplete="name" minlength="2" maxlength="80" required value="<?= escape($name) ?>"></label><?php endif; ?>
       <label>Correo electrónico<input type="email" name="email" autocomplete="email" maxlength="254" required value="<?= escape($email) ?>"></label>
       <label>Contraseña<input type="password" name="password" autocomplete="<?= $register ? 'new-password' : 'current-password' ?>" <?= $register ? 'minlength="10" maxlength="72"' : '' ?> required></label>
+      <button class="password-toggle" type="button" aria-pressed="false">Mostrar contraseña</button>
       <?php if ($register): ?><p>Usa al menos 10 caracteres. Guardamos tu contraseña protegida mediante un hash.</p><?php endif; ?>
       <button type="submit"><?= $register ? 'CREAR CUENTA' : 'ENTRAR' ?></button>
     </form>
     <a href="cuenta.php?mode=<?= $register ? 'login' : 'registro' ?>&amp;next=<?= escape($next) ?>"><?= $register ? 'Ya tengo cuenta' : 'Crear una cuenta' ?></a>
     <a href="index.php">Continuar sin cuenta</a>
     <p class="account-notice">Los escaneos se guardan en este navegador. Al iniciar sesión usamos una cookie necesaria para mantener tu acceso.</p>
+    <?php endif; ?>
   </section>
 </main>
 <?php include __DIR__ . '/vistas/footer.vista.php'; ?>

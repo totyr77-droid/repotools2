@@ -3,7 +3,7 @@
 <html lang="es">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Repotools - Escaner para Repositores | Gestion de Stock e Inventario</title>
     <meta property="og:title" content="Repotools - Escaner para Repositores">
     <meta property="og:description" content="Escanea productos y gestiona stock facilmente. Herramienta eficiente para repositores.">
@@ -20,6 +20,7 @@
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <link href="css/contador.css" rel="stylesheet" type="text/css">
+    <link href="css/mobile.css" rel="stylesheet" type="text/css">
   </head>
   <body<?= !empty($paginaInicio) ? ' class="home-page"' : '' ?>>
     <header>
@@ -33,7 +34,7 @@
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
-        <nav class="nav-celular" id="nav-celular" aria-label="Navegacion movil">
+        <nav class="nav-celular" id="nav-celular" aria-label="Navegación móvil">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
           <a href="tops.php"><i class="fa-solid fa-trophy"></i>TOPs</a>
