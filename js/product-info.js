@@ -24,6 +24,12 @@
     return cache.get(ean);
   }
   function editButton(container, ean) {
+    if (window.RepoProductReports) {
+      const report = document.createElement('button'); report.type = 'button'; report.className = 'product-report-button';
+      report.title = 'Reportar un error'; report.setAttribute('aria-label', 'Reportar un error');
+      report.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 21V3m0 1c4-3 8 3 14 0v10c-6 3-10-3-14 0"/></svg>';
+      report.addEventListener('click', () => window.RepoProductReports.open(ean)); container.append(report);
+    }
     if (!access.get(ean)?.canEdit) return;
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'product-edit-button';
@@ -48,7 +54,7 @@
       editButton(container, ean);
       return product;
     } catch (error) {
-      if (activeRequests.get(container) === token) container.textContent = error.message || 'No pudimos cargar el producto.';
+      if (activeRequests.get(container) === token) { container.textContent = error.message || 'No pudimos cargar el producto.'; editButton(container, ean); }
       return null;
     }
   }
@@ -110,6 +116,7 @@
       status.textContent = 'No pudimos cargar el producto. El EAN sigue disponible.';
       const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Reintentar'; retry.className = 'product-details__retry';
       retry.addEventListener('click', () => show(container, ean)); container.replaceChildren(status, retry);
+      editButton(container, ean);
     } finally {
       if (activeRequests.get(container) === token) container.setAttribute('aria-busy', 'false');
     }

@@ -21,6 +21,7 @@
 
 <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?>
 <?php include __DIR__ . '/product-editor.vista.php'; ?>
+<?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
 <!-- SCRIPTS -->
 <?php if (!empty($paginaBiblioteca)): ?>
@@ -29,7 +30,11 @@
 <script src="js/ean-scanner.js"></script>
 <script src="js/product-info.js"></script>
 <script src="js/product-editor.js"></script>
+<script src="js/product-reports.js"></script>
 <script src="js/biblioteca.js"></script>
+<?php elseif (!empty($paginaReportes)): ?>
+<script src="js/product-reports.js"></script>
+<script src="js/reports-page.js"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/stock.js"></script>
@@ -39,6 +44,7 @@
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 <script src="js/product-info.js"></script>
 <script src="js/product-editor.js"></script>
+<script src="js/product-reports.js"></script>
 <script src="js/ean-scanner.js"></script>
 <script src="js/script.js"></script>
 <?php endif; ?>

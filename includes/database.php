@@ -72,6 +72,16 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX product_api_requests_time ON product_api_requests(requested_at)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (2)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 3')->fetchColumn()) {
+            $db->exec("CREATE TABLE product_reports (id {$id}, submission_key TEXT NOT NULL UNIQUE, owner_key TEXT NOT NULL, user_id {$ref} REFERENCES users(id), ean TEXT NOT NULL, description TEXT NOT NULL, proposed_data TEXT NOT NULL, original_data TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', reviewed_by {$ref} REFERENCES users(id), review_note TEXT NOT NULL DEFAULT '', created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, submitted_at BIGINT NOT NULL, reviewed_at {$timestamp})");
+            $db->exec('CREATE INDEX product_reports_owner ON product_reports(owner_key, id)');
+            $db->exec('CREATE INDEX product_reports_queue ON product_reports(status, id)');
+            $db->exec('CREATE INDEX product_reports_user ON product_reports(user_id, status)');
+            $db->exec("CREATE TABLE report_photos (id {$id}, report_id {$ref} NOT NULL REFERENCES product_reports(id), kind TEXT NOT NULL, object_key TEXT NOT NULL, mime TEXT NOT NULL, bytes INTEGER NOT NULL, UNIQUE(report_id, kind))");
+            $db->exec("CREATE TABLE report_rewards (report_id {$ref} PRIMARY KEY REFERENCES product_reports(id), user_id {$ref} NOT NULL REFERENCES users(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX report_rewards_user ON report_rewards(user_id)');
+            $db->exec('INSERT INTO app_schema_migrations (version) VALUES (3)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

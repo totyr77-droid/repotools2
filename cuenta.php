@@ -66,6 +66,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <p class="account-email"><?= escape(current_user()['email']) ?></p>
     <a href="tops.php">Ver mis estadísticas y TOPs</a>
     <a href="biblioteca.php">Abrir mi biblioteca</a>
+    <a href="reportes.php">Mis reportes</a>
     <a href="stock.php">Gestionar palets</a>
     <a href="index.php">Volver al escáner</a>
     <?php else: ?>
@@ -84,6 +85,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <a href="cuenta.php?mode=<?= $register ? 'login' : 'registro' ?>&amp;next=<?= escape($next) ?>"><?= $register ? 'Ya tengo cuenta' : 'Crear una cuenta' ?></a>
     <a href="index.php">Continuar sin cuenta</a>
     <a href="tops.php">Ver TOPs</a>
+    <a href="reportes.php">Mis reportes</a>
     <p class="account-notice">Usamos una cookie para mantener tu sesión.</p>
     <?php endif; ?>
   </section>

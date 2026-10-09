@@ -108,7 +108,8 @@ function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision
         $values[$field] = trim($fields[$field]);
     }
     if ($values['name'] === '') throw new CatalogException('Escribe el nombre del producto.', 422);
-    $db->beginTransaction();
+    $ownTransaction = !$db->inTransaction();
+    if ($ownTransaction) $db->beginTransaction();
     try {
         $before = catalog_product($db, $ean);
         if ($before) {
@@ -124,7 +125,7 @@ function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision
         $product = catalog_product($db, $ean);
         $db->prepare('INSERT INTO product_edits (ean, user_id, before_data, after_data) VALUES (?, ?, ?, ?)')->execute([$ean, $userId, json_encode($before, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), json_encode($product, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)]);
         $db->prepare('DELETE FROM product_lookup_state WHERE ean = ?')->execute([$ean]);
-        $db->commit();
+        if ($ownTransaction) $db->commit();
         return $product;
-    } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
+    } catch (Throwable $error) { if ($ownTransaction && $db->inTransaction()) $db->rollBack(); throw $error; }
 }
