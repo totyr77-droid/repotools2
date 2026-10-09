@@ -115,13 +115,30 @@
     } catch {
       get('eanPosition').textContent += ' · No se pudo dibujar este EAN.';
     }
+    window.RepoProductInfo.show(get('libraryProductDetails'), product.ean);
   }
   function productDialog(ean = '', libraryId = activeId) {
     productLibraryId = libraryId;
     get('libraryProductForm').reset(); get('libraryProductEan').value = ean;
     openDialog('libraryProductDialog');
     (ean ? get('libraryProductName') : get('libraryProductEan')).focus();
+    window.RepoProductInfo.clear(get('libraryScanProductInfo'));
+    if (ean) loadScannedProduct(ean);
   }
+  async function loadScannedProduct(ean) {
+    const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean);
+    if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = product.name || '';
+  }
+  get('libraryProductEan').addEventListener('change', () => {
+    const ean = get('libraryProductEan').value.trim();
+    window.RepoProductInfo.clear(get('libraryScanProductInfo'));
+    if (window.RepoEANScanner.validEAN(ean)) loadScannedProduct(ean);
+  });
+  window.addEventListener('repotools:product-updated', event => {
+    const { ean } = event.detail;
+    if (get('libraryProductDialog').open && get('libraryProductEan').value === ean) loadScannedProduct(ean);
+    if (get('libraryEanDialog').open && get('eanValue').textContent === ean) window.RepoProductInfo.show(get('libraryProductDetails'), ean);
+  });
   get('newCollection').addEventListener('click', () => {
     editingCollection = false; get('collectionFormTitle').textContent = 'Nueva colección';
     get('collectionName').value = ''; openDialog('collectionDialog');

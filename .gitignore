@@ -4,4 +4,7 @@
 /.codex/
 /.aws/
 /.env
+/.env.*
+/.neon
+/node_modules/
 /tmp/

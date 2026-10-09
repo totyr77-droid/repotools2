@@ -43,14 +43,14 @@ function database(): PDO {
 
 function initialize_database(PDO $db): void {
     $postgres = $db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+    $id = $postgres ? 'BIGSERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    $ref = $postgres ? 'BIGINT' : 'INTEGER';
+    $timestamp = $postgres ? 'TIMESTAMPTZ' : 'TEXT';
     $db->beginTransaction();
     try {
         if ($postgres) $db->query('SELECT pg_advisory_xact_lock(72684621)');
         $db->exec('CREATE TABLE IF NOT EXISTS app_schema_migrations (version INTEGER PRIMARY KEY)');
         if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 1')->fetchColumn()) {
-            $id = $postgres ? 'BIGSERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
-            $ref = $postgres ? 'BIGINT' : 'INTEGER';
-            $timestamp = $postgres ? 'TIMESTAMPTZ' : 'TEXT';
             $db->exec("CREATE TABLE IF NOT EXISTS users (id {$id}, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'usuario', created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             if (!$postgres) {
                 $columns = $db->query('PRAGMA table_info(users)')->fetchAll(PDO::FETCH_COLUMN, 1);
@@ -62,6 +62,15 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE IF NOT EXISTS libraries (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), name TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, name))");
             $db->exec("CREATE TABLE IF NOT EXISTS library_products (id {$id}, library_id {$ref} NOT NULL REFERENCES libraries(id), ean TEXT NOT NULL, name TEXT NOT NULL DEFAULT '', created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(library_id, ean))");
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (1)');
+        }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 2')->fetchColumn()) {
+            $db->exec("CREATE TABLE products (ean TEXT PRIMARY KEY, name TEXT NOT NULL DEFAULT '', brand TEXT NOT NULL DEFAULT '', quantity TEXT NOT NULL DEFAULT '', category TEXT NOT NULL DEFAULT '', packaging TEXT NOT NULL DEFAULT '', image TEXT NOT NULL DEFAULT '', source TEXT NOT NULL DEFAULT 'manual', source_url TEXT NOT NULL DEFAULT '', external_payload TEXT NOT NULL DEFAULT '{}', revision INTEGER NOT NULL DEFAULT 1, updated_by {$ref} REFERENCES users(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE product_edits (id {$id}, ean TEXT NOT NULL REFERENCES products(ean), user_id {$ref} NOT NULL REFERENCES users(id), before_data TEXT NOT NULL, after_data TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX product_edits_ean ON product_edits(ean)');
+            $db->exec("CREATE TABLE product_lookup_state (ean TEXT PRIMARY KEY, state TEXT NOT NULL, checked_at BIGINT NOT NULL, token TEXT NOT NULL)");
+            $db->exec("CREATE TABLE product_api_requests (id {$id}, requested_at BIGINT NOT NULL)");
+            $db->exec('CREATE INDEX product_api_requests_time ON product_api_requests(requested_at)');
+            $db->exec('INSERT INTO app_schema_migrations (version) VALUES (2)');
         }
         $db->commit();
     } catch (Throwable $error) {

@@ -19,11 +19,16 @@
   <p class="alerta-cerrar"><i class="fa-solid fa-xmark"></i> CERRAR</p>
 </div>
 
+<?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?>
+<?php include __DIR__ . '/product-editor.vista.php'; ?>
+<?php endif; ?>
 <!-- SCRIPTS -->
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/ean-scanner.js"></script>
+<script src="js/product-info.js"></script>
+<script src="js/product-editor.js"></script>
 <script src="js/biblioteca.js"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -33,6 +38,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 <script src="js/product-info.js"></script>
+<script src="js/product-editor.js"></script>
 <script src="js/ean-scanner.js"></script>
 <script src="js/script.js"></script>
 <?php endif; ?>

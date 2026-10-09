@@ -22,6 +22,7 @@
   }
 
   function create(elementId, { onCode, onError = () => {}, onStatus = () => {} }) {
+    const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
       const operation = queue.then(task);
@@ -34,6 +35,7 @@
         try { await current.starting; } catch {}
         if (current.reader.isScanning) await current.reader.stop();
         current.reader.clear();
+        element.classList.remove('ean-confirmed');
         if (session === current) session = null;
       })();
       await current.cleanup;
@@ -49,6 +51,7 @@
       return enqueue(async () => {
         await release(session);
         if (token !== revision) return false;
+        element.classList.remove('ean-confirmed');
         if (!window.Html5Qrcode || !window.Html5QrcodeSupportedFormats) throw new Error('No se pudo cargar el lector. Intenta nuevamente.');
         const formats = window.Html5QrcodeSupportedFormats;
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: [formats.EAN_13, formats.EAN_8], verbose: false });
@@ -63,9 +66,11 @@
           }, code => {
             if (!current.accepting || session !== current || token !== revision || !current.confirm(code)) return;
             current.accepting = false;
+            element.classList.add('ean-confirmed');
             onStatus('Código confirmado.');
             // La cámara se libera antes de mostrar o guardar el resultado.
             enqueue(async () => {
+              await new Promise(resolve => setTimeout(resolve, 180));
               await release(current);
               if (token === revision) {
                 Promise.resolve().then(() => {

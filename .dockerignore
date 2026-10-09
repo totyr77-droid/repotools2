@@ -4,6 +4,9 @@
 .aws
 .vscode
 .env
+.env.*
+.neon
+node_modules
 tmp
 tests
 data/*.sqlite*

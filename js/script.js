@@ -229,6 +229,7 @@ async function iniciarScanner() {
   document.getElementById('mainScannerStatus').hidden = false;
   document.getElementById('retryMainScanner').hidden = true;
   document.getElementById('scanCopyStatus').textContent = '';
+  window.RepoProductInfo.clear(els.resultadoApi);
   els.resultado.textContent = '';
   try { await scanner.start(); }
   catch { if (revision === scannerRevision && els.contenedormax.open) mostrarErrorScanner(); }
@@ -276,6 +277,7 @@ async function mostrarResultadoEscaneo(codigo) {
   const resultadoAPI = await buscarProductoPorEAN(codigo);
   if (revision !== scanResultRevision) return;
   els.resultadoApi.textContent = resultadoAPI;
+  window.RepoProductInfo.editButton(els.resultadoApi, codigo);
 }
 
 async function registrarEscaneoTop(codigo) {
@@ -433,3 +435,13 @@ function cerrarAlerta() {
 window.alertaGeneral = alertaGeneral;
 window.cerrarAlerta = cerrarAlerta;
 window.quitarOverlay = quitarOverlay;
+window.addEventListener('repotools:product-updated', event => {
+  const { ean, product } = event.detail;
+  if (els.contenedormax.open && resultadoActual === ean) {
+    els.resultadoApi.textContent = window.RepoProductInfo.summary(product);
+    window.RepoProductInfo.editButton(els.resultadoApi, ean);
+  }
+  if (els.verb.style.display === 'flex' && lista[indiceActual - 1] === ean) {
+    window.RepoProductInfo.show(document.getElementById('resultProductDetails'), ean);
+  }
+});

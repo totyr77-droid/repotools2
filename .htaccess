@@ -1,1 +1,4 @@
 DirectoryIndex index.php index.html
+<FilesMatch "^(\.env.*|\.neon|neon\.ts)$">
+    Require all denied
+</FilesMatch>

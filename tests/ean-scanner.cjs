@@ -17,7 +17,9 @@ class Reader {
   clear() { assert.equal(this.isScanning, false); this.clears++; }
 }
 const window = { Html5Qrcode: Reader, Html5QrcodeSupportedFormats: { EAN_13: 9, EAN_8: 10 } };
-vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/ean-scanner.js'), 'utf8'), { window, performance: { now: () => now } });
+const frame = new Set();
+const document = { getElementById: () => ({ classList: { add: value => frame.add(value), remove: value => frame.delete(value) } }) };
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/ean-scanner.js'), 'utf8'), { window, document, setTimeout: callback => callback(), performance: { now: () => now } });
 const service = window.RepoEANScanner;
 const a = '7791234567898', b = '96385074';
 const flush = async () => { for (let i = 0; i < 20; i++) await Promise.resolve(); };
@@ -43,7 +45,10 @@ function read(reader, code) { now += 100; reader.success(code); }
   const first = readers.at(-1);
   read(first, '7791234567890'); read(first, a); read(first, b); read(first, a); read(first, a);
   assert.equal(accepted.length, 0);
-  read(first, a); read(first, b); read(first, a);
+  assert.equal(frame.has('ean-confirmed'), false, 'El marco sigue blanco durante las lecturas iniciales');
+  read(first, a);
+  assert.equal(frame.has('ean-confirmed'), true, 'Solo la lectura confirmada cambia el marco a verde');
+  read(first, b); read(first, a);
   await flush();
   assert.deepEqual(accepted, [a]);
   assert.equal(first.stops, 1); assert.equal(first.clears, 1);
