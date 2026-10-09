@@ -1631,3 +1631,18 @@ body.home-page {
     top: 0;
     flex-shrink: 0;
 }
+
+.tops-main { padding: 30px 16px; }
+.tops-panel { width: min(760px, 100%); }
+.tops-panel h1 { margin: 10px 0 16px; color: var(--color1); }
+.tops-panel p { line-height: 1.5; margin-bottom: 16px; }
+.tops-stats { display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0; }
+.tops-stats p { flex: 1; min-width: 140px; padding: 20px; margin: 0; border-radius: 12px; background: var(--color1); color: white; }
+.tops-stats strong { display: block; font-size: 2rem; }
+.tops-table-wrap { width: 100%; overflow-x: auto; }
+.tops-table { width: 100%; border-collapse: collapse; background: white; }
+.tops-table th, .tops-table td { padding: 14px 10px; border-bottom: 1px solid #dbe1ec; text-align: left; overflow-wrap: anywhere; }
+.tops-table thead { background: var(--color1); color: white; }
+.tops-me { background: #e9e6ff; }
+.tops-empty { padding: 24px; border-radius: 12px; background: white; }
+.scan-stats-status { margin-top: 10px; font-size: .9rem; color: var(--color1); }

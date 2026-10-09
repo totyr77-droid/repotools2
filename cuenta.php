@@ -2,12 +2,12 @@
 require_once __DIR__ . '/includes/auth.php';
 $paginaCuenta = true;
 $register = ($_GET['mode'] ?? '') === 'registro';
-$next = ($_GET['next'] ?? '') === 'stock' ? 'stock' : '';
+$next = in_array($_GET['next'] ?? '', ['stock', 'tops'], true) ? $_GET['next'] : '';
 $error = '';
 $name = '';
 $email = '';
 if (current_user()) {
-    header('Location: ' . ($next === 'stock' ? 'stock.php' : 'index.php'));
+    header('Location: ' . ($next ? $next . '.php' : 'index.php'));
     exit;
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = $db->prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)');
                     $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT)]);
                 }
-                $stmt = $db->prepare('SELECT id, name, email, password_hash FROM users WHERE email = ?');
+                $stmt = $db->prepare('SELECT id, name, email, role, password_hash FROM users WHERE email = ?');
                 $stmt->execute([$email]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($user && password_verify($password, $user['password_hash'])) {
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     unset($user['password_hash']);
                     $_SESSION['user'] = $user;
                     $_SESSION['csrf'] = bin2hex(random_bytes(32));
-                    header('Location: ' . ($next === 'stock' ? 'stock.php' : 'index.php'));
+                    header('Location: ' . ($next ? $next . '.php' : 'index.php'));
                     exit;
                 }
                 $error = 'El correo o la contraseña no son correctos.';

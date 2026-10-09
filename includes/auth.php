@@ -16,6 +16,12 @@ function database(): PDO {
     $db->exec('PRAGMA busy_timeout = 5000');
     $db->exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)');
     $db->exec('CREATE TABLE IF NOT EXISTS login_attempts (key TEXT PRIMARY KEY, attempts INTEGER NOT NULL, started INTEGER NOT NULL)');
+    $columns = $db->query('PRAGMA table_info(users)')->fetchAll(PDO::FETCH_COLUMN, 1);
+    if (!in_array('role', $columns, true)) {
+        $db->exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'usuario'");
+    }
+    $db->exec('CREATE TABLE IF NOT EXISTS scan_events (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id), event_key TEXT NOT NULL, code TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, event_key))');
+    $db->exec('CREATE INDEX IF NOT EXISTS scans_user_code ON scan_events(user_id, code)');
     return $db;
 }
 
@@ -35,9 +41,9 @@ function valid_csrf(): bool {
     return isset($_POST['csrf']) && is_string($_POST['csrf']) && hash_equals(csrf_token(), $_POST['csrf']);
 }
 
-function require_account(): void {
+function require_account(string $next = 'stock'): void {
     if (!current_user()) {
-        header('Location: cuenta.php?next=stock');
+        header('Location: cuenta.php?next=' . ($next === 'tops' ? 'tops' : 'stock'));
         exit;
     }
 }

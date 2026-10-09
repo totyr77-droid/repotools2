@@ -268,6 +268,7 @@ function cerrarScanner() {
 }
 
 async function procesarDeteccion(data) {
+  if (!scannerActivo) return;
   const codigoActual = data?.codeResult?.code;
   if (!EAN_13.test(codigoActual)) return;
 
@@ -287,6 +288,7 @@ async function procesarDeteccion(data) {
 }
 
 async function mostrarResultadoEscaneo(codigo) {
+  registrarEscaneoTop(codigo);
   const esDuplicado = lista.includes(codigo);
   resultadoActual = codigo;
   ultimoAgregado = esDuplicado ? null : codigo;
@@ -305,6 +307,34 @@ async function mostrarResultadoEscaneo(codigo) {
   const resultadoAPI = await buscarProductoPorEAN(codigo);
   loading();
   els.resultadoApi.textContent = resultadoAPI;
+}
+
+async function registrarEscaneoTop(codigo) {
+  const account = window.repotoolsStats;
+  if (!account) return;
+  const status = document.getElementById("scanStatsStatus");
+  const event = crypto.randomUUID();
+  // Reutilizar el evento en el reintento evita contar dos veces una misma lectura.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await fetch("api/escaneos.php", {
+        method: "POST",
+        body: new URLSearchParams({ csrf: account.csrf, code: codigo, event }),
+        credentials: "same-origin"
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        if (response.status >= 500 && attempt === 0) continue;
+        throw new Error(data.error || "No se pudo registrar el escaneo en TOPs.");
+      }
+      if (status) status.textContent = `${data.unique_codes} códigos únicos · ${data.total_scans} escaneos totales`;
+      return;
+    } catch (error) {
+      if (attempt === 1) {
+        if (status) status.textContent = `${error.message} El código sigue guardado en tu lista local.`;
+      }
+    }
+  }
 }
 
 function iniciarTextoCarga(elemento) {

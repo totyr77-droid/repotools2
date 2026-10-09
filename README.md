@@ -5,6 +5,8 @@ Escáner de códigos EAN para repositores, con registro opcional.
 - Sin cuenta: escanear y guardar códigos en el navegador.
 - Con cuenta: acceso a la gestión de palets en desarrollo. Los palets todavía se guardan localmente, separados por usuario; no están sincronizados con el servidor.
 - Las cuentas se almacenan en SQLite, con contraseñas mediante hash, protección CSRF y límite de intentos.
+- TOPs es exclusivo para cuentas: ordena por códigos únicos acumulados. Cada lectura repetida suma al total, pero no al ranking. Los reintentos de envío con el mismo identificador no duplican una lectura. Importar listas o borrarlas no afecta al TOP. Por ahora se contabilizan las lecturas del escáner de inicio.
+- Las cuentas tienen un campo `role`, cuyo valor inicial es `usuario`. La asignación de otros permisos y su administración quedan pendientes; el registro público no permite elegir un rol.
 
 ## Ejecutar con XAMPP
 

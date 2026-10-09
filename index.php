@@ -3,11 +3,15 @@ $paginaInicio = true;
 include 'vistas/header.vista.php';
 ?>
 <main>
+  <?php if (current_user()): ?>
+  <script>window.repotoolsStats = <?= json_encode(['userId' => (int) current_user()['id'], 'csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
+  <?php endif; ?>
   <div class="contenedor-main">
     <div class="app-resumen">
       <p class="app-resumen__eyebrow">Scanner rapido para reposicion</p>
       <h1>Escanea, guarda y comparte codigos EAN</h1>
       <p>Tu lista queda en este dispositivo y se puede compartir cuando termines el recorrido.</p>
+      <?php if (current_user()): ?><p id="scanStatsStatus" class="scan-stats-status" role="status">Tus escaneos también cuentan para TOPs.</p><?php endif; ?>
     </div>
 
     <!--BOTON SCANER-->

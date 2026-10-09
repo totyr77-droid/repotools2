@@ -29,14 +29,14 @@
         <nav class="nav" aria-label="Navegacion principal">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
-          <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
+          <a href="tops.php"><i class="fa-solid fa-trophy"></i>TOPs</a>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
         <nav class="nav-celular" id="nav-celular" aria-label="Navegacion movil">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
-          <a href="#resultados"><i class="fa-solid fa-box-open"></i>RESULTADOS</a>
+          <a href="tops.php"><i class="fa-solid fa-trophy"></i>TOPs</a>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
