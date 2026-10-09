@@ -1,0 +1,9 @@
+.git
+.agents
+.codex
+.aws
+.vscode
+.env
+tmp
+tests
+data/*.sqlite*
