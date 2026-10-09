@@ -2,6 +2,8 @@
 
 En Inicio y Biblioteca, el botón de la bandera abre un reporte. Incluye una explicación, los datos propuestos y, opcionalmente, fotos del EAN y del producto. Crear el ticket no cambia el catálogo.
 
+Para las fotos, toca **Tomar foto del EAN** o **Tomar foto del producto**. La cámara se abre dentro de la app; permite el acceso, encuadra y toca **Tomar foto**. Puedes revisar la imagen, volver a tomarla o quitarla antes de enviar. La cámara se cierra al capturar, cancelar o salir de la página.
+
 Los invitados pueden reportar y consultar sus tickets desde el mismo navegador. Si borran los datos del navegador, pierden ese acceso. Las cuentas pueden ver sus reportes al iniciar sesión en cualquier dispositivo. Solo cuentas registradas participan en los TOPs de reportes enviados y aportes confirmados.
 
 En **Mi cuenta → Mis reportes**, los administradores y moderadores ven **Pendientes de revisión**. Pueden ajustar los datos y aprobar la corrección o rechazarla con un motivo. Una aprobación actualiza el catálogo y otorga un punto al autor registrado en la misma transacción. No se duplican tickets por reintentos ni puntos por aprobaciones repetidas. Un moderador no puede aprobar su propio reporte. La asignación de permisos queda para la futura CMS; este cambio no convierte cuentas en administradores.

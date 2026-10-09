@@ -20,4 +20,8 @@
 .product-edit-dialog input[type="file"] { max-width: 100%; font-size: .85rem; padding: 8px; }
 .product-edit-dialog summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
 .product-edit-dialog [hidden], .reports-panel [hidden] { display: none !important; }
+.report-photo { margin-top: 16px; }
+.report-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.report-photo-preview { display: block; width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; margin-top: 8px; }
+#reportCameraVideo { display: block; width: 100%; max-height: 55dvh; background: #172033; border-radius: 12px; object-fit: contain; }
 @media (max-width: 480px) { .reports-panel { padding: 16px; } .report-comparison { grid-template-columns: 1fr; } }

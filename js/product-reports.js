@@ -39,9 +39,66 @@
   const dialog = document.getElementById('productReportDialog'); if (!dialog) return;
   const form = document.getElementById('productReportForm'); const status = document.getElementById('productReportStatus');
   const send = document.getElementById('sendProductReport'); const close = document.getElementById('closeProductReport');
+  const camera = document.getElementById('reportCameraDialog'), video = document.getElementById('reportCameraVideo');
+  const cameraStatus = document.getElementById('reportCameraStatus'), capture = document.getElementById('captureReportPhoto'), retryCamera = document.getElementById('retryReportCamera');
+  const capturedPhotos = new Map(), previews = new Map();
+  let cameraVersion = 0, cameraKind, stream;
   let revision = 0, active, busy = false;
+  function stopCamera() {
+    ++cameraVersion; capture.disabled = true;
+    stream?.getTracks().forEach(track => track.stop()); stream = null; video.srcObject = null;
+  }
+  function removePhoto(kind) {
+    if (previews.has(kind)) URL.revokeObjectURL(previews.get(kind)); previews.delete(kind); capturedPhotos.delete(kind);
+    const preview = document.getElementById(kind === 'ean' ? 'reportPreviewEan' : 'reportPreviewProduct'); preview.removeAttribute('src'); preview.hidden = true;
+    form.querySelector(`[data-report-remove="${kind}"]`).hidden = true;
+    form.querySelector(`[data-report-camera="${kind}"]`).textContent = kind === 'ean' ? 'Tomar foto del EAN' : 'Tomar foto del producto';
+  }
+  async function openCamera(kind) {
+    if (busy || !active || document.getElementById('reportPhotos').disabled || !['ean', 'product'].includes(kind)) return;
+    stopCamera(); cameraKind = kind; const attempt = cameraVersion, reportVersion = revision;
+    document.getElementById('reportCameraTitle').textContent = kind === 'ean' ? 'Foto del EAN' : 'Foto del producto';
+    cameraStatus.textContent = 'Abriendo cámara…'; retryCamera.hidden = true; if (!camera.open) camera.showModal();
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
+      const next = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } } });
+      if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) { next.getTracks().forEach(track => track.stop()); return; }
+      stream = next; video.srcObject = next; await video.play();
+      if (attempt !== cameraVersion || !camera.open) return;
+      capture.disabled = false; cameraStatus.textContent = kind === 'ean' ? 'Enfoca el código completo.' : 'Enfoca el frente del producto.';
+    } catch (error) {
+      if (attempt !== cameraVersion || !camera.open) return;
+      stopCamera(); retryCamera.hidden = false;
+      cameraStatus.textContent = error.name === 'NotAllowedError' ? 'Permite usar la cámara en tu navegador y vuelve a intentar.' : 'No pudimos abrir la cámara. Revisa el permiso y vuelve a intentar.';
+    }
+  }
+  form.querySelectorAll('[data-report-camera]').forEach(button => button.addEventListener('click', () => openCamera(button.dataset.reportCamera)));
+  form.querySelectorAll('[data-report-remove]').forEach(button => button.addEventListener('click', () => { if (!busy) removePhoto(button.dataset.reportRemove); }));
+  document.getElementById('closeReportCamera').addEventListener('click', () => { stopCamera(); camera.close(); });
+  camera.addEventListener('cancel', stopCamera);
+  camera.addEventListener('close', () => { if (!camera.open) stopCamera(); });
+  retryCamera.addEventListener('click', () => openCamera(cameraKind));
+  capture.addEventListener('click', async () => {
+    if (!stream || capture.disabled || !video.videoWidth || !video.videoHeight) return;
+    const attempt = cameraVersion, reportVersion = revision, kind = cameraKind; capture.disabled = true;
+    try {
+      const scale = Math.min(1, 1280 / Math.max(video.videoWidth, video.videoHeight)); const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(video.videoWidth * scale)); canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+      if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) return;
+      if (!blob || blob.size > 1024 * 1024) throw new Error('No pudimos guardar la foto. Intenta otra vez.');
+      removePhoto(kind); capturedPhotos.set(kind, blob); const url = URL.createObjectURL(blob); previews.set(kind, url);
+      const preview = document.getElementById(kind === 'ean' ? 'reportPreviewEan' : 'reportPreviewProduct'); preview.src = url; preview.hidden = false;
+      form.querySelector(`[data-report-remove="${kind}"]`).hidden = false; form.querySelector(`[data-report-camera="${kind}"]`).textContent = 'Volver a tomar';
+      stopCamera(); camera.close();
+    } catch (error) { if (attempt === cameraVersion && camera.open) { cameraStatus.textContent = error.message; capture.disabled = false; } }
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { stopCamera(); if (camera.open) camera.close(); } });
+  window.addEventListener('pagehide', stopCamera);
   async function open(ean) {
     if (busy) return;
+    stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto);
     const version = ++revision; active = null; form.reset(); form.hidden = true; status.textContent = 'Cargando…';
     if (!dialog.open) dialog.showModal();
     try {
@@ -63,14 +120,14 @@
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); });
   dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
-  dialog.addEventListener('close', () => { if (!dialog.open) { ++revision; active = null; } });
+  dialog.addEventListener('close', () => { if (!dialog.open) { ++revision; active = null; stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto); } });
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (!active || busy) return;
     busy = true; send.disabled = true; close.disabled = true; status.textContent = 'Enviando…';
     try {
       const body = new FormData(form); body.set('csrf', active.csrf); body.set('ean', active.ean); body.set('submission_key', active.key); body.set('owner_token', ownerToken());
       for (const kind of ['ean', 'product']) {
-        const file = form.elements['photo_' + kind].files[0]; body.delete('photo_' + kind);
+        const file = capturedPhotos.get(kind); body.delete('photo_' + kind);
         if (file && !document.getElementById('reportPhotos').disabled) body.set('photo_' + kind, await compress(file), kind + '.jpg');
       }
       const result = await request('', body); form.hidden = true;
