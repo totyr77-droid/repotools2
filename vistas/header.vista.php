@@ -1,4 +1,12 @@
-<?php require_once __DIR__ . "/../includes/auth.php"; ?>
+<?php
+require_once __DIR__ . "/../includes/auth.php";
+require_once __DIR__ . "/../includes/catalog.php";
+$navModerator = false; $navPending = 0;
+if (current_user()) {
+    try { $navDb = database(); $navModerator = can_edit_catalog($navDb, current_user()); if ($navModerator) $navPending = (int) $navDb->query("SELECT COUNT(*) FROM product_reports WHERE status = 'pending'")->fetchColumn(); }
+    catch (Throwable $error) { error_log('Repotools: no se pudo consultar el menú de moderación.'); }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -37,6 +45,7 @@
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
+          <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-flag"></i>REPORTES <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
@@ -44,11 +53,13 @@
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
+          <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-flag"></i>REPORTES <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
         <button id="btn.nav-celular" class="botonMenu" type="button" aria-label="Abrir menu">
           <i id="btn-nav-celularA" class="fa-solid fa-angle-left"></i>
+          <?php if ($navModerator): ?><span class="report-pending-badge report-menu-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span><?php endif; ?>
         </button>
       </div>
     </header>

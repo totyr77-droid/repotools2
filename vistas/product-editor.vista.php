@@ -3,9 +3,9 @@
   <p id="productEditStatus" class="library-status" role="status"></p>
   <form id="productEditForm" hidden>
     <p id="productEditEan" class="product-edit-ean"></p>
-    <label>Nombre<input id="catalogName" name="name" maxlength="120" required></label>
-    <label>Presentación<input id="catalogQuantity" name="quantity" maxlength="80" placeholder="Ej.: 500 ml"></label>
-    <label>Marca<input id="catalogBrand" name="brand" maxlength="160"></label>
+    <label>Marca<input id="catalogBrand" name="brand" maxlength="160" placeholder="Ej.: Red Bull"></label>
+    <label>Producto<input id="catalogName" name="name" maxlength="120" placeholder="Ej.: Energizante Lata" required></label>
+    <label>Contenido neto<input id="catalogQuantity" name="quantity" maxlength="80" placeholder="Ej.: 250 ml, 500 g o 1 kg"></label>
     <label>Categoría<input id="catalogCategory" name="category" maxlength="240"></label>
     <label>Envase<input id="catalogPackaging" name="packaging" maxlength="240"></label>
     <p class="product-edit-note">Los cambios serán visibles para todos.</p>

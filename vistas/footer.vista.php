@@ -49,5 +49,6 @@
 <script src="js/script.js"></script>
 <?php endif; ?>
 <script src="js/botones.js"></script>
+<script src="js/report-notifications.js"></script>
 </body>
 </html>

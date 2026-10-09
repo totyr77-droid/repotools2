@@ -13,7 +13,7 @@ include __DIR__ . '/vistas/header.vista.php';
   <p id="reviewReportStatus" class="library-status" role="status"></p><div id="reviewReportDetails"></div>
   <form id="reviewReportForm" hidden>
     <p class="product-edit-note">Revisa la propuesta y ajusta los datos si hace falta.</p>
-    <label>Nombre<input name="name" maxlength="120" required></label><label>Presentación<input name="quantity" maxlength="80"></label><label>Marca<input name="brand" maxlength="160"></label><label>Categoría<input name="category" maxlength="240"></label><label>Envase<input name="packaging" maxlength="240"></label>
+    <label>Marca<input name="brand" maxlength="160" placeholder="Ej.: Red Bull"></label><label>Producto<input name="name" maxlength="120" placeholder="Ej.: Energizante Lata" required></label><label>Contenido neto<input name="quantity" maxlength="80" placeholder="Ej.: 250 ml, 500 g o 1 kg"></label><label>Categoría<input name="category" maxlength="240"></label><label>Envase<input name="packaging" maxlength="240"></label>
     <label>Nota de revisión<textarea name="review_note" maxlength="1000" rows="3" placeholder="Obligatoria si rechazas"></textarea></label>
     <div class="library-dialog-actions"><button type="button" id="rejectReport" class="library-secondary">Rechazar</button><button type="submit" id="approveReport" class="library-primary">Aprobar y actualizar</button></div>
   </form>

@@ -8,6 +8,10 @@ Los invitados pueden reportar y consultar sus tickets desde el mismo navegador. 
 
 En **Mi cuenta → Mis reportes**, los administradores y moderadores ven **Pendientes de revisión**. Pueden ajustar los datos y aprobar la corrección o rechazarla con un motivo. Una aprobación actualiza el catálogo y otorga un punto al autor registrado en la misma transacción. No se duplican tickets por reintentos ni puntos por aprobaciones repetidas. Un moderador no puede aprobar su propio reporte. La asignación de permisos queda para la futura CMS; este cambio no convierte cuentas en administradores.
 
+Administradores y moderadores también tienen la pestaña **Reportes** en la navegación principal y móvil. Abre directamente los pendientes y muestra su cantidad. El contador se oculta al llegar a cero y se actualiza al revisar un ticket, volver a la página o cada minuto mientras está visible. El servidor verifica el permiso vigente para mostrar la pestaña y entregar el contador.
+
+Los formularios separan **Marca** (Red Bull), **Producto** (Energizante Lata) y **Contenido neto** (250 ml, 500 g, 1 kg o 1 L). El contenido debe escribirse con su unidad, como aparece en el envase. Los datos existentes conservan su valor; no se convierten automáticamente unidades ni se cambia el nombre recibido de la API.
+
 ## Habilitar las fotos en Render
 
 El bucket privado `report-evidence` se declara en `neon.ts`. Ya fue creado en la rama `production`. Sus cuatro variables están en `.env.local` en la computadora; ese archivo no se sube a Git.

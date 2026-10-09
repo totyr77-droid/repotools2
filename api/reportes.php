@@ -12,6 +12,10 @@ if ($method === 'POST' && !valid_csrf()) report_response(403, ['error' => 'La se
 $csrf = csrf_token(); session_write_close();
 try {
     $db = database(); $moderator = can_edit_catalog($db, $user);
+    if ($method === 'GET' && isset($_GET['pending_count'])) {
+        if (!$moderator) throw new CatalogException('No tienes permiso para revisar reportes.', 403);
+        report_response(200, ['pending_count' => (int) $db->query("SELECT COUNT(*) FROM product_reports WHERE status = 'pending'")->fetchColumn()]);
+    }
     $owner = report_owner($user, $_POST['owner_token'] ?? $_SERVER['HTTP_X_REPORT_OWNER'] ?? '');
     if ($method === 'POST') {
         if (($_POST['action'] ?? '') === 'review') {

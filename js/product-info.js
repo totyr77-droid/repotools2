@@ -99,7 +99,7 @@
         } catch {}
       }
       const list = document.createElement('dl');
-      for (const [label, value] of [['Marca', product.brand], ['Presentación', product.quantity], ['Categoría', product.category], ['Envase', product.packaging]]) {
+      for (const [label, value] of [['Marca', product.brand], ['Contenido neto', product.quantity], ['Categoría', product.category], ['Envase', product.packaging]]) {
         if (!value) continue;
         const row = document.createElement('div'); const term = document.createElement('dt'); const detail = document.createElement('dd');
         term.textContent = label; detail.textContent = value; row.append(term, detail); list.append(row);
@@ -123,7 +123,10 @@
   }
   function summary(product) {
     if (!product) return 'Producto sin información';
-    return `${product.name || 'Nombre no disponible'} | ${product.quantity || 'Presentación no disponible'}`;
+    const name = product.name || 'Producto sin nombre';
+    const brand = (product.brand || '').trim();
+    const title = brand && !name.toLocaleLowerCase('es').includes(brand.toLocaleLowerCase('es')) ? `${brand} ${name}` : name;
+    return `${title} | ${product.quantity || 'Contenido no disponible'}`;
   }
   window.RepoProductInfo = { get, show, summary, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
 })();

@@ -3,15 +3,16 @@
   const list = document.getElementById('reportsList'), status = document.getElementById('reportsStatus');
   const dialog = document.getElementById('reviewReportDialog'), details = document.getElementById('reviewReportDetails'), form = document.getElementById('reviewReportForm'), message = document.getElementById('reviewReportStatus');
   const close = document.getElementById('closeReviewReport'), approve = document.getElementById('approveReport'), reject = document.getElementById('rejectReport');
-  let queue = false, version = 0, listVersion = 0, active, csrf, busy = false, photos = [];
+  let queue = new URLSearchParams(location.search).get('queue') === '1', version = 0, listVersion = 0, active, csrf, busy = false, photos = [];
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
-  const fields = { name: 'Nombre', quantity: 'Presentación', brand: 'Marca', category: 'Categoría', packaging: 'Envase' };
+  const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
   function clearPhotos() { photos.forEach(url => URL.revokeObjectURL(url)); photos = []; }
   async function load() {
     const attempt = ++listVersion; status.textContent = 'Cargando…'; list.replaceChildren();
     try {
       const result = await RepoReports.request(queue ? '?queue=1' : ''); if (attempt !== listVersion) return;
+      if (!result.can_review) queue = false;
       csrf = result.csrf; document.getElementById('queueReports').hidden = !result.can_review;
       document.getElementById('ownReports').setAttribute('aria-pressed', String(!queue)); document.getElementById('queueReports').setAttribute('aria-pressed', String(queue));
       status.textContent = result.reports.length ? '' : (queue ? 'No hay reportes pendientes.' : 'Todavía no enviaste reportes.');
@@ -57,7 +58,7 @@
     busy = true; approve.disabled = reject.disabled = close.disabled = true; message.textContent = 'Guardando…';
     try {
       const body = new FormData(form); body.set('action', 'review'); body.set('id', active.id); body.set('decision', decision); body.set('revision', active.current?.revision || 0); body.set('csrf', csrf);
-      const result = await RepoReports.request('', body); active = result.report; form.hidden = true; message.textContent = decision === 'approved' ? 'Aprobado. Producto actualizado.' : 'Reporte rechazado.'; await load();
+      const result = await RepoReports.request('', body); active = result.report; form.hidden = true; message.textContent = decision === 'approved' ? 'Aprobado. Producto actualizado.' : 'Reporte rechazado.'; window.dispatchEvent(new Event('repotools:reports-changed')); await load();
     } catch (error) { message.textContent = error.message + (error.status === 409 ? ' Cierra y abre el reporte para revisar los datos actuales.' : ''); }
     finally { busy = false; approve.disabled = reject.disabled = close.disabled = false; }
   }

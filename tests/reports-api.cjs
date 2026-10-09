@@ -37,6 +37,9 @@ async function create(request, more = {}) {
   const anon = await create(guest);
   assert.equal((await client('b'.repeat(64))('api/reportes.php?id=' + anon.report.id)).status, 404);
   await login(user, 'usuario'); const registered = await create(user);
+  assert.doesNotMatch((await user('index.php')).text, /class="report-nav-link"/);
+  assert.equal((await guest('api/reportes.php?pending_count=1')).status, 403);
+  assert.equal((await user('api/reportes.php?pending_count=1')).status, 403);
   assert.equal((await user('api/reportes.php', registered.data)).json().report.id, registered.report.id);
   assert.equal((await guest('api/reportes.php?id=' + registered.report.id)).status, 404);
   const userCsrf = (await user('api/reportes.php')).json().csrf;
@@ -46,13 +49,17 @@ async function create(request, more = {}) {
   badPhoto.set('photo_ean', new Blob(['<script>alert(1)</script>'], { type: 'image/jpeg' }), 'fake.jpg');
   assert.equal((await user('api/reportes.php', badPhoto)).status, 422);
   await login(mod, 'moderador'); const modCsrf = (await mod('api/reportes.php?queue=1')).json().csrf;
+  assert.equal((await mod('api/reportes.php?pending_count=1')).json().pending_count, 2);
+  assert.match((await mod('index.php')).text, /href="reportes\.php\?queue=1" class="report-nav-link"/);
   const review = { ...fields, action: 'review', id: registered.report.id, csrf: modCsrf, decision: 'approved', revision: 1 };
   assert.equal((await mod('api/reportes.php', { ...review, revision: 999 })).status, 409);
   assert.equal((await mod('api/reportes.php', review)).status, 200);
+  assert.equal((await mod('api/reportes.php?pending_count=1')).json().pending_count, 1);
   assert.equal((await mod('api/reportes.php', review)).status, 200);
   const top = await guest('tops.php?categoria=aportes'); assert.match(top.text, /usuario/); assert.match(top.text, /<td>1<\/td>/); assert.doesNotMatch(top.text, /moderador<\/th>/);
   assert.match((await guest('tops.php?categoria=reportes')).text, /usuario/);
   assert.equal((await mod('api/reportes.php', { ...review, id: anon.report.id, revision: 2 })).status, 200);
+  assert.equal((await mod('api/reportes.php?pending_count=1')).json().pending_count, 0);
   const points = spawnSync(php, ['-r', `require 'includes/database.php'; echo database()->query('SELECT COUNT(*) FROM report_rewards')->fetchColumn();`], { env, encoding: 'utf8' }); assert.equal(points.stdout, '1');
   if (env.AWS_ENDPOINT_URL_S3) {
     const form = new FormData(); for (const [key, value] of Object.entries({ ...registered.data, submission_key: randomUUID() })) form.set(key, value);
