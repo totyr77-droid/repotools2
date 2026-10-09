@@ -1,4 +1,5 @@
 <?php
+$paginaInicio = true;
 include 'vistas/header.vista.php';
 ?>
 <main>

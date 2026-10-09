@@ -1605,4 +1605,29 @@ canvas.drawingBuffer {
 .account-notice { font-size: .9rem; line-height: 1.5; margin: 20px 0; }
 .account-bar { position: relative; top: 85px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; background: #f4f3ff; color: #27187e; }
 .account-bar button { background: transparent; border: 1px solid #27187e; border-radius: 6px; padding: 8px; color: #27187e; cursor: pointer; }
-.static-notice { margin: 100px 20px 0; padding: 12px; background: #f4f3ff; color: #27187e; line-height: 1.5; }
+.static-notice { margin: 0 0 20px; padding: 12px; background: #f4f3ff; color: #27187e; line-height: 1.5; }
+
+/* Inicio: contenido y pie ocupan el alto disponible de la pantalla. */
+body.home-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: 85px;
+}
+.home-page > main {
+    flex: 1 0 auto;
+    min-height: 0;
+    margin-top: 0;
+    padding: 24px 16px;
+}
+.home-page > .footer {
+    flex-shrink: 0;
+    min-height: 0;
+    max-height: none;
+    padding: 20px 16px;
+}
+.home-page > .account-bar {
+    top: 0;
+    flex-shrink: 0;
+}
