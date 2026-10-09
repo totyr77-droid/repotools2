@@ -25,9 +25,9 @@ include __DIR__ . '/vistas/header.vista.php';
 <dialog id="libraryProductDialog" class="library-dialog">
   <form id="libraryProductForm"><h2>Guardar producto</h2><label>Código EAN<input id="libraryProductEan" inputmode="numeric" pattern="(?:[0-9]{8}|[0-9]{13})" maxlength="13" required placeholder="8 o 13 números"></label><label>Nombre <small>(opcional)</small><input id="libraryProductName" maxlength="120" placeholder="Ej.: Agua mineral"></label><div class="library-dialog-actions"><button type="button" data-close="libraryProductDialog" class="library-secondary">Cancelar</button><button type="submit" class="library-primary">Guardar</button></div></form>
 </dialog>
-<dialog id="libraryScannerDialog" class="library-dialog library-scanner-dialog">
-  <div class="library-heading"><h2>Escanea el producto</h2><button id="closeLibraryScanner" class="library-secondary" type="button">Cerrar</button></div>
-  <div id="libraryReader"></div><p id="libraryScannerStatus" role="status">Apunta al código de barras.</p>
+<dialog id="libraryScannerDialog" class="library-dialog library-scanner-dialog" aria-labelledby="libraryScannerTitle">
+  <div class="library-heading"><h2 id="libraryScannerTitle">Escanea el producto</h2><button id="closeLibraryScanner" class="library-secondary" type="button">Cerrar</button></div>
+  <div id="libraryReader" class="ean-reader"></div><p id="libraryScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
 </dialog>
 <dialog id="libraryEanDialog" class="library-dialog library-ean-dialog">
   <div class="library-heading"><h2>Código EAN</h2><button type="button" data-close="libraryEanDialog" class="library-secondary">Cerrar</button></div>

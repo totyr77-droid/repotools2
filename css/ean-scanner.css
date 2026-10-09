@@ -1,0 +1,21 @@
+/* Cámara y controles compartidos entre Inicio y Biblioteca. */
+.library-scanner-dialog { background: #fff; }
+.library-scanner-dialog .ean-reader { width: 100%; min-height: 200px; border-radius: 12px; overflow: hidden; background: #10121a; }
+.library-scanner-dialog .ean-reader video { display: block; width: 100%; height: auto; max-height: 55dvh; object-fit: contain; }
+.library-scanner-dialog .ean-reader canvas { height: auto; }
+.library-scanner-dialog .scanner-status { margin-top: 12px; color: #536174; line-height: 1.4; font-size: .95rem; }
+.library-scanner-dialog [hidden] { display: none !important; }
+.library-scanner-dialog button:disabled { opacity: .5; cursor: default; }
+.library-scanner-dialog button:focus-visible { outline: 3px solid #8372d8; outline-offset: 3px; }
+#contenedormax.library-dialog { inset: 0; width: min(480px, calc(100% - 24px)); height: fit-content; background: #fff; animation: none; }
+#contenedormax.library-dialog[open] { display: block; }
+#contenedormax.library-dialog:not([open]) { display: none; }
+#contenedormax #conterdormaxc { position: static; width: auto; height: auto; margin: 0; padding: 12px 16px; border-radius: 10px; background: #e9e6f5; color: var(--color1); font-size: 1rem; }
+#contenedormax #contenedor { position: relative; height: auto; }
+#contenedormax #contenedor video { position: static; height: auto; }
+#contenedormax #cartelScaner { position: static; width: 100%; height: auto; padding: 0; background: transparent; }
+#contenedormax .cartelscaner-box { width: 100%; margin: 0; padding: 0; box-shadow: none; filter: none; border-radius: 0; }
+#contenedormax .cartelscaner-box-info { align-items: stretch; }
+#contenedormax .cartelscaner-box-titulo { text-align: left; }
+#contenedormax #scanCopyStatus:empty { display: none; }
+#verc { z-index: 4; }

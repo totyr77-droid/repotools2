@@ -1,14 +1,12 @@
 <!-- ESCANER BLOQUE -->
-<div class="div" id="contenedormax">
-  <div class="ver-logo">
-    <p>REPOTOOLS</p>
+<dialog class="library-dialog library-scanner-dialog" id="contenedormax" aria-labelledby="mainScannerTitle">
+  <div class="library-heading">
+    <h2 id="mainScannerTitle">Escanea el producto</h2>
+    <button id="conterdormaxc" class="library-secondary" type="button">Cerrar</button>
   </div>
-
-  <button id="conterdormaxc" type="button" aria-label="Cerrar scanner">
-    <i class="fa-solid fa-circle-xmark"></i>
-  </button>
-
-  <div id="contenedor"></div>
+  <div id="contenedor" class="ean-reader"></div>
+  <p id="mainScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
+  <button id="retryMainScanner" class="library-primary" type="button" hidden>Intentar de nuevo</button>
 
   <div id="cartelScaner">
     <div class="cartelscaner-box">
@@ -28,10 +26,11 @@
           <button class="cantidadbox" type="button" aria-label="Ver resultados">
             <i class="fa-solid fa-box-open" aria-hidden="true"></i>Ver lista (<span id="cantidadScan"></span>)
           </button>
-          <button class="copybox" id="copy" type="button" aria-label="Copiar codigo">
+          <button class="copybox" id="copy" type="button" aria-label="Copiar codigo" disabled>
             <i class="fa-solid fa-copy" aria-hidden="true"></i>Copiar EAN
           </button>
         </div>
+        <p id="scanCopyStatus" class="scanner-status" role="status"></p>
         <button id="rescancelar" type="button"><i class="fa-solid fa-trash" aria-hidden="true"></i> Quitar de la lista</button>
       </div>
 
@@ -42,7 +41,7 @@
       </div>
     </div>
   </div>
-</div>
+</dialog>
 
 <!-- BLOQUE RESULTADOS -->
 <div class="verb" id="verb">

@@ -30,20 +30,27 @@ const els = {
 };
 
 const STORAGE_KEY = "lista";
-const EAN_13 = /^\d{13}$/;
-const REPETICIONES_NECESARIAS = 3;
+const EAN = /^(?:\d{8}|\d{13})$/;
 const urlActual = new URL(window.location.href);
 const urlOriginal = `${urlActual.origin}${urlActual.pathname}`;
 
 let lista = cargarLista();
 let indiceActual = 1;
 let esListaCompartida = false;
-let scannerActivo = false;
-let ultimoCodigo = null;
-let contadorCoincidencias = 0;
+let scannerRevision = 0;
 let ultimoAgregado = null;
 let resultadoActual = "";
 let scanResultRevision = 0;
+
+const scanner = window.RepoEANScanner.create('contenedor', {
+  onCode: codigo => {
+    const result = mostrarResultadoEscaneo(codigo);
+    snd.play().catch(() => {});
+    return result;
+  },
+  onStatus: text => { document.getElementById('mainScannerStatus').textContent = text; },
+  onError: mostrarErrorScanner
+});
 
 inicializar();
 
@@ -71,10 +78,12 @@ function bindEventos() {
   els.compartir?.addEventListener("click", compartirLista);
   els.compartirD?.addEventListener("click", compartirLista);
 
-  if (window.Quagga) {
-    Quagga.onDetected(procesarDeteccion);
-    Quagga.onProcessed(dibujarGuiasScanner);
-  }
+  document.getElementById('retryMainScanner')?.addEventListener('click', iniciarScanner);
+  els.contenedormax.addEventListener('cancel', event => { event.preventDefault(); cerrarScanner(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && els.contenedormax.open) cerrarScanner();
+  });
+  window.addEventListener('pagehide', cerrarScanner);
 }
 
 function cargarLista() {
@@ -99,7 +108,7 @@ function guardarLista() {
 function limpiarLista(valores) {
   return valores
     .map((codigo) => String(codigo).trim())
-    .filter((codigo, index, arr) => EAN_13.test(codigo) && arr.indexOf(codigo) === index);
+    .filter((codigo, index, arr) => EAN.test(codigo) && arr.indexOf(codigo) === index);
 }
 
 function cargarListaCompartida() {
@@ -175,7 +184,7 @@ function verCodigo(indice) {
   indiceActual = Math.min(Math.max(indice, 1), lista.length);
   els.verb.style.display = "flex";
   JsBarcode("#barcode", lista[indiceActual - 1], {
-    format: "EAN13",
+    format: lista[indiceActual - 1].length === 8 ? "EAN8" : "EAN13",
     displayValue: true,
     margin: 10
   });
@@ -205,95 +214,42 @@ function cerrarResultados() {
 }
 
 function abrirScanner() {
-  mostrarOverlay();
-  els.contenedormax.style.display = "block";
-  els.contenedor.style.display = "block";
+  if (!els.contenedormax.open) els.contenedormax.showModal();
   iniciarScanner();
 }
 
-function iniciarScanner() {
+async function iniciarScanner() {
+  const revision = ++scannerRevision;
   scanResultRevision++;
-  if (!window.Quagga) {
-    alertaGeneral("ERROR", "No se pudo cargar el lector de codigos.");
-    return;
-  }
-
-  detenerScanner();
-  resetDeteccion();
-  els.cartelScaner.style.display = "none";
-  els.rescancelar.style.display = "block";
-  els.resultado.textContent = "";
-  els.resultadoApi.textContent = "Apunta la camara al codigo.";
-
-  Quagga.init({
-    inputStream: {
-      name: "Live",
-      type: "LiveStream",
-      target: els.contenedor,
-      constraints: {
-        facingMode: "environment",
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      }
-    },
-    locate: true,
-    decoder: {
-      readers: ["ean_reader"]
-    }
-  }, (err) => {
-    if (err) {
-      console.error(err);
-      cerrarScanner();
-      alertaGeneral("ERROR", "No se pudo iniciar la camara. Revisa los permisos.");
-      return;
-    }
-
-    scannerActivo = true;
-    Quagga.start();
-  });
+  resultadoActual = '';
+  ultimoAgregado = null;
+  els.copy.disabled = true;
+  els.cartelScaner.style.display = 'none';
+  els.contenedor.hidden = false;
+  document.getElementById('mainScannerStatus').hidden = false;
+  document.getElementById('retryMainScanner').hidden = true;
+  document.getElementById('scanCopyStatus').textContent = '';
+  els.resultado.textContent = '';
+  try { await scanner.start(); }
+  catch { if (revision === scannerRevision && els.contenedormax.open) mostrarErrorScanner(); }
 }
 
-function detenerScanner() {
-  if (!window.Quagga || !scannerActivo) return;
-
-  try {
-    Quagga.stop();
-  } catch (error) {
-    console.warn("No se pudo detener Quagga", error);
-  }
-
-  scannerActivo = false;
+function mostrarErrorScanner() {
+  document.getElementById('mainScannerStatus').textContent = 'No pudimos abrir la cámara. Revisa el permiso e intenta de nuevo.';
+  document.getElementById('retryMainScanner').hidden = false;
 }
 
 function cerrarScanner() {
+  scannerRevision++;
   scanResultRevision++;
-  detenerScanner();
-  els.contenedor.style.display = "none";
-  els.contenedormax.style.display = "none";
-  quitarOverlay();
-}
-
-async function procesarDeteccion(data) {
-  if (!scannerActivo) return;
-  const codigoActual = data?.codeResult?.code;
-  if (!EAN_13.test(codigoActual)) return;
-
-  if (codigoActual !== ultimoCodigo) {
-    ultimoCodigo = codigoActual;
-    contadorCoincidencias = 1;
-    return;
-  }
-
-  contadorCoincidencias++;
-  if (contadorCoincidencias < REPETICIONES_NECESARIAS) return;
-
-  detenerScanner();
-  resetDeteccion();
-  await snd.play().catch(() => {});
-  mostrarResultadoEscaneo(codigoActual);
+  resultadoActual = '';
+  els.copy.disabled = true;
+  els.contenedormax.close();
+  scanner.stop().catch(() => {});
 }
 
 async function mostrarResultadoEscaneo(codigo) {
+  if (!els.contenedormax.open || !window.RepoEANScanner.validEAN(codigo)) return;
   const revision = ++scanResultRevision;
   registrarEscaneoTop(codigo);
   const esDuplicado = lista.includes(codigo);
@@ -304,8 +260,12 @@ async function mostrarResultadoEscaneo(codigo) {
     lista.push(codigo);
     guardarLista();
   }
+  indiceActual = lista.indexOf(codigo) + 1;
 
-  els.cartelScaner.style.display = "flex";
+  els.contenedor.hidden = true;
+  document.getElementById('mainScannerStatus').hidden = true;
+  els.copy.disabled = false;
+  els.cartelScaner.style.display = 'flex';
   els.resultado.textContent = codigo;
   const heading = document.getElementById("scanResultHeading");
   if (heading) heading.textContent = esDuplicado ? "Ya está en tu lista" : "Producto guardado";
@@ -346,11 +306,6 @@ async function registrarEscaneoTop(codigo) {
   }
 }
 
-function resetDeteccion() {
-  ultimoCodigo = null;
-  contadorCoincidencias = 0;
-}
-
 function cancelarUltimoEscaneo() {
   if (!ultimoAgregado) return;
   scanResultRevision++;
@@ -366,16 +321,16 @@ function cancelarUltimoEscaneo() {
 }
 
 async function copiarResultado() {
-  if (!resultadoActual) {
-    alertaGeneral("INFORMACION", "Todavia no hay un codigo para copiar.");
-    return;
-  }
-
+  // Captura el EAN visible antes de esperar a que termine el portapapeles.
+  const code = els.resultado.textContent.trim();
+  const revision = scanResultRevision;
+  if (!els.contenedormax.open || code !== resultadoActual || !window.RepoEANScanner.validEAN(code)) return;
+  const status = document.getElementById('scanCopyStatus');
   try {
-    await navigator.clipboard.writeText(resultadoActual);
-    alertaGeneral("INFORMACION", `Codigo copiado: ${resultadoActual}`);
-  } catch (error) {
-    alertaGeneral("ERROR", "No se pudo copiar el codigo.");
+    await navigator.clipboard.writeText(code);
+    if (revision === scanResultRevision) status.textContent = 'EAN copiado: ' + code;
+  } catch {
+    if (revision === scanResultRevision) status.textContent = 'No se pudo copiar. Mantén pulsado el EAN para seleccionarlo.';
   }
 }
 
@@ -437,30 +392,6 @@ async function buscarProductoPorEAN(ean) {
     return window.RepoProductInfo.summary(product);
   } catch (error) {
     return "No pudimos cargar la información del producto.";
-  }
-}
-
-function dibujarGuiasScanner(result) {
-  if (!window.Quagga?.canvas?.ctx?.overlay || !window.Quagga?.canvas?.dom?.overlay) return;
-
-  const drawingCtx = Quagga.canvas.ctx.overlay;
-  const drawingCanvas = Quagga.canvas.dom.overlay;
-
-  if (!result) return;
-
-  if (result.boxes) {
-    drawingCtx.clearRect(0, 0, Number(drawingCanvas.getAttribute("width")), Number(drawingCanvas.getAttribute("height")));
-    result.boxes
-      .filter((box) => box !== result.box)
-      .forEach((box) => Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: "#23c55e", lineWidth: 2 }));
-  }
-
-  if (result.box) {
-    Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: "#3D8FE1", lineWidth: 2 });
-  }
-
-  if (result.codeResult?.code && result.codeResult.format !== "ean_13") {
-    Quagga.ImageDebug.drawPath(result.line, { x: "x", y: "y" }, drawingCtx, { color: "#e74c3c", lineWidth: 3 });
   }
 }
 

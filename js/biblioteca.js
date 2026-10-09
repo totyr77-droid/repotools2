@@ -8,9 +8,7 @@
   let productLibraryId = null;
   let viewerId = null;
   let viewerIndex = 0;
-  let reader = null;
-  let startPromise = null;
-  let processing = false;
+  let scannerRevision = 0;
   let busy = false;
   let scannedLibraryId = null;
 
@@ -162,41 +160,42 @@
   get('nextLibraryEan').addEventListener('click', () => { viewerIndex++; renderViewer(); });
   document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => get(b.dataset.close).close()));
 
-  async function closeScanner() {
-    const current = reader;
-    if (current) {
-      try { await startPromise; if (current.isScanning) await current.stop(); await current.clear(); } catch {}
-      if (reader === current) reader = null;
+  const scanner = window.RepoEANScanner.create('libraryReader', {
+    onStatus: text => { get('libraryScannerStatus').textContent = text; },
+    onError: () => { get('libraryScannerStatus').textContent = 'No pudimos leer el código. Intenta nuevamente.'; },
+    onCode: async ean => {
+      const libraryId = scannedLibraryId;
+      const revision = scannerRevision;
+      get('libraryScannerDialog').close();
+      productDialog(ean, libraryId);
+      // Cada lectura confirmada cuenta una vez; escribir el código no suma.
+      try {
+        const response = await fetch('api/escaneos.php', { method: 'POST', body: new URLSearchParams({ csrf: config.csrf, code: ean, event: crypto.randomUUID() }) });
+        if (!response.ok && revision === scannerRevision) message('El código se leyó, pero no sumó en TOPs.');
+      } catch { if (revision === scannerRevision) message('El código se leyó, pero no sumó en TOPs.'); }
     }
+  });
+  function closeScanner() {
+    scannerRevision++;
     get('libraryScannerDialog').close();
+    scanner.stop().catch(() => {});
   }
   get('closeLibraryScanner').addEventListener('click', closeScanner);
   get('libraryScannerDialog').addEventListener('cancel', event => { event.preventDefault(); closeScanner(); });
   get('scanLibraryProduct').addEventListener('click', async () => {
-    if (!window.Html5Qrcode) return message('No se pudo cargar la cámara. Puedes escribir el código.');
-    processing = false; get('libraryScannerStatus').textContent = 'Apunta al código de barras.';
+    const revision = ++scannerRevision;
     scannedLibraryId = activeId;
     openDialog('libraryScannerDialog');
-    reader = new Html5Qrcode('libraryReader', { formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8] });
-    try {
-      startPromise = reader.start({ facingMode: 'environment' }, {
-        fps: 10, qrbox: (width, height) => ({ width: Math.min(280, Math.floor(width * .85)), height: Math.min(140, Math.floor(height * .6)) })
-      }, async ean => {
-        if (processing || !/^(?:\d{8}|\d{13})$/.test(ean)) return;
-        processing = true; await closeScanner();
-        // Solo una lectura de cámara cuenta para TOPs; escribir o importar no suma.
-        try {
-          const response = await fetch('api/escaneos.php', { method: 'POST', body: new URLSearchParams({ csrf: config.csrf, code: ean, event: crypto.randomUUID() }) });
-          if (!response.ok) message('El código se leyó, pero no sumó en TOPs.');
-        } catch { message('El código se leyó, pero no sumó en TOPs.'); }
-        productDialog(ean, scannedLibraryId);
-      }, () => {});
-      await startPromise;
-    } catch {
-      await closeScanner(); message('No pudimos abrir la cámara. Revisa el permiso o escribe el código.');
+    try { await scanner.start(); }
+    catch {
+      if (revision !== scannerRevision) return;
+      closeScanner(); message('No pudimos abrir la cámara. Revisa el permiso o escribe el código.');
     }
   });
-  window.addEventListener('pagehide', () => { if (reader) closeScanner(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && get('libraryScannerDialog').open) closeScanner();
+  });
+  window.addEventListener('pagehide', closeScanner);
   get('newCollection').disabled = true;
   message('Cargando colecciones…');
   request().then(result => {

@@ -23,6 +23,8 @@
     <link href="css/footer.css" rel="stylesheet" type="text/css">
     <link href="css/product-info.css" rel="stylesheet" type="text/css">
     <link href="css/scan-result.css" rel="stylesheet" type="text/css">
+    <link href="css/library.css" rel="stylesheet" type="text/css">
+    <link href="css/ean-scanner.css" rel="stylesheet" type="text/css">
   </head>
   <body class="home-page">
     <header>
@@ -88,16 +90,15 @@
       </div>
     </main>
 
-    <div class="div" id="contenedormax">
-  <div class="ver-logo">
-    <p>REPOTOOLS</p>
+    <!-- ESCANER BLOQUE -->
+<dialog class="library-dialog library-scanner-dialog" id="contenedormax" aria-labelledby="mainScannerTitle">
+  <div class="library-heading">
+    <h2 id="mainScannerTitle">Escanea el producto</h2>
+    <button id="conterdormaxc" class="library-secondary" type="button">Cerrar</button>
   </div>
-
-  <button id="conterdormaxc" type="button" aria-label="Cerrar scanner">
-    <i class="fa-solid fa-circle-xmark"></i>
-  </button>
-
-  <div id="contenedor"></div>
+  <div id="contenedor" class="ean-reader"></div>
+  <p id="mainScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
+  <button id="retryMainScanner" class="library-primary" type="button" hidden>Intentar de nuevo</button>
 
   <div id="cartelScaner">
     <div class="cartelscaner-box">
@@ -117,10 +118,11 @@
           <button class="cantidadbox" type="button" aria-label="Ver resultados">
             <i class="fa-solid fa-box-open" aria-hidden="true"></i>Ver lista (<span id="cantidadScan"></span>)
           </button>
-          <button class="copybox" id="copy" type="button" aria-label="Copiar codigo">
+          <button class="copybox" id="copy" type="button" aria-label="Copiar codigo" disabled>
             <i class="fa-solid fa-copy" aria-hidden="true"></i>Copiar EAN
           </button>
         </div>
+        <p id="scanCopyStatus" class="scanner-status" role="status"></p>
         <button id="rescancelar" type="button"><i class="fa-solid fa-trash" aria-hidden="true"></i> Quitar de la lista</button>
       </div>
 
@@ -131,7 +133,7 @@
       </div>
     </div>
   </div>
-</div>
+</dialog>
 
 <div class="verb" id="verb">
       <button class="verc" id="verc" type="button" aria-label="Cerrar resultados">
@@ -182,10 +184,11 @@
       <p class="alerta-cerrar"><i class="fa-solid fa-xmark"></i> CERRAR</p>
     </div>
 
-    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
     <script src="js/product-info.js"></script>
+    <script src="js/ean-scanner.js"></script>
     <script src="js/script.js"></script>
     <script src="js/botones.js"></script>
   </body>
