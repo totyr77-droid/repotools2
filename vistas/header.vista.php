@@ -21,6 +21,7 @@
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <link href="css/contador.css" rel="stylesheet" type="text/css">
     <link href="css/mobile.css" rel="stylesheet" type="text/css">
+    <link href="css/footer.css" rel="stylesheet" type="text/css">
   </head>
   <body<?= !empty($paginaInicio) ? ' class="home-page"' : '' ?>>
     <header>
