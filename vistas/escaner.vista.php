@@ -59,6 +59,7 @@
       <p>RESULTADOS</p>
       <svg id="barcode"></svg>
       <div id="veri"></div>
+      <section id="resultProductDetails" class="product-details" aria-label="Características del producto"></section>
     </div>
 
     <button class="compartir" id="compartirD" type="button" aria-label="Compartir resultados">

@@ -22,6 +22,7 @@
     <link href="css/contador.css" rel="stylesheet" type="text/css">
     <link href="css/mobile.css" rel="stylesheet" type="text/css">
     <link href="css/footer.css" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaInicio)): ?><link href="css/product-info.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca)): ?><link href="css/library.css" rel="stylesheet" type="text/css"><?php endif; ?>
   </head>
   <body<?= !empty($paginaInicio) ? ' class="home-page"' : '' ?>>

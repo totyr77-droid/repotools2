@@ -181,6 +181,9 @@ function verCodigo(indice) {
   els.veri.textContent = `${indiceActual} / ${lista.length}`;
   els.vers.className = indiceActual < lista.length ? "vers si" : "vers no";
   els.vera.className = indiceActual > 1 ? "vera si" : "vera no";
+  els.vers.disabled = indiceActual === lista.length;
+  els.vera.disabled = indiceActual === 1;
+  window.RepoProductInfo?.show(document.getElementById("resultProductDetails"), lista[indiceActual - 1]);
 }
 
 function moverResultado(direccion) {
@@ -433,23 +436,12 @@ async function fallbackCompartir(link) {
 }
 
 async function buscarProductoPorEAN(ean) {
-  const endpoint = `https://world.openfoodfacts.org/api/v0/product/${ean}.json`;
-
   try {
-    const res = await fetch(endpoint);
-    if (!res.ok) throw new Error("Respuesta invalida");
-
-    const data = await res.json();
-    if (data.status !== 1) return "Producto no encontrado en la API.";
-
-    const nombre = (data.product.product_name || "Sin nombre").toUpperCase();
-    const marca = (data.product.brands || "Marca desconocida").toUpperCase();
-    const volumen = (data.product.quantity || "Cantidad desconocida").toUpperCase();
-
-    return `${nombre} | ${marca} | ${volumen}`;
+    const product = await window.RepoProductInfo.get(ean);
+    if (!product) return "No hay información para este producto.";
+    return [product.name, product.brand, product.quantity].filter(Boolean).join(" · ") || "Producto sin datos cargados.";
   } catch (error) {
-    console.error("Error al consultar la API", error);
-    return "No se pudo consultar la informacion del producto.";
+    return "No pudimos cargar la información del producto.";
   }
 }
 

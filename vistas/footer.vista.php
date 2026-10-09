@@ -31,6 +31,7 @@
 <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+<script src="js/product-info.js"></script>
 <script src="js/script.js"></script>
 <?php endif; ?>
 <script src="js/botones.js"></script>
