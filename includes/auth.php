@@ -22,6 +22,8 @@ function database(): PDO {
     }
     $db->exec('CREATE TABLE IF NOT EXISTS scan_events (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id), event_key TEXT NOT NULL, code TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, event_key))');
     $db->exec('CREATE INDEX IF NOT EXISTS scans_user_code ON scan_events(user_id, code)');
+    $db->exec('CREATE TABLE IF NOT EXISTS libraries (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id), name TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, name))');
+    $db->exec('CREATE TABLE IF NOT EXISTS library_products (id INTEGER PRIMARY KEY AUTOINCREMENT, library_id INTEGER NOT NULL REFERENCES libraries(id), ean TEXT NOT NULL, name TEXT NOT NULL DEFAULT "", created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(library_id, ean))');
     return $db;
 }
 
@@ -43,7 +45,7 @@ function valid_csrf(): bool {
 
 function require_account(string $next = 'stock'): void {
     if (!current_user()) {
-        header('Location: cuenta.php?next=' . ($next === 'tops' ? 'tops' : 'stock'));
+        header('Location: cuenta.php?next=' . (in_array($next, ['stock', 'tops', 'biblioteca'], true) ? $next : 'stock'));
         exit;
     }
 }

@@ -22,6 +22,7 @@
     <link href="css/contador.css" rel="stylesheet" type="text/css">
     <link href="css/mobile.css" rel="stylesheet" type="text/css">
     <link href="css/footer.css" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaBiblioteca)): ?><link href="css/library.css" rel="stylesheet" type="text/css"><?php endif; ?>
   </head>
   <body<?= !empty($paginaInicio) ? ' class="home-page"' : '' ?>>
     <header>
@@ -31,14 +32,14 @@
         <nav class="nav" aria-label="Navegacion principal">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
-          <a href="tops.php"><i class="fa-solid fa-trophy"></i>TOPs</a>
+          <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
         <nav class="nav-celular" id="nav-celular" aria-label="Navegación móvil">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
-          <a href="tops.php"><i class="fa-solid fa-trophy"></i>TOPs</a>
+          <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 

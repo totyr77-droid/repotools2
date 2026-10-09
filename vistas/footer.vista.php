@@ -20,7 +20,11 @@
 </div>
 
 <!-- SCRIPTS -->
-<?php if (!empty($paginaStock)): ?>
+<?php if (!empty($paginaBiblioteca)): ?>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
+<script src="js/biblioteca.js"></script>
+<?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/stock.js"></script>
 <?php elseif (empty($paginaCuenta)): ?>
