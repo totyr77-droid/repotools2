@@ -25,6 +25,8 @@ function database(): PDO {
     $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC];
     if ($url !== '') {
         $connection = postgres_connection($url);
+        // Consultas parametrizadas sin PREPARE persistente, compatibles con pooling.
+        $options[PDO::PGSQL_ATTR_DISABLE_PREPARES] = true;
         $candidate = new PDO($connection['dsn'], $connection['user'], $connection['password'], $options);
     } else {
         if (getenv('REPOTOOLS_REQUIRE_DATABASE_URL') === '1') {
