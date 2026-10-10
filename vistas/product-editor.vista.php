@@ -1,5 +1,5 @@
 <dialog id="productEditDialog" class="library-dialog product-edit-dialog" aria-labelledby="productEditTitle">
-  <div class="library-heading"><h2 id="productEditTitle">Editar producto</h2><button id="closeProductEditor" class="library-secondary" type="button">Cerrar</button></div>
+  <div class="library-heading"><h2 id="productEditTitle">Editar producto</h2><button id="closeProductEditor" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="productEditStatus" class="library-status" role="status"></p>
   <form id="productEditForm" hidden>
     <p id="productEditEan" class="product-edit-ean"></p>

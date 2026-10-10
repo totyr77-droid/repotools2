@@ -9,6 +9,7 @@ const originalBody = {
   querySelectorAll: selector => selector === 'video' ? [{ srcObject: { getTracks: () => [{ stop() { stopped++; } }] } }] : selector === 'dialog[open]' ? [{ close() { closed++; } }] : []
 };
 document.body = originalBody; document.scripts = [];
+document.documentElement = { dataset: {} };
 const requests = [];
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/navigation.js'), 'utf8'), {
   window, document, location: { href: 'https://example.invalid/index.php', origin: 'https://example.invalid' }, history: {},
@@ -18,6 +19,10 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/navigation.js'), 
 });
 (async () => {
   const page = window.RepoNavigation.page;
+  document.dispatchEvent(new Event('keydown'));
+  assert.equal(document.documentElement.dataset.keyboardFocus, 'true');
+  document.dispatchEvent(new Event('pointerdown'));
+  assert.equal(document.documentElement.dataset.keyboardFocus, 'false');
   page.listen('activity', () => calls++);
   page.document.addEventListener('activity', () => calls++);
   window.dispatchEvent(new Event('activity')); document.dispatchEvent(new Event('activity'));

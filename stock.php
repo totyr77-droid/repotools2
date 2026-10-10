@@ -28,7 +28,7 @@ include 'vistas/header.vista.php';
 </main>
 
 <dialog class="library-dialog library-scanner-dialog" id="stockScanner" aria-labelledby="stockScannerTitulo">
-  <div class="library-heading"><h2 id="stockScannerTitulo">Escanea el QR del palet</h2><button id="cerrarStockScanner" class="library-secondary" type="button">Cerrar</button></div>
+  <div class="library-heading"><h2 id="stockScannerTitulo">Escanea el QR del palet</h2><button id="cerrarStockScanner" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <div id="stockReader" class="ean-reader"></div>
   <p id="stockScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
   <div class="stock-scanner__manual" id="paletManualScanner">
@@ -42,9 +42,7 @@ include 'vistas/header.vista.php';
 
 <div class="palet-editor" id="paletEditor" aria-hidden="true">
   <div class="palet-editor__panel">
-    <button id="cerrarPaletEditor" class="palet-editor__close" type="button" aria-label="Cerrar palet">
-      <i class="fa-solid fa-circle-xmark"></i>
-    </button>
+    <button id="cerrarPaletEditor" class="palet-editor__close app-close" type="button" aria-label="Cerrar palet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
     <p class="palet-editor__logo">REPOTOOLS</p>
     <div class="palet-editor__header">
       <div>

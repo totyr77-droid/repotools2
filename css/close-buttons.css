@@ -1,0 +1,7 @@
+button.app-close, #contenedormax #conterdormaxc.app-close, #verb #verc.app-close { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px; padding: 10px; margin: 0; border: 0; border-radius: 10px; background: #e9e6f5; color: #27187e; cursor: pointer; font-size: 1rem; }
+.app-close svg { width: 20px; height: 20px; flex-shrink: 0; }
+html:not([data-keyboard-focus="true"]) button.app-close:focus, html:not([data-keyboard-focus="true"]) button.app-close:focus-visible { outline: none; box-shadow: none; }
+html:not([data-keyboard-focus="true"]) dialog button:focus-visible { outline: none; }
+html[data-keyboard-focus="true"] button.app-close:focus-visible { outline: 2px solid #8372d8; outline-offset: 3px; }
+.library-heading > :first-child, .results-heading > :first-child { min-width: 0; }
+dialog > .library-heading, dialog .results-heading { position: sticky; top: 0; z-index: 2; background: white; }

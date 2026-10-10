@@ -16,7 +16,7 @@
       </div>
     </div>
   </div>
-  <p class="alerta-cerrar"><i class="fa-solid fa-xmark"></i> CERRAR</p>
+  <button class="alerta-cerrar app-close" type="button" aria-label="Cerrar aviso" title="Cerrar aviso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
 </div>
 
 <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?>
@@ -24,7 +24,7 @@
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
 <!-- SCRIPTS -->
-<script src="js/navigation.js?v=20261010-motion1"></script>
+<script src="js/navigation.js?v=20261010-close1"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
@@ -33,7 +33,7 @@
 <script src="js/product-info.js?v=20261010-ajax1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261010-ajax1"></script>
-<script src="js/biblioteca.js?v=20261010-empty1"></script>
+<script src="js/biblioteca.js?v=20261010-close1"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="js/product-reports.js?v=20261010-ajax1"></script>
 <script src="js/reports-page.js?v=20261010-ajax1"></script>

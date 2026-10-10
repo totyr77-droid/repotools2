@@ -2,7 +2,7 @@
 <dialog class="library-dialog library-scanner-dialog" id="contenedormax" aria-labelledby="mainScannerTitle">
   <div class="library-heading">
     <h2 id="mainScannerTitle">Escanea el producto</h2>
-    <button id="conterdormaxc" class="library-secondary" type="button">Cerrar</button>
+    <button id="conterdormaxc" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
   </div>
   <div id="contenedor" class="ean-reader"></div>
   <p id="mainScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
@@ -63,7 +63,7 @@
 <!-- BLOQUE RESULTADOS -->
 <dialog class="verb" id="verb" aria-labelledby="resultsTitle">
   <div class="verb-contenedor">
-    <div class="results-heading"><h2 id="resultsTitle">Tu lista</h2><button id="verc" class="library-secondary" type="button">Cerrar</button></div>
+    <div class="results-heading"><h2 id="resultsTitle">Tu lista</h2><button id="verc" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
     <div class="results-content">
       <div class="ver-resultado" id="resultSwipeArea">
         <p id="resultProductSummary" class="results-summary" role="status"></p>
@@ -81,6 +81,6 @@
   </div>
 </dialog>
 <dialog id="resultInfoDialog" class="library-dialog library-ean-dialog" aria-labelledby="resultInfoTitle">
-  <div class="library-heading"><h2 id="resultInfoTitle">Información del producto</h2><button id="closeResultInfo" class="library-secondary" type="button">Cerrar</button></div>
+  <div class="library-heading"><h2 id="resultInfoTitle">Información del producto</h2><button id="closeResultInfo" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="resultInfoEan" class="product-edit-ean"></p><section id="resultProductDetails" class="product-details" aria-label="Características del producto"></section>
 </dialog>

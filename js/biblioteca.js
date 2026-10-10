@@ -239,6 +239,10 @@
     openDialog('libraryInfoDialog'); window.RepoProductInfo.show(get('libraryProductDetails'), ean);
   });
   get('libraryInfoDialog').addEventListener('close', () => window.RepoProductInfo.clear(get('libraryProductDetails')));
+  get('reportLibraryProduct').addEventListener('click', () => {
+    const ean = get('eanValue').textContent;
+    if (window.RepoEANScanner.validEAN(ean)) window.RepoProductReports.open(ean);
+  });
   let swipeStart = null;
   const swipeArea = get('libraryEanSwipeArea');
   swipeArea.addEventListener('touchstart', event => {

@@ -9,7 +9,7 @@ $moderationView = $navModerator && ($_GET['queue'] ?? '') === '1';
   <p id="reportsStatus" class="library-status" role="status"></p><div id="reportsList" class="reports-list"></div>
 </section></main>
 <dialog id="reviewReportDialog" class="library-dialog product-edit-dialog" aria-labelledby="reviewReportTitle">
-  <div class="library-heading"><h2 id="reviewReportTitle">Reporte</h2><button id="closeReviewReport" class="library-secondary" type="button">Cerrar</button></div>
+  <div class="library-heading"><h2 id="reviewReportTitle">Reporte</h2><button id="closeReviewReport" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="reviewReportStatus" class="library-status" role="status"></p><div id="reviewReportDetails"></div>
   <form id="reviewReportForm" hidden>
     <p class="product-edit-note">Revisa la propuesta y ajusta los datos si hace falta.</p>

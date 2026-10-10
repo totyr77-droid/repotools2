@@ -44,19 +44,19 @@ include __DIR__ . '/vistas/header.vista.php';
   </form>
 </dialog>
 <dialog id="libraryScannerDialog" class="library-dialog library-scanner-dialog" aria-labelledby="libraryScannerTitle">
-  <div class="library-heading"><h2 id="libraryScannerTitle">Escanea el producto</h2><button id="closeLibraryScanner" class="library-secondary" type="button">Cerrar</button></div>
+  <div class="library-heading"><h2 id="libraryScannerTitle">Escanea el producto</h2><button id="closeLibraryScanner" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <div id="libraryReader" class="ean-reader"></div><p id="libraryScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
 </dialog>
 <dialog id="libraryEanDialog" class="library-dialog library-ean-dialog">
-  <div class="library-heading"><h2>Código EAN</h2><button type="button" data-close="libraryEanDialog" class="library-secondary">Cerrar</button></div>
+  <div class="library-heading"><h2>Código EAN</h2><button type="button" data-close="libraryEanDialog" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <label>Colección<select id="eanCollection"></select></label>
   <div id="libraryEanSwipeArea" class="library-ean-swipe-area"><h3 id="eanProductName"></h3><svg id="libraryBarcode" role="img" aria-label="Código de barras del producto"></svg><p id="eanValue"></p>
   <p id="eanPosition" role="status"></p><p id="librarySwipeHint" class="library-swipe-hint" hidden>Desliza para cambiar de producto</p></div>
-  <button id="openLibraryProductInfo" type="button" class="library-secondary library-info-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v2"/></svg> Información</button>
+  <div class="library-preview-actions"><button id="openLibraryProductInfo" type="button" class="library-secondary library-info-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v2"/></svg> Información</button><button id="reportLibraryProduct" type="button" class="library-secondary library-info-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 21V3m0 1h14l-3 5 3 5H5"/></svg> Reportar</button></div>
   <div class="library-dialog-actions"><button id="previousLibraryEan" class="library-secondary" type="button">← Anterior</button><button id="nextLibraryEan" class="library-primary" type="button">Siguiente →</button></div>
 </dialog>
 <dialog id="libraryInfoDialog" class="library-dialog" aria-labelledby="libraryInfoTitle">
-  <div class="library-heading"><h2 id="libraryInfoTitle">Información del producto</h2><button type="button" data-close="libraryInfoDialog" class="library-secondary">Cerrar</button></div>
+  <div class="library-heading"><h2 id="libraryInfoTitle">Información del producto</h2><button type="button" data-close="libraryInfoDialog" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="libraryInfoEan" class="library-scanned-ean"></p><section id="libraryProductDetails" class="product-details" aria-label="Características del producto"></section>
 </dialog>
 <dialog id="libraryImportDialog" class="library-dialog" aria-labelledby="libraryImportTitle">
@@ -67,7 +67,7 @@ include __DIR__ . '/vistas/header.vista.php';
 </dialog>
 <dialog id="libraryShareDialog" class="library-dialog" aria-labelledby="libraryShareTitle">
   <h2 id="libraryShareTitle">Compartir colección</h2><label>Enlace<input id="libraryShareUrl" readonly></label>
-  <div class="library-dialog-actions"><button type="button" data-close="libraryShareDialog" class="library-secondary">Cerrar</button><button id="copyLibraryShare" type="button" class="library-primary">Copiar enlace</button></div>
+  <div class="library-dialog-actions"><button type="button" data-close="libraryShareDialog" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><button id="copyLibraryShare" type="button" class="library-primary">Copiar enlace</button></div>
 </dialog>
 <script>window.repotoolsLibrary = <?= json_encode(['userId' => current_user() ? (int) current_user()['id'] : null, 'csrf' => csrf_token(), 'share' => $pendingShare], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
 <?php include __DIR__ . '/vistas/footer.vista.php'; ?>

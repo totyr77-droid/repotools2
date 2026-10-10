@@ -1,5 +1,5 @@
 <dialog id="productReportDialog" class="library-dialog product-edit-dialog" aria-labelledby="productReportTitle">
-  <div class="library-heading"><h2 id="productReportTitle">Reportar producto</h2><button id="closeProductReport" type="button" class="library-secondary">Cerrar</button></div>
+  <div class="library-heading"><h2 id="productReportTitle">Reportar producto</h2><button id="closeProductReport" type="button" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="productReportStatus" class="library-status" role="status"></p>
   <form id="productReportForm" hidden>
     <p id="productReportEan" class="product-edit-ean"></p>
@@ -18,7 +18,7 @@
   </form>
 </dialog>
 <dialog id="reportCameraDialog" class="library-dialog product-edit-dialog" aria-labelledby="reportCameraTitle">
-  <div class="library-heading"><h2 id="reportCameraTitle">Tomar foto</h2><button id="closeReportCamera" class="library-secondary" type="button">Cancelar</button></div>
+  <div class="library-heading"><h2 id="reportCameraTitle">Tomar foto</h2><button id="closeReportCamera" class="library-secondary app-close" type="button" aria-label="Cerrar cámara" title="Cerrar cámara"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="reportCameraStatus" class="library-status" role="status"></p>
   <video id="reportCameraVideo" autoplay muted playsinline></video>
   <div class="library-dialog-actions"><button id="retryReportCamera" class="library-secondary" type="button" hidden>Reintentar</button><button id="captureReportPhoto" class="library-primary" type="button" disabled>Tomar foto</button></div>

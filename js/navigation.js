@@ -123,6 +123,10 @@
     } finally { if (token === version) document.documentElement.classList.remove('app-navigating'); }
   }
   page = createPage();
+  document.addEventListener('keydown', event => {
+    document.documentElement.dataset.keyboardFocus = 'true';
+  });
+  document.addEventListener('pointerdown', () => { document.documentElement.dataset.keyboardFocus = 'false'; }, { passive: true });
   window.RepoNavigation = { get page() { return page; }, navigate };
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   document.addEventListener('click', event => {

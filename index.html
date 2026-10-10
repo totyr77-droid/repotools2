@@ -25,10 +25,11 @@
     <link href="css/reports.css" rel="stylesheet" type="text/css">
     <link href="css/product-info.css" rel="stylesheet" type="text/css">
     <link href="css/scan-result.css" rel="stylesheet" type="text/css">
-    <link href="css/library.css?v=20261010-empty1" rel="stylesheet" type="text/css">
+    <link href="css/library.css?v=20261010-close1" rel="stylesheet" type="text/css">
     <link href="css/ean-scanner.css" rel="stylesheet" type="text/css">
   <link href="css/responsive.css" rel="stylesheet" type="text/css">
   <link href="css/results-viewer.css" rel="stylesheet" type="text/css">
+    <link href="css/close-buttons.css?v=20261010" rel="stylesheet" type="text/css">
     <link href="css/home.css" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261010-motion1" rel="stylesheet" type="text/css">
   </head>
@@ -107,7 +108,7 @@
 <dialog class="library-dialog library-scanner-dialog" id="contenedormax" aria-labelledby="mainScannerTitle">
   <div class="library-heading">
     <h2 id="mainScannerTitle">Escanea el producto</h2>
-    <button id="conterdormaxc" class="library-secondary" type="button">Cerrar</button>
+    <button id="conterdormaxc" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
   </div>
   <div id="contenedor" class="ean-reader"></div>
   <p id="mainScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
@@ -151,7 +152,7 @@
 <!-- BLOQUE RESULTADOS -->
 <dialog class="verb" id="verb" aria-labelledby="resultsTitle">
   <div class="verb-contenedor">
-    <div class="results-heading"><h2 id="resultsTitle">Tu lista</h2><button id="verc" class="library-secondary" type="button">Cerrar</button></div>
+    <div class="results-heading"><h2 id="resultsTitle">Tu lista</h2><button id="verc" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
     <div class="results-content">
       <div class="ver-resultado" id="resultSwipeArea">
         <p id="resultProductSummary" class="results-summary" role="status"></p>
@@ -169,7 +170,7 @@
   </div>
 </dialog>
 <dialog id="resultInfoDialog" class="library-dialog library-ean-dialog" aria-labelledby="resultInfoTitle">
-  <div class="library-heading"><h2 id="resultInfoTitle">Información del producto</h2><button id="closeResultInfo" class="library-secondary" type="button">Cerrar</button></div>
+  <div class="library-heading"><h2 id="resultInfoTitle">Información del producto</h2><button id="closeResultInfo" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="resultInfoEan" class="product-edit-ean"></p><section id="resultProductDetails" class="product-details" aria-label="Características del producto"></section>
 </dialog>
 
@@ -190,11 +191,11 @@
           </div>
         </div>
       </div>
-      <p class="alerta-cerrar"><i class="fa-solid fa-xmark"></i> CERRAR</p>
+      <button class="alerta-cerrar app-close" type="button" aria-label="Cerrar aviso" title="Cerrar aviso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
     </div>
 
 <dialog id="productEditDialog" class="library-dialog product-edit-dialog" aria-labelledby="productEditTitle">
-  <div class="library-heading"><h2 id="productEditTitle">Editar producto</h2><button id="closeProductEditor" class="library-secondary" type="button">Cerrar</button></div>
+  <div class="library-heading"><h2 id="productEditTitle">Editar producto</h2><button id="closeProductEditor" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="productEditStatus" class="library-status" role="status"></p>
   <form id="productEditForm" hidden>
     <p id="productEditEan" class="product-edit-ean"></p>
@@ -209,7 +210,7 @@
 </dialog>
 
 <dialog id="productReportDialog" class="library-dialog product-edit-dialog" aria-labelledby="productReportTitle">
-  <div class="library-heading"><h2 id="productReportTitle">Reportar producto</h2><button id="closeProductReport" type="button" class="library-secondary">Cerrar</button></div>
+  <div class="library-heading"><h2 id="productReportTitle">Reportar producto</h2><button id="closeProductReport" type="button" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="productReportStatus" class="library-status" role="status"></p>
   <form id="productReportForm" hidden>
     <p id="productReportEan" class="product-edit-ean"></p>
@@ -228,13 +229,13 @@
   </form>
 </dialog>
 <dialog id="reportCameraDialog" class="library-dialog product-edit-dialog" aria-labelledby="reportCameraTitle">
-  <div class="library-heading"><h2 id="reportCameraTitle">Tomar foto</h2><button id="closeReportCamera" class="library-secondary" type="button">Cancelar</button></div>
+  <div class="library-heading"><h2 id="reportCameraTitle">Tomar foto</h2><button id="closeReportCamera" class="library-secondary app-close" type="button" aria-label="Cerrar c?mara" title="Cerrar c?mara"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <p id="reportCameraStatus" class="library-status" role="status"></p>
   <video id="reportCameraVideo" autoplay muted playsinline></video>
   <div class="library-dialog-actions"><button id="retryReportCamera" class="library-secondary" type="button" hidden>Reintentar</button><button id="captureReportPhoto" class="library-primary" type="button" disabled>Tomar foto</button></div>
 </dialog>
 
-    <script src="js/navigation.js?v=20261010-motion1"></script>
+    <script src="js/navigation.js?v=20261010-close1"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
