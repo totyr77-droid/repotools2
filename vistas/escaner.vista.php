@@ -31,6 +31,10 @@
           </button>
         </div>
         <p id="scanCopyStatus" class="scanner-status" role="status"></p>
+        <?php if (current_user()): ?>
+        <button id="saveScanLibrary" class="library-secondary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 3h5v18H4ZM11 3h4v18h-4ZM17 4l3-1 4 17-3 1Z"/></svg>Biblioteca</button>
+        <p id="scanLibraryStatus" class="scanner-status" role="status"></p>
+        <?php endif; ?>
         <button id="rescancelar" type="button"><i class="fa-solid fa-trash" aria-hidden="true"></i> Quitar de la lista</button>
       </div>
 
@@ -42,6 +46,19 @@
     </div>
   </div>
 </dialog>
+
+<?php if (current_user()): ?>
+<dialog id="scanLibraryDialog" class="library-dialog" aria-labelledby="scanLibraryTitle">
+  <form id="scanLibraryForm">
+    <h2 id="scanLibraryTitle">Guardar en Biblioteca</h2>
+    <p id="scanLibraryEan" class="product-edit-ean"></p>
+    <label id="scanLibraryChoice">Biblioteca<select id="scanLibrarySelect"></select></label>
+    <label id="scanLibraryNew">Nombre de la nueva biblioteca<input id="scanLibraryName" maxlength="80" autocomplete="off" placeholder="Por ejemplo, Productos"></label>
+    <p id="scanLibraryError" class="library-status" role="alert"></p>
+    <div class="library-dialog-actions"><button id="cancelScanLibrary" class="library-secondary" type="button">Cancelar</button><button id="confirmScanLibrary" class="library-primary" type="submit">Guardar</button></div>
+  </form>
+</dialog>
+<?php endif; ?>
 
 <!-- BLOQUE RESULTADOS -->
 <dialog class="verb" id="verb" aria-labelledby="resultsTitle">

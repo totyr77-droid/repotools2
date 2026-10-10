@@ -42,3 +42,7 @@
     #cartelScaner { padding-top: calc(84px + env(safe-area-inset-top, 0px)); padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 360px) { .cartelscaner-box { padding: 16px; } .cartelscaner-box .cantidadbox, .cartelscaner-box .copybox { font-size: .8rem; } }
+#saveScanLibrary { display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 100%; min-height: 44px; margin-top: 10px; }
+#saveScanLibrary svg { width: 20px; height: 20px; }
+#scanLibraryForm label { display: block; margin-top: 16px; }
+#scanLibraryForm [hidden] { display: none; }
