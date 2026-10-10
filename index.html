@@ -27,6 +27,7 @@
     <link href="css/library.css" rel="stylesheet" type="text/css">
     <link href="css/ean-scanner.css" rel="stylesheet" type="text/css">
   <link href="css/responsive.css" rel="stylesheet" type="text/css">
+  <link href="css/results-viewer.css" rel="stylesheet" type="text/css">
   </head>
   <body class="home-page">
     <header>
@@ -137,36 +138,32 @@
   </div>
 </dialog>
 
-<div class="verb" id="verb">
-      <button class="verc" id="verc" type="button" aria-label="Cerrar resultados">
-        <i class="fa-solid fa-circle-xmark"></i>
-      </button>
-
-      <div class="verb-contenedor">
-        <div class="ver-logoD">
-          <p>REPOTOOLS</p>
-        </div>
-        <div class="ver-resultado">
-          <p>RESULTADOS</p>
-          <svg id="barcode"></svg>
-          <div id="veri"></div>
-      <section id="resultProductDetails" class="product-details" aria-label="Caracteristicas del producto"></section>
-        </div>
-
-        <button class="compartir" id="compartirD" type="button" aria-label="Compartir resultados">
-          <i class="fa-solid fa-share-from-square"></i>
-        </button>
-
-        <div class="verpag">
-          <button id="vera" class="vera" type="button" aria-label="Codigo anterior">
-            <i class="fa-solid fa-arrow-left"></i>
-          </button>
-          <button id="vers" class="vers" type="button" aria-label="Codigo siguiente">
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
+<!-- BLOQUE RESULTADOS -->
+<dialog class="verb" id="verb" aria-labelledby="resultsTitle">
+  <div class="verb-contenedor">
+    <div class="results-heading"><h2 id="resultsTitle">Tu lista</h2><button id="verc" class="library-secondary" type="button">Cerrar</button></div>
+    <div class="results-content">
+      <div class="ver-resultado" id="resultSwipeArea">
+        <p id="resultProductSummary" class="results-summary" role="status"></p>
+        <svg id="barcode" role="img" aria-label="Código de barras del producto"></svg>
+        <p class="results-swipe-hint">Desliza para cambiar de código</p>
+      </div>
+      <div class="results-actions">
+        <button id="shareCurrentEan" class="library-primary" type="button">Compartir este EAN</button>
+        <button id="openResultInfo" class="library-secondary" type="button">Ver información</button>
+        <button id="compartirD" class="library-secondary" type="button">Compartir lista completa</button>
+        <p id="resultShareStatus" class="library-status" role="status"></p>
       </div>
     </div>
+    <div class="verpag"><button id="vera" class="vera" type="button" aria-label="Código anterior">← Anterior</button><div id="veri" role="status"></div><button id="vers" class="vers" type="button" aria-label="Código siguiente">Siguiente →</button></div>
+  </div>
+</dialog>
+<dialog id="resultInfoDialog" class="library-dialog library-ean-dialog" aria-labelledby="resultInfoTitle">
+  <div class="library-heading"><h2 id="resultInfoTitle">Información del producto</h2><button id="closeResultInfo" class="library-secondary" type="button">Cerrar</button></div>
+  <p id="resultInfoEan" class="product-edit-ean"></p><section id="resultProductDetails" class="product-details" aria-label="Características del producto"></section>
+</dialog>
+
+
 
     <footer class="footer site-footer" id="contacto">
   <small class="site-footer__credits"><span>&copy; 2026 Repotools</span><span aria-hidden="true">&middot;</span><span>Hecho por <a href="https://www.instagram.com/greeyes_/" target="_blank" rel="noopener noreferrer">GR Dise&ntilde;o&nbsp;<span aria-hidden="true">&#8599;</span></a></span></small>

@@ -36,6 +36,7 @@ if (current_user()) {
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css" rel="stylesheet" type="text/css"><?php endif; ?>
   </head>
   <body<?= !empty($paginaInicio) ? ' class="home-page"' : '' ?>>
     <header>

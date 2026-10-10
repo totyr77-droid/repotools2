@@ -2,6 +2,8 @@
 
 Escáner de códigos EAN para repositores, con registro opcional.
 
+El visor de Inicio muestra el código de barras, el nombre y el contenido del producto. Permite pasar con botones, deslizar en móvil o usar las flechas del teclado. **Ver información** abre los detalles por separado. **Compartir este EAN** envía solo el código visible y **Compartir lista completa** incluye todo el grupo; sin compartir nativo, copia un enlace.
+
 - Sin cuenta: escanear y guardar códigos en el navegador.
 - Con cuenta: acceso a la gestión de palets en desarrollo. Los palets todavía se guardan localmente, separados por usuario; no están sincronizados con el servidor.
 - Las cuentas usan PostgreSQL cuando se configura `DATABASE_URL`, o SQLite para desarrollo local. Incluyen contraseñas mediante hash, protección CSRF y límite de intentos.

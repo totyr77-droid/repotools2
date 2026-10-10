@@ -41,6 +41,7 @@ let scannerRevision = 0;
 let ultimoAgregado = null;
 let resultadoActual = "";
 let scanResultRevision = 0;
+let viewerRevision = 0;
 
 const scanner = window.RepoEANScanner.create('contenedor', {
   onCode: codigo => {
@@ -77,6 +78,26 @@ function bindEventos() {
   els.copy?.addEventListener("click", copiarResultado);
   els.compartir?.addEventListener("click", compartirLista);
   els.compartirD?.addEventListener("click", compartirLista);
+  document.getElementById('shareCurrentEan')?.addEventListener('click', () => { const ean = lista[indiceActual - 1]; if (ean) compartirCodigos([ean]); });
+  document.getElementById('openResultInfo')?.addEventListener('click', () => {
+    const ean = lista[indiceActual - 1]; if (!ean) return;
+    const dialog = document.getElementById('resultInfoDialog'); document.getElementById('resultInfoEan').textContent = `EAN ${ean}`;
+    if (!dialog.open) dialog.showModal(); window.RepoProductInfo.show(document.getElementById('resultProductDetails'), ean);
+  });
+  document.getElementById('closeResultInfo')?.addEventListener('click', () => document.getElementById('resultInfoDialog').close());
+  els.verb.addEventListener('cancel', event => { event.preventDefault(); cerrarResultados(); });
+  window.addEventListener('keydown', event => {
+    if (!els.verb.open || document.getElementById('resultInfoDialog').open || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); moverResultado(event.key === 'ArrowLeft' ? -1 : 1); }
+  });
+  const swipeArea = document.getElementById('resultSwipeArea'); let touchStart;
+  swipeArea?.addEventListener('touchstart', event => { touchStart = event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null; }, { passive: true });
+  swipeArea?.addEventListener('touchend', event => {
+    if (!touchStart || event.changedTouches.length !== 1) return;
+    const dx = event.changedTouches[0].clientX - touchStart.x, dy = event.changedTouches[0].clientY - touchStart.y; touchStart = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) moverResultado(dx < 0 ? 1 : -1);
+  }, { passive: true });
+  swipeArea?.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
 
   document.getElementById('retryMainScanner')?.addEventListener('click', iniciarScanner);
   els.contenedormax.addEventListener('cancel', event => { event.preventDefault(); cerrarScanner(); });
@@ -183,6 +204,7 @@ function verCodigo(indice) {
 
   indiceActual = Math.min(Math.max(indice, 1), lista.length);
   els.verb.style.display = "flex";
+  if (!els.verb.open) els.verb.showModal();
   JsBarcode("#barcode", lista[indiceActual - 1], {
     format: lista[indiceActual - 1].length === 8 ? "EAN8" : "EAN13",
     displayValue: true,
@@ -193,7 +215,12 @@ function verCodigo(indice) {
   els.vera.className = indiceActual > 1 ? "vera si" : "vera no";
   els.vers.disabled = indiceActual === lista.length;
   els.vera.disabled = indiceActual === 1;
-  window.RepoProductInfo?.show(document.getElementById("resultProductDetails"), lista[indiceActual - 1]);
+  document.getElementById('resultShareStatus').textContent = '';
+  els.compartirD.textContent = `Compartir lista completa (${lista.length})`;
+  const ean = lista[indiceActual - 1], version = ++viewerRevision, summary = document.getElementById('resultProductSummary'); summary.textContent = 'Buscando producto…';
+  window.RepoProductInfo.get(ean).then(product => {
+    if (version === viewerRevision && els.verb.open) summary.textContent = window.RepoProductInfo.summary(product);
+  }).catch(() => { if (version === viewerRevision && els.verb.open) summary.textContent = 'Nombre y contenido no disponibles'; });
 }
 
 function moverResultado(direccion) {
@@ -203,9 +230,14 @@ function moverResultado(direccion) {
 }
 
 function cerrarResultados() {
+  ++viewerRevision;
+  if (els.verb.open) els.verb.close();
+  const info = document.getElementById('resultInfoDialog'); if (info.open) info.close();
+  window.RepoProductInfo.clear(document.getElementById('resultProductDetails'));
   els.verb.style.display = "none";
   document.body.classList.remove("no-scroll");
   quitarOverlay();
+  els.ver?.focus?.();
 
   if (esListaCompartida) {
     window.history.replaceState({}, document.title, urlOriginal);
@@ -342,36 +374,43 @@ async function compartirLista() {
     return;
   }
 
-  const link = crearLinkCompartido();
+  return compartirCodigos([...lista]);
+}
+async function compartirCodigos(codigos) {
+  const link = crearLinkCompartido(codigos);
 
   if (navigator.share) {
     try {
       await navigator.share({
-        title: "RepoTools - Codigos escaneados",
-        text: "Mira los resultados que escanee con RepoTools:",
+        title: codigos.length === 1 ? `EAN ${codigos[0]}` : 'Repotools - Lista de códigos',
+        text: codigos.length === 1 ? `Código EAN: ${codigos[0]}` : `${codigos.length} códigos escaneados`,
         url: link
       });
       return;
     } catch (error) {
+      if (error.name === 'AbortError') return;
       console.warn("No se pudo compartir con Web Share", error);
     }
   }
 
-  fallbackCompartir(link);
+  return fallbackCompartir(link);
 }
 
-function crearLinkCompartido() {
-  const json = JSON.stringify(lista);
+function crearLinkCompartido(codigos = lista) {
+  const json = JSON.stringify(codigos);
   const comprimido = LZString.compressToBase64(json);
   return `${urlOriginal}?${comprimido}`;
 }
 
 async function fallbackCompartir(link) {
+  let copied = false;
   try {
     await navigator.clipboard.writeText(link);
+    copied = true;
   } catch (error) {
     console.warn("No se pudo copiar el enlace", error);
   }
+  if (els.verb.open) { document.getElementById('resultShareStatus').textContent = copied ? 'Enlace copiado. Puedes pegarlo para compartir.' : `Copia este enlace para compartir: ${link}`; return; }
 
   const mensaje = encodeURIComponent(`Mira este resultado de RepoTools: ${link}`);
   const whatsapp = `https://wa.me/?text=${mensaje}`;
@@ -379,7 +418,7 @@ async function fallbackCompartir(link) {
   const email = `mailto:?subject=Resultados%20RepoTools&body=${mensaje}`;
 
   alertaGeneral("ENLACE LISTO", `
-    <p>Copiamos el enlace. Tambien puedes enviarlo desde aca:</p>
+    <p>${copied ? 'Copiamos el enlace. También puedes enviarlo desde acá:' : 'Elige cómo compartir el enlace:'}</p>
     <div class="social">
       <a href="${whatsapp}" target="_blank" rel="noopener" aria-label="Compartir por WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
       <a href="${telegram}" target="_blank" rel="noopener" aria-label="Compartir por Telegram"><i class="fa-brands fa-telegram"></i></a>
@@ -442,6 +481,7 @@ window.addEventListener('repotools:product-updated', event => {
     window.RepoProductInfo.editButton(els.resultadoApi, ean);
   }
   if (els.verb.style.display === 'flex' && lista[indiceActual - 1] === ean) {
-    window.RepoProductInfo.show(document.getElementById('resultProductDetails'), ean);
+    document.getElementById('resultProductSummary').textContent = window.RepoProductInfo.summary(product);
+    if (document.getElementById('resultInfoDialog').open) window.RepoProductInfo.show(document.getElementById('resultProductDetails'), ean);
   }
 });

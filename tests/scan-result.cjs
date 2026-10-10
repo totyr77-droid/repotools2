@@ -21,6 +21,7 @@ const context = {
   navigator: { clipboard: { writeText: code => { copied.push(code); return new Promise(resolve => finishCopy = resolve); } } },
   JsBarcode: (target, code) => drawn.push(code), URL, console
 };
+context.LZString = { compressToBase64: value => Buffer.from(value).toString('base64') };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf8'), context);
 (async () => {
   get('contenedormax').showModal();
@@ -43,6 +44,16 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf
   context.cerrarScanner();
   await context.copiarResultado();
   assert.equal(copied.length, 2, 'No copia un resultado antiguo después de cerrar');
+  context.verCodigo(2); const resolvePrevious = oldProduct; context.verCodigo(1);
+  resolvePrevious({ name: 'Ficha anterior', quantity: '500 ml' }); await Promise.resolve(); await Promise.resolve();
+  assert.equal(get('resultProductSummary').textContent, 'Actual | 1 L', 'La navegación no debe mezclar una ficha tardía con otro EAN');
+  const shares = []; context.navigator.share = async data => shares.push(data);
+  await context.compartirCodigos(['96385074']); await context.compartirLista();
+  const decodeShare = data => JSON.parse(Buffer.from(new URL(data.url).search.slice(1), 'base64').toString());
+  assert.deepEqual(decodeShare(shares[0]), ['96385074'], 'Compartir un EAN no incluye el grupo');
+  assert.deepEqual(decodeShare(shares[1]), ['96385074', '7791234567898'], 'Compartir la lista incluye todos los EAN');
+  context.navigator.share = async () => { const error = new Error('Cancelado'); error.name = 'AbortError'; throw error; };
+  await context.compartirCodigos(['96385074']); assert.equal(copied.length, 2, 'Cancelar compartir no activa la copia alternativa');
   console.log('OK: EAN visible y copiado coinciden, duplicados preservados, producto y portapapeles tardíos no mezclan resultados.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
 
