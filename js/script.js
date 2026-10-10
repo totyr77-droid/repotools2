@@ -126,7 +126,7 @@ function guardarLista() {
 function limpiarLista(valores) {
   return valores
     .map((codigo) => String(codigo).trim())
-    .filter((codigo, index, arr) => EAN.test(codigo) && arr.indexOf(codigo) === index);
+    .filter((codigo, index, arr) => window.RepoEANScanner.validEAN(codigo) && arr.indexOf(codigo) === index);
 }
 
 function cargarListaCompartida() {

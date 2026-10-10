@@ -287,8 +287,8 @@
             fps: 15,
             videoConstraints: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
             disableFlip: true,
-            qrbox: (width, height) => isQR ? { width: Math.floor(Math.min(width, height) * .85), height: Math.floor(Math.min(width, height) * .85) } : { width: Math.floor(width * .94), height: Math.floor(height * .85) }
-          }, accept, () => {});
+            qrbox: (width, height) => isQR ? { width: Math.max(50, Math.floor(Math.min(width, height) * .85)), height: Math.max(50, Math.floor(Math.min(width, height) * .85)) } : { width: Math.max(50, Math.floor(width * .94)), height: Math.max(50, Math.floor(height * .85)) }
+          }, code => accept(code, 'camera'), () => {});
           await current.starting;
           if (token !== revision) { await release(current); return false; }
           // Solicita enfoque continuo solo si la cámara lo admite, sin retrasar

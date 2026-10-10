@@ -34,11 +34,11 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/ean-scanner.js'),
 const service = window.RepoEANScanner;
 const a = '7791234567898', b = '96385074';
 const flush = async () => { for (let i = 0; i < 20; i++) await Promise.resolve(); };
-function read(reader, code) { now += 100; reader.success(code); }
+function read(reader, code) { now += 100; reader.success(code, { decodedText: code }); }
 (async () => {
   assert.equal(service.validEAN(a), true);
   assert.equal(service.validEAN(b), true);
-  for (const code of ['7791234567890', '96385075', '00000000', '123', 7791234567898]) assert.equal(service.validEAN(code), false);
+  for (const code of ['55007732', '7791234567890', '96385075', '00000000', '123', 7791234567898]) assert.equal(service.validEAN(code), false);
   const confirmation = service.confirmation();
   assert.equal(confirmation(a, 0), false);
   assert.equal(confirmation(a, 1), false, 'Callbacks del mismo fotograma no confirman');
@@ -60,6 +60,8 @@ function read(reader, code) { now += 100; reader.success(code); }
   await firstOpening;
   lastAudio.state = 'interrupted';
   const first = readers.at(-1);
+  for (let i = 0; i < 10; i++) read(first, '55007732');
+  assert.equal(accepted.length, 0, 'El codigo incorrecto informado nunca se confirma');
   assert.equal(first.scanConfig.videoConstraints.width.ideal, 1920, 'Solicita detalle de barras pequeñas sin exigir resolución al dispositivo');
   assert.equal(first.scanConfig.videoConstraints.height.ideal, 1080);
   read(first, '7791234567890'); read(first, a); read(first, b); read(first, a); read(first, a);
@@ -121,5 +123,21 @@ function read(reader, code) { now += 100; reader.success(code); }
   assert.equal(frame.has('ean-detecting'), true); assert.equal(qrCodes.length, 0);
   read(qrReader, 'PALET-001'); await flush();
   assert.deepEqual(qrCodes, ['PALET-001']); assert.equal(qrReader.stops, 1);
-  console.log('OK: checksum EAN8/13, confirmación estable, un resultado por sesión, cierre durante permisos, doble toque y recuperación de cámara.');
+  const visibleCodes = [];
+  const video = { videoWidth: 1280, videoHeight: 720, clientWidth: 320, clientHeight: 330 };
+  const element = { classList: { add() {}, remove() {} }, querySelector: () => video };
+  document.getElementById = () => element;
+  document.createElement = () => ({ getContext: () => null });
+  const visibleScanner = service.create('visible', { onCode: code => visibleCodes.push(code) });
+  await visibleScanner.start();
+  const visibleReader = readers.at(-1);
+  visibleReader.qrcode = { decodeRobustlyAsync() {} };
+  for (let i = 0; i < 5; i++) read(visibleReader, a);
+  await flush();
+  assert.deepEqual(visibleCodes, [], 'El segundo argumento del lector no evita validar el encuadre visible');
+  video.clientWidth = 1280; video.clientHeight = 720;
+  for (let i = 0; i < 3; i++) read(visibleReader, '7803403004612');
+  await flush();
+  assert.deepEqual(visibleCodes, ['7803403004612']);
+  console.log('OK: checksum EAN8/13, encuadre visible, confirmacion estable y ciclo de camara.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

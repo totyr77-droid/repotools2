@@ -10,7 +10,7 @@ class Element {
 }
 const elements = new Map();
 const get = id => { if (!elements.has(id)) elements.set(id, new Element()); return elements.get(id); };
-const storage = new Map([['lista', JSON.stringify(['96385074'])]]);
+const storage = new Map([['lista', JSON.stringify(['96385074', '55007732'])]]);
 const copied = [], drawn = [];
 let finishCopy, oldProduct;
 const context = {
@@ -25,6 +25,8 @@ context.LZString = { compressToBase64: value => Buffer.from(value).toString('bas
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf8'), context);
 (async () => {
   get('contenedormax').showModal();
+  await context.mostrarResultadoEscaneo('55007732');
+  assert.equal(get('resultado').textContent, '', 'El EAN incorrecto no aparece como resultado');
   const old = context.mostrarResultadoEscaneo('7791234567898');
   assert.equal(get('resultado').textContent, '7791234567898');
   const copying = context.copiarResultado();
