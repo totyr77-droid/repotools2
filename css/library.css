@@ -102,6 +102,9 @@ summary:focus-visible { outline: 2px solid var(--color1); outline-offset: 3px; }
 .library-save-hint .product-report-button { width: fit-content; max-width: 100%; padding: 10px 14px; gap: 8px; font-size: .85rem; }
 @media (max-width: 360px) { .library-save-card { padding: 12px; } }
 .library-dialog-actions button { flex: 1; }
+.ean-navigation { gap: 10px; }
+.ean-navigation button { min-width: 0; min-height: 48px; padding: 12px 16px; margin: 0; border-radius: 10px; font-size: .95rem; }
+.ean-navigation button:disabled { opacity: .4; cursor: default; }
 .library-ean-dialog { text-align: center; background: white; }
 .library-ean-dialog label { text-align: left; }
 #libraryBarcode { display: block; width: 100%; height: auto; margin: 20px auto 8px; }

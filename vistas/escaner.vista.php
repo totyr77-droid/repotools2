@@ -69,6 +69,7 @@
       <div class="ver-resultado" id="resultSwipeArea">
         <p id="resultProductSummary" class="results-summary" role="status"></p>
         <svg id="barcode" role="img" aria-label="Código de barras del producto"></svg>
+        <p id="veri" role="status"></p>
         <p class="results-swipe-hint">Desliza para cambiar de código</p>
       </div>
       <div class="results-actions">
@@ -78,7 +79,7 @@
         <p id="resultShareStatus" class="library-status" role="status"></p>
       </div>
     </div>
-    <div class="verpag"><button id="vera" class="vera" type="button" aria-label="Código anterior">← Anterior</button><div id="veri" role="status"></div><button id="vers" class="vers" type="button" aria-label="Código siguiente">Siguiente →</button></div>
+    <div class="verpag library-dialog-actions ean-navigation"><button id="vera" class="library-secondary" type="button" aria-label="Código anterior">← Anterior</button><button id="vers" class="library-primary" type="button" aria-label="Código siguiente">Siguiente →</button></div>
   </div>
 </dialog>
 <dialog id="resultInfoDialog" class="library-dialog library-ean-dialog" aria-labelledby="resultInfoTitle">

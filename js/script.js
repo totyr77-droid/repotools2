@@ -219,8 +219,8 @@ function verCodigo(indice) {
     margin: 10
   });
   els.veri.textContent = `${indiceActual} / ${lista.length}`;
-  els.vers.className = indiceActual < lista.length ? "vers si" : "vers no";
-  els.vera.className = indiceActual > 1 ? "vera si" : "vera no";
+  els.vers.className = "library-primary";
+  els.vera.className = "library-secondary";
   els.vers.disabled = indiceActual === lista.length;
   els.vera.disabled = indiceActual === 1;
   document.getElementById('resultShareStatus').textContent = '';
