@@ -42,6 +42,9 @@
 #palletTools .library-settings summary { width: 48px; min-height: 48px; background: #f0eef8; color: #27187e; }
 #palletTools .library-settings-menu { top: calc(100% + 6px); left: 0; right: auto; width: min(260px,100%); }
 .stock-alert-dot { display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; background: #c92a38; vertical-align: middle; }
+.stock-heading-description { margin: 6px 0 0; color: #626b7a; font-size: .85rem; line-height: 1.4; overflow-wrap: anywhere; }
+#palletDialog > .library-heading > div { min-width: 0; }
+.stock-scanner-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
 #palletTools .library-settings-menu button,#palletTools .library-settings-menu a { justify-content: flex-start; gap: 10px; width: 100%; padding: 12px; min-height: 44px; text-align: left; text-decoration: none; }
 #palletTools .library-settings-menu .stock-delete { background: #c92a38; color: white; }
 .stock-metadata { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding: 12px; font-size: .8rem; }

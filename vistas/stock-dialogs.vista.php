@@ -1,16 +1,15 @@
 <span id="ownerIcon" hidden><?= stock_icon('user') ?></span><span id="clockIcon" hidden><?= stock_icon('clock') ?></span><span id="editProductIcon" hidden><?= stock_icon('settings') ?></span>
 <?php
-function stock_dialog_heading(string $title,string $id): void { ?>
-<div class="library-heading"><h2><?= escape($title) ?></h2><button class="app-close" data-stock-close="<?= escape($id) ?>" type="button" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>
+function stock_dialog_heading(string $title,string $id,string $descriptionId=''): void { ?>
+<div class="library-heading"><div><h2><?= escape($title) ?></h2><?php if($descriptionId): ?><p id="<?= escape($descriptionId) ?>" class="stock-heading-description" hidden></p><?php endif; ?></div><button class="app-close" data-stock-close="<?= escape($id) ?>" type="button" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>
 <?php } ?>
-<dialog id="stockScanner" class="library-dialog library-scanner-dialog"><?php stock_dialog_heading('Escanear','stockScanner'); ?><div id="stockReader" class="ean-reader"></div><p id="stockScannerStatus" class="scanner-status" role="status"></p></dialog>
+<dialog id="stockScanner" class="library-dialog library-scanner-dialog"><?php stock_dialog_heading('Escanear','stockScanner'); ?><div id="stockReader" class="ean-reader"></div><div class="stock-scanner-actions"><button id="scannerKeyboard" class="library-secondary stock-icon" type="button" aria-label="Ingresar código manualmente" title="Ingresar código manualmente"><?= stock_icon('keyboard') ?></button></div><p id="stockScannerStatus" class="scanner-status" role="status"></p></dialog>
 <dialog id="manualPalletDialog" class="library-dialog"><?php stock_dialog_heading('Código del palet','manualPalletDialog'); ?><form id="manualPalletForm"><label>Código<input id="palletCodeInput" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="Ej.: 00123456" required></label><p id="manualPalletStatus" class="library-status" role="status"></p><button class="library-primary" type="submit">Abrir palet</button></form></dialog>
 <dialog id="generateDialog" class="library-dialog"><?php stock_dialog_heading('Generar etiquetas','generateDialog'); ?><form id="generateForm"><label>Cantidad de hojas A4<input id="labelCount" type="number" inputmode="numeric" min="1" max="100" value="1" required></label><p class="stock-muted">Un QR grande por hoja. Cada código se reserva durante 3 días.</p><p id="generateStatus" class="library-status" role="status"></p><button class="library-primary" type="submit">Generar</button></form><div id="generatedLabels" hidden><div id="generatedLabelLinks"></div><a id="printGenerated" class="library-primary stock-icon" target="_blank" aria-label="Imprimir etiquetas" title="Imprimir etiquetas"><?= stock_icon('print') ?></a></div></dialog>
-<dialog id="palletDialog" class="library-dialog stock-pallet-dialog"><?php stock_dialog_heading('Palet','palletDialog'); ?>
- <p id="palletStatus" class="library-status" role="status"></p><p id="palletDescription" class="stock-muted"></p>
+<dialog id="palletDialog" class="library-dialog stock-pallet-dialog"><?php stock_dialog_heading('Palet','palletDialog','palletDescription'); ?>
+ <p id="palletStatus" class="library-status" role="status"></p>
  <div id="palletTools" class="stock-toolbar"><button id="scanStockProduct" class="library-primary stock-icon" type="button" aria-label="Escanear producto" title="Escanear producto"><?= stock_icon('barcode') ?></button>
  <details id="palletSettings" class="library-settings"><summary aria-label="Opciones del palet" title="Opciones del palet"><?= stock_icon('settings') ?></summary><div class="library-settings-menu">
- <button id="manualStockProduct" class="library-secondary" type="button"><?= stock_icon('keyboard') ?> Ingresar EAN</button>
  <button id="editPalletDescription" class="library-secondary" type="button"><?= stock_icon('plus') ?> Descripción del palet</button>
  <button id="sharePalletLabel" class="library-secondary" type="button"><?= stock_icon('share') ?> Compartir palet</button>
  <a id="printPallet" class="library-secondary" target="_blank"><?= stock_icon('print') ?> Reimprimir imagen</a>
