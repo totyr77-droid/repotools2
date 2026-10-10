@@ -34,7 +34,7 @@ function stock_generate(PDO $db, int $user): array {
 }
 function stock_detail(PDO $db, string $code, ?int $user): array {
     $label=stock_label($db,$code);
-    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$user !== null && (int)$label['reserved_by']===$user,'can_edit'=>false];
+    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$user !== null && (int)$label['reserved_by']===$user,'can_delete'=>$user !== null && (int)$label['reserved_by']===$user,'can_edit'=>false];
     $p=stock_query($db,'SELECT p.*,u.name AS owner_name,a.name AS updated_name FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
     if (!$p) throw new CatalogException('Este palet ya no está disponible. Recarga la lista.',409);
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
@@ -43,6 +43,7 @@ function stock_detail(PDO $db, string $code, ?int $user): array {
     $p['available']=false; $p['is_owner']=$owner; $p['can_edit']=$owner || $access==='accepted'; $p['pending_invitation']=$access==='pending';
     $p['products']=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? ORDER BY CASE WHEN expires=\'\' THEN 1 ELSE 0 END,expires,name,id',[$p['id']])->fetchAll();
     if ($owner) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
+    if (!$p['can_edit']) unset($p['description']);
     // Only names and product details are public; account identifiers/access are private.
     if (!$p['can_edit'] && !$p['pending_invitation']) unset($p['owner_id'],$p['updated_by']);
     return $p;

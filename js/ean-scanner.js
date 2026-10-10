@@ -98,7 +98,7 @@
         text.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg>';
         const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
         input.setAttribute('aria-orientation', 'vertical');
-        input.min = minZoom; input.max = Math.max(minZoom, Math.min(zoom.max, Math.max(3, minZoom + (zoom.step || .1)))); input.step = zoom.step > 0 ? zoom.step : .1;
+        input.min = minZoom; input.max = current.isQR ? zoom.max : Math.max(minZoom, Math.min(zoom.max, Math.max(3, minZoom + (zoom.step || .1)))); input.step = zoom.step > 0 ? zoom.step : .1;
         let applied = Math.max(Number(input.min), Math.min(Number(input.max), settings.zoom ?? zoom.min));
         input.value = applied;
         const output = document.createElement('span'); output.className = 'ean-camera-zoom-value'; output.textContent = `${applied.toFixed(1)}×`;

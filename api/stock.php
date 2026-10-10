@@ -56,6 +56,11 @@ try {
                 $updated=stock_query($db,'UPDATE pallets SET description=? WHERE id=? AND revision=?',[trim($description),$id,(int)($_POST['revision']??0)])->rowCount();
                 if (!$updated) throw new CatalogException('El palet cambió. Recarga antes de guardar la descripción.',409);
                 stock_touch($db,$id,$uid); break;
+            case 'delete_label':
+                $label=stock_label($db,(string)($_POST['code']??''));
+                if ($label['pallet_id']) throw new CatalogException('Este código ya tiene un palet. Recarga antes de eliminarlo.',409);
+                if ((int)$label['reserved_by']!==$uid) throw new CatalogException('Solo puedes eliminar tus etiquetas pendientes.',403);
+                stock_query($db,'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE code=?',[$label['code']]); break;
             case 'delete':
                 stock_editable($db,$id,$uid,true); stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$id]);
                 stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$id]); break;
