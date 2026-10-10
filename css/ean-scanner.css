@@ -4,6 +4,7 @@
 .library-scanner-dialog .ean-reader video { display: block; width: 100%; height: auto; max-height: 55dvh; object-fit: contain; }
 .library-scanner-dialog .ean-reader canvas { height: auto; }
 .ean-reader #qr-shaded-region > div { background-color: white !important; }
+.ean-reader.ean-detecting #qr-shaded-region > div { background-color: #facc15 !important; }
 .ean-reader.ean-confirmed #qr-shaded-region > div { background-color: #23c55e !important; }
 .library-scanner-dialog .scanner-status { margin-top: 12px; color: #536174; line-height: 1.4; font-size: .95rem; }
 .library-scanner-dialog [hidden] { display: none !important; }
