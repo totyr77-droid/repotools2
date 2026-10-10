@@ -1,3 +1,11 @@
+// Mantiene el desplazamiento con un dedo y bloquea el zoom de la página.
+['gesturestart', 'gesturechange', 'gestureend'].forEach(type => {
+  document.addEventListener(type, event => event.preventDefault(), { passive: false });
+});
+document.addEventListener('touchmove', event => {
+  if (event.touches.length > 1) event.preventDefault();
+}, { passive: false });
+
 const btnNavCel = document.getElementById("btn.nav-celular");
 const btnNavCelIcon = document.getElementById("btn-nav-celularA");
 const navCelu = document.getElementById("nav-celular");
