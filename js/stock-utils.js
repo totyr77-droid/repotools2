@@ -13,5 +13,6 @@
   function expiryText(value,warningDays=30){if(!value)return {text:'Sin vencimiento',className:''};const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Buenos_Aires',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());const days=Math.round((Date.parse(value+'T00:00:00Z')-Date.parse(today+'T00:00:00Z'))/86400000);return {days,text:days<0?`Vencido hace ${-days} día${days===-1?'':'s'}`:days===0?'Vence hoy':`Vence en ${days} día${days===1?'':'s'}`,className:days<0?'stock-expiry-past':days<=warningDays?'stock-expiry-near':''};}
   function palletCode(value){const text=String(value).trim();if(/^\d{8}$/.test(text))return text;try{const url=new URL(text);if(url.origin!==location.origin||!url.pathname.endsWith('/palet.php'))return null;const code=url.searchParams.get('codigo');return /^\d{8}$/.test(code||'')?code:null;}catch{return null;}}
   function movementDate(value){return new Date(/Z$|\+\d\d:?\d\d$/.test(value)?value:value.replace(' ','T')+'Z').toLocaleString('es-AR',{timeZone:'America/Buenos_Aires',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});}
-  window.RepoStockUtils={movementDate,calculate,dateISO,dateDisplay,expiryText,palletCode};
+  function ownerName(p){return p.owner_name+(p.owner_company?' ('+p.owner_company+')':'');}
+  window.RepoStockUtils={ownerName,movementDate,calculate,dateISO,dateDisplay,expiryText,palletCode};
 })();

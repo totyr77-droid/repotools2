@@ -36,7 +36,7 @@ function stock_is_admin(PDO $db,?int $user): bool { return $user!==null && stock
 function stock_detail(PDO $db, string $code, ?int $user): array {
     $label=stock_label($db,$code); $admin=stock_is_admin($db,$user);
     if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
-    $p=stock_query($db,'SELECT p.*,u.name AS owner_name,a.name AS updated_name FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
+    $p=stock_query($db,'SELECT p.*,u.name AS owner_name,u.company AS owner_company,a.name AS updated_name FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
     if (!$p) throw new CatalogException('Este palet ya no está disponible. Recarga la lista.',409);
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     $owner=$user !== null && (int)$p['owner_id']===$user;
@@ -130,7 +130,7 @@ function stock_warning_days(PDO $db,int $user): int {
 function stock_list(PDO $db,int $user,bool $all=false): array {
     $all=$all&&stock_is_admin($db,$user);
     $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
-    return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,(int)$all,$user,$user])->fetchAll();
+    return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,u.company AS owner_company,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,(int)$all,$user,$user])->fetchAll();
 }
 function stock_notify(PDO $db,int $user): void {
     $days=stock_warning_days($db,$user);

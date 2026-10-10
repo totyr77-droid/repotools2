@@ -114,6 +114,10 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE pallet_admin_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), pallet_id {$ref} REFERENCES pallets(id), code TEXT NOT NULL, action TEXT NOT NULL, details TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(8)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 9')->fetchColumn()) {
+            $db->exec("ALTER TABLE users ADD COLUMN company TEXT NOT NULL DEFAULT ''");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(9)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

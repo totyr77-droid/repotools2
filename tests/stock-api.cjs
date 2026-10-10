@@ -12,16 +12,16 @@ function client(owner = 'a'.repeat(64)) {
 }
 
 const a=client(),b=client(),guest=client();let csrfA,csrfB;
-async function register(request,name){const form=await request('cuenta.php?mode=registro');const csrf=form.text.match(/name="csrf" value="([^"]+)"/)[1];assert.equal((await request('cuenta.php?mode=registro',{name,email:name+'@example.invalid',password:'stock-test-password',csrf})).status,302);return (await request('api/stock.php')).json().csrf;}
+async function register(request,name,company=''){const form=await request('cuenta.php?mode=registro');const csrf=form.text.match(/name="csrf" value="([^"]+)"/)[1];assert.equal((await request('cuenta.php?mode=registro',{name,company,email:name+'@example.invalid',password:'stock-test-password',csrf})).status,302);return (await request('api/stock.php')).json().csrf;}
 async function post(request,csrf,data,key=randomUUID()){const r=await request('api/stock.php',{csrf,operation_key:key,...data});return r;}
 (async()=>{
  for(let i=0;i<30;i++){try{await guest('index.php');break;}catch{await new Promise(r=>setTimeout(r,100));}}
- csrfA=await register(a,'Juan');csrfB=await register(b,'Pedro');assert.equal((await a('api/stock.php')).json().warning_days,30);
+ csrfA=await register(a,'Juan','Agencia <Norte>');csrfB=await register(b,'Pedro');assert.equal((await a('api/stock.php')).json().warning_days,30);
  assert.equal((await post(guest,csrfA,{action:'generate'})).status,401);assert.equal((await post(a,'wrong',{action:'generate'})).status,403);
  const key=randomUUID(),generated=await post(a,csrfA,{action:'generate',count:2},key);assert.equal(generated.status,200,generated.text);const labels=generated.json().labels;assert.equal((await post(a,csrfA,{action:'generate',count:2},key)).json().labels[0].code,labels[0].code);assert.equal((await a('api/stock.php')).json().labels.length,2);
  const unused=labels[1].code;assert.equal((await post(b,csrfB,{action:'delete_label',code:unused})).status,403);assert.equal((await post(a,csrfA,{action:'delete_label',code:unused})).status,200);assert.equal((await guest('api/stock.php?code='+unused)).json().pallet.can_claim,false);assert.equal((await a('api/stock.php')).json().labels.length,1);
  const code=labels[0].code;assert.equal((await guest('api/stock.php?code='+code)).json().pallet.available,true);assert.equal((await b('etiqueta.php?codigo='+code)).status,403);
- const claimed=await post(a,csrfA,{action:'claim',code});assert.equal(claimed.status,200,claimed.text);const id=claimed.json().id;
+ const claimed=await post(a,csrfA,{action:'claim',code});assert.equal(claimed.status,200,claimed.text);const id=claimed.json().id;assert.equal((await guest('api/stock.php?code='+code)).json().pallet.owner_company,'Agencia <Norte>');assert.ok((await a('cuenta.php')).text.includes('Agencia &lt;Norte&gt;'));
  assert.equal((await post(b,csrfB,{action:'delete',pallet_id:id})).status,403);
  assert.equal((await post(a,csrfA,{action:'delete_label',code})).status,409);const rev=(await a('api/stock.php?code='+code)).json().pallet.revision;await post(a,csrfA,{action:'description',pallet_id:id,revision:rev,description:'Ubicacion privada'});assert.equal((await a('api/stock.php?code='+code)).json().pallet.description,'Ubicacion privada');assert.ok(!('description' in (await guest('api/stock.php?code='+code)).json().pallet));assert.ok(!('description' in (await b('api/stock.php?code='+code)).json().pallet));
  const product={action:'save_product',pallet_id:id,ean:'96385074',name:'Agua',amount:8,kind:'boxes',pack_size:5,expires:new Date(Date.now()+30*86400000).toLocaleDateString('en-CA',{timeZone:'America/Buenos_Aires'})};

@@ -35,6 +35,7 @@ const token = html => html.match(/name="csrf" value="([^"]+)"/)[1];
   const form = await request('cuenta.php?mode=registro&next=stock');
   const data = { csrf: token(form.text), name: 'Prueba', email: 'test@example.com', password: 'una-clave-de-prueba' };
   assert.match((await request('cuenta.php?mode=registro', { ...data, csrf: 'incorrecto' })).text, /venció/);
+  assert.match((await request('cuenta.php?mode=registro', {...data,company:'x'.repeat(101)})).text,/100 caracteres/);
   const registered = await request('cuenta.php?mode=registro&next=stock', data);
   assert.equal(registered.location, 'stock.php', registered.text);
   const stock = await request('stock.php');

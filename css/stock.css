@@ -67,6 +67,23 @@
 .stock-preferences input { width: 90px; min-height: 44px; padding: 10px; border: 1px solid #b8bfd0; border-radius: 8px; }
 .stock-preferences button { min-height: 44px; border-radius: 10px; padding: 10px 16px; background: #27187e; color: white; }
 .account-panel-profile { max-width: 640px; padding: 24px; }
+.account-panel-auth { max-width: 460px; padding: 24px; background: white; border: 1px solid #e5e5ef; box-shadow: 0 8px 30px #27187e08; }
+.account-panel-auth h1 { font-size: 1.6rem; margin-bottom: 8px; }
+.account-panel-auth .account-intro { font-size: .875rem; color: #626b7a; margin-bottom: 20px; }
+.account-panel-auth label { margin: 14px 0; font-size: .875rem; }
+.account-field-title { display: flex; align-items: center; gap: 8px; line-height: 1.4; }
+.account-field-title svg,.account-company svg { width: 18px; height: 18px; flex-shrink: 0; color: #62577e; }
+.account-field-title small { color: #626b7a; font-weight: 400; }
+.account-panel-auth input { min-height: 48px; border-color: #c8ccda; }
+.account-panel-auth .account-field-hint { font-size: .75rem; color: #626b7a; margin: -6px 0 14px; }
+.account-panel-auth .password-toggle { width: auto; min-height: 44px; padding: 8px 0; background: transparent; color: #62577e; font-size: .8rem; }
+.account-panel-auth form > p:not(.account-error) { font-size: .8rem; color: #626b7a; margin-bottom: 12px; }
+.account-panel-auth form > button[type="submit"] { min-height: 48px; margin-top: 8px; }
+.account-panel-auth > a { min-height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: .875rem; margin-top: 12px; }
+.account-company { display: flex; align-items: center; gap: 8px; overflow-wrap: anywhere; }
+.account-auth-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px 12px; margin-top: 12px; }
+.account-panel-auth .account-auth-links a { display: flex; align-items: center; justify-content: center; min-height: 44px; margin: 0; text-decoration: none; font-size: .8rem; text-align: center; }
+.account-panel-auth .account-notice { margin: 12px 0 0; font-size: .75rem; color: #626b7a; text-align: center; }
 .account-panel-profile h1 { margin-bottom: 8px; }
 .account-panel-profile > p { margin-bottom: 6px; }
 .account-shortcuts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 16px; }
