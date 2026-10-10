@@ -121,14 +121,16 @@ function stock_save_product(PDO $db,int $user,array $input): array {
     stock_query($db,'UPDATE pallets SET activated=1 WHERE id=?',[$id]); stock_touch($db,$id,$user);
     return ['code'=>$p['code'],'relocated'=>$relocated];
 }
+function stock_warning_days(PDO $db,int $user): int {
+    $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
+    return $days===false?30:min(30,max(0,(int)$days));
+}
 function stock_list(PDO $db,int $user): array {
-    $preference=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
-    $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.($preference===false?7:(int)$preference).' days')->format('Y-m-d');
+    $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
     return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,$user,$user])->fetchAll();
 }
 function stock_notify(PDO $db,int $user): void {
-    $preference=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
-    $days=$preference===false?7:(int)$preference;
+    $days=stock_warning_days($db,$user);
     $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify("+{$days} days")->format('Y-m-d');
     $items=stock_query($db,"SELECT b.id,b.name,b.ean,b.expires,p.code FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND b.expires<>'' AND b.expires<=? AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$limit,$user,$user])->fetchAll();
     foreach($items as $item) stock_query($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO NOTHING",[$user,'expiry:'.$user.':'.$item['id'].':'.$item['expires'],'stock_expiry','Mercadería próxima a vencer','Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']).' · Vence '.implode('/',array_reverse(explode('-',$item['expires'])))]);

@@ -78,7 +78,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <a href="reportes.php">Mis reportes</a>
     <a href="stock.php">Gestionar palets</a>
     <a href="index.php">Volver al escáner</a></nav>
-    <section class="stock-preferences"><h2>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="7" value="7" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
+    <section class="stock-preferences"><h2>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="30" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
     <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
     <p>Usa palets y participa en TOPs.</p>

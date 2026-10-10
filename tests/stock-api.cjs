@@ -16,15 +16,16 @@ async function register(request,name){const form=await request('cuenta.php?mode=
 async function post(request,csrf,data,key=randomUUID()){const r=await request('api/stock.php',{csrf,operation_key:key,...data});return r;}
 (async()=>{
  for(let i=0;i<30;i++){try{await guest('index.php');break;}catch{await new Promise(r=>setTimeout(r,100));}}
- csrfA=await register(a,'Juan');csrfB=await register(b,'Pedro');
+ csrfA=await register(a,'Juan');csrfB=await register(b,'Pedro');assert.equal((await a('api/stock.php')).json().warning_days,30);
  assert.equal((await post(guest,csrfA,{action:'generate'})).status,401);assert.equal((await post(a,'wrong',{action:'generate'})).status,403);
  const key=randomUUID(),generated=await post(a,csrfA,{action:'generate',count:2},key);assert.equal(generated.status,200,generated.text);const labels=generated.json().labels;assert.equal((await post(a,csrfA,{action:'generate',count:2},key)).json().labels[0].code,labels[0].code);assert.equal((await a('api/stock.php')).json().labels.length,2);
  const code=labels[0].code;assert.equal((await guest('api/stock.php?code='+code)).json().pallet.available,true);assert.equal((await b('etiqueta.php?codigo='+code)).status,403);
  const claimed=await post(a,csrfA,{action:'claim',code});assert.equal(claimed.status,200,claimed.text);const id=claimed.json().id;
  assert.equal((await post(b,csrfB,{action:'delete',pallet_id:id})).status,403);
- const product={action:'save_product',pallet_id:id,ean:'96385074',name:'Agua',amount:8,kind:'boxes',pack_size:5,expires:'2026-12-24'};
+ const product={action:'save_product',pallet_id:id,ean:'96385074',name:'Agua',amount:8,kind:'boxes',pack_size:5,expires:new Date(Date.now()+30*86400000).toLocaleDateString('en-CA',{timeZone:'America/Buenos_Aires'})};
  const productKey=randomUUID();assert.equal((await post(a,csrfA,product,productKey)).status,200);assert.equal((await post(a,csrfA,product,productKey)).status,200);let detail=(await a('api/stock.php?code='+code)).json().pallet;assert.equal(detail.products[0].units,40);
  assert.equal((await guest('api/stock.php?ean=96385074')).status,401);assert.equal((await b('api/stock.php?ean=96385074')).json().references[0].pack_size,5);assert.equal((await b('api/stock.php?ean=55007732')).status,422);
+ assert.equal(Number((await a('api/stock.php')).json().pallets.find(p=>p.code===code).expiry_count),1);await post(a,csrfA,{action:'preferences',expiry_days:29});assert.equal(Number((await a('api/stock.php')).json().pallets.find(p=>p.code===code).expiry_count),0);await post(a,csrfA,{action:'preferences',expiry_days:30});
  const raced=await post(b,csrfB,{...product,pallet_id:0,code});assert.equal(raced.status,200,raced.text);assert.equal(raced.json().relocated,true);assert.notEqual(raced.json().code,code);assert.equal((await b('api/stock.php?code='+raced.json().code)).json().pallet.products[0].units,40);
  assert.equal((await post(a,csrfA,{action:'invite',pallet_id:id,email:'Pedro@example.invalid'.toLowerCase()})).status,200);const invited=(await b('api/notificaciones.php')).json();assert.ok(invited.notifications.some(n=>n.type==='stock_invitation'));
  assert.equal((await post(b,csrfB,{...product,pallet_id:id})).status,403);assert.equal((await post(b,csrfB,{action:'accept',pallet_id:id})).status,200);assert.equal((await post(b,csrfB,{...product,amount:2,kind:'units'})).status,200);
