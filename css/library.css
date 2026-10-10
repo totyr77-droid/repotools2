@@ -34,7 +34,7 @@
 .library-save-card small { color: #626b7a; font-weight: 400; }
 .library-save-hint { color: #626b7a; font-size: .85rem; line-height: 1.5; font-weight: 400; overflow-wrap: anywhere; }
 .library-save-hint:empty { display: none; }
-.library-save-hint button { margin: 8px 8px 0 0; }
+.library-save-hint button { display: flex; width: 44px; margin: 8px 8px 0 0; }
 @media (max-width: 360px) { .library-save-card { padding: 12px; } }
 .library-dialog-actions button { flex: 1; }
 .library-ean-dialog { text-align: center; background: white; }
