@@ -75,6 +75,8 @@
     }
   }
   function render() {
+    get('libraryEmpty').hidden = libraries.length > 0;
+    get('collectionList').hidden = libraries.length === 0;
     get('collectionSettings').open = false;
     get('collectionList').replaceChildren();
     libraries.forEach(library => {
@@ -350,6 +352,6 @@
   message('Cargando colecciones…');
   request().then(result => {
     libraries = result; activeId = libraries.length ? Number(libraries[0].id) : null;
-    render(); message(libraries.length ? '' : 'Crea tu primera colección.'); previewImport();
+    render(); message(''); previewImport();
   }).catch(error => message(error.message)).finally(() => get('newCollection').disabled = false);
 })();

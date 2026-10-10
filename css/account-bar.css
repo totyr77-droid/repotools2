@@ -1,0 +1,8 @@
+.account-bar { min-height: 48px; padding: 2px 20px; gap: 12px; background: #fafaff; border-bottom: 1px solid #ebeaf2; font-size: .875rem; }
+.account-bar .account-greeting { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #626b7a; }
+.account-greeting strong { font-weight: 600; color: #27187e; }
+.account-bar > form { flex-shrink: 0; margin: 0; }
+.account-bar > form button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 10px; margin: 0; border: 0; border-radius: 8px; background: transparent; font-size: .85rem; color: #62607b; white-space: nowrap; }
+.account-bar > form button svg { width: 18px; height: 18px; flex-shrink: 0; }
+.account-bar > form button:hover { background: #e9e6f5; color: #27187e; }
+@media (max-width: 768px) { .account-bar { padding: 2px 16px; gap: 8px; } }

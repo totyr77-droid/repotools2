@@ -33,7 +33,7 @@
 <script src="js/product-info.js?v=20261010-ajax1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261010-ajax1"></script>
-<script src="js/biblioteca.js?v=20261010-ajax1"></script>
+<script src="js/biblioteca.js?v=20261010-empty1"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="js/product-reports.js?v=20261010-ajax1"></script>
 <script src="js/reports-page.js?v=20261010-ajax1"></script>

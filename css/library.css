@@ -13,6 +13,11 @@ body.library-page { display: flex; flex-direction: column; min-height: 100vh; mi
 .library-status { line-height: 1.5; color: #536174; margin-bottom: 16px; }
 .library-status:empty { display: none; }
 .library-collections { display: flex; width: 100%; gap: 8px; overflow-x: auto; padding: 12px; margin-bottom: 20px; background: #f0eef8; border: 1px solid #e3deef; border-radius: 14px; }
+.library-collections[hidden], .library-empty-notice[hidden] { display: none; }
+.library-empty-notice { display: flex; align-items: flex-start; gap: 12px; padding: 18px; border: 1px solid #c8e8d7; border-radius: 14px; background: #edf8f1; color: #23704a; }
+.library-empty-notice > svg { flex-shrink: 0; width: 22px; height: 22px; margin-top: 2px; }
+.library-empty-notice h2 { margin: 0; font-size: 1rem; line-height: 1.4; color: #236342; }
+.library-empty-notice p { margin: 6px 0 0; font-size: .9rem; line-height: 1.5; color: #426b53; }
 .library-collections button { flex-shrink: 0; max-width: 240px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 .library-collections button[aria-pressed="true"] { background: var(--color1); color: white; }
 #collectionPanel { padding: 20px; border: 1px solid #e1e5ed; border-radius: 16px; background: #fff; }

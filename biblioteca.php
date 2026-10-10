@@ -12,7 +12,8 @@ include __DIR__ . '/vistas/header.vista.php';
     <div class="library-heading"><div><h1>Biblioteca</h1><p>Tus productos, a mano.</p></div><button id="newCollection" class="library-primary" type="button">+ Crear</button></div>
     <p id="libraryStatus" class="library-status" role="status"></p>
     <?php if (!getenv('DATABASE_URL')): ?><p class="library-status">Versión de prueba: las colecciones pueden perderse si el servidor reinicia.</p><?php endif; ?>
-    <nav id="collectionList" class="library-collections" aria-label="Tus colecciones"></nav>
+    <aside id="libraryEmpty" class="library-empty-notice" role="status" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg><div><h2>Crea tu primera colección</h2><p>Usá «+ Crear» para darle un nombre y empezar a guardar productos.</p></div></aside>
+    <nav id="collectionList" class="library-collections" aria-label="Tus colecciones" hidden></nav>
     <section id="collectionPanel" hidden>
       <div class="library-collection-header">
         <div class="library-collection-name"><h2 id="collectionTitle"></h2>
