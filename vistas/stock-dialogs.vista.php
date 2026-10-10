@@ -19,7 +19,7 @@ function stock_dialog_heading(string $title,string $id,string $descriptionId='')
  <button id="claimPallet" class="library-primary" type="button">Usar este palet</button><div id="palletProducts"></div><footer id="palletMetadata" class="stock-metadata"></footer>
 </dialog>
 <dialog id="stockProductDialog" class="library-dialog"><?php stock_dialog_heading('Producto','stockProductDialog'); ?><form id="stockProductForm">
- <label id="stockEanLabel">Código EAN<input id="stockEanInput" inputmode="numeric" maxlength="13" placeholder="EAN de 8 o 13 números" required></label><button id="lookupStockEan" class="library-secondary" type="button">Buscar producto</button><p id="stockFixedEan" class="stock-muted" hidden></p>
+ <label id="stockEanLabel">Código EAN<input id="stockEanInput" inputmode="numeric" maxlength="13" placeholder="EAN de 8 o 13 números" required></label><p id="stockFixedEan" class="stock-muted" hidden></p>
  <label>Nombre de referencia<input id="stockProductName" maxlength="120" placeholder="Ej.: Red Bull Energizante 250 ml"></label>
  <div class="stock-form-row"><label><span>Presentación</span><select id="stockProductKind"><option value="units">Unidades</option><option value="boxes">Cajas cerradas</option><option value="packs">Bultos cerrados</option></select></label><label id="stockPackLabel" hidden><span id="stockPackTitle">Unidades por caja</span><input id="stockPackSize" type="number" inputmode="numeric" min="1" max="1000000" value="1" placeholder="Ej.: 12"></label></div>
  <label>Cantidad<input id="stockAmount" inputmode="numeric" autocomplete="off" maxlength="80" placeholder="Ej.: 8 × 5" value="1" required></label><p id="stockAmountResult" class="stock-muted" role="status"></p>
