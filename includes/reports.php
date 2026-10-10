@@ -106,6 +106,11 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
             if ($report['user_id'] !== null) $db->prepare('INSERT INTO report_rewards (report_id, user_id) VALUES (?, ?) ON CONFLICT(report_id) DO NOTHING')->execute([$id, $report['user_id']]);
         }
         $db->prepare('UPDATE product_reports SET status = ?, reviewed_by = ?, review_note = ?, reviewed_at = CURRENT_TIMESTAMP WHERE id = ? AND status = ?')->execute([$decision, $user['id'], trim($note), $id, 'pending']);
+        if ($report['user_id'] !== null) {
+            $title = $decision === 'approved' ? 'Tu reporte fue aprobado' : 'Tu reporte fue rechazado';
+            $body = 'EAN ' . $report['ean'] . ($decision === 'approved' ? ' · Actualizamos el producto.' : ' · ' . trim($note));
+            $db->prepare('INSERT INTO notifications (user_id, event_key, type, title, body, report_id) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(event_key) DO NOTHING')->execute([$report['user_id'], 'report:' . $id . ':' . $decision, 'report_review', $title, $body, $id]);
+        }
         $db->commit(); return report_detail($db, $id, 'user:' . $user['id'], true);
     } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
 }

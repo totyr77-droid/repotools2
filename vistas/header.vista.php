@@ -38,6 +38,8 @@ if (current_user()) {
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
+    <link href="css/notifications.css" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaInicio)): ?><link href="css/home.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css" rel="stylesheet" type="text/css"><?php endif; ?>
   </head>
   <body<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
@@ -61,6 +63,17 @@ if (current_user()) {
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
         </nav>
 
+        <?php if (current_user()): ?>
+        <div class="notification-control">
+          <button id="openNotifications" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="notificationPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM9 21h6"/></svg><span id="notificationBadge" hidden></span></button>
+          <section id="notificationPanel" class="notification-panel" aria-label="Notificaciones" hidden>
+            <div class="notification-heading"><h2>Notificaciones</h2><button id="closeNotifications" type="button" aria-label="Cerrar notificaciones">×</button></div>
+            <button id="readAllNotifications" type="button" hidden>Marcar todas como leídas</button>
+            <p id="notificationStatus" role="status"></p><div id="notificationList"></div>
+          </section>
+        </div>
+        <script>window.repotoolsNotifications = <?= json_encode(['csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
+        <?php endif; ?>
         <button id="btn.nav-celular" class="botonMenu" type="button" aria-label="Abrir menu">
           <i id="btn-nav-celularA" class="fa-solid fa-angle-left"></i>
           <?php if ($navModerator): ?><span class="report-pending-badge report-menu-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span><?php endif; ?>

@@ -11,6 +11,7 @@ El visor de Inicio muestra el código de barras, el nombre y el contenido del pr
 - TOPs es público y su acceso está en Mi cuenta. Solo los escaneos con cuenta suman. Ordena por códigos únicos acumulados. Cada lectura repetida suma al total, pero no al ranking. Los reintentos de envío con el mismo identificador no duplican una lectura. Escribir productos, importar listas o borrarlas no afecta al TOP. Se contabilizan las lecturas de cámara en Inicio, Biblioteca y Stock.
 - Las cuentas tienen un campo `role`, cuyo valor inicial es `usuario`. La asignación de otros permisos y su administración quedan pendientes; el registro público no permite elegir un rol.
 - Se pueden reportar datos de productos, proponer correcciones y adjuntar fotos privadas. Administradores y moderadores revisan los tickets. Los TOPs públicos incluyen reportes enviados y aportes confirmados, exclusivamente de cuentas registradas. Consulta [reportes y configuración de fotos en Render](docs/reportes.md).
+- Las cuentas tienen una campana de notificaciones en el encabezado. Aprobar o rechazar un reporte genera un aviso privado para su autor, dentro de la misma transacción; repetir una revisión no duplica el aviso. La lectura se guarda en la base. El panel consulta novedades cada minuto mientras la página está visible y permite abrir el reporte o marcar todos los avisos como leídos.
 
 ## Ejecutar con XAMPP
 

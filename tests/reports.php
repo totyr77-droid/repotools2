@@ -38,6 +38,8 @@ if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
 check_report(review_product_report($db, $mod, (int) $report['id'], $review)['status'] === 'approved', 'Acepta el reporte.');
 check_report(catalog_product($db, $ean)['quantity'] === '500 ml', 'La aprobación actualiza el catálogo.');
 review_product_report($db, $mod, (int) $report['id'], $review);
+check_report((int) $db->query('SELECT COUNT(*) FROM notifications WHERE user_id = ' . $user['id'])->fetchColumn() === 1, 'La aprobación repetida genera una sola notificación para el autor.');
+check_report($db->query('SELECT title FROM notifications WHERE user_id = ' . $user['id'])->fetchColumn() === 'Tu reporte fue aprobado', 'Avisa la aprobación.');
 check_report((int) $db->query('SELECT COUNT(*) FROM report_rewards')->fetchColumn() === $previousRewards + 1, 'Una aprobación repetida solo da un punto.');
 $guestOwner = report_owner(null, str_repeat('b', 64));
 $guest = submit_product_report($db, null, $guestOwner, [...$input, 'submission_key' => $uuid()], [], $storage);
@@ -47,6 +49,7 @@ $self = submit_product_report($db, $mod, report_owner($mod, ''), [...$input, 'su
 denied_report(fn() => review_product_report($db, $mod, (int) $self['id'], [...$review, 'revision' => catalog_product($db, $ean)['revision']]), 403);
 denied_report(fn() => review_product_report($db, $users['administrador'], (int) $self['id'], ['decision' => 'rejected', 'review_note' => '']), 422);
 review_product_report($db, $users['administrador'], (int) $self['id'], ['decision' => 'rejected', 'review_note' => 'La foto no demuestra el cambio.']);
+check_report($db->query('SELECT title FROM notifications WHERE user_id = ' . $mod['id'])->fetchColumn() === 'Tu reporte fue rechazado', 'Avisa el rechazo a su autor.');
 check_report((int) $db->query('SELECT COUNT(*) FROM report_rewards')->fetchColumn() === $previousRewards + 1, 'Rechazar no da puntos.');
 $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute(['usuario', $mod['id']]);
 denied_report(fn() => review_product_report($db, $mod, (int) $self['id'], $review), 403);

@@ -63,4 +63,6 @@
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); }); dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); }); dialog.addEventListener('close', () => { ++version; active = null; clearPhotos(); });
   form.addEventListener('submit', event => { event.preventDefault(); review('approved'); }); reject.addEventListener('click', () => review('rejected')); load();
+  const linkedReport = new URL(location.href).searchParams.get('report');
+  if (/^[1-9]\d*$/.test(linkedReport || '')) open(Number(linkedReport));
 })();

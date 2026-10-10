@@ -55,5 +55,6 @@
 <?php endif; ?>
 <script src="js/botones.js"></script>
 <script src="js/report-notifications.js"></script>
+<script src="js/notifications.js"></script>
 </body>
 </html>
