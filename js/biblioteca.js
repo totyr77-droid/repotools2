@@ -116,7 +116,8 @@
     });
   }
   function renderViewer() {
-    get('libraryProductDisclosure').open = false;
+    if (get('libraryInfoDialog').open) get('libraryInfoDialog').close();
+    window.RepoProductInfo.clear(get('libraryProductDetails'));
     const library = libraries.find(l => Number(l.id) === viewerId);
     if (!library?.products.length) return;
     viewerIndex = Math.max(0, Math.min(viewerIndex, library.products.length - 1));
@@ -129,6 +130,7 @@
     get('eanProductName').textContent = product.name || 'Producto sin nombre';
     get('eanValue').textContent = product.ean;
     get('eanPosition').textContent = `${viewerIndex + 1} de ${library.products.length}`;
+    get('librarySwipeHint').hidden = library.products.length < 2;
     get('previousLibraryEan').disabled = viewerIndex === 0;
     get('nextLibraryEan').disabled = viewerIndex === library.products.length - 1;
     get('libraryBarcode').replaceChildren();
@@ -138,7 +140,6 @@
     } catch {
       get('eanPosition').textContent += ' · No se pudo dibujar este EAN.';
     }
-    window.RepoProductInfo.show(get('libraryProductDetails'), product.ean);
   }
   function productDialog(ean = '', libraryId = activeId) {
     enteringEan = !ean;
@@ -163,7 +164,7 @@
   window.addEventListener('repotools:product-updated', event => {
     const { ean } = event.detail;
     if (get('libraryProductDialog').open && get('libraryProductEan').value === ean) loadScannedProduct(ean);
-    if (get('libraryEanDialog').open && get('eanValue').textContent === ean) window.RepoProductInfo.show(get('libraryProductDetails'), ean);
+    if (get('libraryInfoDialog').open && get('libraryInfoEan').dataset.ean === ean) window.RepoProductInfo.show(get('libraryProductDetails'), ean);
   });
   get('newCollection').addEventListener('click', () => {
     editingCollection = false; get('collectionFormTitle').textContent = 'Nueva colección';
@@ -216,8 +217,38 @@
     viewerId = Number(get('eanCollection').value); viewerIndex = 0;
     activeId = viewerId; render(); renderViewer();
   });
-  get('previousLibraryEan').addEventListener('click', () => { viewerIndex--; renderViewer(); });
-  get('nextLibraryEan').addEventListener('click', () => { viewerIndex++; renderViewer(); });
+  function moveViewer(direction) {
+    const library = libraries.find(l => Number(l.id) === viewerId);
+    if (!library || viewerIndex + direction < 0 || viewerIndex + direction >= library.products.length) return;
+    viewerIndex += direction; renderViewer();
+  }
+  get('previousLibraryEan').addEventListener('click', () => moveViewer(-1));
+  get('nextLibraryEan').addEventListener('click', () => moveViewer(1));
+  get('openLibraryProductInfo').addEventListener('click', () => {
+    const ean = get('eanValue').textContent;
+    get('libraryInfoEan').textContent = `EAN ${ean}`; get('libraryInfoEan').dataset.ean = ean;
+    openDialog('libraryInfoDialog'); window.RepoProductInfo.show(get('libraryProductDetails'), ean);
+  });
+  get('libraryInfoDialog').addEventListener('close', () => window.RepoProductInfo.clear(get('libraryProductDetails')));
+  let swipeStart = null;
+  const swipeArea = get('libraryEanSwipeArea');
+  swipeArea.addEventListener('touchstart', event => {
+    swipeStart = event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null;
+  }, { passive: true });
+  swipeArea.addEventListener('touchend', event => {
+    const start = swipeStart; swipeStart = null;
+    if (!start || event.changedTouches.length !== 1 || !get('libraryEanDialog').open || get('libraryInfoDialog').open) return;
+    const dx = event.changedTouches[0].clientX - start.x, dy = event.changedTouches[0].clientY - start.y;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) moveViewer(dx < 0 ? 1 : -1);
+  }, { passive: true });
+  swipeArea.addEventListener('touchcancel', () => { swipeStart = null; }, { passive: true });
+  get('libraryEanDialog').addEventListener('close', () => { swipeStart = null; });
+  window.addEventListener('keydown', event => {
+    if (!get('libraryEanDialog').open || get('libraryInfoDialog').open || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault(); moveViewer(event.key === 'ArrowLeft' ? -1 : 1);
+    }
+  });
   document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => get(b.dataset.close).close()));
 
   const scanner = window.RepoEANScanner.create('libraryReader', {

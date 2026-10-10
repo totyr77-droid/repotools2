@@ -49,10 +49,14 @@ include __DIR__ . '/vistas/header.vista.php';
 <dialog id="libraryEanDialog" class="library-dialog library-ean-dialog">
   <div class="library-heading"><h2>Código EAN</h2><button type="button" data-close="libraryEanDialog" class="library-secondary">Cerrar</button></div>
   <label>Colección<select id="eanCollection"></select></label>
-  <h3 id="eanProductName"></h3><svg id="libraryBarcode" role="img" aria-label="Código de barras del producto"></svg><p id="eanValue"></p>
-  <p id="eanPosition" role="status"></p>
-  <details id="libraryProductDisclosure" class="library-disclosure"><summary>Información del producto <svg class="library-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><section id="libraryProductDetails" class="product-details" aria-label="Características del producto"></section></details>
+  <div id="libraryEanSwipeArea" class="library-ean-swipe-area"><h3 id="eanProductName"></h3><svg id="libraryBarcode" role="img" aria-label="Código de barras del producto"></svg><p id="eanValue"></p>
+  <p id="eanPosition" role="status"></p><p id="librarySwipeHint" class="library-swipe-hint" hidden>Desliza para cambiar de producto</p></div>
+  <button id="openLibraryProductInfo" type="button" class="library-secondary library-info-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v2"/></svg> Información</button>
   <div class="library-dialog-actions"><button id="previousLibraryEan" class="library-secondary" type="button">← Anterior</button><button id="nextLibraryEan" class="library-primary" type="button">Siguiente →</button></div>
+</dialog>
+<dialog id="libraryInfoDialog" class="library-dialog" aria-labelledby="libraryInfoTitle">
+  <div class="library-heading"><h2 id="libraryInfoTitle">Información del producto</h2><button type="button" data-close="libraryInfoDialog" class="library-secondary">Cerrar</button></div>
+  <p id="libraryInfoEan" class="library-scanned-ean"></p><section id="libraryProductDetails" class="product-details" aria-label="Características del producto"></section>
 </dialog>
 <dialog id="libraryImportDialog" class="library-dialog" aria-labelledby="libraryImportTitle">
   <h2 id="libraryImportTitle">Colección compartida</h2><p id="libraryImportQuestion"></p>

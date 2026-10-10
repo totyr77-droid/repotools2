@@ -88,6 +88,10 @@ summary:focus-visible { outline: 2px solid var(--color1); outline-offset: 3px; }
 #eanProductName { overflow-wrap: anywhere; }
 #eanValue { font-size: 1.15rem; letter-spacing: .12em; user-select: text; }
 #eanPosition { color: #626b7a; margin-top: 16px; }
+.library-ean-swipe-area { touch-action: pan-y; }
+.library-swipe-hint { color: #626b7a; font-size: .8rem; margin-top: 8px; }
+.library-info-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; }
+.library-info-button svg { width: 20px; height: 20px; }
 #libraryReader { width: 100%; }
 body:has(.library-dialog[open]) { overflow: hidden; }
 @media (max-width: 768px) {
