@@ -152,6 +152,7 @@ function cargarListaCompartida() {
 function actualizarContadores() {
   if (els.cantidad) els.cantidad.textContent = lista.length;
   if (els.cantidadScan) els.cantidadScan.textContent = lista.length;
+  if (els.ver) els.ver.disabled = lista.length === 0;
   if (els.compartir) els.compartir.disabled = lista.length === 0;
   if (els.compartirD) els.compartirD.disabled = lista.length === 0;
   if (els.borrarD) els.borrarD.disabled = lista.length === 0;

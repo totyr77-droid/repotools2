@@ -57,6 +57,7 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf
   context.navigator.share = async () => { const error = new Error('Cancelado'); error.name = 'AbortError'; throw error; };
   await context.compartirCodigos(['96385074']); assert.equal(copied.length, 2, 'Cancelar compartir no activa la copia alternativa');
   assert.equal(get('compartir').disabled, false, 'Compartir se activa con productos');
+  assert.equal(get('ver').disabled, false, 'Ver lista se activa con productos');
   context.window.RepoConfirm = async () => false;
   await context.borrarTodo();
   assert.equal(JSON.parse(storage.get('lista')).length, 2, 'Cancelar conserva la lista');
@@ -65,6 +66,7 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf
   assert.deepEqual(JSON.parse(storage.get('lista')), [], 'Confirmar borra la lista');
   assert.equal(get('compartir').disabled, true, 'Compartir se desactiva sin productos');
   assert.equal(get('compartirD').disabled, true);
+  assert.equal(get('ver').disabled, true, 'Ver lista se desactiva sin productos');
   console.log('OK: EAN visible y copiado coinciden, duplicados preservados, producto y portapapeles tardíos no mezclan resultados.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
 

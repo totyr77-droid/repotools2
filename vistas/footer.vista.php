@@ -51,7 +51,7 @@
 <script src="js/product-reports.js"></script>
 <script src="js/ean-scanner.js?v=20261010-scan2"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/script.js?v=20261010-home3"></script>
+<script src="js/script.js?v=20261010-home4"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/botones.js"></script>
