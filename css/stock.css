@@ -37,6 +37,13 @@
 .stock-pallet-dialog { width: min(720px,calc(100% - 24px)); }
 .stock-pallet-dialog [hidden],.stock-workspace [hidden] { display: none !important; }
 #palletTools .library-settings-menu { left: auto; right: 0; }
+#palletTools .library-settings { position: relative; }
+#palletTools .library-settings summary { width: 48px; min-height: 48px; background: #f0eef8; color: #27187e; }
+#palletTools .library-settings-menu { top: calc(100% + 6px); width: min(240px,calc(100vw - 64px)); }
+#palletTools .library-settings-menu button,#palletTools .library-settings-menu a { justify-content: flex-start; gap: 10px; width: 100%; padding: 12px; min-height: 44px; text-align: left; text-decoration: none; }
+#palletTools .library-settings-menu .stock-delete { background: #c92a38; color: white; }
+.stock-metadata { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding: 12px; font-size: .8rem; }
+.stock-metadata svg { width: 18px; height: 18px; }
 #palletDescriptionInput { width: 100%; padding: 12px; border: 1px solid #b8bfd0; border-radius: 10px; font: inherit; }
 .stock-member { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 0; border-bottom: 1px solid #edf0f5; }
 .stock-preferences { margin-top: 24px; padding-top: 20px; border-top: 1px solid #edf0f5; }
