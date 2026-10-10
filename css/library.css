@@ -2,7 +2,7 @@ body.library-page { display: flex; flex-direction: column; min-height: 100vh; mi
 .library-page > .account-bar { top: 0; flex-shrink: 0; }
 .library-page > .library-main { flex: 1 0 auto; min-height: 0; margin-top: 0; }
 .library-main { justify-content: flex-start; }
-.library-app { width: min(720px, 100%); }
+.library-app { width: min(1120px, 100%); }
 .library-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .library-heading h1, .library-heading h2 { margin: 0; color: var(--color1); overflow-wrap: anywhere; }
 .library-heading p { margin-top: 8px; line-height: 1.4; color: #536174; }
@@ -11,9 +11,35 @@ body.library-page { display: flex; flex-direction: column; min-height: 100vh; mi
 .library-secondary { background: #e9e6f5; color: var(--color1); }
 .library-danger { background: transparent; color: #a32d2d; margin-top: 16px; }
 .library-status { line-height: 1.5; color: #536174; margin-bottom: 16px; }
-.library-collections { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 16px; }
+.library-status:empty { display: none; }
+.library-collections { display: flex; width: 100%; gap: 8px; overflow-x: auto; padding: 12px; margin-bottom: 20px; background: #f0eef8; border: 1px solid #e3deef; border-radius: 14px; }
 .library-collections button { flex-shrink: 0; max-width: 240px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 .library-collections button[aria-pressed="true"] { background: var(--color1); color: white; }
+#collectionPanel { padding: 20px; border: 1px solid #e1e5ed; border-radius: 16px; background: #fff; }
+.library-collection-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid #edf0f5; }
+.library-collection-name { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.library-collection-name h2 { margin: 0; font-size: 1.25rem; overflow-wrap: anywhere; color: var(--color1); }
+.library-add-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.library-icon-button { display: grid; place-items: center; width: 48px; padding: 12px; font-size: 1.15rem; }
+.library-icon-button svg, .library-settings svg { width: 20px; height: 20px; flex-shrink: 0; }
+svg.library-chevron { width: 14px; height: 14px; flex-shrink: 0; }
+.library-settings { position: relative; flex-shrink: 0; }
+.library-settings summary { display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 48px; min-height: 48px; border-radius: 10px; color: #62577e; cursor: pointer; }
+.library-settings summary:hover, .library-settings[open] summary { background: #f0eef8; }
+.library-settings summary, .library-disclosure summary { list-style: none; }
+.library-settings summary::-webkit-details-marker, .library-disclosure summary::-webkit-details-marker { display: none; }
+.library-chevron { font-size: .7rem; transition: transform .18s ease; }
+details[open] > summary .library-chevron { transform: rotate(180deg); }
+.library-settings-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 4; width: 210px; padding: 6px; background: white; border: 1px solid #e1e5ed; border-radius: 12px; box-shadow: 0 8px 24px #1720331a; }
+.library-settings-menu button { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0; text-align: left; background: transparent; }
+.library-settings-menu button:hover { background: #f4f3f9; }
+.library-disclosure { margin-top: 16px; border-top: 1px solid #e1e5ed; text-align: left; }
+.library-disclosure summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; gap: 12px; color: var(--color1); cursor: pointer; }
+.library-disclosure .product-details { margin-top: 0; border-top: 0; }
+summary:focus-visible { outline: 2px solid var(--color1); outline-offset: 3px; }
+@media (min-width: 900px) { .library-products { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 540px) { #collectionPanel { padding: 14px; } .library-collection-header { position: relative; flex-wrap: wrap; gap: 8px; } .library-collection-name { flex: 1; } .library-settings { position: static; } .library-settings-menu { left: 0; top: calc(100% - 8px); } }
+@media (prefers-reduced-motion: reduce) { .library-chevron { transition: none; } }
 .library-scan { width: 100%; margin-bottom: 8px; }
 .library-products { display: grid; gap: 10px; margin-top: 20px; }
 .library-product { background: white; border: 1px solid #e1e5ed; border-radius: 12px; padding: 16px; }

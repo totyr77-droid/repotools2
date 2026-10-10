@@ -60,6 +60,7 @@
     }
   }
   function render() {
+    get('collectionSettings').open = false;
     get('collectionList').replaceChildren();
     libraries.forEach(library => {
       const tab = button(`${library.name} (${library.products.length})`, 'library-secondary', () => {
@@ -94,6 +95,7 @@
     });
   }
   function renderViewer() {
+    get('libraryProductDisclosure').open = false;
     const library = libraries.find(l => Number(l.id) === viewerId);
     if (!library?.products.length) return;
     viewerIndex = Math.max(0, Math.min(viewerIndex, library.products.length - 1));
@@ -148,6 +150,7 @@
     get('collectionName').value = ''; openDialog('collectionDialog');
   });
   get('renameCollection').addEventListener('click', () => {
+    get('collectionSettings').open = false;
     editingCollection = true; get('collectionFormTitle').textContent = 'Renombrar colección';
     get('collectionName').value = activeLibrary().name; openDialog('collectionDialog');
   });
@@ -157,15 +160,22 @@
     try {
       await mutate({ action: editingCollection ? 'rename' : 'create', name, library_id: activeId || '' });
       if (!editingCollection) { activeId = Number(libraries.find(l => l.name === name).id); render(); }
-      get('collectionDialog').close(); message('Colección guardada.');
+      get('collectionDialog').close(); message('');
     } catch (error) { message(error.message); }
   });
   get('deleteCollection').addEventListener('click', async () => {
+    get('collectionSettings').open = false;
     if (!confirm('¿Eliminar esta colección y todos sus productos?')) return;
     try { await mutate({ action: 'delete', library_id: activeId }); message('Colección eliminada.'); }
     catch (error) { message(error.message); }
   });
   get('manualLibraryProduct').addEventListener('click', () => productDialog());
+  document.addEventListener('click', event => {
+    if (!get('collectionSettings').contains(event.target)) get('collectionSettings').open = false;
+  });
+  get('collectionSettings').addEventListener('keydown', event => {
+    if (event.key === 'Escape') { get('collectionSettings').open = false; get('collectionSettings').querySelector('summary').focus(); }
+  });
   get('libraryProductForm').addEventListener('submit', async event => {
     event.preventDefault();
     try {

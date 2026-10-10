@@ -6,16 +6,21 @@ include __DIR__ . '/vistas/header.vista.php';
 ?>
 <main class="library-main">
   <section class="library-app">
-    <div class="library-heading"><div><h1>Biblioteca</h1><p>Organiza productos en colecciones.</p></div><button id="newCollection" class="library-primary" type="button">+ Crear</button></div>
+    <div class="library-heading"><div><h1>Biblioteca</h1><p>Tus productos, a mano.</p></div><button id="newCollection" class="library-primary" type="button">+ Crear</button></div>
     <p id="libraryStatus" class="library-status" role="status"></p>
     <?php if (!getenv('DATABASE_URL')): ?><p class="library-status">Versión de prueba: las colecciones pueden perderse si el servidor reinicia.</p><?php endif; ?>
-    <div id="collectionList" class="library-collections" aria-label="Tus colecciones"></div>
+    <nav id="collectionList" class="library-collections" aria-label="Tus colecciones"></nav>
     <section id="collectionPanel" hidden>
-      <div class="library-heading"><h2 id="collectionTitle"></h2><button id="renameCollection" class="library-secondary" type="button">Renombrar</button></div>
-      <button id="scanLibraryProduct" class="library-primary library-scan" type="button"><i class="fa-solid fa-barcode" aria-hidden="true"></i> Escanear producto</button>
-      <button id="manualLibraryProduct" class="library-secondary" type="button">Escribir código</button>
+      <div class="library-collection-header">
+        <div class="library-collection-name"><h2 id="collectionTitle"></h2>
+          <details id="collectionSettings" class="library-settings">
+            <summary aria-label="Ajustes de colección" title="Ajustes de colección"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3 1-1h4l1 1 .5 2 2 1 2-.5 2 3-.5 2-1.5 1v2l1.5 1 .5 2-2 3-2-.5-2 1-.5 2-1 1h-4l-1-1-.5-2-2-1-2 .5-2-3 .5-2 1.5-1v-2L3 11l-.5-2 2-3 2 .5 2-1Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="library-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+            <div class="library-settings-menu"><button id="renameCollection" class="library-secondary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6ZM13 6l5 5"/></svg> Renombrar</button><button id="deleteCollection" class="library-danger" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg> Eliminar colección</button></div>
+          </details>
+        </div>
+        <div class="library-add-actions"><button id="scanLibraryProduct" class="library-primary library-icon-button" type="button" aria-label="Escanear producto" title="Escanear producto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5v14M6 5v14M10 5v14M13 5v14M18 5v14M21 5v14"/></svg></button><button id="manualLibraryProduct" class="library-secondary library-icon-button" type="button" aria-label="Escribir código" title="Escribir código"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 15h10"/></svg></button></div>
+      </div>
       <div id="libraryProducts" class="library-products"></div>
-      <button id="deleteCollection" class="library-danger" type="button">Eliminar colección</button>
     </section>
   </section>
 </main>
@@ -43,7 +48,7 @@ include __DIR__ . '/vistas/header.vista.php';
   <label>Colección<select id="eanCollection"></select></label>
   <h3 id="eanProductName"></h3><svg id="libraryBarcode" role="img" aria-label="Código de barras del producto"></svg><p id="eanValue"></p>
   <p id="eanPosition" role="status"></p>
-  <section id="libraryProductDetails" class="product-details" aria-label="Características del producto"></section>
+  <details id="libraryProductDisclosure" class="library-disclosure"><summary>Información del producto <svg class="library-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><section id="libraryProductDetails" class="product-details" aria-label="Características del producto"></section></details>
   <div class="library-dialog-actions"><button id="previousLibraryEan" class="library-secondary" type="button">← Anterior</button><button id="nextLibraryEan" class="library-primary" type="button">Siguiente →</button></div>
 </dialog>
 <script>window.repotoolsLibrary = <?= json_encode(['userId' => current_user() ? (int) current_user()['id'] : null, 'csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
