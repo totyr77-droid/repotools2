@@ -29,14 +29,14 @@ include __DIR__ . '/vistas/header.vista.php';
 </dialog>
 <dialog id="libraryProductDialog" class="library-dialog">
   <form id="libraryProductForm">
-    <h2>Guardar producto</h2>
+    <h2 id="libraryProductFormTitle">Guardar producto</h2>
     <div class="library-save-card">
       <p id="libraryScannedEan" class="library-scanned-ean" hidden></p>
       <label id="libraryManualEan">Código EAN<input id="libraryProductEan" inputmode="numeric" pattern="(?:[0-9]{8}|[0-9]{13})" maxlength="13" required placeholder="8 o 13 números"></label>
-      <label>Nombre de referencia <small>(opcional)</small><input id="libraryProductName" maxlength="120" placeholder="Ej.: Red Bull Energizante Lata 250 ml" aria-describedby="libraryScanProductInfo"></label>
-      <section id="libraryScanProductInfo" class="library-save-hint" role="status" aria-label="Información del producto"></section>
+      <div id="libraryProductReference"><label>Nombre de referencia <small>(opcional)</small><input id="libraryProductName" maxlength="120" placeholder="Ej.: Red Bull Energizante Lata 250 ml" aria-describedby="libraryScanProductInfo"></label>
+      <section id="libraryScanProductInfo" class="library-save-hint" role="status" aria-label="Información del producto"></section></div>
     </div>
-    <div class="library-dialog-actions"><button type="button" data-close="libraryProductDialog" class="library-secondary">Cancelar</button><button type="submit" class="library-primary">Guardar</button></div>
+    <div class="library-dialog-actions"><button type="button" data-close="libraryProductDialog" class="library-secondary">Cancelar</button><button id="libraryProductSubmit" type="submit" class="library-primary">Guardar</button></div>
   </form>
 </dialog>
 <dialog id="libraryScannerDialog" class="library-dialog library-scanner-dialog" aria-labelledby="libraryScannerTitle">

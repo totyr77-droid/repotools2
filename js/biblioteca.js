@@ -11,6 +11,16 @@
   let scannerRevision = 0;
   let busy = false;
   let scannedLibraryId = null;
+  let enteringEan = false;
+  const icon = paths => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '1.8');
+    svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = paths; return svg;
+  };
+  const barcodeIcon = () => icon('<path d="M3 5v14M6 5v14M10 5v14M13 5v14M18 5v14M21 5v14"/>');
 
   function message(text) {
     get('libraryStatus').textContent = text;
@@ -81,17 +91,25 @@
     library.products.forEach((product, index) => {
       const card = document.createElement('article'); card.className = 'library-product';
       const title = document.createElement('h3'); title.textContent = product.name || 'Producto sin nombre';
-      const code = document.createElement('p'); code.textContent = product.ean;
+      const code = document.createElement('p'); code.className = 'library-product-code';
+      code.append(barcodeIcon(), document.createTextNode(product.ean));
+      const description = document.createElement('div'); description.className = 'library-product-description'; description.append(title, code);
       const actions = document.createElement('div'); actions.className = 'library-product-actions';
-      actions.append(button('Ver EAN', 'library-primary', () => {
+      const view = button('', 'library-primary library-view-code', () => {
         viewerId = Number(library.id); viewerIndex = index;
         renderViewer(); openDialog('libraryEanDialog');
-      }), button('Quitar', 'library-danger', async () => {
+      });
+      view.setAttribute('aria-label', 'Ver EAN'); view.title = 'Ver EAN';
+      view.append(icon('<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'), barcodeIcon());
+      const remove = button('', 'library-danger library-remove-product', async () => {
         if (!confirm('¿Quitar este producto de la colección?')) return;
         try { await mutate({ action: 'delete_product', library_id: library.id, ean: product.ean }); message('Producto eliminado.'); }
         catch (error) { message(error.message); }
-      }));
-      card.append(title, code, actions); get('libraryProducts').append(card);
+      });
+      remove.setAttribute('aria-label', 'Quitar producto'); remove.title = 'Quitar producto';
+      remove.append(icon('<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>'));
+      actions.append(view, remove);
+      card.append(description, actions); get('libraryProducts').append(card);
     });
   }
   function renderViewer() {
@@ -120,12 +138,16 @@
     window.RepoProductInfo.show(get('libraryProductDetails'), product.ean);
   }
   function productDialog(ean = '', libraryId = activeId) {
+    enteringEan = !ean;
     productLibraryId = libraryId;
     get('libraryProductForm').reset(); get('libraryProductEan').value = ean;
     get('libraryProductEan').readOnly = Boolean(ean);
     get('libraryManualEan').hidden = Boolean(ean);
     get('libraryScannedEan').hidden = !ean;
     get('libraryScannedEan').textContent = ean ? `EAN ${ean}` : '';
+    get('libraryProductReference').hidden = enteringEan;
+    get('libraryProductSubmit').textContent = enteringEan ? 'Siguiente' : 'Guardar';
+    get('libraryProductFormTitle').textContent = enteringEan ? 'Escribir código EAN' : 'Guardar producto';
     openDialog('libraryProductDialog');
     (ean ? get('libraryProductName') : get('libraryProductEan')).focus();
     window.RepoProductInfo.clear(get('libraryScanProductInfo'));
@@ -135,11 +157,6 @@
     const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean, { compact: true });
     if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = Array.from(window.RepoProductInfo.referenceName(product)).slice(0, 120).join('');
   }
-  get('libraryProductEan').addEventListener('change', () => {
-    const ean = get('libraryProductEan').value.trim();
-    window.RepoProductInfo.clear(get('libraryScanProductInfo'));
-    if (window.RepoEANScanner.validEAN(ean)) loadScannedProduct(ean);
-  });
   window.addEventListener('repotools:product-updated', event => {
     const { ean } = event.detail;
     if (get('libraryProductDialog').open && get('libraryProductEan').value === ean) loadScannedProduct(ean);
@@ -178,6 +195,12 @@
   });
   get('libraryProductForm').addEventListener('submit', async event => {
     event.preventDefault();
+    const ean = get('libraryProductEan').value.trim();
+    if (!window.RepoEANScanner.validEAN(ean)) return message('Revisa el código EAN: debe tener 8 o 13 números y ser válido.');
+    if (enteringEan) {
+      productDialog(ean, productLibraryId);
+      return;
+    }
     try {
       await mutate({ action: 'add_product', library_id: productLibraryId, ean: get('libraryProductEan').value.trim(), name: get('libraryProductName').value.trim() });
       get('libraryProductDialog').close(); message('Producto guardado.');
