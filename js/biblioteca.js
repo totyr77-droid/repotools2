@@ -120,6 +120,7 @@
   function productDialog(ean = '', libraryId = activeId) {
     productLibraryId = libraryId;
     get('libraryProductForm').reset(); get('libraryProductEan').value = ean;
+    get('libraryProductEan').readOnly = Boolean(ean);
     openDialog('libraryProductDialog');
     (ean ? get('libraryProductName') : get('libraryProductEan')).focus();
     window.RepoProductInfo.clear(get('libraryScanProductInfo'));
