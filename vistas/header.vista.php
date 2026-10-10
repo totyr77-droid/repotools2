@@ -35,12 +35,12 @@ if (current_user()) {
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/product-info.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261010-result2" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <link href="css/notifications.css" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261010-stock8" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261010-stock9" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261010-motion1" rel="stylesheet" type="text/css">

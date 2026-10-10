@@ -265,6 +265,7 @@
   document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => get(b.dataset.close).close()));
 
   const scanner = window.RepoEANScanner.create('libraryReader', {
+    onManual:()=>{const id=scannedLibraryId;closeScanner();productDialog('',id);},
     onStatus: text => { get('libraryScannerStatus').textContent = text; },
     onError: () => { get('libraryScannerStatus').textContent = 'No pudimos leer el código. Intenta nuevamente.'; },
     onCode: async ean => {

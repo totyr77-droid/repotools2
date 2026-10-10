@@ -47,6 +47,7 @@ let scanResultRevision = 0;
 let viewerRevision = 0;
 
 const scanner = window.RepoEANScanner.create('contenedor', {
+  onManual: abrirEntradaManual,
   onCode: codigo => {
     const result = mostrarResultadoEscaneo(codigo);
     return result;
@@ -291,10 +292,10 @@ function cerrarScanner() {
   scanner.stop().catch(() => {});
 }
 
-async function mostrarResultadoEscaneo(codigo) {
+async function mostrarResultadoEscaneo(codigo,lectura=true) {
   if (!els.contenedormax.open || !window.RepoEANScanner.validEAN(codigo)) return;
   const revision = ++scanResultRevision;
-  registrarEscaneoTop(codigo);
+  if(lectura)registrarEscaneoTop(codigo);
   const esDuplicado = lista.includes(codigo);
   resultadoActual = codigo;
   ultimoAgregado = esDuplicado ? null : codigo;
@@ -499,5 +500,15 @@ window.quitarOverlay = quitarOverlay;
     if (document.getElementById('resultInfoDialog').open) window.RepoProductInfo.show(document.getElementById('resultProductDetails'), ean);
   }
 });
+
+async function abrirEntradaManual(){
+  await scanner.stop();
+  const dialog=document.createElement('dialog');dialog.className='library-dialog';
+  dialog.innerHTML='<div class="library-heading"><h2>Ingresar EAN</h2><button class="app-close" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><form><label>Código EAN<input inputmode="numeric" maxlength="13" autocomplete="off" placeholder="EAN de 8 o 13 números" required></label><p role="status" class="library-status"></p><button class="library-primary" type="submit">Agregar producto</button></form>';
+  document.body.append(dialog);let accepted=false;
+  dialog.querySelector('.app-close').addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('close',()=>{dialog.remove();if(!accepted&&els.contenedormax.open)iniciarScanner();},{once:true});
+  dialog.querySelector('form').addEventListener('submit',e=>{e.preventDefault();const code=dialog.querySelector('input').value.trim();if(!window.RepoEANScanner.validEAN(code)){dialog.querySelector('[role=status]').textContent='Ingresa un EAN válido de 8 o 13 números.';return;}accepted=true;dialog.close();mostrarResultadoEscaneo(code,false);});dialog.showModal();
+}
 
 })();

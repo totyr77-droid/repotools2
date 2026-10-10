@@ -58,7 +58,7 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {} }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual }) {
     const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
@@ -68,12 +68,12 @@
     };
     function cameraControls(current) {
       const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
-      if (!track || !document.createElement) return;
-      const capabilities = track.getCapabilities?.() ?? {}, settings = track.getSettings?.() ?? {};
+      if (!document.createElement) return;
+      const capabilities = track?.getCapabilities?.() ?? {}, settings = track?.getSettings?.() ?? {};
       const zoom = capabilities.zoom;
       const minZoom = Math.max(1, zoom?.min ?? 1);
       const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && zoom.max > minZoom;
-      if (!hasZoom && capabilities.torch !== true) return;
+      if (!hasZoom && capabilities.torch !== true && !onManual) return;
       const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
       controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', 'Controles de cámara');
       const active = () => current.accepting && session === current && current.token === revision;
@@ -128,6 +128,7 @@
         });
         controls.append(button);
       }
+      if(onManual){const manual=document.createElement('button');manual.type='button';manual.className='ean-camera-manual';if(capabilities.torch!==true)manual.classList.add('ean-camera-manual-only');manual.setAttribute('aria-label',current.isQR?'Ingresar código del palet':'Ingresar EAN');manual.title=manual.getAttribute('aria-label');manual.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M7 16h10"/></svg>';manual.addEventListener('click',()=>{if(active())Promise.resolve(onManual()).catch(onError);});controls.append(manual);}
       current.disposeControls = () => controls.remove();
       element.append(controls);
     }
