@@ -2,3 +2,16 @@ html::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height
 html.app-navigating::after { opacity: 1; animation: navigation-progress 1s ease-in-out infinite; }
 @keyframes navigation-progress { from { transform: scaleX(.15); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
 @media (prefers-reduced-motion: reduce) { html.app-navigating::after { animation: none; } }
+
+/* El foco de lectura no necesita el contorno de un control interactivo. */
+html, body { overflow-x: clip; }
+main h1[tabindex="-1"]:focus, dialog:focus { outline: none; }
+.app-page-enter { animation: section-enter 260ms cubic-bezier(.2, .7, .2, 1); }
+@keyframes section-enter { from { opacity: .35; transform: translateX(var(--page-shift, 28px)); } to { opacity: 1; transform: translateX(0); } }
+dialog[open], dialog:is(#contenedormax, #verb)[open] { animation: dialog-enter 180ms cubic-bezier(.2, .7, .2, 1); }
+dialog[open]::backdrop { animation: backdrop-enter 180ms ease-out; }
+@keyframes dialog-enter { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+@keyframes backdrop-enter { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .app-page-enter, dialog[open], dialog:is(#contenedormax, #verb)[open], dialog[open]::backdrop { animation: none; }
+}

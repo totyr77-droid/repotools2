@@ -3,7 +3,7 @@
   const routes = new Set(['index.php', 'index.html', 'biblioteca.php', 'stock.php', 'tops.php', 'reportes.php', 'cuenta.php', '']);
   const base = new URL('.', location.href);
   const loaded = new Set([...document.scripts].filter(script => script.src && new URL(script.src).origin !== location.origin).map(script => script.src));
-  let page, version = 0, pending, commitQueue = Promise.resolve();
+  let page, version = 0, pending, commitQueue = Promise.resolve(), activeURL = new URL(location.href);
   function createPage() {
     const body = document.body, controller = new AbortController(), cleanups = [];
     const listen = (target, type, callback, options = {}) => {
@@ -97,11 +97,18 @@
         await page.dispose(); resetConfig();
         const scripts = [...next.body.querySelectorAll('script')]; scripts.forEach(script => script.remove());
         const destination = new URL(response.url);
+        const sections = ['index.php', 'biblioteca.php', 'stock.php', 'tops.php', 'reportes.php', 'cuenta.php'];
+        const sectionIndex = url => sections.indexOf((url.pathname.split('/').pop() || 'index.php').replace('index.html', 'index.php'));
+        const direction = sectionIndex(destination) < sectionIndex(activeURL) ? -1 : 1;
+        const main = next.querySelector('main');
+        main.classList.add('app-page-enter');
+        main.style.setProperty('--page-shift', `${direction * 28}px`);
         if (new URL(href).hash) destination.hash = new URL(href).hash;
         if (historyMode === 'push') history.replaceState({ ...history.state, appScroll: [scrollX, scrollY] }, '', location.href);
         if (historyMode === 'push') history.pushState({ appScroll: scroll }, '', destination.href);
         else history.replaceState({ ...history.state, appScroll: scroll }, '', destination.href);
         document.title = next.title;
+        activeURL = destination;
         document.body.replaceWith(document.importNode(next.body, true));
         finishStyles(); page = createPage();
         await execute(scripts);
