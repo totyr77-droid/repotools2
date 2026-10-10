@@ -1,0 +1,43 @@
+.stock-main { display: block; padding: 24px 16px; }
+.stock-workspace { width: min(1200px,100%); margin: auto; color: #172033; }
+.stock-workspace h1,.stock-workspace h2 { color: #27187e; }
+.stock-workspace > section { margin-top: 24px; }
+.stock-workspace h2 { font-size: 1.1rem; margin-bottom: 12px; }
+.stock-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.stock-toolbar button,.stock-toolbar a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.stock-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; min-height: 48px; padding: 12px; border-radius: 10px; text-decoration: none; }
+.stock-icon svg,.stock-toolbar svg,.stock-card svg,.stock-metadata svg,.stock-delete svg { width: 20px; height: 20px; flex-shrink: 0; }
+.stock-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 12px; }
+.stock-card { padding: 16px; background: white; border: 1px solid #e1e5ed; border-radius: 14px; text-align: left; display: flex; gap: 12px; align-items: center; color: #27187e; min-height: 80px; cursor: pointer; }
+.stock-card strong { display: block; font-size: 1.1rem; letter-spacing: .06em; }
+.stock-card small { display: block; color: #626b7a; line-height: 1.5; margin-top: 4px; }
+.stock-muted { color: #626b7a; font-size: .875rem; line-height: 1.5; margin: 8px 0 16px; overflow-wrap: anywhere; }
+.stock-product { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #edf0f5; }
+.stock-product > div { min-width: 0; }
+.stock-product h3 { font-size: 1rem; overflow-wrap: anywhere; }
+.stock-product p { margin-top: 5px; font-size: .875rem; color: #626b7a; }
+.stock-product-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.stock-product-actions button { width: 44px; min-height: 44px; padding: 10px; }
+.stock-delete { background: #c92a38; color: white; margin: 0; }
+.stock-expiry-near { color: #99620c !important; }
+.stock-expiry-past { color: #b42332 !important; }
+.stock-metadata { margin-top: 24px; padding: 14px; border-radius: 12px; background: #f4f3f9; color: #62577e; font-size: .85rem; display: grid; gap: 12px; }
+.stock-metadata p { display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+.stock-metadata { min-height: 0; max-height: none; text-align: left; font-weight: 400; }
+.stock-metadata p { min-width: 0; width: 100%; margin: 0; }
+.stock-metadata p > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.stock-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stock-calculator { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+.stock-calculator button { min-height: 44px; border-radius: 8px; background: #f0eef8; color: #27187e; font-size: 1rem; cursor: pointer; }
+.stock-calculator button:nth-child(4n) { background: #e2dcef; }
+.stock-pallet-dialog { width: min(720px,calc(100% - 24px)); }
+.stock-pallet-dialog [hidden],.stock-workspace [hidden] { display: none !important; }
+#palletTools .library-settings-menu { left: auto; right: 0; }
+#palletDescriptionInput { width: 100%; padding: 12px; border: 1px solid #b8bfd0; border-radius: 10px; font: inherit; }
+.stock-member { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 0; border-bottom: 1px solid #edf0f5; }
+.stock-preferences { margin-top: 24px; padding-top: 20px; border-top: 1px solid #edf0f5; }
+.stock-preferences label { display: block; margin: 12px 0; }
+.stock-preferences input { width: 90px; min-height: 44px; padding: 10px; border: 1px solid #b8bfd0; border-radius: 8px; }
+.stock-preferences button { min-height: 44px; border-radius: 10px; padding: 10px 16px; background: #27187e; color: white; }
+@media(min-width:769px) { .stock-main { padding: 40px 32px; } }
+@media(max-width:400px) { .stock-form-row { grid-template-columns: 1fr; gap: 0; } .stock-icon { width: 44px; min-height: 44px; padding: 10px; } }

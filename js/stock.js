@@ -1,301 +1,63 @@
 (() => {
-  "use strict";
-  const page = window.RepoNavigation?.page;
-  const document = page?.document || globalThis.document;
-  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
-
-
-  const STORAGE_KEY = `repotools_palets_v1_user_${window.repotoolsUserId}`;
-  const els = {
-    escanearPalet: document.getElementById("escanearPalet"),
-    codigoPaletManual: document.getElementById("codigoPaletManual"),
-    abrirPaletManual: document.getElementById("abrirPaletManual"),
-    lista: document.getElementById("lista-palets-contenido"),
-    scanner: document.getElementById("stockScanner"),
-    scannerTitulo: document.getElementById("stockScannerTitulo"),
-    reader: document.getElementById("stockReader"),
-    paletManualScanner: document.getElementById("paletManualScanner"),
-    cerrarScanner: document.getElementById("cerrarStockScanner"),
-    editor: document.getElementById("paletEditor"),
-    cerrarEditor: document.getElementById("cerrarPaletEditor"),
-    paletCodigo: document.getElementById("paletCodigo"),
-    escanearProducto: document.getElementById("escanearProducto"),
-    eanManual: document.getElementById("eanManual"),
-    agregarEanManual: document.getElementById("agregarEanManual"),
-    productos: document.getElementById("productosPalet"),
-    eliminarPalet: document.getElementById("eliminarPalet"),
-    template: document.getElementById("productoFormTemplate")
-  };
-
-  let palets = cargarPalets();
-  let paletActivo = null;
-  const lector = window.RepoEANScanner.create('stockReader', {
-    onCode: procesarLectura,
-    onStatus: text => { document.getElementById('stockScannerStatus').textContent = text; },
-    onError: () => avisar('No pudimos leer el código. Intenta nuevamente.')
-  });
-  let scannerRevision = 0;
-  let modoEscaneo = "palet";
-  let procesandoLectura = false;
-
-  enlazarEventos();
-  renderPalets();
-
-  function enlazarEventos() {
-    els.escanearPalet.addEventListener("click", () => abrirScanner("palet"));
-    els.abrirPaletManual.addEventListener("click", abrirPaletDesdeInput);
-    els.codigoPaletManual.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") abrirPaletDesdeInput();
-    });
-    els.cerrarScanner.addEventListener("click", cerrarScanner);
-    els.scanner.addEventListener('cancel', event => { event.preventDefault(); cerrarScanner(); });
-    els.scanner.addEventListener('close', () => { if (!els.scanner.open) { scannerRevision++; lector.stop().catch(() => {}); } });
-    els.cerrarEditor.addEventListener("click", cerrarEditor);
-    els.escanearProducto.addEventListener("click", () => abrirScanner("producto"));
-    els.agregarEanManual.addEventListener("click", agregarProductoDesdeInput);
-    els.eanManual.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") agregarProductoDesdeInput();
-    });
-    els.eliminarPalet.addEventListener("click", eliminarPaletActivo);
+  'use strict';
+  const page=window.RepoNavigation?.page,document=page?.document||globalThis.document,fetch=page?.fetch||globalThis.fetch.bind(globalThis);
+  const $=id=>document.getElementById(id),U=window.RepoStockUtils,config=window.repotoolsStock||{};
+  if(!$('stockApp'))return;
+  let active=null,detailVersion=0,productVersion=0,editing=null,productTarget=null,scannerMode='pallet',scannerVersion=0,csrf=config.csrf,productKey,descriptionRevision,lookupVersion=0;
+  const busy=new Set();let calculatorReplace=true;
+  const icon=name=>{const source=document.querySelector(`[data-icon="${name}"]`);return source?.innerHTML||$('scanPallet').querySelector('svg').outerHTML;};
+  function text(tag,value,parent,className=''){const el=document.createElement(tag);el.textContent=value;if(className)el.className=className;parent?.append(el);return el;}
+  function button(label,parent,fn,className='library-secondary'){const b=text('button',label,parent,className);b.type='button';b.addEventListener('click',fn);return b;}
+  function iconButton(label,source,parent,fn,className='library-secondary stock-icon'){const b=button('',parent,fn,className);b.innerHTML=$(source).querySelector('svg').outerHTML;b.setAttribute('aria-label',label);b.title=label;return b;}
+  function stamp(value){return new Date(/Z$|\+\d\d:?\d\d$/.test(value)?value:value.replace(' ','T')+'Z').toLocaleString('es-AR');}
+  async function api(query='',data,key){const options={credentials:'same-origin',cache:'no-store'};if(data){options.method='POST';options.body=new URLSearchParams({...data,csrf,operation_key:key||crypto.randomUUID()});}const response=await fetch('api/stock.php'+query,options),result=await response.json();if(!response.ok){const e=Error(result.error||'No pudimos acceder a Stock.');e.status=response.status;throw e;}if(result.csrf)csrf=result.csrf;return result;}
+  async function run(id,fn){if(busy.has(id))return;busy.add(id);const root=$(id),controls=[...(root.matches('button')?[root]:[]),...root.querySelectorAll('button,input,select,textarea')],states=controls.map(b=>b.disabled);controls.forEach(b=>b.disabled=true);try{await fn();}finally{busy.delete(id);controls.forEach((b,i)=>b.disabled=states[i]);}}
+  function show(id){if(!$(id).open)$(id).showModal();}
+  document.querySelectorAll('[data-stock-close]').forEach(b=>b.addEventListener('click',()=>{const dialog=$(b.dataset.stockClose);if([...busy].some(id=>dialog.contains($(id))))return;dialog.close();}));
+  document.querySelectorAll('dialog').forEach(d=>d.addEventListener('cancel',e=>{if([...busy].some(id=>d.contains($(id))))e.preventDefault();}));
+  const scanner=window.RepoEANScanner.create('stockReader',{onCode:async code=>{const mode=scannerMode;await closeScanner();if(mode==='pallet'){const parsed=U.palletCode(code);if(parsed)await openPallet(parsed);else $('stockStatus').textContent='Este QR no pertenece a un palet de esta web.';}else{await openProduct(null,code);try{await fetch('api/escaneos.php',{method:'POST',body:new URLSearchParams({csrf,code,event:crypto.randomUUID()})});}catch{}}},onStatus:value=>$('stockScannerStatus').textContent=value,onError:()=>{$('stockScannerStatus').textContent='No pudimos leer el código. Puedes ingresarlo con el botón de teclado.';}});
+  async function closeScanner(){++scannerVersion;if($('stockScanner').open)$('stockScanner').close();await scanner.stop();}
+  $('stockScanner').addEventListener('close',()=>{++scannerVersion;scanner.stop().catch(()=>{});});
+  $('stockScanner').addEventListener('cancel',()=>scanner.stop().catch(()=>{}));
+  async function scan(mode){scannerMode=mode;const version=++scannerVersion;$('stockScanner').querySelector('h2').textContent=mode==='pallet'?'Escanea el QR del palet':'Escanea el EAN';show('stockScanner');try{await scanner.start(mode==='pallet'?'qr':'ean');}catch{if(version===scannerVersion)$('stockScannerStatus').textContent='No pudimos abrir la cámara. Revisa el permiso o usa el teclado.';}}
+  $('scanPallet').addEventListener('click',()=>scan('pallet'));
+  $('manualPallet').addEventListener('click',()=>{ $('manualPalletStatus').textContent='';show('manualPalletDialog');});
+  $('manualPalletForm').addEventListener('submit',async e=>{e.preventDefault();const code=U.palletCode($('palletCodeInput').value);if(!code){$('manualPalletStatus').textContent='Ingresa los 8 números del palet.';return;}await run('manualPalletForm',async()=>{try{await openPallet(code,true);$('manualPalletDialog').close();}catch(error){$('manualPalletStatus').textContent=error.message;}});});
+  function card(p,container,subtitle){const b=button('',container,()=>openPallet(p.code),'stock-card');const span=document.createElement('span');b.append(span);text('strong',p.code,span);text('small',subtitle,span);if(p.description)text('small',p.description,span);}
+  async function load(){try{const data=await api();$('ownedPallets').replaceChildren();$('sharedPallets').replaceChildren();for(const p of data.pallets)card(p,Number(p.owner_id)===config.user_id?$('ownedPallets'):$('sharedPallets'),`${p.product_count} productos${Number(p.owner_id)!==config.user_id?' · '+p.owner_name:''}`);if(!$('ownedPallets').children.length)text('p','Todavía no tienes palets. Genera una etiqueta o escanea una disponible.',$('ownedPallets'),'stock-muted');$('sharedSection').hidden=!$('sharedPallets').children.length;$('stockLabels').hidden=!data.labels.length;$('labelList').replaceChildren();for(const label of data.labels)card(label,$('labelList'),'Reservado hasta '+new Date(Number(label.reserved_until)*1000).toLocaleString('es-AR'));$('stockInvitations').hidden=!data.invitations.length;$('invitationList').replaceChildren();for(const invitation of data.invitations){const row=text('div','',$('invitationList'),'stock-member');text('p',`${invitation.owner_name} · Palet ${invitation.code}`,row);for(const [label,action] of [['Aceptar','accept'],['Rechazar','decline']])button(label,row,async()=>{await run('invitationList',async()=>{try{await api('',{action,pallet_id:invitation.id});await load();}catch(e){$('stockStatus').textContent=e.message;}});});} }catch(e){$('stockStatus').textContent=e.message;}}
+  async function openPallet(code,throwError=false){const version=++detailVersion;try{const data=await api('?code='+encodeURIComponent(code));if(version!==detailVersion)return;active=data.pallet;renderPallet();show('palletDialog');}catch(e){if(throwError)throw e;$('stockStatus').textContent=e.message;}}
+  function renderPallet(){const p=active;$('palletDialog').querySelector('h2').textContent='Palet '+p.code;$('palletDescription').textContent=p.description||'';$('palletStatus').textContent=p.available?(p.can_claim?'Palet disponible. Puedes utilizarlo.':'Esta etiqueta está reservada para quien la generó.'):!Number(p.activated)?'Carga el primer producto antes del '+new Date(Number(p.prepared_until)*1000).toLocaleString('es-AR')+'.':!p.can_edit?'Solo puedes consultar este palet.':'';
+    $('palletTools').hidden=!p.can_edit&&!p.can_print;$('scanStockProduct').hidden=!p.can_edit;$('manualStockProduct').hidden=!p.can_edit;$('palletSettings').hidden=!p.can_edit;$('claimPallet').hidden=!p.available||!p.can_claim;$('deletePallet').hidden=!p.is_owner;$('managePalletAccess').hidden=!p.is_owner;$('leavePallet').hidden=p.is_owner||!p.can_edit;$('printPallet').href='etiqueta.php?codigo='+p.code;$('palletSettings').open=false;
+    $('palletProducts').replaceChildren();for(const product of p.products||[]){const row=text('article','',$('palletProducts'),'stock-product'),info=text('div','',row);text('h3',product.name||'Producto sin nombre',info);text('p','EAN '+product.ean,info);text('p',`${product.units} unidades${product.kind!=='units'?' · '+(Number(product.units)/Number(product.pack_size))+' '+(product.kind==='boxes'?'cajas':'bultos')+' × '+product.pack_size:''}`,info);const expiry=U.expiryText(product.expires);text('p',expiry.text+(product.expires?' · '+U.dateDisplay(product.expires):''),info,expiry.className);if(p.can_edit){const controls=text('div','',row,'stock-product-actions');iconButton('Editar producto','editProductIcon',controls,()=>openProduct(product));iconButton('Eliminar producto','deletePallet',controls,async()=>{if(!await RepoConfirm({title:'Eliminar producto',message:'Se quitará este producto del palet.'}))return;try{await api('',{action:'delete_product',pallet_id:p.id,product_id:product.id,revision:product.revision});await openPallet(p.code);await load();}catch(e){$('palletStatus').textContent=e.message;}},'library-secondary stock-icon stock-delete');}}
+    if(!p.available&&!p.products.length)text('p','Este palet no tiene productos.',$('palletProducts'),'stock-muted');$('palletMetadata').hidden=p.available;$('palletMetadata').replaceChildren();if(!p.available){for(const [label,value,source] of [['Propietario',p.owner_name,'ownerIcon'],['Último movimiento',stamp(p.updated_at)+' · por '+p.updated_name,'clockIcon']]){const row=text('p','',$('palletMetadata'));row.innerHTML=$(source).innerHTML;const span=text('span','',row);text('strong',label,span);text('br','',span);span.append(document.createTextNode(value));}}if(p.can_edit||p.can_print)RepoPalletLabel.image(p).catch(()=>{});
   }
-
-  function cargarPalets() {
-    try {
-      const datos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      return datos && typeof datos === "object" && !Array.isArray(datos) ? datos : {};
-    } catch {
-      return {};
-    }
-  }
-
-  function guardarPalets() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(palets));
-  }
-
-  function normalizarCodigo(valor) {
-    return String(valor || "").trim().replace(/\s+/g, " ").slice(0, 80);
-  }
-
-  async function abrirPaletDesdeInput() {
-    const codigo = normalizarCodigo(els.codigoPaletManual.value);
-    if (!codigo) return avisar("Ingresa o escanea un código de palet.");
-    els.codigoPaletManual.value = "";
-    await cerrarScanner();
-    abrirPalet(codigo);
-  }
-
-  function abrirPalet(codigo) {
-    if (!palets[codigo]) {
-      palets[codigo] = {
-        codigo,
-        creado: new Date().toISOString(),
-        actualizado: new Date().toISOString(),
-        productos: []
-      };
-      guardarPalets();
-    }
-    paletActivo = codigo;
-    els.paletCodigo.textContent = codigo;
-    els.editor.classList.add("activo");
-    els.editor.setAttribute("aria-hidden", "false");
-    document.body.classList.add("no-scroll");
-    renderProductos();
-    renderPalets();
-  }
-
-  function cerrarEditor() {
-    els.editor.classList.remove("activo");
-    els.editor.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("no-scroll");
-    paletActivo = null;
-    renderPalets();
-  }
-
-  async function abrirScanner(modo) {
-    if (!window.RepoEANScanner || !window.Html5Qrcode) {
-      avisar("No se pudo cargar el lector. Puedes ingresar el código manualmente.");
-      return;
-    }
-    const revision = ++scannerRevision;
-    modoEscaneo = modo;
-    procesandoLectura = false;
-    els.scannerTitulo.textContent = modo === "palet"
-      ? "Escanea el QR del palet"
-      : "Escanea el código EAN del producto";
-    els.paletManualScanner.hidden = modo !== "palet";
-    if (!els.scanner.open) els.scanner.showModal();
-
-    try {
-      await lector.start(modo === 'palet' ? 'qr' : 'ean');
-    } catch (error) {
-      if (revision !== scannerRevision) return;
-      await cerrarScanner();
-      avisar("No se pudo iniciar la cámara. Revisa el permiso o ingresa el código manualmente.");
-    }
-  }
-
-  async function procesarLectura(texto) {
-    if (procesandoLectura) return;
-    procesandoLectura = true;
-    const modo = modoEscaneo;
-    const codigo = normalizarCodigo(texto);
-    await cerrarScanner();
-
-    if (modo === "palet") {
-      if (!codigo) return avisar("El QR no contiene un código de palet válido.");
-      abrirPalet(codigo);
-      return;
-    }
-    agregarProducto(codigo);
-    try {
-      const response = await fetch('api/escaneos.php', { method: 'POST', body: new URLSearchParams({ csrf: window.repotoolsStock.csrf, code: codigo, event: crypto.randomUUID() }) });
-      if (!response.ok) avisar('El código se leyó, pero no sumó en TOPs.');
-    } catch { avisar('El código se leyó, pero no sumó en TOPs.'); }
-  }
-
-  async function cerrarScanner() {
-    ++scannerRevision;
-    if (els.scanner.open) els.scanner.close();
-    await lector.stop();
-  }
-
-  function agregarProductoDesdeInput() {
-    const ean = els.eanManual.value.trim();
-    els.eanManual.value = "";
-    agregarProducto(ean);
-  }
-
-  async function agregarProducto(ean) {
-    if (!paletActivo) return;
-    if (!window.RepoEANScanner.validEAN(ean)) return avisar("Ingresa un código EAN válido de 8 o 13 números.");
-
-    const palet = palets[paletActivo];
-    const existente = palet.productos.find((producto) => producto.ean === ean);
-    if (existente) {
-      renderProductos();
-      document.querySelector(`[data-ean="${ean}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return avisar("Ese producto ya está en el palet. Puedes editar sus datos.");
-    }
-
-    const producto = {
-      ean,
-      nombre: "",
-      bultos: 1,
-      vencimiento: ""
-    };
-    palet.productos.unshift(producto);
-    palet.actualizado = new Date().toISOString();
-    guardarPalets();
-    renderProductos();
-
-    const nombre = await buscarNombreProducto(ean);
-    if (nombre && paletActivo && palets[paletActivo]?.productos.includes(producto)) {
-      producto.nombre = nombre;
-      guardarPalets();
-      renderProductos();
-    }
-  }
-
-  async function buscarNombreProducto(ean) {
-    try {
-      const product = await window.RepoProductInfo.get(ean);
-      return window.RepoProductInfo.referenceName(product);
-    } catch {
-      return "";
-    }
-  }
-
-  function renderPalets() {
-    const lista = Object.values(palets).sort((a, b) => b.actualizado.localeCompare(a.actualizado));
-    els.lista.innerHTML = "";
-    if (!lista.length) {
-      els.lista.innerHTML = '<p class="lista-palets__empty">No hay palets guardados todavía. Escanea uno para comenzar.</p>';
-      return;
-    }
-    lista.forEach((palet) => {
-      const boton = document.createElement("button");
-      boton.type = "button";
-      boton.className = "lista-palets__item";
-      boton.innerHTML = `<span class="lista-palets__icon"><i class="fa-solid fa-pallet"></i></span>
-        <span><strong></strong><small></small><small class="lista-palets__detalle"></small></span>
-        <i class="fa-solid fa-chevron-right"></i>`;
-      boton.querySelector("strong").textContent = palet.codigo;
-      boton.querySelector("small").textContent = `${palet.productos.length} producto${palet.productos.length === 1 ? "" : "s"}`;
-      boton.querySelector(".lista-palets__detalle").textContent = palet.productos.length
-        ? palet.productos.map((producto) => `${producto.nombre || "Sin nombre"} · EAN ${producto.ean} · Cant. ${producto.bultos}${producto.vencimiento ? ` · Vence ${formatearFecha(producto.vencimiento)}` : ""}`).join(" | ")
-        : "Palet vacío";
-      boton.addEventListener("click", () => abrirPalet(palet.codigo));
-      els.lista.appendChild(boton);
-    });
-  }
-
-  function renderProductos() {
-    if (!paletActivo) return;
-    const productos = palets[paletActivo].productos;
-    els.productos.innerHTML = "";
-    if (!productos.length) {
-      els.productos.innerHTML = '<p class="productos-palet__empty">Este palet está vacío. Escanea un EAN para agregar el primer producto.</p>';
-      return;
-    }
-
-    productos.forEach((producto) => {
-      const fragmento = els.template.content.cloneNode(true);
-      const form = fragmento.querySelector("form");
-      form.dataset.ean = producto.ean;
-      form.querySelector(".producto-ean").textContent = `EAN ${producto.ean}`;
-      form.querySelector(".producto-nombre").value = producto.nombre;
-      form.querySelector(".producto-bultos").value = producto.bultos;
-      form.querySelector(".producto-vencimiento").value = producto.vencimiento;
-      form.addEventListener("submit", (e) => guardarProducto(e, producto));
-      form.querySelector(".producto-eliminar").addEventListener("click", () => eliminarProducto(producto.ean));
-      els.productos.appendChild(fragmento);
-    });
-  }
-
-  function guardarProducto(evento, producto) {
-    evento.preventDefault();
-    const form = evento.currentTarget;
-    const bultos = Number.parseInt(form.querySelector(".producto-bultos").value, 10);
-    const vencimiento = form.querySelector(".producto-vencimiento").value;
-    if (!Number.isInteger(bultos) || bultos < 1) {
-      return avisar("Completa la cantidad con un número mayor a cero.");
-    }
-    producto.nombre = form.querySelector(".producto-nombre").value.trim();
-    producto.bultos = bultos;
-    producto.vencimiento = vencimiento;
-    palets[paletActivo].actualizado = new Date().toISOString();
-    guardarPalets();
-    renderPalets();
-    avisar("Producto guardado.");
-  }
-
-  async function eliminarProducto(ean) {
-    const codigoPalet = paletActivo;
-    if (!await window.RepoConfirm({ title: 'Eliminar producto', message: `¿Eliminar el producto ${ean} de este palet?` })) return;
-    const palet = palets[codigoPalet];
-    if (!palet) return;
-    palet.productos = palet.productos.filter((producto) => producto.ean !== ean);
-    palet.actualizado = new Date().toISOString();
-    guardarPalets();
-    renderProductos();
-    renderPalets();
-  }
-
-  async function eliminarPaletActivo() {
-    const codigoPalet = paletActivo;
-    if (!codigoPalet || !await window.RepoConfirm({ title: 'Eliminar palet', message: `Se eliminará el palet ${codigoPalet} y todos sus productos. Esta acción no se puede deshacer.` })) return;
-    delete palets[codigoPalet];
-    guardarPalets();
-    cerrarEditor();
-  }
-
-  function avisar(mensaje) {
-    if (window.alertaGeneral) window.alertaGeneral("INFORMACIÓN", mensaje);
-    else alert(mensaje);
-  }
-
-  function formatearFecha(fecha) {
-    const [anio, mes, dia] = fecha.split("-");
-    return anio && mes && dia ? `${dia}/${mes}/${anio}` : fecha;
-  }
+  $('claimPallet').addEventListener('click',async()=>{if(!active?.available||!active.can_claim)return;const code=active.code;await run('claimPallet',async()=>{try{const claimed=await api('',{action:'claim',code});await openPallet(claimed.code);await load();if(claimed.relocated)$('palletStatus').textContent='Otra persona ya utilizó este código. Creamos tu palet con el código '+claimed.code+'.';await openProduct(null,'');}catch(e){$('palletStatus').textContent=e.message;}});});
+  $('manualStockProduct').addEventListener('click',()=>openProduct(null,''));$('scanStockProduct').addEventListener('click',()=>scan('product'));
+  function quantity(){try{const amount=U.calculate($('stockAmount').value),pack=$('stockProductKind').value==='units'?1:Number($('stockPackSize').value);$('stockAmountResult').textContent=`${amount}${pack>1?' × '+pack:''} = ${amount*pack} unidades`;}catch(e){$('stockAmountResult').textContent=e.message;}}
+  async function lookup(){const ean=$('stockEanInput').value.trim(),version=++lookupVersion,pVersion=productVersion;if(!RepoEANScanner.validEAN(ean)){$('stockProductStatus').textContent='Ingresa un EAN válido de 8 o 13 números.';return;}const previous=$('stockProductName').value;$('stockProductStatus').textContent='Buscando producto…';try{const product=await RepoProductInfo.get(ean);if(version!==lookupVersion||pVersion!==productVersion||!$('stockProductDialog').open)return;if($('stockProductName').value===previous&&!previous)$('stockProductName').value=RepoProductInfo.referenceName(product)||'';$('stockProductStatus').textContent=product?'':'No tenemos información de este producto. Puedes darle un nombre de referencia.';}catch{if(version===lookupVersion&&pVersion===productVersion)$('stockProductStatus').textContent='Puedes completar el nombre de referencia.';}}
+  async function openProduct(product,ean=''){if(busy.has('stockProductForm'))return;productVersion++;calculatorReplace=true;editing=product;productTarget={...active};productKey=crypto.randomUUID();$('stockProductForm').reset();$('stockProductStatus').textContent='';$('reloadStockProduct').hidden=true;const fixed=!!product;$('stockEanLabel').hidden=fixed;$('stockEanInput').required=!fixed;$('lookupStockEan').hidden=fixed;$('stockFixedEan').hidden=!fixed;$('stockFixedEan').textContent=product?'EAN '+product.ean:'';$('stockEanInput').value=product?.ean||ean;$('stockProductName').value=product?.name||'';$('stockProductKind').value=product?.kind||'units';$('stockPackSize').value=product?.pack_size||1;$('stockAmount').value=product?String(Number(product.units)/Number(product.pack_size)):'1';$('stockExpiry').value=U.dateDisplay(product?.expires||'');$('stockPackLabel').hidden=$('stockProductKind').value==='units';show('stockProductDialog');quantity();if(!product&&ean)await lookup();}
+  $('stockProductDialog').addEventListener('close',()=>{++productVersion;++lookupVersion;});
+  $('lookupStockEan').addEventListener('click',lookup);$('stockEanInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookup();}});
+  $('stockAmount').addEventListener('input',()=>{calculatorReplace=false;quantity();});$('stockPackSize').addEventListener('input',quantity);$('stockProductKind').addEventListener('change',()=>{$('stockPackLabel').hidden=$('stockProductKind').value==='units';quantity();});
+  function equals(){try{$('stockAmount').value=U.calculate($('stockAmount').value);calculatorReplace=true;quantity();}catch(e){$('stockProductStatus').textContent=e.message;}}
+  $('stockAmount').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();equals();}});
+  document.querySelectorAll('[data-calc]').forEach(b=>b.addEventListener('click',()=>{const key=b.dataset.calc,field=$('stockAmount');if(key==='=')equals();else if(key==='C')field.value='';else if(key==='⌫')field.value=field.value.slice(0,-1);else {if(calculatorReplace&&/^[0-9]$/.test(key))field.value='';field.value+=key;calculatorReplace=false;}quantity();}));
+  $('stockExpiry').addEventListener('input',e=>{const field=e.target,pos=field.selectionStart,count=field.value.slice(0,pos).replace(/\D/g,'').length,digits=field.value.replace(/\D/g,'').slice(0,6);field.value=digits.slice(0,2)+(digits.length>2?'/'+digits.slice(2,4):'')+(digits.length>4?'/'+digits.slice(4):'');let caret=count+(count>2?1:0)+(count>4?1:0);field.setSelectionRange(caret,caret);});
+  $('stockExpiry').addEventListener('keydown',e=>{const f=e.target;if(e.key==='Backspace'&&f.selectionStart===f.selectionEnd&&f.value[f.selectionStart-1]==='/')f.setSelectionRange(f.selectionStart-1,f.selectionStart-1);});
+  $('stockProductForm').addEventListener('submit',async e=>{e.preventDefault();await run('stockProductForm',async()=>{try{const data={action:'save_product',pallet_id:productTarget.id||0,code:productTarget.code,product_id:editing?.id||0,revision:editing?.revision||0,ean:editing?.ean||$('stockEanInput').value.trim(),name:$('stockProductName').value,amount:U.calculate($('stockAmount').value),kind:$('stockProductKind').value,pack_size:$('stockPackSize').value,expires:U.dateISO($('stockExpiry').value)};const saved=await api('',data,productKey);$('stockProductDialog').close();await openPallet(saved.code);if(saved.relocated)$('palletStatus').textContent=`Otra persona ya utilizó este código. Guardamos tus productos en el palet Nº ${saved.code}.`;else $('palletStatus').textContent='Producto guardado.';await load();}catch(error){$('stockProductStatus').textContent=error.message;if(error.status===409&&editing)$('reloadStockProduct').hidden=false;}});});
+  $('reloadStockProduct').addEventListener('click',async()=>{try{const data=await api('?code='+productTarget.code),current=data.pallet.products?.find(p=>Number(p.id)===Number(editing.id));if(!current)throw Error('El producto ya no está en el palet. Conservamos tus datos.');editing=current;productTarget=data.pallet;productKey=crypto.randomUUID();$('stockProductStatus').textContent=`Cantidad actual: ${current.units} unidades. Tu formulario se conservó; ajusta la cantidad antes de guardar.`;$('reloadStockProduct').hidden=true;}catch(e){$('stockProductStatus').textContent=e.message;}});
+  $('generateLabels').addEventListener('click',()=>{$('generatedLabels').hidden=true;$('generateStatus').textContent='';show('generateDialog');});
+  let generateKey; $('generateDialog').addEventListener('close',()=>generateKey=null);
+  $('generateForm').addEventListener('submit',async e=>{e.preventDefault();await run('generateForm',async()=>{try{generateKey??=crypto.randomUUID();const result=await api('',{action:'generate',count:$('labelCount').value},generateKey);generateKey=null;$('generatedLabelLinks').replaceChildren();for(const label of result.labels){const row=text('div','',$('generatedLabelLinks'),'stock-member');button(label.code,row,async()=>{$('generateDialog').close();await openPallet(label.code);});iconButton('Compartir etiqueta','sharePalletLabel',row,async()=>{try{$('generateStatus').textContent=await RepoPalletLabel.share(label);}catch(e){if(e.name!=='AbortError')$('generateStatus').textContent=e.message;}});} $('printGenerated').href='etiqueta.php?codigos='+result.labels.map(l=>l.code).join(',');$('generatedLabels').hidden=false;$('generateStatus').textContent='Etiquetas listas. Se reservaron durante 3 días.';await load();}catch(e){$('generateStatus').textContent=e.message;}});});
+  $('sharePalletLabel').addEventListener('click',async()=>{if(!active?.can_edit&&!active?.can_print)return;try{$('palletStatus').textContent=await RepoPalletLabel.share(active);}catch(e){if(e.name!=='AbortError')$('palletStatus').textContent=e.message;}});
+  $('deletePallet').addEventListener('click',async()=>{const p=active;if(!p?.is_owner||!await RepoConfirm({title:'Eliminar palet',message:`Se eliminará el palet ${p.code} y su contenido. El código quedará disponible para otra persona.`}))return;try{await api('',{action:'delete',pallet_id:p.id});$('palletDialog').close();await load();}catch(e){$('palletStatus').textContent=e.message;}});
+  $('leavePallet').addEventListener('click',async()=>{const p=active;if(!p||!await RepoConfirm({title:'Dejar de participar',message:'El palet dejará de aparecer en tus compartidos y perderás el permiso para editarlo.'}))return;try{await api('',{action:'leave',pallet_id:p.id});$('palletDialog').close();await load();}catch(e){$('palletStatus').textContent=e.message;}});
+  $('editPalletDescription').addEventListener('click',()=>{descriptionRevision=active.revision;$('palletDescriptionInput').value=active.description||'';$('descriptionStatus').textContent='';show('palletDescriptionDialog');});
+  $('palletDescriptionForm').addEventListener('submit',async e=>{e.preventDefault();await run('palletDescriptionForm',async()=>{try{await api('',{action:'description',pallet_id:active.id,revision:descriptionRevision,description:$('palletDescriptionInput').value});$('palletDescriptionDialog').close();await openPallet(active.code);await load();}catch(e){$('descriptionStatus').textContent=e.message;}});});
+  function members(){$('palletMemberList').replaceChildren();for(const member of active.members||[]){const row=text('div','',$('palletMemberList'),'stock-member');text('p',`${member.name} · ${member.status==='accepted'?'Con acceso':'Invitación pendiente'}`,row);iconButton('Quitar acceso','deletePallet',row,async()=>{if(!await RepoConfirm({title:'Quitar acceso',message:'Esta persona ya no podrá modificar el palet.'}))return;try{await api('',{action:'revoke',pallet_id:active.id,user_id:member.user_id});active=(await api('?code='+active.code)).pallet;members();}catch(e){$('accessStatus').textContent=e.message;}});}}
+  $('managePalletAccess').addEventListener('click',()=>{$('accessStatus').textContent='';members();show('palletAccessDialog');});
+  $('palletInviteForm').addEventListener('submit',async e=>{e.preventDefault();await run('palletInviteForm',async()=>{try{await api('',{action:'invite',pallet_id:active.id,email:$('palletInviteEmail').value});active=(await api('?code='+active.code)).pallet;members();$('accessStatus').textContent='Invitación enviada. La persona debe aceptarla desde Stock.';$('palletInviteForm').reset();}catch(e){$('accessStatus').textContent=e.message;}});});
+  function legacy(){let previous;try{previous=JSON.parse(localStorage.getItem('repotools_palets_v1_user_'+config.user_id)||'{}');}catch{return;}const items=Object.values(previous||{}).filter(p=>p&&typeof p.codigo==='string'&&Array.isArray(p.productos));$('legacyStock').hidden=!items.length;$('legacyList').replaceChildren();for(const p of items){const row=text('div','',$('legacyList'),'stock-member');text('p',p.codigo+' · '+p.productos.length+' productos',row);const key=crypto.randomUUID();button('Importar',row,async()=>{await run('legacyList',async()=>{try{const products=p.productos.map(b=>({ean:b.ean,name:b.nombre||'',amount:b.bultos||1,kind:'packs',pack_size:1,expires:b.vencimiento||''}));const saved=await api('',{action:'import',products:JSON.stringify(products),description:'Importado del dispositivo: '+p.codigo},key);delete previous[p.codigo];localStorage.setItem('repotools_palets_v1_user_'+config.user_id,JSON.stringify(previous));legacy();await load();await openPallet(saved.code);}catch(e){$('stockStatus').textContent=e.message;}});});}}
+  page?.onLeave(()=>{detailVersion++;productVersion++;scannerVersion++;});
+  load().then(()=>{legacy();const code=U.palletCode(new URL(location.href).searchParams.get('codigo')||'');if(code)openPallet(code);});
 })();

@@ -1,0 +1,9 @@
+(() => {
+  const page=window.RepoNavigation?.page,document=page?.document||globalThis.document,fetch=page?.fetch||globalThis.fetch.bind(globalThis);
+  const $=id=>document.getElementById(id),root=$('publicPallet');if(!root)return;
+  function text(tag,value,parent,className=''){const el=document.createElement(tag);el.textContent=value;el.className=className;parent.append(el);return el;}
+  (async()=>{try{const response=await fetch('api/stock.php?code='+encodeURIComponent(root.dataset.code),{credentials:'same-origin',cache:'no-store'}),data=await response.json();if(!response.ok)throw Error(data.error);const p=data.pallet;$('publicPalletStatus').textContent=p.available?'Palet disponible. Inicia sesión y úsalo desde Stock.':p.products.length?'Contenido del palet':'Este palet está vacío y tiene propietario.';$('publicPalletDescription').textContent=p.description||'';
+    for(const b of p.products||[]){const row=text('article','',$('publicPalletProducts'),'stock-product'),info=text('div','',row);text('h3',b.name||'Producto sin nombre',info);text('p','EAN '+b.ean,info);text('p',b.units+' unidades',info);const expiry=RepoStockUtils.expiryText(b.expires);text('p',expiry.text+(b.expires?' · '+RepoStockUtils.dateDisplay(b.expires):''),info,expiry.className);}
+    if(!p.available){$('publicPalletMetadata').hidden=false;for(const [label,value,icon] of [['Propietario',p.owner_name,'publicOwnerIcon'],['Último movimiento',new Date(/Z$|\+\d\d:?\d\d$/.test(p.updated_at)?p.updated_at:p.updated_at.replace(' ','T')+'Z').toLocaleString('es-AR')+' · por '+p.updated_name,'publicClockIcon']]){const row=text('p','',$('publicPalletMetadata'));row.innerHTML=$(icon).innerHTML;const span=text('span','',row);text('strong',label,span);text('br','',span);span.append(document.createTextNode(value));}}
+  }catch(e){$('publicPalletStatus').textContent=e.message;$('publicPalletStock').hidden=true;}})();
+})();

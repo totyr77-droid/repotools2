@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/stock.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
@@ -14,6 +15,7 @@ if ($method === 'POST' && !valid_csrf()) notification_response(403, ['error' => 
 session_write_close();
 try {
     $db = database();
+    stock_notify($db, $userId);
     if ($method === 'POST') {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         if (!$id || !in_array($_POST['action'] ?? '', ['read', 'read_all'], true)) notification_response(422, ['error' => 'Notificación no válida.']);

@@ -8,8 +8,15 @@ $error = $_SESSION['logout_error'] ?? '';
 unset($_SESSION['logout_error']);
 $name = '';
 $email = '';
+function account_destination(string $next): string {
+    $target=$next?$next.'.php':'index.php';
+    if ($next==='stock' && preg_match('/^[0-9]{8}$/D',$_SESSION['pending_stock_code']??'')) {
+        $target.='?codigo='.$_SESSION['pending_stock_code']; unset($_SESSION['pending_stock_code']);
+    }
+    return $target;
+}
 if (current_user() && $next) {
-    header('Location: ' . $next . '.php');
+    header('Location: ' . account_destination($next));
     exit;
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
@@ -47,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
                     unset($user['password_hash']);
                     $_SESSION['user'] = $user;
                     $_SESSION['csrf'] = bin2hex(random_bytes(32));
-                    header('Location: ' . ($next ? $next . '.php' : 'index.php'));
+                    header('Location: ' . account_destination($next));
                     exit;
                 }
                 $error = 'El correo o la contraseña no son correctos.';
@@ -71,6 +78,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <a href="reportes.php">Mis reportes</a>
     <a href="stock.php">Gestionar palets</a>
     <a href="index.php">Volver al escáner</a>
+    <section class="stock-preferences"><h2>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="7" value="7" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
     <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
     <p>Usa palets y participa en TOPs.</p>

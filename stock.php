@@ -1,101 +1,19 @@
 <?php
-require_once __DIR__ . "/includes/auth.php";
+require_once __DIR__.'/includes/auth.php';
+if (!current_user() && is_string($_GET['codigo']??null) && preg_match('/^[0-9]{8}$/D',$_GET['codigo'])) $_SESSION['pending_stock_code']=$_GET['codigo'];
 require_account();
-$paginaStock = true;
-include 'vistas/header.vista.php';
+require_once __DIR__.'/includes/stock-icons.php';
+$paginaStock=true; include __DIR__.'/vistas/header.vista.php';
 ?>
-<main class="stock-main">
-  <div class="contenedor-main stock-app">
-    <div class="app-resumen">
-      <h1>Tus palets</h1>
-      <p>Escanea un QR para crear o abrir un palet.</p>
-    </div>
-
-    <p class="account-notice">En desarrollo. Tus palets se guardan solo en este dispositivo.</p>
-    <script>window.repotoolsUserId = <?= (int) current_user()["id"] ?>;</script>
-    <script>window.repotoolsStock = <?= json_encode(['csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
-    <button id="escanearPalet" type="button" class="stock-primary">
-      <i class="fa-solid fa-qrcode"></i> ESCANEAR PALET
-    </button>
-
-    <section class="lista-palets" aria-labelledby="tituloPalets">
-      <p class="lista-palets__titulo" id="tituloPalets">
-        <i class="fa-solid fa-boxes-stacked"></i> Palets guardados
-      </p>
-      <div id="lista-palets-contenido"></div>
-    </section>
-  </div>
-</main>
-
-<dialog class="library-dialog library-scanner-dialog" id="stockScanner" aria-labelledby="stockScannerTitulo">
-  <div class="library-heading"><h2 id="stockScannerTitulo">Escanea el QR del palet</h2><button id="cerrarStockScanner" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
-  <div id="stockReader" class="ean-reader"></div>
-  <p id="stockScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
-  <div class="stock-scanner__manual" id="paletManualScanner">
-    <label for="codigoPaletManual">¿No puedes escanearlo? Ingresa el código</label>
-    <div>
-      <input id="codigoPaletManual" type="text" maxlength="80" placeholder="Ej: PALET-001">
-      <button id="abrirPaletManual" type="button">CONTINUAR</button>
-    </div>
-  </div>
-</dialog>
-
-<div class="palet-editor" id="paletEditor" aria-hidden="true">
-  <div class="palet-editor__panel">
-    <button id="cerrarPaletEditor" class="palet-editor__close app-close" type="button" aria-label="Cerrar palet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
-    <p class="palet-editor__logo">REPOTOOLS</p>
-    <div class="palet-editor__header">
-      <div>
-        <span>PALET</span>
-        <h2 id="paletCodigo"></h2>
-      </div>
-    </div>
-
-    <div class="palet-editor__actions">
-      <button id="escanearProducto" type="button" class="stock-primary">
-        <i class="fa-solid fa-barcode"></i> AGREGAR PRODUCTO POR EAN
-      </button>
-      <div class="stock-manual">
-        <label for="eanManual">O ingresa el EAN manualmente</label>
-        <div>
-          <input id="eanManual" type="text" inputmode="numeric" maxlength="14" placeholder="EAN-8 o EAN-13">
-          <button id="agregarEanManual" type="button">AGREGAR</button>
-        </div>
-      </div>
-    </div>
-
-    <p class="palet-editor__subtitle">Productos del palet</p>
-    <div id="productosPalet" class="productos-palet"></div>
-    <button id="eliminarPalet" class="stock-danger" type="button">
-      <i class="fa-solid fa-trash"></i> ELIMINAR PALET
-    </button>
-  </div>
-</div>
-
-<template id="productoFormTemplate">
-  <form class="producto-form">
-    <div class="producto-form__title">
-      <strong class="producto-ean"></strong>
-      <button type="button" class="producto-eliminar" aria-label="Eliminar producto">
-        <i class="fa-solid fa-trash"></i>
-      </button>
-    </div>
-    <label>
-      Producto
-      <input class="producto-nombre" type="text" maxlength="120" placeholder="Nombre del producto">
-    </label>
-    <div class="producto-form__row">
-      <label>
-        Cantidad
-        <input class="producto-bultos" type="number" min="1" step="1" required>
-      </label>
-      <label>
-        Fecha de vencimiento <small>(opcional)</small>
-        <input class="producto-vencimiento" type="date">
-      </label>
-    </div>
-    <button class="producto-guardar" type="submit">GUARDAR CAMBIOS</button>
-  </form>
-</template>
-
-<?php include 'vistas/footer.vista.php'; ?>
+<main class="stock-main"><section id="stockApp" class="stock-workspace">
+<div class="library-heading"><div><h1>Stock</h1><p>Organiza y comparte tus palets.</p></div><button id="generateLabels" class="library-primary stock-icon" type="button" aria-label="Generar etiquetas QR" title="Generar etiquetas QR"><?= stock_icon('plus') ?></button></div>
+<div class="stock-toolbar"><button id="scanPallet" class="library-primary" type="button"><?= stock_icon('qr') ?> Escanear palet</button><button id="manualPallet" class="library-secondary stock-icon" type="button" aria-label="Ingresar código" title="Ingresar código"><?= stock_icon('keyboard') ?></button></div>
+<p id="stockStatus" class="library-status" role="status"></p>
+<section id="stockInvitations" hidden><h2>Invitaciones</h2><div id="invitationList"></div></section>
+<section id="stockLabels" hidden><h2>Etiquetas pendientes</h2><p class="stock-muted">Reservadas durante 3 días desde su generación.</p><div id="labelList" class="stock-grid"></div></section>
+<section><h2>Mis palets</h2><div id="ownedPallets" class="stock-grid"></div></section>
+<section id="sharedSection" hidden><h2>Compartidos conmigo</h2><div id="sharedPallets" class="stock-grid"></div></section>
+<section id="legacyStock" hidden><h2>Palets de este dispositivo</h2><p class="stock-muted">Puedes conservar tus palets anteriores importándolos a la cuenta con un QR nuevo.</p><div id="legacyList"></div></section>
+</section></main>
+<script>window.repotoolsStock=<?= json_encode(['csrf'=>csrf_token(),'user_id'=>(int)current_user()['id']],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script>
+<?php include __DIR__.'/vistas/stock-dialogs.vista.php'; include __DIR__.'/vistas/footer.vista.php'; ?>

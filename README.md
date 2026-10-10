@@ -5,7 +5,7 @@ Escáner de códigos EAN para repositores, con registro opcional.
 El visor de Inicio muestra el código de barras, el nombre y el contenido del producto. Permite pasar con botones, deslizar en móvil o usar las flechas del teclado. **Ver información** abre los detalles por separado. **Compartir este EAN** envía solo el código visible y **Compartir lista completa** incluye todo el grupo; sin compartir nativo, copia un enlace.
 
 - Sin cuenta: escanear y guardar códigos en el navegador.
-- Con cuenta: acceso a la gestión de palets en desarrollo. Los palets todavía se guardan localmente, separados por usuario; no están sincronizados con el servidor.
+- Con cuenta: Stock guarda palets en la base de datos, con propietario e invitados que aceptan una notificación. El contenido se puede consultar sin cuenta mediante el QR; la edición requiere permisos.
 - Las cuentas usan PostgreSQL cuando se configura `DATABASE_URL`, o SQLite para desarrollo local. Incluyen contraseñas mediante hash, protección CSRF y límite de intentos.
 - Biblioteca permite crear y renombrar colecciones privadas, escanear o escribir EAN, guardar nombres y recorrer códigos de barras. Cada EAN aparece una vez por colección. Con al menos dos productos, el dueño puede compartir una copia mediante un enlace aleatorio. El destinatario inicia sesión, revisa los productos y confirma la importación; la misma colección de origen se importa una sola vez por cuenta mientras conserve su copia. Recompartir actualiza el contenido del enlace, sin sobrescribir copias ya importadas. Los datos se guardan en la misma base de cuentas.
 - TOPs es público y su acceso está en Mi cuenta. Solo los escaneos con cuenta suman. Ordena por códigos únicos acumulados. Cada lectura repetida suma al total, pero no al ranking. Los reintentos de envío con el mismo identificador no duplican una lectura. Escribir productos, importar listas o borrarlas no afecta al TOP. Se contabilizan las lecturas de cámara en Inicio, Biblioteca y Stock.
@@ -40,3 +40,17 @@ Ejecuta `node tests/auth-smoke.cjs` con PHP disponible en `C:/xampp/php/php.exe`
 La navegación entre Inicio, Biblioteca, Stock, TOPs, Moderación y Mi cuenta usa AJAX, conserva el historial y carga los permisos desde el servidor. Al cambiar de sección se detienen cámaras, consultas pendientes y temporizadores de notificaciones. Si falla la carga, el enlace abre la página normalmente. Los formularios de ingreso, registro y cierre de sesión mantienen su envío al servidor. Ejecuta `node tests/navigation.cjs` para comprobar la limpieza de recursos entre secciones.
 
 Ejecuta `php tests/database-config.php` para verificar el formato PostgreSQL y que una configuración incompleta no use almacenamiento temporal. Las pruebas locales de integración usan SQLite; la conexión con Neon debe verificarse tras configurar Render siguiendo la guía.
+
+## Stock y etiquetas
+
+Stock permite generar de 1 a 100 etiquetas A4 en blanco y negro, con QR, marca REPOTOOLS y código de 8 dígitos (incluidos ceros iniciales). La reserva dura 72 horas desde la generación. Se activa desde Stock; si no recibe su primer producto antes del plazo, se libera. Un palet que ya recibió productos no vence al vaciarlo. Eliminarlo libera su código y mantiene separado el historial anterior. Las reservas vencidas se limpian al consultar Stock, el QR o las etiquetas.
+
+La ficha pública es `palet.php?codigo=00123456`. El QR utiliza el dominio desde el que se genera. Propietario e invitados aceptados pueden reimprimir o compartir la imagen PNG. La impresión usa imágenes SVG para conservar calidad y reducir el consumo de memoria al preparar varias hojas. Generación QR local: QRCode.js, licencia MIT en `js/vendor/qrcode-LICENSE.txt`.
+
+Los lotes se identifican por EAN y vencimiento opcional. Coincidencias suman unidades; cajas y bultos incluyen unidades por envase. La calculadora acepta operaciones aritméticas sin ejecutar código. Al editar, la revisión impide sobrescribir cambios ajenos. Si otro usuario ocupa un código durante una activación, el guardado crea otro palet y conserva los datos enviados. Los reintentos usan una clave de operación para evitar duplicar cantidades.
+
+Solo el propietario elimina y gestiona accesos. Los invitados pueden modificar el contenido y dejar de participar. La descripción, el propietario y la fecha/persona del último movimiento aparecen en la ficha. Los palets locales anteriores tienen una opción de importación, sin borrar el original hasta confirmar el guardado.
+
+En Mi cuenta se configura el aviso entre 0 y 365 días antes del vencimiento. Las notificaciones se generan cuando la web consulta la campana; no son correo ni notificaciones push con la web cerrada.
+
+Pruebas: `php tests/stock.php`, `node tests/stock-utils.cjs` y `node tests/stock-api.cjs`. Para PostgreSQL, usar `REPOTOOLS_TEST_DATABASE_URL` exclusivamente con una rama de prueba. La migración 6 conserva las tablas y cuentas existentes.

@@ -92,6 +92,19 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX notifications_user ON notifications(user_id, id)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (5)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 6')->fetchColumn()) {
+            $db->exec("CREATE TABLE pallets (id {$id}, code TEXT NOT NULL, owner_id {$ref} NOT NULL REFERENCES users(id), description TEXT NOT NULL DEFAULT '', prepared_until BIGINT NOT NULL, activated INTEGER NOT NULL DEFAULT 0, released INTEGER NOT NULL DEFAULT 0, revision INTEGER NOT NULL DEFAULT 1, updated_by {$ref} NOT NULL REFERENCES users(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE pallet_labels (code TEXT PRIMARY KEY, reserved_by {$ref} REFERENCES users(id), reserved_until BIGINT NOT NULL DEFAULT 0, pallet_id {$ref} REFERENCES pallets(id))");
+            $db->exec("CREATE TABLE pallet_products (id {$id}, pallet_id {$ref} NOT NULL REFERENCES pallets(id), ean TEXT NOT NULL, name TEXT NOT NULL DEFAULT '', expires TEXT NOT NULL DEFAULT '', units INTEGER NOT NULL, kind TEXT NOT NULL DEFAULT 'units', pack_size INTEGER NOT NULL DEFAULT 1, revision INTEGER NOT NULL DEFAULT 1, UNIQUE(pallet_id, ean, expires))");
+            $db->exec("CREATE TABLE pallet_access (pallet_id {$ref} NOT NULL REFERENCES pallets(id), user_id {$ref} NOT NULL REFERENCES users(id), status TEXT NOT NULL DEFAULT 'pending', PRIMARY KEY(pallet_id,user_id))");
+            $db->exec("CREATE TABLE stock_preferences (user_id {$ref} PRIMARY KEY REFERENCES users(id), expiry_days INTEGER NOT NULL DEFAULT 7)");
+            $db->exec("CREATE TABLE stock_operations (user_id {$ref} NOT NULL REFERENCES users(id), operation_key TEXT NOT NULL, result TEXT NOT NULL, PRIMARY KEY(user_id,operation_key))");
+            $db->exec('CREATE TABLE stock_mutex (id INTEGER PRIMARY KEY, revision INTEGER NOT NULL)');
+            $db->exec('INSERT INTO stock_mutex(id,revision) VALUES(1,0)');
+            $db->exec('CREATE INDEX pallets_owner ON pallets(owner_id,released)');
+            $db->exec('CREATE INDEX pallet_expiries ON pallet_products(expires,pallet_id)');
+            $db->exec('INSERT INTO app_schema_migrations (version) VALUES (6)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

@@ -19,7 +19,7 @@
     get('notificationList').replaceChildren();
     items.forEach(item => {
       const link = document.createElement('a'); link.className = 'notification-item';
-      link.href = item.report_id ? `reportes.php?report=${encodeURIComponent(item.report_id)}` : 'cuenta.php';
+      link.href = item.report_id ? `reportes.php?report=${encodeURIComponent(item.report_id)}` : item.type?.startsWith('stock_') ? 'stock.php' : 'cuenta.php';
       if (!item.read_at) link.dataset.unread = '';
       const title = document.createElement('strong'); title.textContent = item.title;
       const body = document.createElement('span'); body.textContent = item.body;
