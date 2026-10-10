@@ -36,7 +36,8 @@
       // sin convertir cada fotograma en archivos ni crear URLs de imágenes.
       const decoder = current.reader.qrcode;
       if (!context || typeof decoder?.decodeRobustlyAsync !== 'function') return;
-      let variant = 0, lastAngle = null, running = false, disposed = false;
+      const profiles = [{ angle: 0, crop: .7 }, { angle: 0, crop: 1 }, { angle: 90, crop: .7 }, { angle: 90, crop: 1 }, { angle: -18, crop: .7 }, { angle: 18, crop: .7 }];
+      let variant = 0, lastProfile = null, running = false, disposed = false;
       const dispose = () => { if (disposed) return; disposed = true; canvas.width = canvas.height = 0; };
       current.disposeBackground = () => { clearTimeout(current.backgroundTimer); if (!running) dispose(); };
       async function analyze() {
@@ -46,22 +47,26 @@
           running = true;
           try {
             // Recorre orientaciones fuera de la vista del usuario; una sola tarea a la vez.
-            const angle = lastAngle ?? [0, 90, -18, 18][variant++ % 4], radians = angle * Math.PI / 180;
-            const scale = Math.min(1, 960 / Math.max(video.videoWidth, video.videoHeight));
-            const width = video.videoWidth * scale, height = video.videoHeight * scale;
-            canvas.width = Math.ceil(Math.abs(width * Math.cos(radians)) + Math.abs(height * Math.sin(radians)));
-            canvas.height = Math.ceil(Math.abs(width * Math.sin(radians)) + Math.abs(height * Math.cos(radians)));
-            context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, -width / 2, -height / 2, width, height); context.restore();
+            const profile = lastProfile ?? profiles[variant++ % profiles.length], radians = profile.angle * Math.PI / 180;
+            // Conserva los píxeles originales de las barras pequeñas. El recorte
+            // central reduce trabajo sin reducir resolución; la vista completa
+            // también busca códigos que estén fuera del centro.
+            const sourceWidth = Math.round(video.videoWidth * profile.crop), sourceHeight = Math.round(video.videoHeight * profile.crop);
+            const scale = Math.min(1, 1920 / Math.max(sourceWidth, sourceHeight));
+            const width = sourceWidth * scale, height = sourceHeight * scale;
+            canvas.width = Math.ceil(Math.abs(width * Math.cos(radians)) + Math.abs(height * Math.sin(radians)) - 1e-6);
+            canvas.height = Math.ceil(Math.abs(width * Math.sin(radians)) + Math.abs(height * Math.cos(radians)) - 1e-6);
+            context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, (video.videoWidth - sourceWidth) / 2, (video.videoHeight - sourceHeight) / 2, sourceWidth, sourceHeight, -width / 2, -height / 2, width, height); context.restore();
             if (current.accepting && current.token === revision) {
               const result = await decoder.decodeRobustlyAsync(canvas);
               const code = result.text;
-              if (validEAN(code)) { lastAngle = angle; accept(code, 'background'); } else lastAngle = null;
+              if (validEAN(code)) { lastProfile = profile; accept(code, 'background'); } else lastProfile = null;
             }
-          } catch { lastAngle = null; }
+          } catch { lastProfile = null; }
           finally { running = false; }
         }
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
-        current.backgroundTimer = setTimeout(analyze, lastAngle === null ? 260 : 140);
+        current.backgroundTimer = setTimeout(analyze, lastProfile === null ? 260 : 140);
       }
       current.backgroundTimer = setTimeout(analyze, 500);
     }
@@ -117,12 +122,20 @@
         try {
           current.starting = reader.start({ facingMode: 'environment' }, {
             fps: 15,
-            videoConstraints: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            videoConstraints: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
             disableFlip: true,
             qrbox: (width, height) => ({ width: Math.floor(width * .94), height: Math.floor(height * .85) })
           }, accept, () => {});
           await current.starting;
           if (token !== revision) { await release(current); return false; }
+          // Solicita enfoque continuo solo si la cámara lo admite, sin retrasar
+          // la lectura ni fallar en navegadores que no exponen este control.
+          try {
+            const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
+            if (track?.getCapabilities?.().focusMode?.includes('continuous')) {
+              track.applyConstraints({ ...track.getConstraints(), advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
+            }
+          } catch {}
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
           onStatus('Centra un solo código dentro del recuadro.');
           return true;

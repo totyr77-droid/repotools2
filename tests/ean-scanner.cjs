@@ -43,6 +43,8 @@ function read(reader, code) { now += 100; reader.success(code); }
   const scanner = service.create('reader', { onCode: code => accepted.push(code), onError: error => errors.push(error) });
   await scanner.start();
   const first = readers.at(-1);
+  assert.equal(first.scanConfig.videoConstraints.width.ideal, 1920, 'Solicita detalle de barras pequeñas sin exigir resolución al dispositivo');
+  assert.equal(first.scanConfig.videoConstraints.height.ideal, 1080);
   read(first, '7791234567890'); read(first, a); read(first, b); read(first, a); read(first, a);
   assert.equal(accepted.length, 0);
   assert.equal(frame.has('ean-confirmed'), false, 'Las lecturas iniciales no muestran verde');
