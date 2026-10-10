@@ -1,5 +1,3 @@
-const snd = new Audio("sonido/sonido.mp3");
-
 const els = {
   boton: document.getElementById("boton"),
   cantidad: document.getElementById("cantidad"),
@@ -46,7 +44,6 @@ let viewerRevision = 0;
 const scanner = window.RepoEANScanner.create('contenedor', {
   onCode: codigo => {
     const result = mostrarResultadoEscaneo(codigo);
-    snd.play().catch(() => {});
     return result;
   },
   onStatus: text => { document.getElementById('mainScannerStatus').textContent = text; },

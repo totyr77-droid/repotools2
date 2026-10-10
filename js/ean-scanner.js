@@ -1,5 +1,28 @@
 (() => {
   'use strict';
+  let audioContext = null, soundEnabled = true;
+  try { soundEnabled = window.localStorage?.getItem('repotools_scan_sound') !== 'off'; } catch {}
+  function prepareSound() {
+    try {
+      if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient';
+      if (!soundEnabled) return;
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      audioContext ??= new Context();
+      if (audioContext.state !== 'running') audioContext.resume().catch(() => {});
+    } catch {}
+  }
+  function beep() {
+    if (!soundEnabled || audioContext?.state !== 'running') return;
+    try {
+      const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
+      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.06, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .08);
+      oscillator.connect(gain); gain.connect(audioContext.destination);
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+      oscillator.start(now); oscillator.stop(now + .09);
+    } catch {}
+  }
   function validEAN(code) {
     if (typeof code !== 'string' || !/^(?:\d{8}|\d{13})$/.test(code) || /^0+$/.test(code)) return false;
     let sum = 0;
@@ -31,11 +54,10 @@
     };
     function cameraControls(current) {
       const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
-      if (!track?.getCapabilities || !track.applyConstraints || !document.createElement) return;
-      const capabilities = track.getCapabilities(), settings = track.getSettings();
+      if (!track || !document.createElement) return;
+      const capabilities = track.getCapabilities?.() ?? {}, settings = track.getSettings?.() ?? {};
       const zoom = capabilities.zoom;
       const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && zoom.max > zoom.min;
-      if (!hasZoom && capabilities.torch !== true) return;
       const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
       controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', 'Controles de cámara');
       const active = () => current.accepting && session === current && current.token === revision;
@@ -56,7 +78,8 @@
       }
       if (hasZoom) {
         const label = document.createElement('label'); label.className = 'ean-camera-zoom';
-        const text = document.createElement('span'); text.textContent = 'Zoom';
+        const text = document.createElement('span'); text.className = 'ean-camera-zoom-icon'; text.setAttribute('aria-hidden', 'true');
+        text.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg>';
         const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
         input.min = zoom.min; input.max = Math.max(zoom.min, Math.min(zoom.max, Math.max(3, zoom.min + (zoom.step || .1)))); input.step = zoom.step > 0 ? zoom.step : .1;
         let applied = Math.max(Number(input.min), Math.min(Number(input.max), settings.zoom ?? zoom.min));
@@ -74,7 +97,8 @@
       if (capabilities.torch === true) {
         const button = document.createElement('button'); button.type = 'button'; button.className = 'ean-camera-light';
         let enabled = settings.torch === true;
-        const render = () => { button.textContent = enabled ? 'Apagar luz' : 'Encender luz'; button.setAttribute('aria-pressed', String(enabled)); };
+        button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 10-12h-7Z"/></svg>';
+        const render = () => { const label = enabled ? 'Apagar luz' : 'Encender luz'; button.setAttribute('aria-label', label); button.title = label; button.setAttribute('aria-pressed', String(enabled)); };
         render();
         button.addEventListener('click', async () => {
           if (!active()) return;
@@ -85,8 +109,23 @@
         });
         controls.append(button);
       }
+      const sound = document.createElement('button'); sound.type = 'button'; sound.className = 'ean-camera-sound';
+      const renderSound = () => {
+        const label = soundEnabled ? 'Silenciar escaneos' : 'Activar sonido de escaneo';
+        sound.setAttribute('aria-label', label); sound.title = label; sound.setAttribute('aria-pressed', String(soundEnabled));
+        sound.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M11 4 5 9H2v6h3l6 5Z"/>${soundEnabled ? '<path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>' : '<path d="m16 9 6 6m0-6-6 6"/>'}</svg>`;
+      };
+      renderSound();
+      sound.addEventListener('click', () => {
+        if (!active()) return;
+        soundEnabled = !soundEnabled;
+        try { window.localStorage?.setItem('repotools_scan_sound', soundEnabled ? 'on' : 'off'); } catch {}
+        if (soundEnabled) prepareSound();
+        renderSound();
+      });
+      controls.append(sound);
       current.disposeControls = () => controls.remove();
-      element.after(controls);
+      element.append(controls);
     }
     function background(current, accept) {
       if (current.isQR || !document.createElement || !element.querySelector) return;
@@ -196,6 +235,9 @@
       return enqueue(() => release(session));
     }
     function start(format = 'ean') {
+      // Se habilita el audio en el toque que abre la cámara, antes de esperar
+      // permisos o fotogramas, para que el primer escaneo también tenga sonido.
+      prepareSound();
       const token = ++revision;
       if (session) session.accepting = false;
       return enqueue(async () => {
@@ -224,7 +266,7 @@
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
           enqueue(async () => {
             await new Promise(resolve => setTimeout(resolve, 100)); await release(current);
-            if (token === revision) Promise.resolve().then(() => { if (token === revision) return onCode(code); }).catch(error => { if (token === revision) onError(error); });
+            if (token === revision) Promise.resolve().then(() => { if (token === revision) { beep(); return onCode(code); } }).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };
         onStatus('Abriendo cámara…');

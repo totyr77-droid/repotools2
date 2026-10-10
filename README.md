@@ -30,6 +30,8 @@ Los escaneos permanecen en el dispositivo y se pierden si se borra el almacenami
 
 ## Verificación
 
+Los controles de zoom, luz y sonido se muestran dentro del recuadro de cámara. La preferencia de sonido se guarda en el navegador. El pitido usa Web Audio, preparado durante el toque que abre el lector, y solicita una sesión `ambient` cuando está disponible para mezclarlo con otros audios; la interacción final con música depende del navegador y del sistema operativo.
+
 Ejecuta `node tests/auth-smoke.cjs` con PHP disponible en `C:/xampp/php/php.exe` o en la variable `PHP_BIN`. La prueba usa una base temporal y verifica registro, login, logout, CSRF, restricción de palets y límite de intentos; no usa cuentas reales.
 
 Ejecuta `php tests/database-config.php` para verificar el formato PostgreSQL y que una configuración incompleta no use almacenamiento temporal. Las pruebas locales de integración usan SQLite; la conexión con Neon debe verificarse tras configurar Render siguiendo la guía.

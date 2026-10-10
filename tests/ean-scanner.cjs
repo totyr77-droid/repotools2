@@ -17,6 +17,14 @@ class Reader {
   clear() { assert.equal(this.isScanning, false); this.clears++; }
 }
 const window = { Html5Qrcode: Reader, Html5QrcodeSupportedFormats: { EAN_13: 9, EAN_8: 10, QR_CODE: 0 } };
+let audioCreated = 0, audioResumed = 0, beeps = 0;
+window.navigator = { audioSession: { type: 'auto' } };
+window.AudioContext = class {
+  constructor() { audioCreated++; this.state = 'suspended'; this.currentTime = 0; this.destination = {}; }
+  resume() { audioResumed++; this.state = 'running'; return Promise.resolve(); }
+  createOscillator() { return { frequency: { setValueAtTime() {} }, connect() {}, disconnect() {}, start() { beeps++; }, stop() { this.onended?.(); } }; }
+  createGain() { return { gain: { setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {}, disconnect() {} }; }
+};
 const frame = new Set();
 const document = { getElementById: () => ({ classList: { add: value => frame.add(value), remove: value => frame.delete(value) } }) };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/ean-scanner.js'), 'utf8'), { window, document, setTimeout: (callback, delay) => { if (delay <= 180) callback(); return 1; }, clearTimeout: () => {}, performance: { now: () => now } });
@@ -41,7 +49,11 @@ function read(reader, code) { now += 100; reader.success(code); }
 
   const accepted = [], errors = [];
   const scanner = service.create('reader', { onCode: code => accepted.push(code), onError: error => errors.push(error) });
-  await scanner.start();
+  const firstOpening = scanner.start();
+  assert.equal(audioCreated, 1, 'El audio se prepara dentro del toque que abre la cámara');
+  assert.equal(audioResumed, 1);
+  assert.equal(window.navigator.audioSession.type, 'ambient', 'No solicita audio exclusivo');
+  await firstOpening;
   const first = readers.at(-1);
   assert.equal(first.scanConfig.videoConstraints.width.ideal, 1920, 'Solicita detalle de barras pequeñas sin exigir resolución al dispositivo');
   assert.equal(first.scanConfig.videoConstraints.height.ideal, 1080);
@@ -55,6 +67,7 @@ function read(reader, code) { now += 100; reader.success(code); }
   read(first, b); read(first, a);
   await flush();
   assert.deepEqual(accepted, [a]);
+  assert.equal(beeps, 1, 'El primer resultado confirmado suena una sola vez');
   assert.equal(first.stops, 1); assert.equal(first.clears, 1);
   await scanner.stop();
   read(first, b); await flush(); assert.deepEqual(accepted, [a]);
@@ -79,6 +92,7 @@ function read(reader, code) { now += 100; reader.success(code); }
   read(third, b); read(third, b); read(third, b);
   const cancel = scanner.stop(); await cancel; await flush();
   assert.deepEqual(accepted, [a], 'Cancelar una confirmación pendiente no guarda ni suma');
+  assert.equal(beeps, 1, 'Una confirmación cancelada tampoco suena');
 
   failStart = true;
   await assert.rejects(scanner.start(), /Permission denied/);

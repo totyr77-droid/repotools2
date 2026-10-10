@@ -1,16 +1,20 @@
-/* Cámara y controles compartidos entre Inicio y Biblioteca. */
+/* Cámara y controles compartidos entre Inicio, Biblioteca y Stock. */
 .library-scanner-dialog { background: #fff; }
-.library-scanner-dialog .ean-reader { width: 100%; min-height: 200px; border-radius: 12px; overflow: hidden; background: #10121a; }
-.library-scanner-dialog .ean-reader video { display: block; width: 100%; height: auto; max-height: 55dvh; object-fit: contain; }
+.library-scanner-dialog .ean-reader { position: relative; width: 100%; min-height: 200px; border-radius: 12px; overflow: hidden; background: #10121a; }
+.library-scanner-dialog .ean-reader video { display: block; position: static !important; width: 100%; height: auto !important; max-height: 55dvh; object-fit: contain !important; margin: 0; }
 .library-scanner-dialog .ean-reader canvas { height: auto; }
 .ean-reader #qr-shaded-region > div { background-color: white !important; }
 .ean-reader.ean-detecting #qr-shaded-region > div { background-color: #facc15 !important; }
 .ean-reader.ean-confirmed #qr-shaded-region > div { background-color: #23c55e !important; }
-.ean-camera-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
-.ean-camera-zoom { display: flex; flex: 1 1 180px; align-items: center; gap: 10px; min-width: 0; margin: 0 !important; color: #172033; font-size: .9rem; }
-.ean-camera-zoom input[type="range"] { flex: 1; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 0; border: 0; background: transparent; accent-color: #27187e; touch-action: pan-y; }
+.ean-camera-controls { position: absolute; z-index: 3; bottom: 12px; left: 12px; right: 12px; display: flex; align-items: center; gap: 6px; padding: 4px 6px; border: 1px solid rgba(255,255,255,.18); border-radius: 30px; background: rgba(15,19,30,.8); color: #fff; backdrop-filter: blur(10px); }
+.ean-camera-controls .ean-camera-zoom { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; margin: 0 !important; color: #fff; font-size: .85rem; }
+.ean-camera-zoom input[type="range"] { flex: 1; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 0; border: 0; background: transparent; accent-color: #fff; touch-action: pan-y; }
 .ean-camera-zoom-value { min-width: 36px; font-variant-numeric: tabular-nums; }
-.ean-camera-light { min-height: 44px; padding: 10px 14px; border-radius: 10px; background: #e9e6f5; color: #27187e; cursor: pointer; }
+.ean-camera-light, .ean-camera-sound { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 10px; border-radius: 50%; background: transparent; color: #fff; cursor: pointer; }
+.ean-camera-controls svg { display: block; width: 22px; height: 22px; }
+.ean-camera-zoom-icon { flex: 0 0 22px; }
+.ean-camera-controls:has(.ean-camera-zoom):not(:has(.ean-camera-light)) { gap: 8px; }
+.ean-camera-controls:not(:has(.ean-camera-zoom)) { left: auto; border-radius: 28px; }
 .ean-camera-light[aria-pressed="true"] { background: #facc15; color: #172033; }
 .ean-camera-controls :focus-visible { outline: 3px solid #8372d8; outline-offset: 3px; }
 .library-scanner-dialog .scanner-status { margin-top: 12px; color: #536174; line-height: 1.4; font-size: .95rem; }
