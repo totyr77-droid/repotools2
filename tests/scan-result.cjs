@@ -56,6 +56,15 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf
   assert.deepEqual(decodeShare(shares[1]), ['96385074', '7791234567898'], 'Compartir la lista incluye todos los EAN');
   context.navigator.share = async () => { const error = new Error('Cancelado'); error.name = 'AbortError'; throw error; };
   await context.compartirCodigos(['96385074']); assert.equal(copied.length, 2, 'Cancelar compartir no activa la copia alternativa');
+  assert.equal(get('compartir').disabled, false, 'Compartir se activa con productos');
+  context.window.RepoConfirm = async () => false;
+  await context.borrarTodo();
+  assert.equal(JSON.parse(storage.get('lista')).length, 2, 'Cancelar conserva la lista');
+  context.window.RepoConfirm = async () => true;
+  await context.borrarTodo();
+  assert.deepEqual(JSON.parse(storage.get('lista')), [], 'Confirmar borra la lista');
+  assert.equal(get('compartir').disabled, true, 'Compartir se desactiva sin productos');
+  assert.equal(get('compartirD').disabled, true);
   console.log('OK: EAN visible y copiado coinciden, duplicados preservados, producto y portapapeles tardíos no mezclan resultados.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
 

@@ -152,6 +152,9 @@ function cargarListaCompartida() {
 function actualizarContadores() {
   if (els.cantidad) els.cantidad.textContent = lista.length;
   if (els.cantidadScan) els.cantidadScan.textContent = lista.length;
+  if (els.compartir) els.compartir.disabled = lista.length === 0;
+  if (els.compartirD) els.compartirD.disabled = lista.length === 0;
+  if (els.borrarD) els.borrarD.disabled = lista.length === 0;
   renderListaPalets();
 }
 
@@ -169,11 +172,14 @@ function renderListaPalets() {
     : `<p class="lista-palets__empty">No hay palets creados aun. Escanea uno para comenzar.</p>`;
 }
 
-function borrarTodo() {
-  if (!lista.length) {
-    alertaGeneral("ERROR", "No hay codigos para borrar.");
-    return;
-  }
+async function borrarTodo() {
+  if (!lista.length) return;
+  const confirmed = await window.RepoConfirm({
+    title: '¿Borrar la lista?',
+    message: 'Se quitarán todos los códigos de esta lista.',
+    confirmLabel: 'Borrar lista'
+  });
+  if (!confirmed) return;
 
   lista = [];
   indiceActual = 1;
@@ -181,7 +187,6 @@ function borrarTodo() {
   resultadoActual = "";
   guardarLista();
   actualizarContadores();
-  alertaGeneral("INFORMACION", "Productos borrados.");
 }
 
 function abrirResultados() {
