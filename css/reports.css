@@ -22,6 +22,10 @@
 .product-edit-dialog [hidden], .reports-panel [hidden] { display: none !important; }
 .report-photo { margin-top: 16px; }
 .report-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.report-more-data summary { justify-content: space-between; gap: 12px; }
+.report-more-data summary .library-chevron { width: 16px; height: 16px; }
+#reportPhotos:disabled .report-photo-actions button { opacity: .45; cursor: not-allowed; }
+#reportPhotosNote:not(:empty) { padding: 12px; border-radius: 10px; background: #fff5df; color: #76551c; }
 .report-photo-preview { display: block; width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; margin-top: 8px; }
 #reportCameraVideo { display: block; width: 100%; max-height: 55dvh; background: #172033; border-radius: 12px; object-fit: contain; }
 @media (max-width: 480px) { .reports-panel { padding: 16px; } .report-comparison { grid-template-columns: 1fr; } }

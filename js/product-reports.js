@@ -69,11 +69,12 @@
       if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) { next.getTracks().forEach(track => track.stop()); return; }
       stream = next; video.srcObject = next; await video.play();
       if (attempt !== cameraVersion || !camera.open) return;
-      capture.disabled = false; cameraStatus.textContent = kind === 'ean' ? 'Enfoca el código completo.' : 'Enfoca el frente del producto.';
+      capture.disabled = !video.videoWidth || !video.videoHeight;
+      cameraStatus.textContent = kind === 'ean' ? 'Enfoca el código completo.' : 'Enfoca el frente del producto.';
     } catch (error) {
       if (attempt !== cameraVersion || !camera.open) return;
       stopCamera(); retryCamera.hidden = false;
-      cameraStatus.textContent = error.name === 'NotAllowedError' ? 'Permite usar la cámara en tu navegador y vuelve a intentar.' : 'No pudimos abrir la cámara. Revisa el permiso y vuelve a intentar.';
+      cameraStatus.textContent = error.name === 'NotAllowedError' ? 'Permite usar la cámara en tu navegador y vuelve a intentar.' : error.name === 'NotReadableError' ? 'La cámara está ocupada. Cierra otras aplicaciones que la usen y vuelve a intentar.' : error.message === 'unsupported' ? 'Abre la web con HTTPS en Safari o Chrome para usar la cámara.' : 'No pudimos abrir la cámara. Revisa el permiso y vuelve a intentar.';
     }
   }
   form.querySelectorAll('[data-report-camera]').forEach(button => button.addEventListener('click', () => openCamera(button.dataset.reportCamera)));
@@ -82,6 +83,11 @@
   camera.addEventListener('cancel', stopCamera);
   camera.addEventListener('close', () => { if (!camera.open) stopCamera(); });
   retryCamera.addEventListener('click', () => openCamera(cameraKind));
+  function cameraReady() {
+    if (stream && camera.open && video.videoWidth && video.videoHeight) capture.disabled = false;
+  }
+  video.addEventListener('loadeddata', cameraReady);
+  video.addEventListener('resize', cameraReady);
   capture.addEventListener('click', async () => {
     if (!stream || capture.disabled || !video.videoWidth || !video.videoHeight) return;
     const attempt = cameraVersion, reportVersion = revision, kind = cameraKind; capture.disabled = true;
@@ -120,7 +126,7 @@
       document.getElementById('reportInstructions').textContent = missing ? 'Completa los datos del producto. Un moderador los revisará.' : 'Propón los datos correctos. Un moderador los revisará.';
       for (const field of ['name', 'quantity', 'brand', 'category', 'packaging']) form.elements[field].value = product?.[field] || '';
       document.getElementById('reportPhotos').disabled = !config.photos_enabled;
-      document.getElementById('reportPhotosNote').textContent = config.photos_enabled ? '' : 'Las fotos todavía no están habilitadas. Puedes reportar igual.';
+      document.getElementById('reportPhotosNote').textContent = config.photos_enabled ? '' : 'Las fotos no están disponibles porque falta configurar su almacenamiento. Puedes enviar el reporte sin fotos.';
       status.textContent = ''; form.hidden = false;
     } catch (error) { if (version === revision) status.textContent = error.message; }
   }

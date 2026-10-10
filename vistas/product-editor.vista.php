@@ -6,8 +6,8 @@
     <label>Marca<input id="catalogBrand" name="brand" maxlength="160" placeholder="Ej.: Red Bull"></label>
     <label>Producto<input id="catalogName" name="name" maxlength="120" placeholder="Ej.: Energizante Lata" required></label>
     <label>Contenido neto<input id="catalogQuantity" name="quantity" maxlength="80" placeholder="Ej.: 250 ml, 500 g o 1 kg"></label>
-    <label>Categoría<input id="catalogCategory" name="category" maxlength="240"></label>
-    <label>Envase<input id="catalogPackaging" name="packaging" maxlength="240"></label>
+    <label>Categoría<input id="catalogCategory" name="category" maxlength="240" placeholder="Ej.: Bebidas, limpieza o alimentos"></label>
+    <label>Envase<input id="catalogPackaging" name="packaging" maxlength="240" placeholder="Ej.: Lata, botella o bolsa"></label>
     <p class="product-edit-note">Los cambios serán visibles para todos.</p>
     <div class="library-dialog-actions"><button id="reloadProductEditor" class="library-secondary" type="button" hidden>Revisar versión actual</button><button id="saveProductEditor" class="library-primary" type="submit">Guardar cambios</button></div>
   </form>
