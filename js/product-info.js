@@ -28,6 +28,10 @@
       const report = document.createElement('button'); report.type = 'button'; report.className = 'product-report-button';
       report.title = 'Reportar un error'; report.setAttribute('aria-label', 'Reportar un error');
       report.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 21V3m0 1c4-3 8 3 14 0v10c-6 3-10-3-14 0"/></svg>';
+      if (container.id === 'libraryScanProductInfo') {
+        const label = document.createElement('span'); label.textContent = 'Reportar producto'; report.append(label);
+        report.title = 'Reportar producto'; report.setAttribute('aria-label', 'Reportar producto');
+      }
       report.addEventListener('click', () => window.RepoProductReports.open(ean)); container.append(report);
     }
     if (!access.get(ean)?.canEdit) return;

@@ -1,5 +1,5 @@
 /* Ajustes de interacción y pantallas móviles. */
-* { font-family: var(--font1); }
+* { font-family: var(--font1); touch-action: manipulation; }
 button, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 input, textarea, select { font-size: 16px; user-select: text; }
 button:disabled { cursor: wait; opacity: .65; }
