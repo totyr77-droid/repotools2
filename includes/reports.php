@@ -89,7 +89,7 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
     if (!can_edit_catalog($db, $user)) throw new CatalogException('No tienes permiso para revisar reportes.', 403);
     $decision = $input['decision'] ?? ''; $note = $input['review_note'] ?? '';
     if (!in_array($decision, ['approved', 'rejected'], true) || !is_string($note) || mb_strlen($note) > 1000) throw new CatalogException('Revisa la decisión.', 422);
-    if ($decision === 'rejected' && mb_strlen(trim($note)) < 5) throw new CatalogException('Explica el motivo del rechazo.', 422);
+    if ($decision === 'rejected' && trim($note) === '') $note = 'La petición no es apta para actualizar el producto.';
     $db->beginTransaction();
     try {
         report_lock($db);

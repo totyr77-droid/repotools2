@@ -5,3 +5,8 @@ html:not([data-keyboard-focus="true"]) dialog button:focus-visible { outline: no
 html[data-keyboard-focus="true"] button.app-close:focus-visible { outline: 2px solid #8372d8; outline-offset: 3px; }
 .library-heading > :first-child, .results-heading > :first-child { min-width: 0; }
 dialog > .library-heading, dialog .results-heading { position: sticky; top: 0; z-index: 2; background: white; }
+.library-dialog { --dialog-padding-x: 24px; --dialog-padding-y: 24px; }
+.library-dialog > .library-heading { margin-left: calc(-1 * var(--dialog-padding-x)); margin-right: calc(-1 * var(--dialog-padding-x)); padding: 12px var(--dialog-padding-x); box-shadow: 0 calc(-1 * var(--dialog-padding-y)) 0 0 white; border-bottom: 1px solid #edf0f5; }
+#verb .results-heading { padding-bottom: 10px; box-shadow: 0 -16px 0 0 white; }
+@media (max-width: 768px) { .library-dialog { --dialog-padding-x: 16px; --dialog-padding-y: 20px; } }
+@media (min-width: 769px) { .library-dialog { --dialog-padding-x: 32px; --dialog-padding-y: 32px; } }

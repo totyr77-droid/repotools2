@@ -40,7 +40,7 @@ if (current_user()) {
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <link href="css/notifications.css" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
-    <link href="css/close-buttons.css?v=20261010" rel="stylesheet" type="text/css">
+    <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261010-motion1" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261010" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/home.css" rel="stylesheet" type="text/css"><?php endif; ?>

@@ -57,7 +57,6 @@
   async function review(decision) {
     if (!active || busy) return;
     if (decision === 'approved' && !form.reportValidity()) return;
-    if (decision === 'rejected' && form.elements.review_note.value.trim().length < 5) { message.textContent = 'Explica el motivo del rechazo.'; form.elements.review_note.focus(); return; }
     busy = true; approve.disabled = reject.disabled = close.disabled = true; message.textContent = 'Guardando…';
     try {
       const body = new FormData(form); body.set('action', 'review'); body.set('id', active.id); body.set('decision', decision); body.set('revision', active.current?.revision || 0); body.set('csrf', csrf);

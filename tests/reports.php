@@ -47,7 +47,8 @@ review_product_report($db, $mod, (int) $guest['id'], [...$review, 'revision' => 
 check_report((int) $db->query('SELECT COUNT(*) FROM report_rewards')->fetchColumn() === $previousRewards + 1, 'Invitados no participan en TOPs.');
 $self = submit_product_report($db, $mod, report_owner($mod, ''), [...$input, 'submission_key' => $uuid()], [], $storage);
 denied_report(fn() => review_product_report($db, $mod, (int) $self['id'], [...$review, 'revision' => catalog_product($db, $ean)['revision']]), 403);
-denied_report(fn() => review_product_report($db, $users['administrador'], (int) $self['id'], ['decision' => 'rejected', 'review_note' => '']), 422);
+$automatic = review_product_report($db, $users['administrador'], (int) $self['id'], ['decision' => 'rejected', 'review_note' => '   ']);
+check_report($automatic['review_note'] === 'La petición no es apta para actualizar el producto.', 'El rechazo sin nota guarda un motivo genérico.');
 review_product_report($db, $users['administrador'], (int) $self['id'], ['decision' => 'rejected', 'review_note' => 'La foto no demuestra el cambio.']);
 check_report($db->query('SELECT title FROM notifications WHERE user_id = ' . $mod['id'])->fetchColumn() === 'Tu reporte fue rechazado', 'Avisa el rechazo a su autor.');
 check_report((int) $db->query('SELECT COUNT(*) FROM report_rewards')->fetchColumn() === $previousRewards + 1, 'Rechazar no da puntos.');
