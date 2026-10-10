@@ -1,3 +1,8 @@
+(() => {
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+
 const els = {
   boton: document.getElementById("boton"),
   cantidad: document.getElementById("cantidad"),
@@ -83,7 +88,7 @@ function bindEventos() {
   });
   document.getElementById('closeResultInfo')?.addEventListener('click', () => document.getElementById('resultInfoDialog').close());
   els.verb.addEventListener('cancel', event => { event.preventDefault(); cerrarResultados(); });
-  window.addEventListener('keydown', event => {
+  (page ? page.listen : window.addEventListener.bind(window))('keydown', event => {
     if (!els.verb.open || document.getElementById('resultInfoDialog').open || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); moverResultado(event.key === 'ArrowLeft' ? -1 : 1); }
   });
@@ -101,7 +106,7 @@ function bindEventos() {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && els.contenedormax.open) cerrarScanner();
   });
-  window.addEventListener('pagehide', cerrarScanner);
+  (page ? page.listen : window.addEventListener.bind(window))('pagehide', cerrarScanner);
 }
 
 function cargarLista() {
@@ -477,7 +482,7 @@ function cerrarAlerta() {
 window.alertaGeneral = alertaGeneral;
 window.cerrarAlerta = cerrarAlerta;
 window.quitarOverlay = quitarOverlay;
-window.addEventListener('repotools:product-updated', event => {
+(page ? page.listen : window.addEventListener.bind(window))('repotools:product-updated', event => {
   const { ean, product } = event.detail;
   if (els.contenedormax.open && resultadoActual === ean) {
     els.resultadoApi.textContent = window.RepoProductInfo.summary(product);
@@ -488,3 +493,5 @@ window.addEventListener('repotools:product-updated', event => {
     if (document.getElementById('resultInfoDialog').open) window.RepoProductInfo.show(document.getElementById('resultProductDetails'), ean);
   }
 });
+
+})();

@@ -1,5 +1,8 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+
   const get = id => document.getElementById(id);
   const dialog = get('productEditDialog');
   if (!dialog) return;

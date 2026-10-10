@@ -1,4 +1,8 @@
 (() => {
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+
   const get = id => document.getElementById(id);
   const button = get('saveScanLibrary');
   if (!button || !window.repotoolsStats) return;

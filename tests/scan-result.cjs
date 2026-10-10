@@ -22,7 +22,7 @@ const context = {
   JsBarcode: (target, code) => drawn.push(code), URL, console
 };
 context.LZString = { compressToBase64: value => Buffer.from(value).toString('base64') };
-vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf8'), context);
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf8').replace(/^\(\(\) => \{/, '').replace(/\}\)\(\);\s*$/, ''), context);
 (async () => {
   get('contenedormax').showModal();
   await context.mostrarResultadoEscaneo('55007732');

@@ -1,5 +1,9 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+
   const config = window.repotoolsLibrary;
   const get = id => document.getElementById(id);
   let libraries = [];
@@ -162,7 +166,7 @@
     const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean, { compact: true });
     if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = Array.from(window.RepoProductInfo.referenceName(product)).slice(0, 120).join('');
   }
-  window.addEventListener('repotools:product-updated', event => {
+  (page ? page.listen : window.addEventListener.bind(window))('repotools:product-updated', event => {
     const { ean } = event.detail;
     if (get('libraryProductDialog').open && get('libraryProductEan').value === ean) loadScannedProduct(ean);
     if (get('libraryInfoDialog').open && get('libraryInfoEan').dataset.ean === ean) window.RepoProductInfo.show(get('libraryProductDetails'), ean);
@@ -246,7 +250,7 @@
   }, { passive: true });
   swipeArea.addEventListener('touchcancel', () => { swipeStart = null; }, { passive: true });
   get('libraryEanDialog').addEventListener('close', () => { swipeStart = null; });
-  window.addEventListener('keydown', event => {
+  (page ? page.listen : window.addEventListener.bind(window))('keydown', event => {
     if (!get('libraryEanDialog').open || get('libraryInfoDialog').open || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault(); moveViewer(event.key === 'ArrowLeft' ? -1 : 1);
@@ -289,7 +293,7 @@
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && get('libraryScannerDialog').open) closeScanner();
   });
-  window.addEventListener('pagehide', closeScanner);
+  (page ? page.listen : window.addEventListener.bind(window))('pagehide', closeScanner);
   async function shareRequest(data) {
     const response = await fetch('api/biblioteca.php', { method: 'POST', body: new URLSearchParams({ csrf: config.csrf, ...data }) });
     const result = await response.json();

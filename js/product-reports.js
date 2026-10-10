@@ -1,5 +1,9 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+
   let guestToken;
   function ownerToken() {
     if (guestToken) return guestToken;
@@ -95,7 +99,9 @@
     } catch (error) { if (attempt === cameraVersion && camera.open) { cameraStatus.textContent = error.message; capture.disabled = false; } }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { stopCamera(); if (camera.open) camera.close(); } });
-  window.addEventListener('pagehide', stopCamera);
+  (page ? page.listen : window.addEventListener.bind(window))('pagehide', stopCamera);
+  page?.onLeave(stopCamera);
+  page?.onLeave(() => { revision++; previews.forEach(url => URL.revokeObjectURL(url)); previews.clear(); });
   async function open(ean) {
     if (busy) return;
     stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto);

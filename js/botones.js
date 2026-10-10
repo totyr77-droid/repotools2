@@ -1,3 +1,7 @@
+(() => {
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+
 // Mantiene el desplazamiento con un dedo y bloquea el zoom de la página.
 ['gesturestart', 'gesturechange', 'gestureend'].forEach(type => {
   document.addEventListener(type, event => event.preventDefault(), { passive: false });
@@ -69,7 +73,7 @@ document.querySelectorAll('.account-panel form').forEach((form) => {
   });
 });
 
-window.addEventListener('pageshow', () => {
+(page ? page.listen : window.addEventListener.bind(window))('pageshow', () => {
   document.querySelectorAll('.account-panel button[type="submit"]').forEach((button) => {
     button.disabled = false;
     button.textContent = document.querySelector('input[name="name"]') ? 'CREAR CUENTA' : 'ENTRAR';
@@ -83,3 +87,5 @@ document.querySelectorAll('.nav a, .nav-celular a').forEach((link) => {
     link.setAttribute('aria-current', 'page');
   }
 });
+
+})();

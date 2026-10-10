@@ -1,5 +1,9 @@
 (() => {
   "use strict";
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+
 
   const STORAGE_KEY = `repotools_palets_v1_user_${window.repotoolsUserId}`;
   const els = {

@@ -39,6 +39,7 @@ if (current_user()) {
     <?php if (!empty($paginaStock)): ?><link href="css/library.css" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <link href="css/notifications.css" rel="stylesheet" type="text/css">
+    <link href="css/navigation.css?v=20261010" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261010" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/home.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css" rel="stylesheet" type="text/css"><?php endif; ?>

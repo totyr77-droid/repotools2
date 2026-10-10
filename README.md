@@ -37,4 +37,6 @@ El zoom vertical y el botón circular de flash se muestran dentro del recuadro d
 
 Ejecuta `node tests/auth-smoke.cjs` con PHP disponible en `C:/xampp/php/php.exe` o en la variable `PHP_BIN`. La prueba usa una base temporal y verifica registro, login, logout, CSRF, restricción de palets y límite de intentos; no usa cuentas reales.
 
+La navegación entre Inicio, Biblioteca, Stock, TOPs, Moderación y Mi cuenta usa AJAX, conserva el historial y carga los permisos desde el servidor. Al cambiar de sección se detienen cámaras, consultas pendientes y temporizadores de notificaciones. Si falla la carga, el enlace abre la página normalmente. Los formularios de ingreso, registro y cierre de sesión mantienen su envío al servidor. Ejecuta `node tests/navigation.cjs` para comprobar la limpieza de recursos entre secciones.
+
 Ejecuta `php tests/database-config.php` para verificar el formato PostgreSQL y que una configuración incompleta no use almacenamiento temporal. Las pruebas locales de integración usan SQLite; la conexión con Neon debe verificarse tras configurar Render siguiendo la guía.

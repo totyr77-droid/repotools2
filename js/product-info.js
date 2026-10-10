@@ -1,5 +1,9 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+
   const cache = new Map();
   const access = new Map();
   const activeRequests = new WeakMap();

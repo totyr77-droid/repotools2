@@ -1,5 +1,8 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+
   let audioContext = null, audioPrimed = false;
   function prepareSound() {
     try {
@@ -311,6 +314,7 @@
         }
       });
     }
+    page?.onLeave(stop);
     return { start, stop };
   }
   window.RepoEANScanner = { create, validEAN, confirmation };

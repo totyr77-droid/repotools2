@@ -1,5 +1,10 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+  const setInterval = page?.interval || globalThis.setInterval?.bind(globalThis);
+
   const badges = [...document.querySelectorAll('[data-report-pending]')]; if (!badges.length) return;
   let pending = false;
   async function refresh() {
@@ -12,6 +17,6 @@
       for (const badge of badges) { badge.textContent = result.pending_count > 99 ? '99+' : String(result.pending_count); badge.hidden = result.pending_count === 0; badge.setAttribute('aria-label', `${result.pending_count} reportes pendientes`); }
     } catch {} finally { pending = false; }
   }
-  setInterval(refresh, 60000); window.addEventListener('focus', refresh); window.addEventListener('repotools:reports-changed', refresh);
+  setInterval(refresh, 60000); (page ? page.listen : window.addEventListener.bind(window))('focus', refresh); (page ? page.listen : window.addEventListener.bind(window))('repotools:reports-changed', refresh);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 })();

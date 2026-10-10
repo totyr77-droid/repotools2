@@ -1,5 +1,10 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+  const fetch = page?.fetch || globalThis.fetch?.bind(globalThis);
+  const setInterval = page?.interval || globalThis.setInterval?.bind(globalThis);
+
   const config = window.repotoolsNotifications;
   if (!config) return;
   const get = id => document.getElementById(id), panel = get('notificationPanel'), button = get('openNotifications');
@@ -24,7 +29,7 @@
       link.addEventListener('click', async event => {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
-        try { await refresh({ action: 'read', id: item.id }); } finally { location.assign(link.href); }
+        try { await refresh({ action: 'read', id: item.id }); } finally { if (window.RepoNavigation) window.RepoNavigation.navigate(link.href); else location.assign(link.href); }
       });
       get('notificationList').append(link);
     });
@@ -51,6 +56,6 @@
   document.addEventListener('click', event => { if (!event.target.closest('.notification-control')) toggle(false); });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) { toggle(false); button.focus(); } });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-  window.addEventListener('focus', () => refresh()); window.addEventListener('repotools:reports-changed', () => refresh());
+  (page ? page.listen : window.addEventListener.bind(window))('focus', () => refresh()); (page ? page.listen : window.addEventListener.bind(window))('repotools:reports-changed', () => refresh());
   setInterval(() => refresh(), 60000); refresh();
 })();

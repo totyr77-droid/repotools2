@@ -1,5 +1,8 @@
 (() => {
   'use strict';
+  const page = window.RepoNavigation?.page;
+  const document = page?.document || globalThis.document;
+
   const list = document.getElementById('reportsList'), status = document.getElementById('reportsStatus');
   const dialog = document.getElementById('reviewReportDialog'), details = document.getElementById('reviewReportDetails'), form = document.getElementById('reviewReportForm'), message = document.getElementById('reviewReportStatus');
   const close = document.getElementById('closeReviewReport'), approve = document.getElementById('approveReport'), reject = document.getElementById('rejectReport');
@@ -8,6 +11,7 @@
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
   function clearPhotos() { photos.forEach(url => URL.revokeObjectURL(url)); photos = []; }
+  page?.onLeave(() => { ++version; clearPhotos(); });
   async function load() {
     const attempt = ++listVersion; status.textContent = 'Cargando…'; list.replaceChildren();
     try {
