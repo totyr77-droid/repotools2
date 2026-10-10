@@ -22,7 +22,7 @@ try {
         } else {
             if (!$uid) throw new CatalogException('Inicia sesión para ver tus palets.',401);
             $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$uid])->fetchColumn();
-            $result=['pallets'=>stock_list($db,$uid),'labels'=>stock_query($db,'SELECT code,reserved_until FROM pallet_labels WHERE reserved_by=? AND pallet_id IS NULL AND reserved_until>? ORDER BY reserved_until DESC',[$uid,time()])->fetchAll(),'invitations'=>stock_query($db,"SELECT p.id,p.code,u.name AS owner_name FROM pallet_access a JOIN pallets p ON p.id=a.pallet_id JOIN users u ON u.id=p.owner_id WHERE a.user_id=? AND a.status='pending' AND p.released=0",[$uid])->fetchAll(),'expiry_days'=>$days===false?30:(int)$days,'warning_days'=>stock_warning_days($db,$uid)];
+            $result=['is_admin'=>stock_is_admin($db,$uid),'admin_pallets'=>stock_is_admin($db,$uid)?stock_list($db,$uid,true):[],'pallets'=>stock_list($db,$uid),'labels'=>stock_query($db,'SELECT code,reserved_until FROM pallet_labels WHERE reserved_by=? AND pallet_id IS NULL AND reserved_until>? ORDER BY reserved_until DESC',[$uid,time()])->fetchAll(),'invitations'=>stock_query($db,"SELECT p.id,p.code,u.name AS owner_name FROM pallet_access a JOIN pallets p ON p.id=a.pallet_id JOIN users u ON u.id=p.owner_id WHERE a.user_id=? AND a.status='pending' AND p.released=0",[$uid])->fetchAll(),'expiry_days'=>$days===false?30:(int)$days,'warning_days'=>stock_warning_days($db,$uid)];
         }
     } else {
         $key=$_POST['operation_key']??'';
@@ -59,7 +59,7 @@ try {
             case 'delete_label':
                 $label=stock_label($db,(string)($_POST['code']??''));
                 if ($label['pallet_id']) throw new CatalogException('Este código ya tiene un palet. Recarga antes de eliminarlo.',409);
-                if ((int)$label['reserved_by']!==$uid) throw new CatalogException('Solo puedes eliminar tus etiquetas pendientes.',403);
+                if ((int)$label['reserved_by']!==$uid&&!stock_is_admin($db,$uid)) throw new CatalogException('Solo puedes eliminar tus etiquetas pendientes.',403);
                 stock_query($db,'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE code=?',[$label['code']]); break;
             case 'delete':
                 stock_editable($db,$id,$uid,true); stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$id]);
@@ -89,6 +89,11 @@ try {
                 if ($days===false) throw new CatalogException('Elige entre 0 y 365 días de anticipación.',422);
                 stock_query($db,'INSERT INTO stock_preferences(user_id,expiry_days) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET expiry_days=excluded.expiry_days',[$uid,$days]); break;
             default: throw new CatalogException('Acción no válida.',422);
+        }
+        if (stock_is_admin($db,$uid)&&($id||isset($_POST['code']))) {
+            $target=$id?stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn():(string)$_POST['code'];
+            $details=$_POST;unset($details['csrf'],$details['operation_key']);
+            stock_query($db,'INSERT INTO pallet_admin_events(user_id,pallet_id,code,action,details) VALUES(?,?,?,?,?)',[$uid,$id?:null,$target?:'',(string)$action,json_encode($details,JSON_UNESCAPED_UNICODE)]);
         }
         $result['ok']=true; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }

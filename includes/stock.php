@@ -32,17 +32,18 @@ function stock_generate(PDO $db, int $user): array {
     stock_query($db,'UPDATE pallet_labels SET reserved_by=?,reserved_until=? WHERE code=?',[$user,time()+259200,$code]);
     return stock_label($db,$code);
 }
+function stock_is_admin(PDO $db,?int $user): bool { return $user!==null && stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn()==='administrador'; }
 function stock_detail(PDO $db, string $code, ?int $user): array {
-    $label=stock_label($db,$code);
-    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$user !== null && (int)$label['reserved_by']===$user,'can_delete'=>$user !== null && (int)$label['reserved_by']===$user,'can_edit'=>false];
+    $label=stock_label($db,$code); $admin=stock_is_admin($db,$user);
+    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
     $p=stock_query($db,'SELECT p.*,u.name AS owner_name,a.name AS updated_name FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
     if (!$p) throw new CatalogException('Este palet ya no está disponible. Recarga la lista.',409);
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     $owner=$user !== null && (int)$p['owner_id']===$user;
     $access=$user ? stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$p['id'],$user])->fetchColumn() : false;
-    $p['available']=false; $p['is_owner']=$owner; $p['can_edit']=$owner || $access==='accepted'; $p['pending_invitation']=$access==='pending';
+    $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted'; $p['pending_invitation']=$access==='pending';
     $p['products']=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? ORDER BY CASE WHEN expires=\'\' THEN 1 ELSE 0 END,expires,name,id',[$p['id']])->fetchAll();
-    if ($owner) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
+    if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
     if (!$p['can_edit']) unset($p['description']);
     // Only names and product details are public; account identifiers/access are private.
     if (!$p['can_edit'] && !$p['pending_invitation']) unset($p['owner_id'],$p['updated_by']);
@@ -52,7 +53,7 @@ function stock_editable(PDO $db, int $id, int $user, bool $ownerOnly=false): arr
     $p=stock_query($db,'SELECT * FROM pallets WHERE id=? AND released=0',[$id])->fetch();
     if (!$p) throw new CatalogException('El palet ya no está activo.',409);
     $owner=(int)$p['owner_id']===$user;
-    if (!$owner && ($ownerOnly || stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted')) throw new CatalogException('No tienes permiso para modificar este palet.',403);
+    if (!$owner && !stock_is_admin($db,$user) && ($ownerOnly || stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted')) throw new CatalogException('No tienes permiso para modificar este palet.',403);
     return $p;
 }
 function stock_claim(PDO $db,string $code,int $user): array {
@@ -126,9 +127,10 @@ function stock_warning_days(PDO $db,int $user): int {
     $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
     return $days===false?30:min(30,max(0,(int)$days));
 }
-function stock_list(PDO $db,int $user): array {
+function stock_list(PDO $db,int $user,bool $all=false): array {
+    $all=$all&&stock_is_admin($db,$user);
     $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
-    return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,$user,$user])->fetchAll();
+    return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,(int)$all,$user,$user])->fetchAll();
 }
 function stock_notify(PDO $db,int $user): void {
     $days=stock_warning_days($db,$user);

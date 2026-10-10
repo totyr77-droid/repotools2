@@ -110,6 +110,10 @@ function initialize_database(PDO $db): void {
             $db->exec("INSERT INTO stock_product_references(ean,kind,pack_size,updated_by) SELECT b.ean,b.kind,b.pack_size,p.updated_by FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.kind IN ('boxes','packs') ON CONFLICT(ean,kind) DO NOTHING");
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (7)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 8')->fetchColumn()) {
+            $db->exec("CREATE TABLE pallet_admin_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), pallet_id {$ref} REFERENCES pallets(id), code TEXT NOT NULL, action TEXT NOT NULL, details TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(8)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();
