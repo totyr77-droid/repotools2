@@ -38,7 +38,7 @@ if (current_user()) {
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css" rel="stylesheet" type="text/css"><?php endif; ?>
   </head>
-  <body<?= !empty($paginaInicio) ? ' class="home-page"' : '' ?>>
+  <body<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
       <div class="header-contenedor">
         <a class="logo" href="./" aria-label="Inicio Repotools"><p>REPOTOOLS</p></a>

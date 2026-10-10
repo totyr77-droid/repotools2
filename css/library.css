@@ -1,3 +1,6 @@
+body.library-page { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; padding-top: 85px; }
+.library-page > .account-bar { top: 0; flex-shrink: 0; }
+.library-page > .library-main { flex: 1 0 auto; min-height: 0; margin-top: 0; }
 .library-main { justify-content: flex-start; }
 .library-app { width: min(720px, 100%); }
 .library-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
@@ -47,6 +50,7 @@
 #libraryReader { width: 100%; }
 body:has(.library-dialog[open]) { overflow: hidden; }
 @media (max-width: 768px) {
+    body.library-page { padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
     .library-dialog { padding: 20px 16px; max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
     .library-heading h1 { font-size: 1.6rem; }
     .library-heading h2 { font-size: 1.2rem; }
