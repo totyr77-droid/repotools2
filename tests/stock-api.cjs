@@ -24,6 +24,7 @@ async function post(request,csrf,data,key=randomUUID()){const r=await request('a
  assert.equal((await post(b,csrfB,{action:'delete',pallet_id:id})).status,403);
  const product={action:'save_product',pallet_id:id,ean:'96385074',name:'Agua',amount:8,kind:'boxes',pack_size:5,expires:'2026-12-24'};
  const productKey=randomUUID();assert.equal((await post(a,csrfA,product,productKey)).status,200);assert.equal((await post(a,csrfA,product,productKey)).status,200);let detail=(await a('api/stock.php?code='+code)).json().pallet;assert.equal(detail.products[0].units,40);
+ assert.equal((await guest('api/stock.php?ean=96385074')).status,401);assert.equal((await b('api/stock.php?ean=96385074')).json().references[0].pack_size,5);assert.equal((await b('api/stock.php?ean=55007732')).status,422);
  const raced=await post(b,csrfB,{...product,pallet_id:0,code});assert.equal(raced.status,200,raced.text);assert.equal(raced.json().relocated,true);assert.notEqual(raced.json().code,code);assert.equal((await b('api/stock.php?code='+raced.json().code)).json().pallet.products[0].units,40);
  assert.equal((await post(a,csrfA,{action:'invite',pallet_id:id,email:'Pedro@example.invalid'.toLowerCase()})).status,200);const invited=(await b('api/notificaciones.php')).json();assert.ok(invited.notifications.some(n=>n.type==='stock_invitation'));
  assert.equal((await post(b,csrfB,{...product,pallet_id:id})).status,403);assert.equal((await post(b,csrfB,{action:'accept',pallet_id:id})).status,200);assert.equal((await post(b,csrfB,{...product,amount:2,kind:'units'})).status,200);

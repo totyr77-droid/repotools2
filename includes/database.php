@@ -105,6 +105,11 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX pallet_expiries ON pallet_products(expires,pallet_id)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (6)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 7')->fetchColumn()) {
+            $db->exec("CREATE TABLE stock_product_references (ean TEXT NOT NULL, kind TEXT NOT NULL, pack_size INTEGER NOT NULL, updated_by {$ref} NOT NULL REFERENCES users(id), updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(ean,kind))");
+            $db->exec("INSERT INTO stock_product_references(ean,kind,pack_size,updated_by) SELECT b.ean,b.kind,b.pack_size,p.updated_by FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.kind IN ('boxes','packs') ON CONFLICT(ean,kind) DO NOTHING");
+            $db->exec('INSERT INTO app_schema_migrations (version) VALUES (7)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

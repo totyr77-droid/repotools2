@@ -14,7 +14,12 @@ try {
     stock_expire($db);
     if ($method==='GET') {
         if (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid)];
-        else {
+        elseif (isset($_GET['ean'])) {
+            if (!$uid) throw new CatalogException('Inicia sesión para agregar productos.',401);
+            $ean=$_GET['ean'];
+            if (!is_string($ean)||!valid_product_ean($ean)) throw new CatalogException('Ingresa un EAN válido.',422);
+            $result=['references'=>stock_query($db,'SELECT kind,pack_size FROM stock_product_references WHERE ean=?',[$ean])->fetchAll()];
+        } else {
             if (!$uid) throw new CatalogException('Inicia sesión para ver tus palets.',401);
             $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$uid])->fetchColumn();
             $result=['pallets'=>stock_list($db,$uid),'labels'=>stock_query($db,'SELECT code,reserved_until FROM pallet_labels WHERE reserved_by=? AND pallet_id IS NULL AND reserved_until>? ORDER BY reserved_until DESC',[$uid,time()])->fetchAll(),'invitations'=>stock_query($db,"SELECT p.id,p.code,u.name AS owner_name FROM pallet_access a JOIN pallets p ON p.id=a.pallet_id JOIN users u ON u.id=p.owner_id WHERE a.user_id=? AND a.status='pending' AND p.released=0",[$uid])->fetchAll(),'expiry_days'=>$days===false?7:(int)$days];
