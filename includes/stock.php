@@ -122,7 +122,9 @@ function stock_save_product(PDO $db,int $user,array $input): array {
     return ['code'=>$p['code'],'relocated'=>$relocated];
 }
 function stock_list(PDO $db,int $user): array {
-    return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$user,$user])->fetchAll();
+    $preference=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
+    $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.($preference===false?7:(int)$preference).' days')->format('Y-m-d');
+    return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,$user,$user])->fetchAll();
 }
 function stock_notify(PDO $db,int $user): void {
     $preference=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();

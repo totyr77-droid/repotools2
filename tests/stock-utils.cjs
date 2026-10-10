@@ -1,3 +1,5 @@
 const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');const context={window:{},location:{origin:'https://example.com'},URL,Intl,Date};vm.createContext(context);vm.runInContext(fs.readFileSync('js/stock-utils.js','utf8'),context);const u=context.window.RepoStockUtils;
 assert.equal(u.calculate('8 × 5'),40);assert.equal(u.calculate('(8+2)*5'),50);assert.equal(u.calculate('10/2'),5);for(const input of ['alert(1)','1/0','1/3','1-2','1+','1000001'])assert.throws(()=>u.calculate(input));
 assert.equal(u.dateISO('24/12/26'),'2026-12-24');assert.equal(u.dateISO(''),'');assert.equal(u.dateISO('29/02/28'),'2028-02-29');assert.throws(()=>u.dateISO('29/02/26'));assert.throws(()=>u.dateISO('24/12/2'));assert.equal(u.palletCode('00123456'),'00123456');assert.equal(u.palletCode('https://example.com/palet.php?codigo=00123456'),'00123456');assert.equal(u.palletCode('https://evil.example/palet.php?codigo=00123456'),null);console.log('OK: quantity calculator, date validation and QR URL parsing.');
+
+assert.equal(u.movementDate('2026-10-10T18:34:56Z'),'10/10/2026, 15:34');
