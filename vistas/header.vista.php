@@ -3,7 +3,7 @@ require_once __DIR__ . "/../includes/auth.php";
 require_once __DIR__ . "/../includes/catalog.php";
 $navModerator = false; $navPending = 0;
 if (current_user()) {
-    try { $navDb = database(); $navModerator = can_edit_catalog($navDb, current_user()); if ($navModerator) $navPending = (int) $navDb->query("SELECT COUNT(*) FROM product_reports WHERE status = 'pending'")->fetchColumn(); }
+    try { $navDb = database(); $navModerator = can_edit_catalog($navDb, current_user()); if ($navModerator) { $navCount = $navDb->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $navCount->execute([current_user()['id']]); $navPending = (int) $navCount->fetchColumn(); } }
     catch (Throwable $error) { error_log('Repotools: no se pudo consultar el menú de moderación.'); }
 }
 ?>

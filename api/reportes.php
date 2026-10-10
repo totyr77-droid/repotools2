@@ -14,7 +14,8 @@ try {
     $db = database(); $moderator = can_edit_catalog($db, $user);
     if ($method === 'GET' && isset($_GET['pending_count'])) {
         if (!$moderator) throw new CatalogException('No tienes permiso para revisar reportes.', 403);
-        report_response(200, ['pending_count' => (int) $db->query("SELECT COUNT(*) FROM product_reports WHERE status = 'pending'")->fetchColumn()]);
+        $count = $db->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $count->execute([$user['id']]);
+        report_response(200, ['pending_count' => (int) $count->fetchColumn()]);
     }
     $owner = report_owner($user, $_POST['owner_token'] ?? $_SERVER['HTTP_X_REPORT_OWNER'] ?? '');
     if ($method === 'POST') {
@@ -40,7 +41,7 @@ try {
         report_response(200, ['report' => $report, 'csrf' => $csrf, 'can_review' => $moderator]);
     }
     $queue = $moderator && ($_GET['queue'] ?? '') === '1';
-    $stmt = $db->prepare('SELECT id, ean, description, status, created_at, review_note FROM product_reports WHERE ' . ($queue ? "status = 'pending'" : 'owner_key = ?') . ' ORDER BY id DESC LIMIT 50'); $stmt->execute($queue ? [] : [$owner]);
+    $stmt = $db->prepare('SELECT id, ean, description, status, created_at, review_note FROM product_reports WHERE ' . ($queue ? "status = 'pending' AND (user_id IS NULL OR user_id <> ?)" : 'owner_key = ?') . ' ORDER BY id DESC LIMIT 50'); $stmt->execute($queue ? [$user['id']] : [$owner]);
     report_response(200, ['reports' => $stmt->fetchAll(), 'csrf' => $csrf, 'can_review' => $moderator, 'photos_enabled' => report_storage_ready(), 'registered' => $user !== null]);
 } catch (CatalogException $error) { report_response($error->status, ['error' => $error->getMessage()]); }
 catch (Throwable $error) { error_log('Repotools reports error: ' . get_class($error) . ' code=' . $error->getCode()); report_response(503, ['error' => 'No pudimos acceder a los reportes. Intenta nuevamente.']); }

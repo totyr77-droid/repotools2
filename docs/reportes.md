@@ -10,6 +10,8 @@ En **Mi cuenta → Mis reportes**, los administradores y moderadores ven **Pendi
 
 Administradores y moderadores también tienen la pestaña **Reportes** en la navegación principal y móvil. Abre directamente los pendientes y muestra su cantidad. El contador se oculta al llegar a cero y se actualiza al revisar un ticket, volver a la página o cada minuto mientras está visible. El servidor verifica el permiso vigente para mostrar la pestaña y entregar el contador.
 
+La bandeja de moderación excluye los tickets del propio moderador, al igual que su contador. Otro administrador o moderador puede revisarlos. **Mis reportes** es una vista separada, accesible desde Mi cuenta; no aparece como pestaña dentro de la bandeja de moderación.
+
 Los formularios separan **Marca** (Red Bull), **Producto** (Energizante Lata) y **Contenido neto** (250 ml, 500 g, 1 kg o 1 L). El contenido debe escribirse con su unidad, como aparece en el envase. Los datos existentes conservan su valor; no se convierten automáticamente unidades ni se cambia el nombre recibido de la API.
 
 ## Habilitar las fotos en Render

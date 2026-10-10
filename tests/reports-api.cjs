@@ -79,4 +79,14 @@ async function create(request, more = {}) {
   assert.equal((await guest('api/reportes.php', missing.data)).json().report.id, missing.report.id);
   assert.equal((await guest('api/reportes.php', { ...missing.data, ean: '12345670', submission_key: randomUUID(), name: '' })).status, 422);
   console.log('OK: producto nuevo sin explicación, nombre obligatorio, correcciones con motivo y reintentos después de aprobar.');
+  const ownModerator = await create(mod);
+  assert.equal((await mod('api/reportes.php?pending_count=1')).json().pending_count, 0);
+  assert.equal((await mod('api/reportes.php?queue=1')).json().reports.some(report => report.id === ownModerator.report.id), false);
+  assert.equal((await mod('api/reportes.php')).json().reports.some(report => report.id === ownModerator.report.id), true);
+  const admin = client(); await login(admin, 'administrador');
+  assert.equal((await admin('api/reportes.php?queue=1')).json().reports.some(report => report.id === ownModerator.report.id), true);
+  const moderationPage = (await mod('reportes.php?queue=1')).text;
+  assert.match(moderationPage, /data-report-view="queue"/); assert.doesNotMatch(moderationPage, /id="ownReports"/);
+  assert.match((await mod('reportes.php')).text, /data-report-view="own"/);
+  console.log('OK: bandeja y contador excluyen reportes propios; otro administrador sí puede revisarlos; vistas separadas.');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => server.kill());

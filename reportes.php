@@ -2,10 +2,10 @@
 require_once __DIR__ . '/includes/auth.php';
 $paginaCuenta = true; $paginaReportes = true;
 include __DIR__ . '/vistas/header.vista.php';
+$moderationView = $navModerator && ($_GET['queue'] ?? '') === '1';
 ?>
-<main class="reports-main"><section class="reports-panel">
-  <div class="library-heading"><h1>Reportes</h1><a href="cuenta.php" class="library-secondary">Mi cuenta</a></div>
-  <div class="reports-tabs"><button id="ownReports" class="library-secondary" type="button">Mis reportes</button><button id="queueReports" class="library-secondary" type="button" hidden>Pendientes de revisión</button></div>
+<main class="reports-main" data-report-view="<?= $moderationView ? 'queue' : 'own' ?>"><section class="reports-panel">
+  <div class="library-heading"><div><p class="app-resumen__eyebrow"><?= $moderationView ? 'Moderación' : 'Mi cuenta' ?></p><h1><?= $moderationView ? 'Reportes pendientes' : 'Mis reportes' ?></h1></div><a href="cuenta.php" class="library-secondary">Mi cuenta</a></div>
   <p id="reportsStatus" class="library-status" role="status"></p><div id="reportsList" class="reports-list"></div>
 </section></main>
 <dialog id="reviewReportDialog" class="library-dialog product-edit-dialog" aria-labelledby="reviewReportTitle">

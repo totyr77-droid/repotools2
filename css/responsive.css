@@ -3,18 +3,25 @@
   .header-contenedor { max-width: 1440px; margin: auto; }
   .nav { width: auto; max-width: none; flex-shrink: 0; gap: 8px; }
   .nav a { padding: 12px 14px; white-space: nowrap; }
-  .home-page > main { padding: 48px clamp(24px, 5vw, 80px); }
-  .home-page .contenedor-main { width: min(880px, 100%); }
+  .home-page > main { padding: 48px clamp(24px, 4vw, 64px); justify-content: flex-start; align-items: stretch; }
+  .home-page .contenedor-main { width: 100%; max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: stretch; }
+  .home-page .app-resumen { grid-column: 1 / -1; margin: 0 0 16px; }
   .home-page .app-resumen h1 { font-size: clamp(2rem, 3vw, 3rem); }
-  .home-page #boton { min-height: 110px; font-size: 1.4rem; }
-  .home-page .box-tools { width: 100%; }
-  .library-app, .stock-app, .tops-panel { width: min(1200px, 100%); }
-  .library-main, .stock-main, .tops-main { padding: 40px clamp(24px, 5vw, 80px); }
+  .home-page #boton { grid-column: 1; grid-row: 2 / 4; min-height: 160px; height: 100%; font-size: 1.4rem; }
+  .home-page .box-tools { grid-column: 2; width: 100%; margin: 0; }
+  .home-page .resultados-box { flex-direction: column; gap: 4px; background: white; color: #27187e; border: 1px solid #dce1ec; }
+  .home-page .resultados-box::after { content: 'Códigos guardados'; font-size: .85rem; color: #626b7a; }
+  .home-page .borrar-box { grid-column: 2; margin: 0; background: transparent; color: #a32d2d; border: 1px solid #e8cbd0; box-shadow: none; }
+  .library-app, .stock-app, .tops-panel { width: 100%; max-width: 1440px; margin: 0 auto; }
+  .library-main, .stock-main, .tops-main { padding: 40px clamp(24px, 4vw, 64px); justify-content: flex-start; align-items: stretch; }
   .library-products, .reports-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
   .library-product, .report-card { min-width: 0; }
   .library-scan { width: auto; min-width: 260px; margin-right: 12px; }
-  .reports-main { width: 100%; padding: 40px clamp(24px, 5vw, 80px); }
-  .reports-panel { width: 100%; max-width: 1200px; padding: 32px; }
+  .reports-main { width: 100%; padding: 40px clamp(24px, 4vw, 64px); justify-content: flex-start; align-items: stretch; }
+  .reports-panel { width: 100%; max-width: 1440px; margin: 0 auto; padding: 32px; border: 1px solid #e1e5ed; }
+  .reports-list { display: grid; grid-template-columns: 1fr; }
+  .report-card { display: grid; grid-template-columns: 170px 150px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 20px; }
+  .report-card h2, .report-card p, .report-card button { margin: 0; }
   .library-dialog { width: min(680px, calc(100% - 64px)); padding: 32px; }
   #contenedormax.library-dialog { width: min(680px, calc(100% - 64px)); }
   .product-edit-dialog { width: min(760px, calc(100% - 64px)); }
@@ -22,10 +29,13 @@
   .tops-table th, .tops-table td { padding: 18px 20px; }
 }
 @media (min-width: 1100px) {
-  .library-products, .reports-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .library-products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (min-width: 769px) and (max-width: 1000px) {
   .nav { gap: 2px; }
   .nav a { padding: 12px 8px; font-size: .8rem; }
   .logo { font-size: 1.2rem; }
+  .report-card { grid-template-columns: 1fr auto; }
+  .report-card p:nth-of-type(2) { grid-column: 1; }
+  .report-card button { grid-column: 2; grid-row: 1 / 4; }
 }

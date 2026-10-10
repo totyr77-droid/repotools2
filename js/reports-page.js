@@ -3,7 +3,7 @@
   const list = document.getElementById('reportsList'), status = document.getElementById('reportsStatus');
   const dialog = document.getElementById('reviewReportDialog'), details = document.getElementById('reviewReportDetails'), form = document.getElementById('reviewReportForm'), message = document.getElementById('reviewReportStatus');
   const close = document.getElementById('closeReviewReport'), approve = document.getElementById('approveReport'), reject = document.getElementById('rejectReport');
-  let queue = new URLSearchParams(location.search).get('queue') === '1', version = 0, listVersion = 0, active, csrf, busy = false, photos = [];
+  let queue = document.querySelector('[data-report-view]').dataset.reportView === 'queue', version = 0, listVersion = 0, active, csrf, busy = false, photos = [];
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
@@ -13,8 +13,7 @@
     try {
       const result = await RepoReports.request(queue ? '?queue=1' : ''); if (attempt !== listVersion) return;
       if (!result.can_review) queue = false;
-      csrf = result.csrf; document.getElementById('queueReports').hidden = !result.can_review;
-      document.getElementById('ownReports').setAttribute('aria-pressed', String(!queue)); document.getElementById('queueReports').setAttribute('aria-pressed', String(queue));
+      csrf = result.csrf;
       status.textContent = result.reports.length ? '' : (queue ? 'No hay reportes pendientes.' : 'Todavía no enviaste reportes.');
       for (const report of result.reports) {
         const card = document.createElement('article'); card.className = 'report-card';
@@ -45,7 +44,7 @@
           photos.push(url); hint.remove(); const image = document.createElement('img'); image.src = url; image.alt = kind === 'ean' ? 'Código del producto' : 'Frente del producto'; image.className = 'report-evidence'; wrapper.append(image);
         }).catch(error => { if (attempt === version) hint.textContent = error.message; });
       }
-      if (result.can_review && active.status === 'pending') {
+      if (queue && result.can_review && active.status === 'pending') {
         form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] || '';
         form.hidden = false;
       }
@@ -62,8 +61,6 @@
     } catch (error) { message.textContent = error.message + (error.status === 409 ? ' Cierra y abre el reporte para revisar los datos actuales.' : ''); }
     finally { busy = false; approve.disabled = reject.disabled = close.disabled = false; }
   }
-  document.getElementById('ownReports').addEventListener('click', () => { queue = false; load(); });
-  document.getElementById('queueReports').addEventListener('click', () => { queue = true; load(); });
   close.addEventListener('click', () => { if (!busy) dialog.close(); }); dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); }); dialog.addEventListener('close', () => { ++version; active = null; clearPhotos(); });
   form.addEventListener('submit', event => { event.preventDefault(); review('approved'); }); reject.addEventListener('click', () => review('rejected')); load();
 })();
