@@ -8,11 +8,13 @@ El visor de Inicio muestra el código de barras, el nombre y el contenido del pr
 - Con cuenta: acceso a la gestión de palets en desarrollo. Los palets todavía se guardan localmente, separados por usuario; no están sincronizados con el servidor.
 - Las cuentas usan PostgreSQL cuando se configura `DATABASE_URL`, o SQLite para desarrollo local. Incluyen contraseñas mediante hash, protección CSRF y límite de intentos.
 - Biblioteca permite crear y renombrar colecciones privadas, escanear o escribir EAN, guardar nombres y recorrer códigos de barras. Cada EAN aparece una vez por colección. Solo su dueño puede consultar o editar una colección. Los datos se guardan en la misma base de cuentas.
-- TOPs es público y su acceso está en Mi cuenta. Solo los escaneos con cuenta suman. Ordena por códigos únicos acumulados. Cada lectura repetida suma al total, pero no al ranking. Los reintentos de envío con el mismo identificador no duplican una lectura. Escribir productos, importar listas o borrarlas no afecta al TOP. Se contabilizan las lecturas de cámara en Inicio y Biblioteca.
+- TOPs es público y su acceso está en Mi cuenta. Solo los escaneos con cuenta suman. Ordena por códigos únicos acumulados. Cada lectura repetida suma al total, pero no al ranking. Los reintentos de envío con el mismo identificador no duplican una lectura. Escribir productos, importar listas o borrarlas no afecta al TOP. Se contabilizan las lecturas de cámara en Inicio, Biblioteca y Stock.
 - Las cuentas tienen un campo `role`, cuyo valor inicial es `usuario`. La asignación de otros permisos y su administración quedan pendientes; el registro público no permite elegir un rol.
 - Se pueden reportar datos de productos, proponer correcciones y adjuntar fotos privadas. Administradores y moderadores revisan los tickets. Los TOPs públicos incluyen reportes enviados y aportes confirmados, exclusivamente de cuentas registradas. Consulta [reportes y configuración de fotos en Render](docs/reportes.md).
 
 ## Ejecutar con XAMPP
+
+Inicio, Biblioteca y Stock comparten el lector de `js/ean-scanner.js`, la interfaz, la confirmación de tres lecturas y los controles compatibles de zoom y luz. Stock cambia al modo QR para los palets. El análisis oculto del canvas estima posición y orientación de las barras para corregir diagonales, conserva resolución y dispone de Quagga2 como localizador alternativo y de rotaciones de respaldo. Los escaneos EAN confirmados en Stock también consultan el catálogo común y suman en TOPs; escribir un código o leer el QR del palet no suma.
 
 Activa Apache y abre `http://localhost/repotolls2/index.php`. PHP requiere las extensiones PDO SQLite y mbstring. La base de cuentas se crea automáticamente en `data/accounts.sqlite`, y esa carpeta está bloqueada por Apache y excluida de Git. No subas bases de usuarios al repositorio.
 

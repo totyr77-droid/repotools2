@@ -13,6 +13,7 @@ include 'vistas/header.vista.php';
 
     <p class="account-notice">En desarrollo. Tus palets se guardan solo en este dispositivo.</p>
     <script>window.repotoolsUserId = <?= (int) current_user()["id"] ?>;</script>
+    <script>window.repotoolsStock = <?= json_encode(['csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
     <button id="escanearPalet" type="button" class="stock-primary">
       <i class="fa-solid fa-qrcode"></i> ESCANEAR PALET
     </button>
@@ -26,13 +27,10 @@ include 'vistas/header.vista.php';
   </div>
 </main>
 
-<div class="stock-scanner" id="stockScanner" aria-hidden="true">
-  <button id="cerrarStockScanner" class="stock-close" type="button" aria-label="Cerrar lector">
-    <i class="fa-solid fa-circle-xmark"></i>
-  </button>
-  <p class="stock-scanner__logo">REPOTOOLS</p>
-  <p id="stockScannerTitulo">Escanea el QR del palet</p>
-  <div id="stockReader"></div>
+<dialog class="library-dialog library-scanner-dialog" id="stockScanner" aria-labelledby="stockScannerTitulo">
+  <div class="library-heading"><h2 id="stockScannerTitulo">Escanea el QR del palet</h2><button id="cerrarStockScanner" class="library-secondary" type="button">Cerrar</button></div>
+  <div id="stockReader" class="ean-reader"></div>
+  <p id="stockScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
   <div class="stock-scanner__manual" id="paletManualScanner">
     <label for="codigoPaletManual">¿No puedes escanearlo? Ingresa el código</label>
     <div>
@@ -40,7 +38,7 @@ include 'vistas/header.vista.php';
       <button id="abrirPaletManual" type="button">CONTINUAR</button>
     </div>
   </div>
-</div>
+</dialog>
 
 <div class="palet-editor" id="paletEditor" aria-hidden="true">
   <div class="palet-editor__panel">

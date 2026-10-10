@@ -8,10 +8,10 @@
   }
 
   // Confirma el mismo EAN en fotogramas separados y dentro de una ventana corta.
-  function confirmation() {
+  function confirmation(validate = validEAN) {
     let code = '', count = 0, first = 0, last = 0;
     return (value, now = performance.now()) => {
-      if (!validEAN(value)) { code = ''; count = 0; return false; }
+      if (!validate(value)) { code = ''; count = 0; return false; }
       if (value !== code || now - last > 650 || now - first > 1500) {
         code = value; count = 1; first = last = now; return false;
       }
@@ -89,45 +89,93 @@
       element.after(controls);
     }
     function background(current, accept) {
-      if (!document.createElement || !element.querySelector) return;
+      if (current.isQR || !document.createElement || !element.querySelector) return;
       const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
       // Adaptador para html5-qrcode 2.3.8: reutiliza su decodificador sobre el canvas,
       // sin convertir cada fotograma en archivos ni crear URLs de imágenes.
       const decoder = current.reader.qrcode;
       if (!context || typeof decoder?.decodeRobustlyAsync !== 'function') return;
-      const profiles = [{ angle: 0, crop: .7 }, { angle: 0, crop: 1 }, { angle: 90, crop: .7 }, { angle: 90, crop: 1 }, { angle: -18, crop: .7 }, { angle: 18, crop: .7 }];
-      let variant = 0, lastProfile = null, running = false, disposed = false;
-      const dispose = () => { if (disposed) return; disposed = true; canvas.width = canvas.height = 0; };
+      const profiles = [{ angle: 0, crop: .7 }, { angle: -45, crop: .7 }, { angle: 45, crop: .7 }, { angle: 90, crop: .7 }, { angle: 0, crop: 1 }, { angle: -30, crop: .7 }, { angle: 30, crop: .7 }, { angle: -60, crop: .7 }, { angle: 60, crop: .7 }, { angle: 90, crop: 1 }, { angle: -18, crop: .7 }, { angle: 18, crop: .7 }];
+      const probe = document.createElement('canvas'), probeContext = probe.getContext('2d', { willReadFrequently: true });
+      function locate(video) {
+        if (!probeContext) return null;
+        const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight));
+        probe.width = Math.round(video.videoWidth * scale); probe.height = Math.round(video.videoHeight * scale);
+        probeContext.drawImage(video, 0, 0, probe.width, probe.height);
+        const { data } = probeContext.getImageData(0, 0, probe.width, probe.height);
+        let xx = 0, yy = 0, xy = 0, mass = 0, xMass = 0, yMass = 0;
+        for (let y = 1; y < probe.height - 1; y += 2) for (let x = 1; x < probe.width - 1; x += 2) {
+          const i = (y * probe.width + x) * 4;
+          const gx = data[i + 4] - data[i - 4], gy = data[i + probe.width * 4] - data[i - probe.width * 4];
+          const energy = gx * gx + gy * gy;
+          if (energy < 1600) continue;
+          xx += gx * gx; yy += gy * gy; xy += gx * gy;
+          mass += energy; xMass += x * energy; yMass += y * energy;
+        }
+        if (!mass || Math.hypot(xx - yy, 2 * xy) / mass < .35) return null;
+        let angle = -Math.atan2(2 * xy, xx - yy) * 90 / Math.PI;
+        const axis = Math.round(angle / 90) * 90;
+        if (Math.abs(angle - axis) < 7) angle = axis;
+        return { angle, crop: .7, centerX: xMass / mass / probe.width, centerY: yMass / mass / probe.height };
+      }
+      let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false;
+      const dispose = () => { if (disposed) return; disposed = true; canvas.width = canvas.height = probe.width = probe.height = 0; };
       current.disposeBackground = () => { clearTimeout(current.backgroundTimer); if (!running) dispose(); };
       async function analyze() {
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
         const video = element.querySelector('video');
-        if (video?.videoWidth && video.videoHeight && performance.now() - (current.lastPrimaryDetection ?? -Infinity) > 450) {
+        const started = performance.now();
+        if (video?.videoWidth && video.videoHeight && started - (current.lastPrimaryDetection ?? -Infinity) > 180) {
           running = true;
           try {
+            const adaptive = lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video) : null);
+            if (window.Quagga?.decodeSingle && !adaptive) {
+              // Localiza barras y su orientación en una sola imagen. El canvas
+              // y las cajas del localizador permanecen fuera de la interfaz.
+              const scale = Math.min(1, 1920 / Math.max(video.videoWidth, video.videoHeight));
+              canvas.width = Math.round(video.videoWidth * scale); canvas.height = Math.round(video.videoHeight * scale);
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              let result;
+              try {
+                result = await window.Quagga.decodeSingle({ src: canvas.toDataURL('image/jpeg', .92), inputStream: { size: 0 }, locate: true, locator: { halfSample: false, patchSize: 'small' }, decoder: { readers: ['ean_reader', 'ean_8_reader'] }, numOfWorkers: 0 });
+              } catch { /* El decodificador alternativo sigue disponible. */ }
+              if (validEAN(result?.codeResult?.code)) {
+                accept(result.codeResult.code, 'background');
+                return;
+              }
+            }
             // Recorre orientaciones fuera de la vista del usuario; una sola tarea a la vez.
-            const profile = lastProfile ?? profiles[variant++ % profiles.length], radians = profile.angle * Math.PI / 180;
+            const profile = adaptive ?? profiles[variant++ % profiles.length], radians = profile.angle * Math.PI / 180;
             // Conserva los píxeles originales de las barras pequeñas. El recorte
             // central reduce trabajo sin reducir resolución; la vista completa
             // también busca códigos que estén fuera del centro.
             const sourceWidth = Math.round(video.videoWidth * profile.crop), sourceHeight = Math.round(video.videoHeight * profile.crop);
             const scale = Math.min(1, 1920 / Math.max(sourceWidth, sourceHeight));
             const width = sourceWidth * scale, height = sourceHeight * scale;
+            // drawImage recorta lo que queda fuera del video; el fondo blanco
+            // permite mantener centradas también las barras cercanas a un borde.
+            const sourceX = Math.round(video.videoWidth * (profile.centerX ?? .5) - sourceWidth / 2);
+            const sourceY = Math.round(video.videoHeight * (profile.centerY ?? .5) - sourceHeight / 2);
             canvas.width = Math.ceil(Math.abs(width * Math.cos(radians)) + Math.abs(height * Math.sin(radians)) - 1e-6);
             canvas.height = Math.ceil(Math.abs(width * Math.sin(radians)) + Math.abs(height * Math.cos(radians)) - 1e-6);
-            context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, (video.videoWidth - sourceWidth) / 2, (video.videoHeight - sourceHeight) / 2, sourceWidth, sourceHeight, -width / 2, -height / 2, width, height); context.restore();
+            context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, -width / 2, -height / 2, width, height); context.restore();
             if (current.accepting && current.token === revision) {
               const result = await decoder.decodeRobustlyAsync(canvas);
               const code = result.text;
               if (validEAN(code)) { lastProfile = profile; accept(code, 'background'); } else lastProfile = null;
             }
           } catch { lastProfile = null; }
-          finally { running = false; }
+          finally {
+            running = false;
+            if (!current.accepting || session !== current || current.token !== revision) dispose();
+            else current.backgroundTimer = setTimeout(analyze, Math.max(30, 100 - (performance.now() - started)));
+          }
+          return;
         }
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
-        current.backgroundTimer = setTimeout(analyze, lastProfile === null ? 260 : 140);
+        current.backgroundTimer = setTimeout(analyze, 100);
       }
-      current.backgroundTimer = setTimeout(analyze, 500);
+      current.backgroundTimer = setTimeout(analyze, 100);
     }
     async function release(current) {
       if (!current) return;
@@ -147,7 +195,7 @@
       if (session) session.accepting = false;
       return enqueue(() => release(session));
     }
-    function start() {
+    function start(format = 'ean') {
       const token = ++revision;
       if (session) session.accepting = false;
       return enqueue(async () => {
@@ -157,12 +205,14 @@
         element.classList.remove('ean-detecting');
         if (!window.Html5Qrcode || !window.Html5QrcodeSupportedFormats) throw new Error('No se pudo cargar el lector. Intenta nuevamente.');
         const formats = window.Html5QrcodeSupportedFormats;
-        const reader = new window.Html5Qrcode(elementId, { formatsToSupport: [formats.EAN_13, formats.EAN_8], verbose: false });
-        const current = { reader, accepting: true, token, confirm: confirmation() };
+        const isQR = format === 'qr';
+        const validate = isQR ? code => typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
+        const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
+        const current = { reader, accepting: true, token, isQR, confirm: confirmation(validate) };
         session = current;
         const accept = (code, source = 'camera') => {
           if (!current.accepting || session !== current || token !== revision) return;
-          if (!validEAN(code)) { current.confirm(code); return; }
+          if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();
           const confirmed = current.confirm(code);
           if (!confirmed) {
@@ -183,7 +233,7 @@
             fps: 15,
             videoConstraints: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
             disableFlip: true,
-            qrbox: (width, height) => ({ width: Math.floor(width * .94), height: Math.floor(height * .85) })
+            qrbox: (width, height) => isQR ? { width: Math.floor(Math.min(width, height) * .85), height: Math.floor(Math.min(width, height) * .85) } : { width: Math.floor(width * .94), height: Math.floor(height * .85) }
           }, accept, () => {});
           await current.starting;
           if (token !== revision) { await release(current); return false; }

@@ -16,7 +16,7 @@ class Reader {
   async stop() { this.stops++; this.isScanning = false; }
   clear() { assert.equal(this.isScanning, false); this.clears++; }
 }
-const window = { Html5Qrcode: Reader, Html5QrcodeSupportedFormats: { EAN_13: 9, EAN_8: 10 } };
+const window = { Html5Qrcode: Reader, Html5QrcodeSupportedFormats: { EAN_13: 9, EAN_8: 10, QR_CODE: 0 } };
 const frame = new Set();
 const document = { getElementById: () => ({ classList: { add: value => frame.add(value), remove: value => frame.delete(value) } }) };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/ean-scanner.js'), 'utf8'), { window, document, setTimeout: (callback, delay) => { if (delay <= 180) callback(); return 1; }, clearTimeout: () => {}, performance: { now: () => now } });
@@ -93,5 +93,13 @@ function read(reader, code) { now += 100; reader.success(code); }
   await slow.start(); const last = readers.at(-1);
   read(last, a); read(last, a); read(last, a); await flush();
   await slow.stop(); await slow.start(); await slow.stop(); resultPending.resolve();
+  const qrCodes = [];
+  const qr = service.create('qr', { onCode: code => qrCodes.push(code) });
+  await qr.start('qr'); const qrReader = readers.at(-1);
+  assert.deepEqual(Array.from(qrReader.config.formatsToSupport), [0], 'El palet usa el motor compartido en modo QR');
+  read(qrReader, ''); read(qrReader, 'PALET-001'); read(qrReader, 'PALET-001');
+  assert.equal(frame.has('ean-detecting'), true); assert.equal(qrCodes.length, 0);
+  read(qrReader, 'PALET-001'); await flush();
+  assert.deepEqual(qrCodes, ['PALET-001']); assert.equal(qrReader.stops, 1);
   console.log('OK: checksum EAN8/13, confirmación estable, un resultado por sesión, cierre durante permisos, doble toque y recuperación de cámara.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

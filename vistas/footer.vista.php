@@ -28,6 +28,7 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/ean-scanner.js"></script>
+<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js"></script>
 <script src="js/product-editor.js"></script>
 <script src="js/product-reports.js"></script>
@@ -37,6 +38,9 @@
 <script src="js/reports-page.js"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/vendor/quagga-1.12.1.min.js"></script>
+<script src="js/ean-scanner.js"></script>
+<script src="js/product-info.js"></script>
 <script src="js/stock.js"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -46,6 +50,7 @@
 <script src="js/product-editor.js"></script>
 <script src="js/product-reports.js"></script>
 <script src="js/ean-scanner.js"></script>
+<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/script.js"></script>
 <?php endif; ?>
 <script src="js/botones.js"></script>

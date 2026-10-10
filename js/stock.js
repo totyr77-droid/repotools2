@@ -2,7 +2,6 @@
   "use strict";
 
   const STORAGE_KEY = `repotools_palets_v1_user_${window.repotoolsUserId}`;
-  const EAN = /^(?:\d{8}|\d{13})$/;
   const els = {
     escanearPalet: document.getElementById("escanearPalet"),
     codigoPaletManual: document.getElementById("codigoPaletManual"),
@@ -26,7 +25,12 @@
 
   let palets = cargarPalets();
   let paletActivo = null;
-  let lector = null;
+  const lector = window.RepoEANScanner.create('stockReader', {
+    onCode: procesarLectura,
+    onStatus: text => { document.getElementById('stockScannerStatus').textContent = text; },
+    onError: () => avisar('No pudimos leer el código. Intenta nuevamente.')
+  });
+  let scannerRevision = 0;
   let modoEscaneo = "palet";
   let procesandoLectura = false;
 
@@ -40,6 +44,8 @@
       if (e.key === "Enter") abrirPaletDesdeInput();
     });
     els.cerrarScanner.addEventListener("click", cerrarScanner);
+    els.scanner.addEventListener('cancel', event => { event.preventDefault(); cerrarScanner(); });
+    els.scanner.addEventListener('close', () => { if (!els.scanner.open) { scannerRevision++; lector.stop().catch(() => {}); } });
     els.cerrarEditor.addEventListener("click", cerrarEditor);
     els.escanearProducto.addEventListener("click", () => abrirScanner("producto"));
     els.agregarEanManual.addEventListener("click", agregarProductoDesdeInput);
@@ -102,33 +108,23 @@
   }
 
   async function abrirScanner(modo) {
-    if (!window.Html5Qrcode) {
+    if (!window.RepoEANScanner || !window.Html5Qrcode) {
       avisar("No se pudo cargar el lector. Puedes ingresar el código manualmente.");
       return;
     }
+    const revision = ++scannerRevision;
     modoEscaneo = modo;
     procesandoLectura = false;
     els.scannerTitulo.textContent = modo === "palet"
       ? "Escanea el QR del palet"
       : "Escanea el código EAN del producto";
     els.paletManualScanner.hidden = modo !== "palet";
-    els.scanner.classList.add("activo");
-    els.scanner.setAttribute("aria-hidden", "false");
-
-    lector = new Html5Qrcode("stockReader");
-    const formatos = modo === "palet"
-      ? [Html5QrcodeSupportedFormats.QR_CODE]
-      : [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8];
+    if (!els.scanner.open) els.scanner.showModal();
 
     try {
-      await lector.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 260, height: modo === "palet" ? 260 : 140 }, formatsToSupport: formatos },
-        procesarLectura,
-        () => {}
-      );
+      await lector.start(modo === 'palet' ? 'qr' : 'ean');
     } catch (error) {
-      console.error(error);
+      if (revision !== scannerRevision) return;
       await cerrarScanner();
       avisar("No se pudo iniciar la cámara. Revisa el permiso o ingresa el código manualmente.");
     }
@@ -137,30 +133,26 @@
   async function procesarLectura(texto) {
     if (procesandoLectura) return;
     procesandoLectura = true;
+    const modo = modoEscaneo;
     const codigo = normalizarCodigo(texto);
     await cerrarScanner();
 
-    if (modoEscaneo === "palet") {
+    if (modo === "palet") {
       if (!codigo) return avisar("El QR no contiene un código de palet válido.");
       abrirPalet(codigo);
       return;
     }
     agregarProducto(codigo);
+    try {
+      const response = await fetch('api/escaneos.php', { method: 'POST', body: new URLSearchParams({ csrf: window.repotoolsStock.csrf, code: codigo, event: crypto.randomUUID() }) });
+      if (!response.ok) avisar('El código se leyó, pero no sumó en TOPs.');
+    } catch { avisar('El código se leyó, pero no sumó en TOPs.'); }
   }
 
   async function cerrarScanner() {
-    if (lector) {
-      try {
-        if (lector.isScanning) await lector.stop();
-        await lector.clear();
-      } catch (error) {
-        console.warn("No se pudo cerrar el lector", error);
-      }
-      lector = null;
-    }
-    els.scanner.classList.remove("activo");
-    els.scanner.setAttribute("aria-hidden", "true");
-    els.reader.innerHTML = "";
+    ++scannerRevision;
+    if (els.scanner.open) els.scanner.close();
+    await lector.stop();
   }
 
   function agregarProductoDesdeInput() {
@@ -171,7 +163,7 @@
 
   async function agregarProducto(ean) {
     if (!paletActivo) return;
-    if (!EAN.test(ean)) return avisar("El EAN debe contener 8 o 13 números.");
+    if (!window.RepoEANScanner.validEAN(ean)) return avisar("Ingresa un código EAN válido de 8 o 13 números.");
 
     const palet = palets[paletActivo];
     const existente = palet.productos.find((producto) => producto.ean === ean);
@@ -202,10 +194,8 @@
 
   async function buscarNombreProducto(ean) {
     try {
-      const respuesta = await fetch(`https://world.openfoodfacts.org/api/v2/product/${ean}.json`);
-      if (!respuesta.ok) return "";
-      const datos = await respuesta.json();
-      return datos.status === 1 ? (datos.product?.product_name || datos.product?.generic_name || "") : "";
+      const product = await window.RepoProductInfo.get(ean);
+      return window.RepoProductInfo.referenceName(product);
     } catch {
       return "";
     }
