@@ -121,12 +121,14 @@
       if (activeRequests.get(container) === token) container.setAttribute('aria-busy', 'false');
     }
   }
+  function displayName(product) {
+    const name = (product?.name || '').trim(), brand = (product?.brand || '').trim();
+    if (!name) return brand;
+    return brand && !name.toLocaleLowerCase('es').includes(brand.toLocaleLowerCase('es')) ? `${brand} ${name}` : name;
+  }
   function summary(product) {
     if (!product) return 'Producto sin información';
-    const name = product.name || 'Producto sin nombre';
-    const brand = (product.brand || '').trim();
-    const title = brand && !name.toLocaleLowerCase('es').includes(brand.toLocaleLowerCase('es')) ? `${brand} ${name}` : name;
-    return `${title} | ${product.quantity || 'Contenido no disponible'}`;
+    return `${displayName(product) || 'Producto sin nombre'} | ${product.quantity || 'Contenido no disponible'}`;
   }
-  window.RepoProductInfo = { get, show, summary, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
+  window.RepoProductInfo = { get, show, summary, displayName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
 })();

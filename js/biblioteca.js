@@ -127,7 +127,7 @@
   }
   async function loadScannedProduct(ean) {
     const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean);
-    if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = product.name || '';
+    if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = Array.from(window.RepoProductInfo.displayName(product)).slice(0, 120).join('');
   }
   get('libraryProductEan').addEventListener('change', () => {
     const ean = get('libraryProductEan').value.trim();

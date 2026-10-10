@@ -20,6 +20,8 @@ const service = context.window.RepoProductInfo;
   assert.equal(service.summary({ name: 'Agua', brand: 'Marca' }), 'Marca Agua | Contenido no disponible');
   assert.equal(service.summary({ name: 'Energizante Lata', brand: 'Red Bull', quantity: '250 ml' }), 'Red Bull Energizante Lata | 250 ml');
   assert.equal(service.summary({ name: 'Red Bull Energizante', brand: 'Red Bull', quantity: '250 ml' }), 'Red Bull Energizante | 250 ml');
+  assert.equal(service.displayName({ name: 'Energizante Lata', brand: 'Red Bull' }), 'Red Bull Energizante Lata');
+  assert.equal(service.displayName({ name: 'Red Bull Energizante', brand: 'Red Bull' }), 'Red Bull Energizante');
   assert.equal(service.summary(null), 'Producto sin información');
   const container = new Element('section'); await service.show(container, '7791234567898');
   assert.equal(container.children[0].textContent, 'Agua'); assert.equal(container.attrs['aria-busy'], 'false');
