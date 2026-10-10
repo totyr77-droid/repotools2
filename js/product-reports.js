@@ -109,7 +109,7 @@
       document.getElementById('productReportEan').textContent = `EAN ${ean}`;
       document.getElementById('productReportTitle').textContent = missing ? 'Agregar producto' : 'Reportar producto';
       document.getElementById('reportProblem').hidden = missing;
-      form.elements.description.disabled = missing; form.elements.description.required = !missing;
+      form.elements.description.disabled = missing; form.elements.description.required = false;
       form.elements.name.required = missing;
       document.getElementById('reportInstructions').textContent = missing ? 'Completa los datos del producto. Un moderador los revisará.' : 'Propón los datos correctos. Un moderador los revisará.';
       for (const field of ['name', 'quantity', 'brand', 'category', 'packaging']) form.elements[field].value = product?.[field] || '';

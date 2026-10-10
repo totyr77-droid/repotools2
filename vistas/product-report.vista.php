@@ -3,7 +3,7 @@
   <p id="productReportStatus" class="library-status" role="status"></p>
   <form id="productReportForm" hidden>
     <p id="productReportEan" class="product-edit-ean"></p>
-    <label id="reportProblem">¿Qué está mal?<textarea name="description" required minlength="5" maxlength="1000" rows="3" placeholder="Ej.: la presentación es de 500 ml"></textarea></label>
+    <label id="reportProblem">¿Qué está mal? <small>(opcional)</small><textarea name="description" minlength="5" maxlength="1000" rows="3" placeholder="Ej.: la presentación es de 500 ml"></textarea></label>
     <p id="reportInstructions" class="product-edit-note">Propón los datos correctos. Un moderador los revisará.</p>
     <label>Marca<input name="brand" maxlength="160" placeholder="Ej.: Red Bull"></label>
     <label>Producto<input name="name" maxlength="120" placeholder="Ej.: Energizante Lata"></label>

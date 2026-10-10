@@ -50,4 +50,9 @@ review_product_report($db, $users['administrador'], (int) $self['id'], ['decisio
 check_report((int) $db->query('SELECT COUNT(*) FROM report_rewards')->fetchColumn() === $previousRewards + 1, 'Rechazar no da puntos.');
 $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute(['usuario', $mod['id']]);
 denied_report(fn() => review_product_report($db, $mod, (int) $self['id'], $review), 403);
-echo "OK: privacidad, evidencias, roles vigentes, conflictos, invitados, rechazo y puntos idempotentes.\n";
+$withoutNote = submit_product_report($db, null, report_owner(null, str_repeat('c', 64)), [...$input, 'description' => '', 'quantity' => '250 ml', 'submission_key' => $uuid()], [], $storage);
+check_report(str_contains($withoutNote['description'], 'contenido neto'), 'La explicación es opcional cuando hay una corrección.');
+$photoOnly = submit_product_report($db, null, report_owner(null, str_repeat('d', 64)), [...$input, 'description' => '', 'submission_key' => $uuid()], ['ean' => 'photo-only'], $storage);
+check_report($photoOnly['description'] === 'Revisar las fotos adjuntas del producto.', 'Acepta evidencia sin explicación ni cambios.');
+denied_report(fn() => submit_product_report($db, null, report_owner(null, str_repeat('e', 64)), [...$input, 'description' => '', 'submission_key' => $uuid()], [], $storage), 422);
+echo "OK: privacidad, evidencias, roles, conflictos, puntos y explicación opcional con cambios o fotos.\n";

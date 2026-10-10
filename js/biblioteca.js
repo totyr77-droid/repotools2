@@ -85,6 +85,7 @@
     get('libraryProducts').replaceChildren();
     if (!library) return;
     get('collectionTitle').textContent = library.name;
+    get('collectionTitle').title = library.name;
     get('shareLibrary').disabled = library.products.length < 2;
     get('shareLibrary').title = library.products.length < 2 ? 'Agrega al menos dos productos para compartir' : 'Compartir colección';
     if (!library.products.length) {

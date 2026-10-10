@@ -89,4 +89,8 @@ async function create(request, more = {}) {
   assert.match(moderationPage, /data-report-view="queue"/); assert.doesNotMatch(moderationPage, /id="ownReports"/);
   assert.match((await mod('reportes.php')).text, /data-report-view="own"/);
   console.log('OK: bandeja y contador excluyen reportes propios; otro administrador sí puede revisarlos; vistas separadas.');
+  const optional = await user('api/reportes.php', { ...fields, quantity: '250 ml', description: '', csrf: userCsrf, submission_key: randomUUID() });
+  assert.equal(optional.status,200,optional.text);
+  assert.match(optional.json().report.description,/contenido neto/);
+  console.log('OK: la API acepta una corrección sin explicación.');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => server.kill());

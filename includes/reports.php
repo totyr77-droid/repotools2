@@ -43,9 +43,19 @@ function submit_product_report(PDO $db, ?array $user, string $owner, array $inpu
         return report_detail($db, (int) $row['id'], $owner, false);
     }
     $fields = report_fields($input);
-    if (is_string($description) && trim($description) === '' && catalog_product($db, $ean) === null) {
-        if ($fields['name'] === '') throw new CatalogException('Escribe el nombre del producto.', 422);
-        $description = 'Solicitud de alta de producto.';
+    if (is_string($description) && trim($description) === '') {
+        $current = catalog_product($db, $ean);
+        if ($current === null) {
+            if ($fields['name'] === '') throw new CatalogException('Escribe el nombre del producto.', 422);
+            $description = 'Solicitud de alta de producto.';
+        } else {
+            $changed = [];
+            foreach (['name' => 'producto', 'brand' => 'marca', 'quantity' => 'contenido neto', 'category' => 'categoría', 'packaging' => 'envase'] as $field => $label) {
+                if ($fields[$field] !== ($current[$field] ?? '')) $changed[] = $label;
+            }
+            if (!$changed && !$photos) throw new CatalogException('Cambia algún dato, agrega una foto o explica qué hay que revisar.', 422);
+            $description = $changed ? 'Corrección propuesta: ' . implode(', ', $changed) . '.' : 'Revisar las fotos adjuntas del producto.';
+        }
     }
     if (!is_string($description) || mb_strlen(trim($description)) < 5 || mb_strlen($description) > 1000) throw new CatalogException('Explica qué dato está mal (5 a 1000 caracteres).', 422);
     $objects = []; $saved = false;
