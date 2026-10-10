@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/auth.php';
 $viewer = current_user();
 $viewerId = $viewer ? (int) $viewer['id'] : null;
 $paginaCuenta = true;
+$paginaTops = true;
 $leaders = [];
 $stats = ['unique_codes' => 0, 'total_scans' => 0];
 $error = '';
@@ -38,7 +39,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <?php if ($viewer): ?>
     <div class="tops-stats"><p><strong><?= (int) $stats['unique_codes'] ?></strong> <?= $category === 'escaneos' ? 'códigos únicos' : ($category === 'reportes' ? 'reportes enviados' : 'aportes confirmados') ?></p><?php if ($category === 'escaneos'): ?><p><strong><?= (int) $stats['total_scans'] ?></strong> escaneos totales</p><?php endif; ?></div>
     <?php else: ?>
-    <p><a href="cuenta.php?mode=registro&amp;next=tops">Crea una cuenta</a> o <a href="cuenta.php?next=tops">entra</a> para participar.</p>
+    <div class="tops-join"><p>Sumá puntos con tu cuenta.</p><div><a class="tops-join-primary" href="cuenta.php?mode=registro&amp;next=tops">Crear cuenta</a><a href="cuenta.php?next=tops">Ingresar</a></div></div>
     <?php endif; ?>
     <p><?= $category === 'escaneos' ? 'Solo cuentan escaneos con sesión iniciada. Borrar la lista no borra tus puntos.' : 'Solo participan cuentas registradas.' ?></p>
     <?php if ($error): ?><p role="alert"><?= escape($error) ?></p>
@@ -48,7 +49,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <?php $position = 0; $previous = null; foreach ($leaders as $index => $leader):
         if ($previous !== (int) $leader['unique_codes']) $position = $index + 1;
         $previous = (int) $leader['unique_codes']; ?>
-      <tr<?= (int) $leader['id'] === $viewerId ? ' class="tops-me"' : '' ?>><td><?= $position ?></td><th scope="row"><?= escape($leader['name']) ?><?= (int) $leader['id'] === $viewerId ? ' (vos)' : '' ?></th><td><?= (int) $leader['unique_codes'] ?></td><?php if ($category === 'escaneos'): ?><td><?= (int) $leader['total_scans'] ?></td><?php endif; ?></tr>
+      <tr<?= (int) $leader['id'] === $viewerId ? ' class="tops-me"' : '' ?>><td><span class="tops-position<?= $position <= 3 ? ' tops-position-' . $position : '' ?>"><?= $position ?></span></td><th scope="row"><?= escape($leader['name']) ?><?php if ((int) $leader['id'] === $viewerId): ?> <span class="tops-you">Vos</span><?php endif; ?></th><td><?= (int) $leader['unique_codes'] ?></td><?php if ($category === 'escaneos'): ?><td><?= (int) $leader['total_scans'] ?></td><?php endif; ?></tr>
     <?php endforeach; ?>
     </tbody></table></div>
     <?php endif; ?>
