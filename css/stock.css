@@ -55,5 +55,20 @@
 .stock-preferences label { display: block; margin: 12px 0; }
 .stock-preferences input { width: 90px; min-height: 44px; padding: 10px; border: 1px solid #b8bfd0; border-radius: 8px; }
 .stock-preferences button { min-height: 44px; border-radius: 10px; padding: 10px 16px; background: #27187e; color: white; }
+.account-panel-profile { max-width: 640px; padding: 24px; }
+.account-panel-profile h1 { margin-bottom: 8px; }
+.account-panel-profile > p { margin-bottom: 6px; }
+.account-shortcuts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 16px; }
+.account-panel .account-shortcuts a { display: flex; align-items: center; min-height: 44px; margin: 0; padding: 10px 12px; border-radius: 10px; background: white; text-decoration: none; font-size: .875rem; line-height: 1.35; }
+.account-panel-profile .stock-preferences { margin-top: 20px; padding-top: 16px; }
+.account-panel-profile .stock-preferences h2 { font-size: 1.05rem; margin-bottom: 8px; }
+.account-panel-profile .stock-preferences p { font-size: .875rem; margin-bottom: 12px; }
+#stockPreferences { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 12px; }
+.account-panel #stockPreferences label { margin: 0; font-size: .875rem; }
+.account-panel #stockPreferences input { width: 100%; min-height: 44px; margin-top: 6px; padding: 10px; }
+.account-panel #stockPreferences button { width: auto; margin: 0; min-height: 44px; padding: 10px 12px; font-size: .875rem; }
+.account-panel #stockPreferenceStatus { grid-column: 1/-1; margin: 0; }
+#stockPreferenceStatus:empty { display: none; }
+@media(max-width:360px) { .account-panel-profile { padding: 18px; } #stockPreferences { grid-template-columns: 1fr; } .account-panel #stockPreferences button { width: 100%; } }
 @media(min-width:769px) { .stock-main { padding: 40px 32px; } }
 @media(max-width:400px) { .stock-form-row { grid-template-columns: 1fr; gap: 0; } .stock-icon { width: 44px; min-height: 44px; padding: 10px; } }

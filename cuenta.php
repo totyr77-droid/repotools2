@@ -67,17 +67,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
 include __DIR__ . '/vistas/header.vista.php';
 ?>
 <main class="account-main">
-  <section class="account-panel">
+  <section class="account-panel<?= current_user() ? ' account-panel-profile' : '' ?>">
     <?php if (current_user() && $error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
     <?php if (current_user()): ?>
     <h1>Mi cuenta</h1>
     <p>Hola, <?= escape(current_user()['name']) ?>.</p>
     <p class="account-email"><?= escape(current_user()['email']) ?></p>
-    <a href="tops.php">Ver mis estadísticas y TOPs</a>
+    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php">Ver mis estadísticas y TOPs</a>
     <a href="biblioteca.php">Abrir mi biblioteca</a>
     <a href="reportes.php">Mis reportes</a>
     <a href="stock.php">Gestionar palets</a>
-    <a href="index.php">Volver al escáner</a>
+    <a href="index.php">Volver al escáner</a></nav>
     <section class="stock-preferences"><h2>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="7" value="7" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
     <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
