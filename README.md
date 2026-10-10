@@ -7,7 +7,7 @@ El visor de Inicio muestra el código de barras, el nombre y el contenido del pr
 - Sin cuenta: escanear y guardar códigos en el navegador.
 - Con cuenta: acceso a la gestión de palets en desarrollo. Los palets todavía se guardan localmente, separados por usuario; no están sincronizados con el servidor.
 - Las cuentas usan PostgreSQL cuando se configura `DATABASE_URL`, o SQLite para desarrollo local. Incluyen contraseñas mediante hash, protección CSRF y límite de intentos.
-- Biblioteca permite crear y renombrar colecciones privadas, escanear o escribir EAN, guardar nombres y recorrer códigos de barras. Cada EAN aparece una vez por colección. Solo su dueño puede consultar o editar una colección. Los datos se guardan en la misma base de cuentas.
+- Biblioteca permite crear y renombrar colecciones privadas, escanear o escribir EAN, guardar nombres y recorrer códigos de barras. Cada EAN aparece una vez por colección. Con al menos dos productos, el dueño puede compartir una copia mediante un enlace aleatorio. El destinatario inicia sesión, revisa los productos y confirma la importación; la misma colección de origen se importa una sola vez por cuenta mientras conserve su copia. Recompartir actualiza el contenido del enlace, sin sobrescribir copias ya importadas. Los datos se guardan en la misma base de cuentas.
 - TOPs es público y su acceso está en Mi cuenta. Solo los escaneos con cuenta suman. Ordena por códigos únicos acumulados. Cada lectura repetida suma al total, pero no al ranking. Los reintentos de envío con el mismo identificador no duplican una lectura. Escribir productos, importar listas o borrarlas no afecta al TOP. Se contabilizan las lecturas de cámara en Inicio, Biblioteca y Stock.
 - Las cuentas tienen un campo `role`, cuyo valor inicial es `usuario`. La asignación de otros permisos y su administración quedan pendientes; el registro público no permite elegir un rol.
 - Se pueden reportar datos de productos, proponer correcciones y adjuntar fotos privadas. Administradores y moderadores revisan los tickets. Los TOPs públicos incluyen reportes enviados y aportes confirmados, exclusivamente de cuentas registradas. Consulta [reportes y configuración de fotos en Render](docs/reportes.md).
@@ -29,6 +29,8 @@ La cámara necesita HTTPS (o localhost en el mismo dispositivo). Abrir la IP de 
 Los escaneos permanecen en el dispositivo y se pierden si se borra el almacenamiento del navegador. La sesión de cuenta usa una cookie con HttpOnly y SameSite; no hay un banner de aceptación. El proyecto carga fuentes y bibliotecas desde proveedores externos.
 
 ## Verificación
+
+Ejecuta `php tests/library-sharing.php` para comprobar la migración y el intercambio de colecciones, permisos, nombres repetidos y prevención de importaciones duplicadas. Usa SQLite en memoria o `REPOTOOLS_TEST_DATABASE_URL` en una rama PostgreSQL de prueba.
 
 El zoom vertical y el botón circular de flash se muestran dentro del recuadro de cámara con efecto vidrio. La imagen llena el recuadro y el análisis oculto sigue la porción visible. El pitido usa Web Audio, preparado durante el toque que abre el lector y reactivado al confirmar; no hay botón ni preferencia de silencio. Solicita una sesión `ambient` cuando está disponible para mezclarlo con otros audios. En iPhone esta sesión respeta el modo silencio; la interacción con música depende del navegador y del sistema operativo.
 

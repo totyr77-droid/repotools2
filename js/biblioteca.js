@@ -67,6 +67,7 @@
     } finally {
       busy = false;
       document.querySelectorAll('.library-app button, .library-dialog button[type="submit"]').forEach(b => b.disabled = false);
+      get('shareLibrary').disabled = !activeLibrary() || activeLibrary().products.length < 2;
     }
   }
   function render() {
@@ -84,6 +85,8 @@
     get('libraryProducts').replaceChildren();
     if (!library) return;
     get('collectionTitle').textContent = library.name;
+    get('shareLibrary').disabled = library.products.length < 2;
+    get('shareLibrary').title = library.products.length < 2 ? 'Agrega al menos dos productos para compartir' : 'Compartir colección';
     if (!library.products.length) {
       const empty = document.createElement('p'); empty.textContent = 'Escanea tu primer producto.';
       get('libraryProducts').append(empty);
@@ -193,6 +196,9 @@
   get('collectionSettings').addEventListener('keydown', event => {
     if (event.key === 'Escape') { get('collectionSettings').open = false; get('collectionSettings').querySelector('summary').focus(); }
   });
+  get('collectionSettings').addEventListener('toggle', () => {
+    if (get('collectionSettings').open) get('collectionSettings').querySelector('.library-settings-menu').scrollIntoView({ block: 'nearest' });
+  });
   get('libraryProductForm').addEventListener('submit', async event => {
     event.preventDefault();
     const ean = get('libraryProductEan').value.trim();
@@ -250,10 +256,62 @@
     if (document.hidden && get('libraryScannerDialog').open) closeScanner();
   });
   window.addEventListener('pagehide', closeScanner);
+  async function shareRequest(data) {
+    const response = await fetch('api/biblioteca.php', { method: 'POST', body: new URLSearchParams({ csrf: config.csrf, ...data }) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'No pudimos compartir la colección.');
+    return result;
+  }
+  get('shareLibrary').addEventListener('click', async () => {
+    const library = activeLibrary();
+    if (!library || library.products.length < 2 || busy) return;
+    const control = get('shareLibrary'); control.disabled = true;
+    try {
+      const result = await shareRequest({ action: 'share', library_id: library.id });
+      const url = new URL('biblioteca.php', location.href); url.searchParams.set('share', result.token);
+      const showLink = () => { get('libraryShareUrl').value = url.href; openDialog('libraryShareDialog'); };
+      if (navigator.share) {
+        try { await navigator.share({ title: library.name, text: `${library.name}: ${library.products.length} productos`, url: url.href }); }
+        catch (error) { if (error.name !== 'AbortError') showLink(); }
+      } else showLink();
+    } catch (error) { message(error.message); }
+    finally { control.disabled = !activeLibrary() || activeLibrary().products.length < 2; }
+  });
+  get('copyLibraryShare').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(get('libraryShareUrl').value); get('libraryShareDialog').close(); message('Enlace copiado.'); }
+    catch { get('libraryShareUrl').select(); message('Copia este enlace para compartir.'); }
+  });
+  async function previewImport() {
+    if (!config.share) return;
+    openDialog('libraryImportDialog'); get('confirmLibraryImport').disabled = true;
+    get('libraryImportStatus').textContent = 'Cargando colección…';
+    try {
+      const response = await fetch(`api/biblioteca.php?share=${encodeURIComponent(config.share)}`);
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'No pudimos cargar la colección.');
+      get('libraryImportQuestion').textContent = `¿Agregar «${result.collection.name}» a tu biblioteca con estos ${result.collection.products.length} productos?`;
+      get('libraryImportProducts').replaceChildren();
+      result.collection.products.forEach(product => {
+        const item = document.createElement('li'); item.textContent = product.name || 'Producto sin nombre';
+        const code = document.createElement('small'); code.textContent = `EAN ${product.ean}`; item.append(code); get('libraryImportProducts').append(item);
+      });
+      get('libraryImportStatus').textContent = result.alreadyAdded ? 'Esta colección ya está en tu biblioteca.' : '';
+      get('confirmLibraryImport').disabled = result.alreadyAdded;
+    } catch (error) { get('libraryImportStatus').textContent = error.message; }
+  }
+  get('confirmLibraryImport').addEventListener('click', async () => {
+    const control = get('confirmLibraryImport'); control.disabled = true;
+    try {
+      const result = await shareRequest({ action: 'import', token: config.share });
+      libraries = result.libraries; activeId = Number(libraries.at(-1).id); render();
+      get('libraryImportDialog').close(); message('Colección agregada.');
+      const url = new URL(location.href); url.searchParams.delete('share'); history.replaceState(null, '', url);
+    } catch (error) { get('libraryImportStatus').textContent = error.message; control.disabled = false; }
+  });
   get('newCollection').disabled = true;
   message('Cargando colecciones…');
   request().then(result => {
     libraries = result; activeId = libraries.length ? Number(libraries[0].id) : null;
-    render(); message(libraries.length ? '' : 'Crea tu primera colección.');
+    render(); message(libraries.length ? '' : 'Crea tu primera colección.'); previewImport();
   }).catch(error => message(error.message)).finally(() => get('newCollection').disabled = false);
 })();

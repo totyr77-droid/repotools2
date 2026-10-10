@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/library-sharing.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 function library_response(int $status, array $data): void {
@@ -14,11 +15,24 @@ if ($method === 'POST' && !valid_csrf()) library_response(403, ['error' => 'La s
 $userId = (int) current_user()['id'];
 try {
     $db = database();
+    if ($method === 'GET' && isset($_GET['share'])) {
+        $share = library_share_preview($db, is_string($_GET['share']) ? $_GET['share'] : '');
+        if (!$share) library_response(404, ['error' => 'El enlace no está disponible.']);
+        $stmt = $db->prepare('SELECT library_id FROM library_imports WHERE user_id = ? AND source_library_id = ?');
+        $stmt->execute([$userId, $share['source_library_id']]);
+        library_response(200, ['collection' => $share['collection'], 'alreadyAdded' => (bool) $stmt->fetchColumn() || (int) $share['owner_id'] === $userId]);
+    }
     if ($method === 'POST') {
         $action = $_POST['action'] ?? '';
         $name = trim(is_string($_POST['name'] ?? null) ? $_POST['name'] : '');
         if (in_array($action, ['create', 'rename'], true) && (mb_strlen($name) < 1 || mb_strlen($name) > 80)) library_response(422, ['error' => 'Escribe un nombre de hasta 80 caracteres.']);
-        if ($action === 'create') {
+        if ($action === 'share') {
+            $id = filter_var($_POST['library_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if (!$id) library_response(422, ['error' => 'Colección no válida.']);
+            library_response(200, ['token' => library_share_create($db, $userId, $id)]);
+        } elseif ($action === 'import') {
+            library_share_import($db, $userId, is_string($_POST['token'] ?? null) ? $_POST['token'] : '');
+        } elseif ($action === 'create') {
             $stmt = $db->prepare('INSERT INTO libraries (user_id, name) VALUES (?, ?)');
             $stmt->execute([$userId, $name]);
         } elseif (in_array($action, ['rename', 'delete', 'add_product', 'delete_product'], true)) {
@@ -34,6 +48,7 @@ try {
             if ($action === 'rename') {
                 $db->prepare('UPDATE libraries SET name = ? WHERE id = ? AND user_id = ?')->execute([$name, $id, $userId]);
             } elseif ($action === 'delete') {
+                $db->prepare('DELETE FROM library_imports WHERE library_id = ?')->execute([$id]);
                 $db->prepare('DELETE FROM library_products WHERE library_id = ?')->execute([$id]);
                 $db->prepare('DELETE FROM libraries WHERE id = ? AND user_id = ?')->execute([$id, $userId]);
             } else {
@@ -79,6 +94,8 @@ try {
     }
     unset($library);
     library_response(200, ['libraries' => $libraries]);
+} catch (DomainException $exception) {
+    library_response(422, ['error' => $exception->getMessage()]);
 } catch (PDOException $exception) {
     if (isset($db) && $db->inTransaction()) $db->rollBack();
     library_response(is_unique_violation($exception) ? 409 : 503, ['error' => is_unique_violation($exception) ? 'Ya tienes una colección con ese nombre.' : 'No pudimos guardar los cambios. Intenta nuevamente.']);

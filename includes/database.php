@@ -82,6 +82,11 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX report_rewards_user ON report_rewards(user_id)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (3)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 4')->fetchColumn()) {
+            $db->exec("CREATE TABLE library_shares (token TEXT PRIMARY KEY, source_library_id {$ref} NOT NULL UNIQUE, owner_id {$ref} NOT NULL REFERENCES users(id), payload TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE library_imports (user_id {$ref} NOT NULL REFERENCES users(id), source_library_id {$ref} NOT NULL, library_id {$ref} NOT NULL REFERENCES libraries(id), PRIMARY KEY(user_id, source_library_id))");
+            $db->exec('INSERT INTO app_schema_migrations (version) VALUES (4)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();
