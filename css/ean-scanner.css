@@ -6,6 +6,13 @@
 .ean-reader #qr-shaded-region > div { background-color: white !important; }
 .ean-reader.ean-detecting #qr-shaded-region > div { background-color: #facc15 !important; }
 .ean-reader.ean-confirmed #qr-shaded-region > div { background-color: #23c55e !important; }
+.ean-camera-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
+.ean-camera-zoom { display: flex; flex: 1 1 180px; align-items: center; gap: 10px; min-width: 0; margin: 0 !important; color: #172033; font-size: .9rem; }
+.ean-camera-zoom input[type="range"] { flex: 1; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 0; border: 0; background: transparent; accent-color: #27187e; touch-action: pan-y; }
+.ean-camera-zoom-value { min-width: 36px; font-variant-numeric: tabular-nums; }
+.ean-camera-light { min-height: 44px; padding: 10px 14px; border-radius: 10px; background: #e9e6f5; color: #27187e; cursor: pointer; }
+.ean-camera-light[aria-pressed="true"] { background: #facc15; color: #172033; }
+.ean-camera-controls :focus-visible { outline: 3px solid #8372d8; outline-offset: 3px; }
 .library-scanner-dialog .scanner-status { margin-top: 12px; color: #536174; line-height: 1.4; font-size: .95rem; }
 .library-scanner-dialog [hidden] { display: none !important; }
 .library-scanner-dialog button:disabled { opacity: .5; cursor: default; }

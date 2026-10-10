@@ -29,6 +29,65 @@
       queue = operation.catch(() => {});
       return operation;
     };
+    function cameraControls(current) {
+      const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
+      if (!track?.getCapabilities || !track.applyConstraints || !document.createElement) return;
+      const capabilities = track.getCapabilities(), settings = track.getSettings();
+      const zoom = capabilities.zoom;
+      const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && zoom.max > zoom.min;
+      if (!hasZoom && capabilities.torch !== true) return;
+      const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
+      controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', 'Controles de cámara');
+      const active = () => current.accepting && session === current && current.token === revision;
+      let updates = current.cameraUpdates ?? Promise.resolve();
+      function apply(name, value) {
+        const operation = updates.catch(() => {}).then(async () => {
+          if (!active()) return false;
+          const constraints = track.getConstraints();
+          const advanced = Object.assign({}, ...(constraints.advanced ?? []), { [name]: value });
+          await track.applyConstraints({ ...constraints, advanced: [advanced] });
+          if (!active()) return false;
+          const actual = track.getSettings()[name];
+          if (name === 'torch' ? actual !== value : !Number.isFinite(actual) || Math.abs(actual - value) > .1) throw new Error('Control no disponible');
+          return true;
+        });
+        updates = operation;
+        return operation;
+      }
+      if (hasZoom) {
+        const label = document.createElement('label'); label.className = 'ean-camera-zoom';
+        const text = document.createElement('span'); text.textContent = 'Zoom';
+        const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
+        input.min = zoom.min; input.max = Math.max(zoom.min, Math.min(zoom.max, Math.max(3, zoom.min + (zoom.step || .1)))); input.step = zoom.step > 0 ? zoom.step : .1;
+        let applied = Math.max(Number(input.min), Math.min(Number(input.max), settings.zoom ?? zoom.min));
+        input.value = applied;
+        const output = document.createElement('span'); output.className = 'ean-camera-zoom-value'; output.textContent = `${applied.toFixed(1)}×`;
+        input.addEventListener('change', async () => {
+          if (!active()) return;
+          input.disabled = true;
+          try { if (await apply('zoom', Number(input.value))) { applied = track.getSettings().zoom; output.textContent = `${applied.toFixed(1)}×`; } }
+          catch { if (active()) { input.value = applied; onStatus('No pudimos ajustar el zoom. Puedes seguir escaneando.'); } }
+          finally { input.disabled = false; }
+        });
+        label.append(text, input, output); controls.append(label);
+      }
+      if (capabilities.torch === true) {
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'ean-camera-light';
+        let enabled = settings.torch === true;
+        const render = () => { button.textContent = enabled ? 'Apagar luz' : 'Encender luz'; button.setAttribute('aria-pressed', String(enabled)); };
+        render();
+        button.addEventListener('click', async () => {
+          if (!active()) return;
+          button.disabled = true;
+          try { if (await apply('torch', !enabled)) { enabled = !enabled; render(); } }
+          catch { if (active()) onStatus('No pudimos encender o apagar la luz. Puedes seguir escaneando.'); }
+          finally { button.disabled = false; }
+        });
+        controls.append(button);
+      }
+      current.disposeControls = () => controls.remove();
+      element.after(controls);
+    }
     function background(current, accept) {
       if (!document.createElement || !element.querySelector) return;
       const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
@@ -73,7 +132,7 @@
     async function release(current) {
       if (!current) return;
       if (!current.cleanup) current.cleanup = (async () => {
-        current.accepting = false; current.disposeBackground?.(); clearTimeout(current.progressTimer);
+        current.accepting = false; current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
         if (current.reader.isScanning) await current.reader.stop();
         current.reader.clear();
@@ -133,9 +192,10 @@
           try {
             const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
             if (track?.getCapabilities?.().focusMode?.includes('continuous')) {
-              track.applyConstraints({ ...track.getConstraints(), advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
+              current.cameraUpdates = track.applyConstraints({ ...track.getConstraints(), advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
             }
           } catch {}
+          try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
           onStatus('Centra un solo código dentro del recuadro.');
           return true;
