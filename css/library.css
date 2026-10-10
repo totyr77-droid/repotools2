@@ -26,6 +26,8 @@
 .library-dialog input, .library-dialog select { display: block; width: 100%; min-height: 48px; margin-top: 8px; padding: 12px; border: 1px solid #b8bfd0; border-radius: 8px; background: white; font-size: 16px; user-select: text; }
 .library-dialog-actions { display: flex; gap: 10px; margin-top: 20px; }
 .library-dialog input[readonly] { background: #f4f3f9; color: #626b7a; border-color: #e1e5ed; }
+.library-dialog [hidden] { display: none !important; }
+.library-scanned-ean { margin: 16px 0; color: #626b7a; font-size: 1rem; letter-spacing: .04em; user-select: text; }
 .library-dialog-actions button { flex: 1; }
 .library-ean-dialog { text-align: center; background: white; }
 .library-ean-dialog label { text-align: left; }

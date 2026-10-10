@@ -121,6 +121,9 @@
     productLibraryId = libraryId;
     get('libraryProductForm').reset(); get('libraryProductEan').value = ean;
     get('libraryProductEan').readOnly = Boolean(ean);
+    get('libraryManualEan').hidden = Boolean(ean);
+    get('libraryScannedEan').hidden = !ean;
+    get('libraryScannedEan').textContent = ean ? `EAN ${ean}` : '';
     openDialog('libraryProductDialog');
     (ean ? get('libraryProductName') : get('libraryProductEan')).focus();
     window.RepoProductInfo.clear(get('libraryScanProductInfo'));
@@ -128,7 +131,7 @@
   }
   async function loadScannedProduct(ean) {
     const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean);
-    if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = Array.from(window.RepoProductInfo.displayName(product)).slice(0, 120).join('');
+    if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = Array.from(window.RepoProductInfo.referenceName(product)).slice(0, 120).join('');
   }
   get('libraryProductEan').addEventListener('change', () => {
     const ean = get('libraryProductEan').value.trim();

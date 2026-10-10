@@ -127,8 +127,11 @@
     return brand && !name.toLocaleLowerCase('es').includes(brand.toLocaleLowerCase('es')) ? `${brand} ${name}` : name;
   }
   function summary(product) {
-    if (!product) return 'Producto sin información';
+    if (!product) return 'No tenemos información de este producto';
     return `${displayName(product) || 'Producto sin nombre'} | ${product.quantity || 'Contenido no disponible'}`;
   }
-  window.RepoProductInfo = { get, show, summary, displayName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
+  function referenceName(product) {
+    return [displayName(product), (product?.quantity || '').trim()].filter(Boolean).join(' ');
+  }
+  window.RepoProductInfo = { get, show, summary, displayName, referenceName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
 })();
