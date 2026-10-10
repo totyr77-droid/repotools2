@@ -4,7 +4,8 @@ $paginaCuenta = true;
 $mostrarCreditos = true;
 $register = ($_GET['mode'] ?? '') === 'registro';
 $next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca'], true) ? $_GET['next'] : '';
-$error = '';
+$error = $_SESSION['logout_error'] ?? '';
+unset($_SESSION['logout_error']);
 $name = '';
 $email = '';
 if (current_user() && $next) {
@@ -60,6 +61,7 @@ include __DIR__ . '/vistas/header.vista.php';
 ?>
 <main class="account-main">
   <section class="account-panel">
+    <?php if (current_user() && $error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
     <?php if (current_user()): ?>
     <h1>Mi cuenta</h1>
     <p>Hola, <?= escape(current_user()['name']) ?>.</p>
