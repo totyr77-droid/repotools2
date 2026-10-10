@@ -130,7 +130,7 @@
     if (ean) loadScannedProduct(ean);
   }
   async function loadScannedProduct(ean) {
-    const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean);
+    const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean, { compact: true });
     if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = Array.from(window.RepoProductInfo.referenceName(product)).slice(0, 120).join('');
   }
   get('libraryProductEan').addEventListener('change', () => {

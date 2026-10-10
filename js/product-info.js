@@ -43,18 +43,18 @@
     activeRequests.set(container, Symbol()); container.replaceChildren();
     container.setAttribute('aria-busy', 'false');
   }
-  async function showSummary(container, ean) {
+  async function showSummary(container, ean, { compact = false } = {}) {
     if (!container) return null;
     const token = Symbol(); activeRequests.set(container, token);
     container.textContent = 'Buscando producto…';
     try {
       const product = await get(ean);
       if (activeRequests.get(container) !== token) return null;
-      container.textContent = summary(product);
+      container.textContent = compact ? (product ? 'Nombre sugerido. Puedes editarlo.' : 'No tenemos información de este producto. Escribe un nombre para recordarlo.') : summary(product);
       editButton(container, ean);
       return product;
     } catch (error) {
-      if (activeRequests.get(container) === token) { container.textContent = error.message || 'No pudimos cargar el producto.'; editButton(container, ean); }
+      if (activeRequests.get(container) === token) { container.textContent = compact ? 'No pudimos cargar los datos del producto. Puedes guardar el EAN con un nombre propio.' : (error.message || 'No pudimos cargar el producto.'); editButton(container, ean); }
       return null;
     }
   }

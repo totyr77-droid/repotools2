@@ -46,7 +46,7 @@ function fetch_external_product(string $ean): ?array {
     if (($result['status'] ?? null) === 0) return null;
     if (($result['status'] ?? null) !== 1 || !is_array($result['product'] ?? null)) throw new CatalogException('La información del producto no está disponible.');
     $product = $result['product'];
-    if (isset($product['code']) && (string) $product['code'] !== $ean) throw new CatalogException('La información recibida no corresponde al EAN.');
+    if (isset($product['code']) && (string) $product['code'] !== $ean) throw new CatalogException('No pudimos obtener los datos del producto. El EAN leído sigue disponible.');
     return $product;
 }
 

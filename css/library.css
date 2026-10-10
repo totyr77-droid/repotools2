@@ -28,6 +28,14 @@
 .library-dialog input[readonly] { background: #f4f3f9; color: #626b7a; border-color: #e1e5ed; }
 .library-dialog [hidden] { display: none !important; }
 .library-scanned-ean { margin: 16px 0; color: #626b7a; font-size: 1rem; letter-spacing: .04em; user-select: text; }
+.library-save-card { padding: 18px; margin-top: 18px; border: 1px solid #e1e5ed; border-radius: 12px; background: #f8f9fc; }
+.library-save-card .library-scanned-ean { margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px solid #e1e5ed; }
+.library-save-card label { margin: 12px 0; }
+.library-save-card small { color: #626b7a; font-weight: 400; }
+.library-save-hint { color: #626b7a; font-size: .85rem; line-height: 1.5; font-weight: 400; overflow-wrap: anywhere; }
+.library-save-hint:empty { display: none; }
+.library-save-hint button { margin: 8px 8px 0 0; }
+@media (max-width: 360px) { .library-save-card { padding: 12px; } }
 .library-dialog-actions button { flex: 1; }
 .library-ean-dialog { text-align: center; background: white; }
 .library-ean-dialog label { text-align: left; }
