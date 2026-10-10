@@ -62,12 +62,9 @@
       await request();
       if (!current(code, token)) return;
       get('scanLibraryStatus').textContent = '';
-      if (libraries.length === 1) await save(libraries[0], code, token);
-      else {
-        get('scanLibraryForm').reset(); options(libraries[0]?.id || 'new');
-        get('scanLibraryEan').textContent = `EAN ${code}`;
-        dialog.showModal();
-      }
+      get('scanLibraryForm').reset(); options(libraries[0]?.id || 'new');
+      get('scanLibraryEan').textContent = `EAN ${code}`;
+      dialog.showModal();
     } catch (error) { if (current(code, token)) get('scanLibraryStatus').textContent = error.message; }
     finally { loading(false); }
   });

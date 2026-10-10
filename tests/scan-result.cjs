@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 class Element {
   constructor() { this.textContent = ''; this.style = {}; this.disabled = false; this.open = false; }
   addEventListener() {}
+  replaceChildren() { this.textContent = ''; }
   showModal() { this.open = true; }
   close() { this.open = false; }
 }
@@ -29,10 +30,13 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf
   assert.equal(get('resultado').textContent, '', 'El EAN incorrecto no aparece como resultado');
   const old = context.mostrarResultadoEscaneo('7791234567898');
   assert.equal(get('resultado').textContent, '7791234567898');
+  assert.equal(get('mainScannerTitle').textContent, 'Producto escaneado');
   const copying = context.copiarResultado();
   await context.iniciarScanner();
+  assert.equal(get('mainScannerTitle').textContent, 'Escanea el producto');
   assert.equal(get('copy').disabled, true);
   await context.mostrarResultadoEscaneo('96385074');
+  assert.equal(get('mainScannerTitle').textContent, 'Ya está en tu lista');
   finishCopy(); await copying;
   oldProduct({ name: 'Anterior', quantity: '500 ml' }); await old;
   assert.equal(get('.resultado-api').textContent, 'Actual | 1 L', 'Una respuesta tardía no cambia el producto actual');

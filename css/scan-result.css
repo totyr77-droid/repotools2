@@ -46,3 +46,10 @@
 #saveScanLibrary svg { width: 20px; height: 20px; }
 #scanLibraryForm label { display: block; margin-top: 16px; }
 #scanLibraryForm [hidden] { display: none; }
+.scan-product-actions { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+.scan-product-actions:empty { display: none; }
+.scan-product-actions .product-report-button, .scan-product-actions .product-edit-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0; padding: 10px 12px; min-height: 44px; font-size: .9rem; font-weight: 400; }
+.cartelscaner-box-info { padding-top: 10px; gap: 12px; }
+.cartelscaner-box .resultado-api { width: 100%; font-size: 1.1rem; }
+.cartelscaner-box #scanCopyStatus:empty, .cartelscaner-box #scanLibraryStatus:empty { display: none; }
+.cartelscaner-box #saveScanLibrary { margin: 0; min-height: 48px; }

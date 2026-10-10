@@ -34,7 +34,7 @@ if (current_user()) {
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261010-close1" rel="stylesheet" type="text/css"><link href="css/product-info.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261010-result2" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261010-close1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261010-close1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">

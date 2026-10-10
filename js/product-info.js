@@ -28,12 +28,13 @@
     return cache.get(ean);
   }
   function editButton(container, ean) {
+    if (!container) return;
     if (window.RepoProductReports) {
       const report = document.createElement('button'); report.type = 'button'; report.className = 'product-report-button';
       report.title = 'Reportar un error'; report.setAttribute('aria-label', 'Reportar un error');
       report.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 21V3m0 1c4-3 8 3 14 0v10c-6 3-10-3-14 0"/></svg>';
-      if (container.id === 'libraryScanProductInfo') {
-        const label = document.createElement('span'); label.textContent = 'Reportar producto'; report.append(label);
+      if (container.id === 'libraryScanProductInfo' || container.id === 'scanProductActions') {
+        const label = document.createElement('span'); label.textContent = container.id === 'scanProductActions' ? 'Reportar' : 'Reportar producto'; report.append(label);
         report.title = 'Reportar producto'; report.setAttribute('aria-label', 'Reportar producto');
       }
       report.addEventListener('click', () => window.RepoProductReports.open(ean)); container.append(report);
@@ -43,6 +44,7 @@
     button.type = 'button'; button.className = 'product-edit-button';
     button.title = 'Editar información del producto'; button.setAttribute('aria-label', 'Editar información del producto');
     button.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6Z"/><path d="m14 5 5 5"/></svg>';
+    if (container.id === 'scanProductActions') { const label = document.createElement('span'); label.textContent = 'Editar'; button.append(label); }
     button.addEventListener('click', () => window.RepoProductEditor?.open(ean));
     container.append(button);
   }

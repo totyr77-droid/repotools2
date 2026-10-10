@@ -24,7 +24,7 @@
     <link href="css/footer.css" rel="stylesheet" type="text/css">
     <link href="css/reports.css" rel="stylesheet" type="text/css">
     <link href="css/product-info.css" rel="stylesheet" type="text/css">
-    <link href="css/scan-result.css" rel="stylesheet" type="text/css">
+    <link href="css/scan-result.css?v=20261010-result2" rel="stylesheet" type="text/css">
     <link href="css/library.css?v=20261010-close1" rel="stylesheet" type="text/css">
     <link href="css/ean-scanner.css" rel="stylesheet" type="text/css">
   <link href="css/responsive.css" rel="stylesheet" type="text/css">
@@ -122,10 +122,11 @@
 
       <div class="cartelscaner-box-info">
         <div class="resultado-box">
+          <div class="resultado-api" role="status"></div>
           <div class="resultado-title">
             <i class="fa-solid fa-barcode"></i><p id="resultado"></p>
           </div>
-          <div class="resultado-api" role="status"></div>
+          <div id="scanProductActions" class="scan-product-actions" aria-label="Acciones del producto"></div>
         </div>
 
         <div class="CsBH">
@@ -239,12 +240,12 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
-    <script src="js/product-info.js?v=20261010-ajax1"></script>
+    <script src="js/product-info.js?v=20261010-result2"></script>
     <script src="js/product-editor.js?v=20261010-ajax1"></script>
     <script src="js/product-reports.js?v=20261010-ajax1"></script>
     <script src="js/ean-scanner.js?v=20261010-ajax1"></script>
     <script src="js/vendor/quagga-1.12.1.min.js"></script>
-    <script src="js/script.js?v=20261010-ajax1"></script>
+    <script src="js/script.js?v=20261010-result2"></script>
     <script src="js/botones.js?v=20261010-ajax1"></script>
   </body>
 </html>

@@ -16,10 +16,11 @@
 
       <div class="cartelscaner-box-info">
         <div class="resultado-box">
+          <div class="resultado-api" role="status"></div>
           <div class="resultado-title">
             <i class="fa-solid fa-barcode"></i><p id="resultado"></p>
           </div>
-          <div class="resultado-api" role="status"></div>
+          <div id="scanProductActions" class="scan-product-actions" aria-label="Acciones del producto"></div>
         </div>
 
         <div class="CsBH">
@@ -32,7 +33,7 @@
         </div>
         <p id="scanCopyStatus" class="scanner-status" role="status"></p>
         <?php if (current_user()): ?>
-        <button id="saveScanLibrary" class="library-secondary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 3h5v18H4ZM11 3h4v18h-4ZM17 4l3-1 4 17-3 1Z"/></svg>Biblioteca</button>
+        <button id="saveScanLibrary" class="library-secondary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 3h5v18H4ZM11 3h4v18h-4ZM17 4l3-1 4 17-3 1Z"/></svg>+ Biblioteca</button>
         <p id="scanLibraryStatus" class="scanner-status" role="status"></p>
         <?php endif; ?>
         <button id="rescancelar" type="button"><i class="fa-solid fa-trash" aria-hidden="true"></i> Quitar de la lista</button>

@@ -264,6 +264,8 @@ async function iniciarScanner() {
   resultadoActual = '';
   ultimoAgregado = null;
   els.copy.disabled = true;
+  document.getElementById('mainScannerTitle').textContent = 'Escanea el producto';
+  document.getElementById('scanProductActions')?.replaceChildren();
   els.cartelScaner.style.display = 'none';
   els.contenedor.hidden = false;
   document.getElementById('mainScannerStatus').hidden = false;
@@ -309,7 +311,9 @@ async function mostrarResultadoEscaneo(codigo) {
   els.cartelScaner.style.display = 'flex';
   els.resultado.textContent = codigo;
   const heading = document.getElementById("scanResultHeading");
-  if (heading) heading.textContent = esDuplicado ? "Ya está en tu lista" : "Producto guardado";
+  document.getElementById('mainScannerTitle').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto escaneado';
+  if (heading) heading.textContent = esDuplicado ? 'El código no se agregó otra vez.' : 'Guardado en tu lista.';
+  document.getElementById('scanProductActions')?.replaceChildren();
   els.rescancelar.style.display = esDuplicado ? "none" : "block";
   actualizarContadores();
 
@@ -317,7 +321,7 @@ async function mostrarResultadoEscaneo(codigo) {
   const resultadoAPI = await buscarProductoPorEAN(codigo);
   if (revision !== scanResultRevision) return;
   els.resultadoApi.textContent = resultadoAPI;
-  window.RepoProductInfo.editButton(els.resultadoApi, codigo);
+  window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), codigo);
 }
 
 async function registrarEscaneoTop(codigo) {
@@ -357,6 +361,7 @@ function cancelarUltimoEscaneo() {
   guardarLista();
   actualizarContadores();
   const heading = document.getElementById("scanResultHeading");
+  document.getElementById('mainScannerTitle').textContent = 'Producto quitado';
   if (heading) heading.textContent = "Producto quitado";
   els.resultadoApi.textContent = "El código se quitó de tu lista.";
   els.rescancelar.style.display = "none";
@@ -486,7 +491,8 @@ window.quitarOverlay = quitarOverlay;
   const { ean, product } = event.detail;
   if (els.contenedormax.open && resultadoActual === ean) {
     els.resultadoApi.textContent = window.RepoProductInfo.summary(product);
-    window.RepoProductInfo.editButton(els.resultadoApi, ean);
+    document.getElementById('scanProductActions')?.replaceChildren();
+    window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), ean);
   }
   if (els.verb.style.display === 'flex' && lista[indiceActual - 1] === ean) {
     document.getElementById('resultProductSummary').textContent = window.RepoProductInfo.summary(product);
