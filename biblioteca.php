@@ -35,7 +35,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <h2 id="libraryProductFormTitle">Guardar producto</h2>
     <div class="library-save-card">
       <p id="libraryScannedEan" class="library-scanned-ean" hidden></p>
-      <label id="libraryManualEan">Código EAN<input id="libraryProductEan" inputmode="numeric" pattern="(?:[0-9]{8}|[0-9]{13})" maxlength="13" required placeholder="8 o 13 números"></label>
+      <label id="libraryManualEan">Código EAN<input id="libraryProductEan" type="text" inputmode="numeric" autocomplete="off" required placeholder="8 o 13 números"></label>
       <div id="libraryProductReference"><label>Nombre de referencia <small>(opcional)</small><input id="libraryProductName" maxlength="120" placeholder="Ej.: Red Bull Energizante Lata 250 ml" aria-describedby="libraryScanProductInfo"></label>
       <section id="libraryScanProductInfo" class="library-save-hint" role="status" aria-label="Información del producto"></section></div>
     </div>

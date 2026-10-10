@@ -265,9 +265,11 @@
     avisar("Producto guardado.");
   }
 
-  function eliminarProducto(ean) {
-    if (!confirm(`¿Eliminar el producto ${ean} de este palet?`)) return;
-    const palet = palets[paletActivo];
+  async function eliminarProducto(ean) {
+    const codigoPalet = paletActivo;
+    if (!await window.RepoConfirm({ title: 'Eliminar producto', message: `¿Eliminar el producto ${ean} de este palet?` })) return;
+    const palet = palets[codigoPalet];
+    if (!palet) return;
     palet.productos = palet.productos.filter((producto) => producto.ean !== ean);
     palet.actualizado = new Date().toISOString();
     guardarPalets();
@@ -275,9 +277,10 @@
     renderPalets();
   }
 
-  function eliminarPaletActivo() {
-    if (!paletActivo || !confirm(`¿Eliminar el palet ${paletActivo} y todos sus productos?`)) return;
-    delete palets[paletActivo];
+  async function eliminarPaletActivo() {
+    const codigoPalet = paletActivo;
+    if (!codigoPalet || !await window.RepoConfirm({ title: 'Eliminar palet', message: `Se eliminará el palet ${codigoPalet} y todos sus productos. Esta acción no se puede deshacer.` })) return;
+    delete palets[codigoPalet];
     guardarPalets();
     cerrarEditor();
   }

@@ -6,6 +6,28 @@ document.addEventListener('touchmove', event => {
   if (event.touches.length > 1) event.preventDefault();
 }, { passive: false });
 
+let confirmationOpen = false;
+window.RepoConfirm = ({ title, message, confirmLabel = 'Eliminar' }) => {
+  if (confirmationOpen) return Promise.resolve(false);
+  confirmationOpen = true;
+  return new Promise(resolve => {
+    const dialog = document.createElement('dialog'); dialog.className = 'library-dialog library-confirm-dialog';
+    dialog.setAttribute('aria-labelledby', 'deleteConfirmTitle'); dialog.setAttribute('aria-describedby', 'deleteConfirmMessage');
+    const heading = document.createElement('h2'); heading.id = 'deleteConfirmTitle'; heading.textContent = title;
+    const description = document.createElement('p'); description.id = 'deleteConfirmMessage'; description.textContent = message;
+    const actions = document.createElement('div'); actions.className = 'library-dialog-actions';
+    const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'library-secondary'; cancel.textContent = 'Cancelar';
+    const accept = document.createElement('button'); accept.type = 'button'; accept.className = 'library-danger library-confirm-delete'; accept.textContent = confirmLabel;
+    cancel.addEventListener('click', () => dialog.close());
+    accept.addEventListener('click', () => dialog.close('confirmed'));
+    dialog.addEventListener('close', () => {
+      const confirmed = dialog.returnValue === 'confirmed'; dialog.remove(); confirmationOpen = false; resolve(confirmed);
+    }, { once: true });
+    actions.append(cancel, accept); dialog.append(heading, description, actions); document.body.append(dialog);
+    dialog.showModal(); cancel.focus();
+  });
+};
+
 const btnNavCel = document.getElementById("btn.nav-celular");
 const btnNavCelIcon = document.getElementById("btn-nav-celularA");
 const navCelu = document.getElementById("nav-celular");

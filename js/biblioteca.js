@@ -105,7 +105,7 @@
       view.setAttribute('aria-label', 'Ver EAN'); view.title = 'Ver EAN';
       view.append(icon('<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'), barcodeIcon());
       const remove = button('', 'library-danger library-remove-product', async () => {
-        if (!confirm('¿Quitar este producto de la colección?')) return;
+        if (!await window.RepoConfirm({ title: 'Quitar producto', message: `¿Quitar «${product.name || product.ean}» de esta colección?`, confirmLabel: 'Quitar' })) return;
         try { await mutate({ action: 'delete_product', library_id: library.id, ean: product.ean }); message('Producto eliminado.'); }
         catch (error) { message(error.message); }
       });
@@ -186,7 +186,7 @@
   });
   get('deleteCollection').addEventListener('click', async () => {
     get('collectionSettings').open = false;
-    if (!confirm('¿Eliminar esta colección y todos sus productos?')) return;
+    if (!await window.RepoConfirm({ title: 'Eliminar colección', message: `Se eliminará «${activeLibrary().name}» y todos sus productos. Esta acción no se puede deshacer.` })) return;
     try { await mutate({ action: 'delete', library_id: activeId }); message('Colección eliminada.'); }
     catch (error) { message(error.message); }
   });
@@ -202,8 +202,10 @@
   });
   get('libraryProductForm').addEventListener('submit', async event => {
     event.preventDefault();
-    const ean = get('libraryProductEan').value.trim();
-    if (!window.RepoEANScanner.validEAN(ean)) return message('Revisa el código EAN: debe tener 8 o 13 números y ser válido.');
+    const ean = get('libraryProductEan').value.replace(/[\s\u200B-\u200D\uFEFF-]/g, '');
+    get('libraryProductEan').value = ean;
+    if (!/^(?:\d{8}|\d{13})$/.test(ean)) return message('Escribe un código EAN de 8 o 13 números.');
+    if (!window.RepoEANScanner.validEAN(ean)) return message('Revisa el código EAN: el dígito de control no coincide.');
     if (enteringEan) {
       productDialog(ean, productLibraryId);
       return;
