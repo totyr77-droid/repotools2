@@ -30,7 +30,7 @@ Los escaneos permanecen en el dispositivo y se pierden si se borra el almacenami
 
 ## Verificación
 
-Los controles de zoom, luz y sonido se muestran dentro del recuadro de cámara. La preferencia de sonido se guarda en el navegador. El pitido usa Web Audio, preparado durante el toque que abre el lector, y solicita una sesión `ambient` cuando está disponible para mezclarlo con otros audios; la interacción final con música depende del navegador y del sistema operativo.
+El zoom vertical y el botón circular de flash se muestran dentro del recuadro de cámara con efecto vidrio. La imagen llena el recuadro y el análisis oculto sigue la porción visible. El pitido usa Web Audio, preparado durante el toque que abre el lector y reactivado al confirmar; no hay botón ni preferencia de silencio. Solicita una sesión `ambient` cuando está disponible para mezclarlo con otros audios. En iPhone esta sesión respeta el modo silencio; la interacción con música depende del navegador y del sistema operativo.
 
 Ejecuta `node tests/auth-smoke.cjs` con PHP disponible en `C:/xampp/php/php.exe` o en la variable `PHP_BIN`. La prueba usa una base temporal y verifica registro, login, logout, CSRF, restricción de palets y límite de intentos; no usa cuentas reales.
 

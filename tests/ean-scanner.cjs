@@ -17,13 +17,16 @@ class Reader {
   clear() { assert.equal(this.isScanning, false); this.clears++; }
 }
 const window = { Html5Qrcode: Reader, Html5QrcodeSupportedFormats: { EAN_13: 9, EAN_8: 10, QR_CODE: 0 } };
-let audioCreated = 0, audioResumed = 0, beeps = 0;
+let audioCreated = 0, audioResumed = 0, beeps = 0, unlocked = 0, lastAudio;
+window.localStorage = { getItem: () => 'off' };
 window.navigator = { audioSession: { type: 'auto' } };
 window.AudioContext = class {
-  constructor() { audioCreated++; this.state = 'suspended'; this.currentTime = 0; this.destination = {}; }
+  constructor() { audioCreated++; lastAudio = this; this.state = 'suspended'; this.currentTime = 0; this.destination = {}; }
   resume() { audioResumed++; this.state = 'running'; return Promise.resolve(); }
   createOscillator() { return { frequency: { setValueAtTime() {} }, connect() {}, disconnect() {}, start() { beeps++; }, stop() { this.onended?.(); } }; }
   createGain() { return { gain: { setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {}, disconnect() {} }; }
+  createBuffer() { return {}; }
+  createBufferSource() { return { connect() {}, disconnect() {}, start() { unlocked++; this.onended?.(); } }; }
 };
 const frame = new Set();
 const document = { getElementById: () => ({ classList: { add: value => frame.add(value), remove: value => frame.delete(value) } }) };
@@ -52,8 +55,10 @@ function read(reader, code) { now += 100; reader.success(code); }
   const firstOpening = scanner.start();
   assert.equal(audioCreated, 1, 'El audio se prepara dentro del toque que abre la cámara');
   assert.equal(audioResumed, 1);
+  assert.equal(unlocked, 1, 'Desbloquea el audio al tocar Escanear, incluso con una preferencia antigua de silencio');
   assert.equal(window.navigator.audioSession.type, 'ambient', 'No solicita audio exclusivo');
   await firstOpening;
+  lastAudio.state = 'interrupted';
   const first = readers.at(-1);
   assert.equal(first.scanConfig.videoConstraints.width.ideal, 1920, 'Solicita detalle de barras pequeñas sin exigir resolución al dispositivo');
   assert.equal(first.scanConfig.videoConstraints.height.ideal, 1080);
@@ -68,6 +73,7 @@ function read(reader, code) { now += 100; reader.success(code); }
   await flush();
   assert.deepEqual(accepted, [a]);
   assert.equal(beeps, 1, 'El primer resultado confirmado suena una sola vez');
+  assert.equal(audioResumed, 2, 'Recupera el audio si la apertura de cámara lo interrumpe');
   assert.equal(first.stops, 1); assert.equal(first.clears, 1);
   await scanner.stop();
   read(first, b); await flush(); assert.deepEqual(accepted, [a]);

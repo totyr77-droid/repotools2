@@ -1,27 +1,38 @@
 (() => {
   'use strict';
-  let audioContext = null, soundEnabled = true;
-  try { soundEnabled = window.localStorage?.getItem('repotools_scan_sound') !== 'off'; } catch {}
+  let audioContext = null, audioPrimed = false;
   function prepareSound() {
     try {
       if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient';
-      if (!soundEnabled) return;
       const Context = window.AudioContext || window.webkitAudioContext;
       if (!Context) return;
       audioContext ??= new Context();
       if (audioContext.state !== 'running') audioContext.resume().catch(() => {});
+      if (!audioPrimed && audioContext.createBufferSource) {
+        const source = audioContext.createBufferSource(); source.buffer = audioContext.createBuffer(1, 1, 22050);
+        source.connect(audioContext.destination); source.onended = () => source.disconnect(); source.start(0); audioPrimed = true;
+      }
     } catch {}
   }
-  function beep() {
-    if (!soundEnabled || audioContext?.state !== 'running') return;
+  async function beep() {
+    if (!audioContext) return;
     try {
+      if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient';
+      if (audioContext.state !== 'running') await audioContext.resume();
+      if (audioContext.state !== 'running') return;
       const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
-      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(880, now);
-      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.06, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .08);
+      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1100, now);
+      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.18, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
       oscillator.connect(gain); gain.connect(audioContext.destination);
       oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
-      oscillator.start(now); oscillator.stop(now + .09);
+      oscillator.start(now); oscillator.stop(now + .15);
     } catch {}
+  }
+  function visibleFrame(video) {
+    const width = video.videoWidth, height = video.videoHeight;
+    const ratio = video.clientWidth && video.clientHeight ? video.clientWidth / video.clientHeight : width / height;
+    const frameWidth = Math.min(width, Math.round(height * ratio)), frameHeight = Math.min(height, Math.round(width / ratio));
+    return { x: Math.round((width - frameWidth) / 2), y: Math.round((height - frameHeight) / 2), width: frameWidth, height: frameHeight };
   }
   function validEAN(code) {
     if (typeof code !== 'string' || !/^(?:\d{8}|\d{13})$/.test(code) || /^0+$/.test(code)) return false;
@@ -58,6 +69,7 @@
       const capabilities = track.getCapabilities?.() ?? {}, settings = track.getSettings?.() ?? {};
       const zoom = capabilities.zoom;
       const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && zoom.max > zoom.min;
+      if (!hasZoom && capabilities.torch !== true) return;
       const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
       controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', 'Controles de cámara');
       const active = () => current.accepting && session === current && current.token === revision;
@@ -81,6 +93,7 @@
         const text = document.createElement('span'); text.className = 'ean-camera-zoom-icon'; text.setAttribute('aria-hidden', 'true');
         text.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg>';
         const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
+        input.setAttribute('aria-orientation', 'vertical');
         input.min = zoom.min; input.max = Math.max(zoom.min, Math.min(zoom.max, Math.max(3, zoom.min + (zoom.step || .1)))); input.step = zoom.step > 0 ? zoom.step : .1;
         let applied = Math.max(Number(input.min), Math.min(Number(input.max), settings.zoom ?? zoom.min));
         input.value = applied;
@@ -109,26 +122,11 @@
         });
         controls.append(button);
       }
-      const sound = document.createElement('button'); sound.type = 'button'; sound.className = 'ean-camera-sound';
-      const renderSound = () => {
-        const label = soundEnabled ? 'Silenciar escaneos' : 'Activar sonido de escaneo';
-        sound.setAttribute('aria-label', label); sound.title = label; sound.setAttribute('aria-pressed', String(soundEnabled));
-        sound.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M11 4 5 9H2v6h3l6 5Z"/>${soundEnabled ? '<path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>' : '<path d="m16 9 6 6m0-6-6 6"/>'}</svg>`;
-      };
-      renderSound();
-      sound.addEventListener('click', () => {
-        if (!active()) return;
-        soundEnabled = !soundEnabled;
-        try { window.localStorage?.setItem('repotools_scan_sound', soundEnabled ? 'on' : 'off'); } catch {}
-        if (soundEnabled) prepareSound();
-        renderSound();
-      });
-      controls.append(sound);
       current.disposeControls = () => controls.remove();
       element.append(controls);
     }
     function background(current, accept) {
-      if (current.isQR || !document.createElement || !element.querySelector) return;
+      if (!document.createElement || !element.querySelector) return;
       const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
       // Adaptador para html5-qrcode 2.3.8: reutiliza su decodificador sobre el canvas,
       // sin convertir cada fotograma en archivos ni crear URLs de imágenes.
@@ -136,11 +134,11 @@
       if (!context || typeof decoder?.decodeRobustlyAsync !== 'function') return;
       const profiles = [{ angle: 0, crop: .7 }, { angle: -45, crop: .7 }, { angle: 45, crop: .7 }, { angle: 90, crop: .7 }, { angle: 0, crop: 1 }, { angle: -30, crop: .7 }, { angle: 30, crop: .7 }, { angle: -60, crop: .7 }, { angle: 60, crop: .7 }, { angle: 90, crop: 1 }, { angle: -18, crop: .7 }, { angle: 18, crop: .7 }];
       const probe = document.createElement('canvas'), probeContext = probe.getContext('2d', { willReadFrequently: true });
-      function locate(video) {
+      function locate(video, frame) {
         if (!probeContext) return null;
-        const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight));
-        probe.width = Math.round(video.videoWidth * scale); probe.height = Math.round(video.videoHeight * scale);
-        probeContext.drawImage(video, 0, 0, probe.width, probe.height);
+        const scale = Math.min(1, 640 / Math.max(frame.width, frame.height));
+        probe.width = Math.round(frame.width * scale); probe.height = Math.round(frame.height * scale);
+        probeContext.drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, probe.width, probe.height);
         const { data } = probeContext.getImageData(0, 0, probe.width, probe.height);
         let xx = 0, yy = 0, xy = 0, mass = 0, xMass = 0, yMass = 0;
         for (let y = 1; y < probe.height - 1; y += 2) for (let x = 1; x < probe.width - 1; x += 2) {
@@ -167,13 +165,14 @@
         if (video?.videoWidth && video.videoHeight && started - (current.lastPrimaryDetection ?? -Infinity) > 180) {
           running = true;
           try {
-            const adaptive = lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video) : null);
-            if (window.Quagga?.decodeSingle && !adaptive) {
+            const frame = visibleFrame(video);
+            const adaptive = current.isQR ? { angle: 0, crop: 1 } : lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video, frame) : null);
+            if (!current.isQR && window.Quagga?.decodeSingle && !adaptive) {
               // Localiza barras y su orientación en una sola imagen. El canvas
               // y las cajas del localizador permanecen fuera de la interfaz.
-              const scale = Math.min(1, 1920 / Math.max(video.videoWidth, video.videoHeight));
-              canvas.width = Math.round(video.videoWidth * scale); canvas.height = Math.round(video.videoHeight * scale);
-              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const scale = Math.min(1, 1920 / Math.max(frame.width, frame.height));
+              canvas.width = Math.round(frame.width * scale); canvas.height = Math.round(frame.height * scale);
+              context.drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
               let result;
               try {
                 result = await window.Quagga.decodeSingle({ src: canvas.toDataURL('image/jpeg', .92), inputStream: { size: 0 }, locate: true, locator: { halfSample: false, patchSize: 'small' }, decoder: { readers: ['ean_reader', 'ean_8_reader'] }, numOfWorkers: 0 });
@@ -188,20 +187,23 @@
             // Conserva los píxeles originales de las barras pequeñas. El recorte
             // central reduce trabajo sin reducir resolución; la vista completa
             // también busca códigos que estén fuera del centro.
-            const sourceWidth = Math.round(video.videoWidth * profile.crop), sourceHeight = Math.round(video.videoHeight * profile.crop);
+            const sourceWidth = Math.round(frame.width * profile.crop), sourceHeight = Math.round(frame.height * profile.crop);
             const scale = Math.min(1, 1920 / Math.max(sourceWidth, sourceHeight));
             const width = sourceWidth * scale, height = sourceHeight * scale;
             // drawImage recorta lo que queda fuera del video; el fondo blanco
             // permite mantener centradas también las barras cercanas a un borde.
-            const sourceX = Math.round(video.videoWidth * (profile.centerX ?? .5) - sourceWidth / 2);
-            const sourceY = Math.round(video.videoHeight * (profile.centerY ?? .5) - sourceHeight / 2);
+            const sourceX = frame.x + Math.round(frame.width * (profile.centerX ?? .5) - sourceWidth / 2);
+            const sourceY = frame.y + Math.round(frame.height * (profile.centerY ?? .5) - sourceHeight / 2);
             canvas.width = Math.ceil(Math.abs(width * Math.cos(radians)) + Math.abs(height * Math.sin(radians)) - 1e-6);
             canvas.height = Math.ceil(Math.abs(width * Math.sin(radians)) + Math.abs(height * Math.cos(radians)) - 1e-6);
-            context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, -width / 2, -height / 2, width, height); context.restore();
+            const clipX = Math.max(frame.x, sourceX), clipY = Math.max(frame.y, sourceY);
+            const clipWidth = Math.min(frame.x + frame.width, sourceX + sourceWidth) - clipX;
+            const clipHeight = Math.min(frame.y + frame.height, sourceY + sourceHeight) - clipY;
+            context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, clipX, clipY, clipWidth, clipHeight, -width / 2 + (clipX - sourceX) * scale, -height / 2 + (clipY - sourceY) * scale, clipWidth * scale, clipHeight * scale); context.restore();
             if (current.accepting && current.token === revision) {
               const result = await decoder.decodeRobustlyAsync(canvas);
               const code = result.text;
-              if (validEAN(code)) { lastProfile = profile; accept(code, 'background'); } else lastProfile = null;
+              if (current.validate(code)) { lastProfile = profile; accept(code, 'background'); } else lastProfile = null;
             }
           } catch { lastProfile = null; }
           finally {
@@ -250,10 +252,17 @@
         const isQR = format === 'qr';
         const validate = isQR ? code => typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
-        const current = { reader, accepting: true, token, isQR, confirm: confirmation(validate) };
+        const current = { reader, accepting: true, token, isQR, validate, confirm: confirmation(validate) };
         session = current;
         const accept = (code, source = 'camera') => {
           if (!current.accepting || session !== current || token !== revision) return;
+          // Con object-fit: cover se confirma únicamente la zona que el usuario
+          // ve. El lector oculto usa ese mismo recorte, sin bandas negras.
+          const video = source === 'camera' ? element.querySelector?.('video') : null;
+          if (video?.videoWidth && document.createElement && typeof reader.qrcode?.decodeRobustlyAsync === 'function') {
+            const frame = visibleFrame(video);
+            if (frame.width < video.videoWidth - 2 || frame.height < video.videoHeight - 2) return;
+          }
           if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();
           const confirmed = current.confirm(code);
