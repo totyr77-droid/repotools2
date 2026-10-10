@@ -34,7 +34,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <nav class="tops-categories" aria-label="Categorías de TOPs"><a href="tops.php"<?= $category === 'escaneos' ? ' aria-current="page"' : '' ?>>Escaneos</a><a href="tops.php?categoria=reportes"<?= $category === 'reportes' ? ' aria-current="page"' : '' ?>>Reportes</a><a href="tops.php?categoria=aportes"<?= $category === 'aportes' ? ' aria-current="page"' : '' ?>>Aportes confirmados</a></nav>
     <h1><?= escape($titles[$category]) ?></h1>
     <?php if ($category === 'escaneos'): ?>
-    <p>Código nuevo: +1 al TOP. Repetido: solo suma al total.</p>
+    <p>Cada código diferente que escaneás suma un punto en este TOP. Si volvés a escanear el mismo, aumenta tu total de escaneos, pero no suma otro punto.</p>
     <?php else: ?><p><?= $category === 'reportes' ? 'Cada reporte enviado suma uno.' : 'Cada corrección aprobada suma un punto.' ?></p><?php endif; ?>
     <?php if ($viewer): ?>
     <div class="tops-stats"><p><strong><?= (int) $stats['unique_codes'] ?></strong> <?= $category === 'escaneos' ? 'códigos únicos' : ($category === 'reportes' ? 'reportes enviados' : 'aportes confirmados') ?></p><?php if ($category === 'escaneos'): ?><p><strong><?= (int) $stats['total_scans'] ?></strong> escaneos totales</p><?php endif; ?></div>
