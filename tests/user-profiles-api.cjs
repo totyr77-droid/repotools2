@@ -27,6 +27,10 @@ assert.equal((await admin('api/usuarios.php?token=invalid')).status,422);
 assert.equal((await admin('api/usuarios.php?email=missing@example.invalid')).status,404);
 assert.equal((await admin('api/usuarios.php?token='+token+'&page=-1')).status,422);
 r=await admin('api/usuarios.php',{action:'role',id:1,role:'moderador',csrf});assert.equal(r.status,200);assert.equal(JSON.parse(r.text).user.role,'moderador');assert.ok(JSON.parse(r.text).events.some(e=>e.kind==='role'&&e.detail.includes('administrador')));
+const activity=JSON.parse((await admin('api/usuarios.php?id=1&activity=block')).text);assert.ok(activity.activity_filters.includes('role'));assert.ok(activity.activity_filters.includes('block'));assert.ok(activity.events.length);assert.ok(activity.events.every(e=>e.kind==='block'));assert.ok(!activity.activity_filters.includes('scan'));assert.equal((await admin('api/usuarios.php?id=1&activity=invalid')).status,422);assert.equal((await admin('api/usuarios.php?id=1&activity[]=block')).status,422);
+const scanSeed=spawnSync(php,['-r',`require 'includes/database.php';$db=database();for($i=0;$i<35;$i++)$db->prepare('INSERT INTO scan_events(user_id,event_key,code) VALUES(?,?,?)')->execute([1,'filter-test-'.$i,'9002490100070']);`],{env,cwd:root,encoding:'utf8'});assert.equal(scanSeed.status,0,scanSeed.stderr);
+const scanPage=JSON.parse((await admin('api/usuarios.php?id=1&activity=scan&page=1')).text);assert.equal(scanPage.events.length,5);assert.ok(scanPage.events.every(e=>e.kind==='scan'));assert.ok(scanPage.activity_filters.includes('role'));assert.ok(scanPage.activity_filters.includes('block'));
+
 assert.ok(JSON.parse((await admin('api/reportes.php?view=logs')).text).items.some(e=>e.event_type==='user_role'));
 await login(manager,'manager');r=await manager('api/usuarios.php?email=USUARIO@example.invalid');assert.equal(r.status,200);const m=JSON.parse(r.text);assert.ok(Object.hasOwn(m.user,'report_ip'));assert.equal(m.roles.length,4);
 assert.equal((await manager('api/usuarios.php',{action:'role',id:4,role:'usuario',csrf:m.csrf})).status,422);

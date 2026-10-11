@@ -45,7 +45,7 @@ function profile_block_reports(PDO $db, int $actorId, int $targetId, bool $block
         $db->commit();
     } catch (Throwable $e) {if ($db->inTransaction()) $db->rollBack();throw $e;}
 }
-function profile_detail(PDO $db, array $actor, array $target, int $page = 0): array {
+function profile_detail(PDO $db, array $actor, array $target, int $page = 0, string $activity = ''): array {
     $id = (int)$target['id']; $stats = [];
     foreach (['scans'=>'SELECT COUNT(*) FROM scan_events WHERE user_id=?','unique_codes'=>'SELECT COUNT(DISTINCT code) FROM scan_events WHERE user_id=?','reports'=>'SELECT COUNT(*) FROM product_reports WHERE user_id=?','approved'=>'SELECT COUNT(*) FROM report_rewards WHERE user_id=?','libraries'=>'SELECT COUNT(*) FROM libraries WHERE user_id=?','pallets'=>'SELECT COUNT(*) FROM pallets WHERE owner_id=? AND released=0'] as $key=>$sql) {
         $s=$db->prepare($sql);$s->execute([$id]);$stats[$key]=(int)$s->fetchColumn();
@@ -55,7 +55,7 @@ function profile_detail(PDO $db, array $actor, array $target, int $page = 0): ar
     }
     $directEdit=catalog_direct_edit_condition($db);
     $offset=$page*30;
-    $s=$db->prepare("SELECT * FROM (
+    $eventsSql="
         SELECT 'scan' AS kind, code AS detail, created_at, id AS event_id FROM scan_events WHERE user_id=?
         UNION ALL SELECT 'report', ean, created_at, id FROM product_reports WHERE user_id=?
         UNION ALL SELECT 'review', status, reviewed_at, id FROM product_reports WHERE reviewed_by=? AND reviewed_at IS NOT NULL
@@ -63,8 +63,11 @@ function profile_detail(PDO $db, array $actor, array $target, int $page = 0): ar
         UNION ALL SELECT 'pallet',code,created_at,id FROM pallet_admin_events WHERE user_id=?
         UNION ALL SELECT 'role',a.name || ': ' || u.name || ' · ' || e.old_role || ' → ' || e.new_role,e.created_at,e.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE e.user_id=? OR e.actor_id=?
         UNION ALL SELECT 'block',a.name || ': ' || u.name || ' · ' || e.action,e.created_at,e.id FROM report_block_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE e.user_id=? OR e.actor_id=?
-    ) events ORDER BY created_at DESC,kind,event_id DESC LIMIT 31 OFFSET {$offset}");
-    $s->execute(array_fill(0,9,$id));$events=$s->fetchAll();
+    ";
+    $s=$db->prepare("SELECT DISTINCT kind FROM ({$eventsSql}) events ORDER BY kind");$s->execute(array_fill(0,9,$id));$available=$s->fetchAll(PDO::FETCH_COLUMN);
+    if ($activity!=='' && !in_array($activity,['scan','report','review','edit','pallet','role','block'],true)) throw new CatalogException('Actividad no válida.',422);
+    $s=$db->prepare("SELECT * FROM ({$eventsSql}) events".($activity!==''?' WHERE kind=?':'')." ORDER BY created_at DESC,kind,event_id DESC LIMIT 31 OFFSET {$offset}");
+    $params=array_fill(0,9,$id);if($activity!=='')$params[]=$activity;$s->execute($params);$events=$s->fetchAll();
     $blocked=report_is_blocked($db,$target);
-    return ['user'=>$target,'stats'=>$stats,'roles'=>profile_roles($actor,$target),'reports_blocked'=>$blocked,'can_manage_reports'=>report_can_manage_sender($actor['role'],(int)$actor['id'],$target,!$blocked),'events'=>array_slice($events,0,30),'has_more'=>count($events)>30];
+    return ['user'=>$target,'stats'=>$stats,'roles'=>profile_roles($actor,$target),'reports_blocked'=>$blocked,'can_manage_reports'=>report_can_manage_sender($actor['role'],(int)$actor['id'],$target,!$blocked),'activity_filters'=>$available,'events'=>array_slice($events,0,30),'has_more'=>count($events)>30];
 }

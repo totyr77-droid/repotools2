@@ -17,6 +17,7 @@
   const actionLabels = {approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
   document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
     moderationView = button.dataset.moderationView; auditPage = 0;
+    if(queue){const url=new URL(location.href);url.searchParams.set('view',moderationView);history.replaceState({...history.state},'',url);}
     const reports = ['pending','history'].includes(moderationView); if(reports)reportState=moderationView;
     const filters=document.getElementById('reportStateTabs'); if(filters)filters.hidden=!reports;
     document.getElementById('moderationReports')?.setAttribute('aria-pressed',String(reports));
@@ -173,7 +174,8 @@
     finally { busy = false; approve.disabled = reject.disabled = close.disabled = false; }
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); }); dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); }); dialog.addEventListener('close', () => { ++version; active = null; clearPhotos(); });
-  form.addEventListener('submit', event => { event.preventDefault(); review('approved'); }); reject.addEventListener('click', () => review('rejected')); load();
+  form.addEventListener('submit', event => { event.preventDefault(); review('approved'); }); reject.addEventListener('click', () => review('rejected'));
+  const savedView=new URL(location.href).searchParams.get('view');const savedTab=queue&&['pending','history','logs','users'].includes(savedView)?document.querySelector(`[data-moderation-view=${savedView}]`):null;if(savedTab)savedTab.click();else load();
   const linkedReport = new URL(location.href).searchParams.get('report');
   if (/^[1-9]\d*$/.test(linkedReport || '')) open(Number(linkedReport));
 })();

@@ -35,6 +35,7 @@ try {
         $id=$s->fetchColumn();if (!$id) throw new CatalogException('No encontramos esa cuenta.',404);$target=profile_user($db,(int)$id);
     }
     $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);if ($page===false) throw new CatalogException('Página no válida.',422);
-    user_response(200,profile_detail($db,$actor,$target,$page)+['csrf'=>$csrf]);
+    $activity=$_GET['activity']??'';if(!is_string($activity))throw new CatalogException('Actividad no válida.',422);
+    user_response(200,profile_detail($db,$actor,$target,$page,$activity)+['csrf'=>$csrf]);
 } catch (CatalogException $e) {user_response($e->status,['error'=>$e->getMessage()]);}
 catch (Throwable $e) {error_log('Repotools profiles: '.get_class($e).' code='.$e->getCode());user_response(503,['error'=>'No pudimos consultar el perfil. Intenta nuevamente.']);}
