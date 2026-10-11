@@ -85,14 +85,14 @@
     window.dispatchEvent(new CustomEvent('repotools:product-updated', { detail: { ean, product: result.product } }));
     return result.product;
   }
-  async function show(container, ean) {
+  async function show(container, ean, { fresh = false } = {}) {
     if (!container) return;
     const token = Symbol(); activeRequests.set(container, token);
     container.replaceChildren(); container.setAttribute('aria-busy', 'true');
     const status = document.createElement('p'); status.className = 'product-details__status';
     status.setAttribute('role', 'status'); status.textContent = 'Buscando producto…'; container.append(status);
     try {
-      const product = await get(ean, { image: true });
+      const product = await get(ean, { image: true, fresh });
       if (activeRequests.get(container) !== token) return;
       container.replaceChildren();
       if (!product) {

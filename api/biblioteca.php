@@ -83,10 +83,15 @@ try {
     $stmt = $db->prepare('SELECT id, name FROM libraries WHERE user_id = ? ORDER BY id');
     $stmt->execute([$userId]);
     $libraries = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt = $db->prepare('SELECT p.library_id, p.ean, p.name FROM library_products p JOIN libraries l ON l.id = p.library_id WHERE l.user_id = ? ORDER BY p.id');
+    $stmt = $db->prepare('SELECT p.library_id, p.ean, p.name, c.name AS catalog_name, c.brand AS catalog_brand, c.quantity AS catalog_quantity FROM library_products p JOIN libraries l ON l.id = p.library_id LEFT JOIN products c ON c.ean = p.ean WHERE l.user_id = ? ORDER BY p.id');
     $stmt->execute([$userId]);
     $products = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $product) {
+        if (trim((string) $product['name']) === '') {
+            $name = trim((string) ($product['catalog_name'] ?? '')); $brand = trim((string) ($product['catalog_brand'] ?? ''));
+            if ($brand !== '' && mb_stripos($name, $brand) === false) $name = trim($brand . ' ' . $name);
+            $product['name'] = trim($name . ' ' . trim((string) ($product['catalog_quantity'] ?? '')));
+        }
         $products[$product['library_id']][] = ['ean' => $product['ean'], 'name' => $product['name']];
     }
     foreach ($libraries as &$library) {

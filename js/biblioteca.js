@@ -171,7 +171,7 @@
   (page ? page.listen : window.addEventListener.bind(window))('repotools:product-updated', event => {
     const { ean } = event.detail;
     if (get('libraryProductDialog').open && get('libraryProductEan').value === ean) loadScannedProduct(ean);
-    if (get('libraryInfoDialog').open && get('libraryInfoEan').dataset.ean === ean) window.RepoProductInfo.show(get('libraryProductDetails'), ean);
+    if (get('libraryInfoDialog').open && get('libraryInfoEan').dataset.ean === ean) window.RepoProductInfo.show(get('libraryProductDetails'), ean, { fresh: true });
   });
   get('newCollection').addEventListener('click', () => {
     editingCollection = false; get('collectionFormTitle').textContent = 'Nueva colección';
@@ -236,7 +236,7 @@
   get('openLibraryProductInfo').addEventListener('click', () => {
     const ean = get('eanValue').textContent;
     get('libraryInfoEan').textContent = `EAN ${ean}`; get('libraryInfoEan').dataset.ean = ean;
-    openDialog('libraryInfoDialog'); window.RepoProductInfo.show(get('libraryProductDetails'), ean);
+    openDialog('libraryInfoDialog'); window.RepoProductInfo.show(get('libraryProductDetails'), ean, { fresh: true });
   });
   get('libraryInfoDialog').addEventListener('close', () => window.RepoProductInfo.clear(get('libraryProductDetails')));
   get('reportLibraryProduct').addEventListener('click', () => {
