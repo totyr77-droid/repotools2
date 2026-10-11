@@ -39,12 +39,13 @@ function profile_detail(PDO $db, array $actor, array $target, int $page = 0): ar
     if ($actor['role']==='manager') {
         $s=$db->prepare("SELECT submitter_ip FROM product_reports WHERE user_id=? AND submitter_ip<>'' ORDER BY id DESC LIMIT 1");$s->execute([$id]);$target['report_ip']=$s->fetchColumn() ?: '';
     }
+    $directEdit=catalog_direct_edit_condition($db);
     $offset=$page*30;
     $s=$db->prepare("SELECT * FROM (
         SELECT 'scan' AS kind, code AS detail, created_at, id AS event_id FROM scan_events WHERE user_id=?
         UNION ALL SELECT 'report', ean, created_at, id FROM product_reports WHERE user_id=?
         UNION ALL SELECT 'review', status, reviewed_at, id FROM product_reports WHERE reviewed_by=? AND reviewed_at IS NOT NULL
-        UNION ALL SELECT 'edit',ean,created_at,id FROM product_edits WHERE user_id=?
+        UNION ALL SELECT 'edit',ean,created_at,id FROM product_edits WHERE user_id=? AND {$directEdit}
         UNION ALL SELECT 'pallet',code,created_at,id FROM pallet_admin_events WHERE user_id=?
         UNION ALL SELECT 'role',a.name || ': ' || u.name || ' · ' || e.old_role || ' → ' || e.new_role,e.created_at,e.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE e.user_id=? OR e.actor_id=?
         UNION ALL SELECT 'block',a.name || ': ' || u.name || ' · ' || e.action,e.created_at,e.id FROM report_block_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE e.user_id=? OR e.actor_id=?

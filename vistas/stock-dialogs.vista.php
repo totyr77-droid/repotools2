@@ -1,4 +1,4 @@
-<span id="ownerIcon" hidden><?= stock_icon('user') ?></span><span id="clockIcon" hidden><?= stock_icon('clock') ?></span><span id="editProductIcon" hidden><?= stock_icon('settings') ?></span>
+<span id="palletIcon" hidden><?= stock_icon('pallet') ?></span><span id="ownerIcon" hidden><?= stock_icon('user') ?></span><span id="clockIcon" hidden><?= stock_icon('clock') ?></span><span id="editProductIcon" hidden><?= stock_icon('settings') ?></span>
 <?php
 function stock_dialog_heading(string $title,string $id,string $descriptionId=''): void { ?>
 <div class="library-heading"><div><h2><?= escape($title) ?></h2><?php if($descriptionId): ?><p id="<?= escape($descriptionId) ?>" class="stock-heading-description" hidden></p><?php endif; ?></div><button class="app-close" data-stock-close="<?= escape($id) ?>" type="button" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>

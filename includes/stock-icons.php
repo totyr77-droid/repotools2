@@ -1,6 +1,7 @@
 <?php
 function stock_icon(string $name): string {
     $paths = [
+        'pallet'=>'<path d="M3 21h18M4 17h16V4H4zM4 10h16M12 4v13"/>',
         'search'=>'<circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/>',
         'qr'=>'<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h3v3h3v3h-6zM21 12v3M12 3v3M12 12h3M12 18v3"/>',
         'chart'=>'<path d="M4 3v18h17M8 16v-4M13 16V8M18 16V5"/>',

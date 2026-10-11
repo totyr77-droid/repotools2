@@ -29,7 +29,7 @@ assert.equal((await guest('api/preferencias.php')).status,401);
 assert.equal((await user('api/preferencias.php',{handedness:'left'})).status,403);
 assert.equal((await user('api/preferencias.php',{handedness:'invalid',csrf:pref.csrf})).status,422);
 assert.equal((await user('api/preferencias.php',{handedness:'left',csrf:pref.csrf})).status,200);
-assert.equal(JSON.parse((await user('api/preferencias.php')).text).handedness,'left');assert.match((await user('biblioteca.php')).text,/data-hand="left"/);assert.doesNotMatch((await user('biblioteca.php')).text,/data-profile-pending/);
+assert.equal(JSON.parse((await user('api/preferencias.php')).text).handedness,'left');assert.match((await user('biblioteca.php')).text,/data-hand="left"/);assert.match((await user('biblioteca.php')).text,/<span[^>]*data-profile-pending[^>]* hidden[^>]*>/);
 assert.equal((await user('api/preferencias.php',{handedness:'right',csrf:pref.csrf})).status,200);assert.match((await user('biblioteca.php')).text,/data-hand="right"/);
 console.log('OK: handedness preferences, default reminder, persistence, authentication and CSRF');
 })().finally(()=>{server.kill();fs.rmSync(dir,{recursive:true,force:true});}).catch(e=>{console.error(e);process.exitCode=1;});

@@ -54,6 +54,9 @@ if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
     $db->exec('DROP TRIGGER test_reward_failure');
 }
 check_report(review_product_report($db, $mod, (int) $report['id'], $review)['status'] === 'approved', 'Acepta el reporte.');
+$stmt=$db->prepare('SELECT after_data FROM product_edits WHERE ean=? ORDER BY id DESC LIMIT 1');$stmt->execute([$report['ean']]);
+check_report((int)(json_decode($stmt->fetchColumn(),true)['reviewed_report_id']??0)===(int)$report['id'],'Auditoría vincula aprobación sin perder cambio de ficha.');
+
 check_report(catalog_product($db, $ean)['quantity'] === '500 ml', 'La aprobación actualiza el catálogo.');
 review_product_report($db, $mod, (int) $report['id'], $review);
 check_report((int) $db->query('SELECT COUNT(*) FROM notifications WHERE user_id = ' . $user['id'])->fetchColumn() === 1, 'La aprobación repetida genera una sola notificación para el autor.');

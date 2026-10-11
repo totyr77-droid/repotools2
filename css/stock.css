@@ -139,3 +139,5 @@ body[data-hand="left"] .account-panel-auth .account-password-field input {paddin
 .stock-catalog-name{color:var(--muted,#667085);font-size:.85rem;font-weight:400}.stock-expiry-group{grid-column:1/-1;min-width:0}.stock-expiry-group>h3{font-size:1rem;margin:12px 0 8px}.stock-product-highlight{animation:stock-product-highlight 3s ease-out}@keyframes stock-product-highlight{from{background:#fff0bd}to{background:transparent}}@media(prefers-reduced-motion:reduce){.stock-product-highlight{animation-duration:.01s;background:#fff0bd}}
 
 .stock-product .stock-expiry-past,.stock-product .stock-expiry-today,.stock-product .stock-expiry-near{display:table;border-radius:6px;padding:3px 7px;font-size:.82rem;font-weight:600}.stock-expiry-past{background:#fff0f2}.stock-expiry-today{color:#a8440a!important;background:#fff0df}.stock-expiry-near{background:#fff8da}
+
+.stock-pallet-heading{display:flex;align-items:center;gap:7px}.stock-pallet-heading svg{width:20px;height:20px;flex-shrink:0}

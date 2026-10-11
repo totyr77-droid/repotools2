@@ -136,7 +136,9 @@ async function create(request, more = {}) {
   assert.ok(resolved.changes.some(change=>change.field==='quantity'&&change.before==='1 L'&&change.after==='500 ml'));
   assert.ok(!Object.hasOwn(resolved,'original_data')&&!Object.hasOwn(resolved,'proposed_data'));
   const logs=(await admin('api/reportes.php?view=logs')).json();
-  assert.ok(logs.items.some(item=>item.event_type==='report_review'));assert.ok(logs.items.some(item=>item.event_type==='report_block'));
+  assert.ok(logs.items.some(item=>item.event_type==='report_review'));assert.ok(!logs.items.some(item=>item.event_type==='product_edit'),'Aprobar reportes no debe generar otra etiqueta Editado');assert.ok(logs.items.some(item=>item.event_type==='report_block'));
+  const directRevision=(await admin('api/productos.php?ean=96385074')).json().product.revision;const direct=await admin('api/productos.php',{...fields,ean:'96385074',revision:directRevision,csrf:adminCsrf});assert.equal(direct.status,200,direct.text);
+  assert.ok((await admin('api/reportes.php?view=logs')).json().items.some(item=>item.event_type==='product_edit'&&item.target==='96385074'),'Edición directa mantiene Editado');
   assert.equal((await admin('api/reportes.php?view=logs&page=-1')).status,422);
   assert.equal((await admin('api/reportes.php?view=history&page=1')).json().items.length,0);
   assert.match((await admin('reportes.php?queue=1')).text,/data-moderation-view="history"/);

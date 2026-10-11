@@ -140,7 +140,7 @@ function can_edit_catalog(PDO $db, ?array $user): bool {
     return in_array($stmt->fetchColumn(), ['manager', 'administrador', 'moderador'], true);
 }
 
-function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision, int $userId): array {
+function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision, int $userId, ?int $reviewedReportId = null): array {
     if (!valid_product_ean($ean)) throw new CatalogException('El EAN no es válido.', 422);
     $values = [];
     foreach (['name' => 120, 'quantity' => 80, 'brand' => 160, 'category' => 240, 'packaging' => 240] as $field => $max) {
@@ -163,9 +163,13 @@ function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision
         }
         if ($stmt->rowCount() !== 1) throw new CatalogException('Otra persona modificó esta ficha. Revisa la versión actual antes de guardar.', 409);
         $product = catalog_product($db, $ean);
-        $db->prepare('INSERT INTO product_edits (ean, user_id, before_data, after_data) VALUES (?, ?, ?, ?)')->execute([$ean, $userId, json_encode($before, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), json_encode($product, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)]);
+        $db->prepare('INSERT INTO product_edits (ean, user_id, before_data, after_data) VALUES (?, ?, ?, ?)')->execute([$ean, $userId, json_encode($before, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), json_encode($reviewedReportId===null?$product:[...$product,'reviewed_report_id'=>$reviewedReportId], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)]);
         $db->prepare('DELETE FROM product_lookup_state WHERE ean = ?')->execute([$ean]);
         if ($ownTransaction) $db->commit();
         return $product;
     } catch (Throwable $error) { if ($ownTransaction && $db->inTransaction()) $db->rollBack(); throw $error; }
+}
+
+function catalog_direct_edit_condition(PDO $db, string $column='after_data'): string {
+    return $db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql' ? "({$column}::jsonb ->> 'reviewed_report_id') IS NULL" : "json_extract({$column}, '$.reviewed_report_id') IS NULL";
 }
