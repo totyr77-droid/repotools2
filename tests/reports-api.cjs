@@ -128,6 +128,9 @@ async function create(request, more = {}) {
   const history=(await admin('api/reportes.php?view=history')).json();
   assert.ok(history.items.some(item=>Number(item.id)===Number(registered.report.id)&&item.status==='approved'&&item.reviewer_name==='moderador'));
   assert.ok(history.items.some(item=>item.status==='rejected'));
+  const resolved=history.items.find(item=>Number(item.id)===Number(registered.report.id));
+  assert.ok(resolved.changes.some(change=>change.field==='quantity'&&change.before==='1 L'&&change.after==='500 ml'));
+  assert.ok(!Object.hasOwn(resolved,'original_data')&&!Object.hasOwn(resolved,'proposed_data'));
   const logs=(await admin('api/reportes.php?view=logs')).json();
   assert.ok(logs.items.some(item=>item.event_type==='report_review'));assert.ok(logs.items.some(item=>item.event_type==='report_block'));
   assert.equal((await admin('api/reportes.php?view=logs&page=-1')).status,422);

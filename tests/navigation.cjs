@@ -13,7 +13,7 @@ document.documentElement = { dataset: {} };
 const requests = [];
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/navigation.js'), 'utf8'), {
   window, document, location: { href: 'https://example.invalid/index.php', origin: 'https://example.invalid' }, history: {},
-  URL, AbortController, AbortSignal, CSS: { escape: value => value },
+  URL, AbortController, AbortSignal, setTimeout, clearTimeout, CSS: { escape: value => value },
   setInterval: () => 123, clearInterval: id => { assert.equal(id, 123); cleared++; },
   fetch: async (url, options) => { requests.push(options); return {}; }
 });

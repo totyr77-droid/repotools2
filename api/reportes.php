@@ -19,7 +19,8 @@ try {
         if ($page === false) throw new CatalogException('Página no válida.', 422);
         $offset = $page * 50;
         if ($_GET['view'] === 'history') {
-            $items = $db->query("SELECT r.id, r.ean, r.status, r.review_note, r.reviewed_at, COALESCE(u.name, 'Invitado') AS submitter_name, v.name AS reviewer_name FROM product_reports r LEFT JOIN users u ON u.id = r.user_id LEFT JOIN users v ON v.id = r.reviewed_by WHERE r.status IN ('approved','rejected') ORDER BY r.reviewed_at DESC, r.id DESC LIMIT 51 OFFSET {$offset}")->fetchAll();
+            $items = $db->query("SELECT r.id, r.ean, r.status, r.review_note, r.reviewed_at, r.original_data, r.proposed_data, COALESCE(u.name, 'Invitado') AS submitter_name, v.name AS reviewer_name FROM product_reports r LEFT JOIN users u ON u.id = r.user_id LEFT JOIN users v ON v.id = r.reviewed_by WHERE r.status IN ('approved','rejected') ORDER BY r.reviewed_at DESC, r.id DESC LIMIT 51 OFFSET {$offset}")->fetchAll();
+            foreach ($items as &$item) { $item['changes'] = report_proposed_changes(json_decode($item['original_data'], true), json_decode($item['proposed_data'], true) ?? []); unset($item['original_data'], $item['proposed_data']); } unset($item);
         } else {
             $items = $db->query("SELECT * FROM (
                 SELECT 'product_edit' AS event_type, u.name AS actor, e.ean AS target, e.created_at, NULL AS report_id, 'edited' AS action, e.id AS event_id FROM product_edits e JOIN users u ON u.id = e.user_id

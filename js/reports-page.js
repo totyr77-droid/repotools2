@@ -27,7 +27,8 @@
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
   function icon(container, type) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '1.8');
-    const path = document.createElementNS(svg.namespaceURI, 'path'); path.setAttribute('d', type === 'ean' ? 'M3 4v16m3-16v16m4-16v16m3-16v16m4-16v16m3-16v16' : type === 'user' ? 'M20 21v-2a6 6 0 0 0-12 0v2M18 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0' : 'M4 4l16 16M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'); svg.append(path); container.prepend(svg);
+    const shapes={edit:'M12 20H4v-8M16 3l5 5-11 11-5 1 1-5Z',eye:'M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0',file:'M6 3h12v18H6zM9 7h6m-6 5h6m-6 5h4',brand:'M3 3h8l10 10-8 8L3 11ZM7 7h.01',name:'M3 7l9-4 9 4v10l-9 4-9-4ZM3 7l9 5 9-5M12 12v9',quantity:'M3 8h18v8H3zM7 8v4m5-4v4m5-4v4',category:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',packaging:'M3 7h18v14H3zM3 3h18v4M9 11h6'};
+    const path = document.createElementNS(svg.namespaceURI, 'path'); path.setAttribute('d', shapes[type] || (type === 'ean' ? 'M3 4v16m3-16v16m4-16v16m3-16v16m4-16v16m3-16v16' : type === 'user' ? 'M20 21v-2a6 6 0 0 0-12 0v2M18 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0' : 'M4 4l16 16M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0')); svg.append(path); container.prepend(svg);
   }
   function badge(container, state) { const node = text('span', labels[state], container); node.className = 'report-badge report-badge-' + state; }
   function clearPhotos() { photos.forEach(url => URL.revokeObjectURL(url)); photos = []; }
@@ -44,7 +45,8 @@
           if(moderationView==='history'){
             const heading=document.createElement('div');heading.className='report-card-heading';info.append(heading);text('h2',`#${item.id}`,heading);badge(heading,item.status);
             const ean=text('p',item.ean,info);ean.className='report-inline';icon(ean,'ean');text('p',`${item.submitter_name} · Revisado por ${item.reviewer_name||'Staff'}`,info);text('p',stamp(item.reviewed_at),info);
-            const button=text('button','Ver reporte',card);button.type='button';button.className='library-secondary';button.addEventListener('click',()=>open(item.id));
+            const changes=text('div','',info);changes.className='report-change-tags';for(const change of item.changes||[]){const chip=text('span',fields[change.field],changes);chip.className='report-change-tag';icon(chip,'edit');}if(!item.changes?.length)text('span','Fotos o comentarios',changes);
+            const button=text('button','Ver cambios',card);icon(button,'eye');button.type='button';button.className='library-secondary';button.addEventListener('click',()=>open(item.id));
           }else{
             text('h2',logLabels[item.event_type]||'Actividad',info);text('p',`${item.actor} · ${actionLabels[item.action]||(item.event_type==='user_role'?item.action:'Cambio registrado')}`,info);text('p',item.target,info);text('p',stamp(item.created_at),info);
           }
@@ -107,13 +109,14 @@
         }
       }
       const comparison = document.createElement('div'); comparison.className = 'report-comparison'; details.append(comparison);
-      const changed = Object.keys(fields).filter(key => (active.current?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
-      for (const [heading, product, proposed] of [['Ficha actual', active.current, false], ['Propuesta', active.proposed, true]]) {
-        const section = document.createElement('section'); section.className = proposed ? 'report-proposed' : 'report-current'; text('h3', heading, section);
+      const resolved=active.status!=='pending', baseline=resolved?active.original:active.current;
+      const changed = Object.keys(fields).filter(key => (baseline?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
+      for (const [heading, product, proposed] of [[resolved?'Antes de la propuesta':'Ficha actual', baseline, false], ['Propuesta del usuario', active.proposed, true]]) {
+        const section = document.createElement('section'); section.className = proposed ? 'report-proposed' : 'report-current'; const title=text('h3', heading, section);icon(title,proposed?'edit':'file');
         if (proposed) text('small', changed.length ? `${changed.length} ${changed.length === 1 ? 'dato modificado' : 'datos modificados'}` : 'Sin cambios en los datos', section);
         for (const [key, label] of Object.entries(fields)) if (product?.[key] || changed.includes(key)) {
           const row = document.createElement('div'); row.className = 'report-field' + (changed.includes(key) ? ' report-field-changed' : ''); section.append(row);
-          text('small', label + (proposed && changed.includes(key) ? ' · Modificado' : ''), row); text('p', product?.[key] || 'Sin datos', row);
+          const labelNode=text('small', label + (proposed && changed.includes(key) ? ' · Modificado' : ''), row);icon(labelNode,key); text('p', product?.[key] || 'Sin datos', row);
         }
         if (!product || !Object.keys(fields).some(key => product[key])) text('p', 'Sin datos.', section);
         comparison.append(section);
