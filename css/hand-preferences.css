@@ -6,8 +6,6 @@ body[data-hand=left] .stock-toolbar:has(>#scanPallet),body[data-hand=left] .stoc
 body[data-hand=left] .header-contenedor{flex-direction:row-reverse}
 body[data-hand=left] .header-contenedor .notification-control{margin-left:16px;margin-right:auto}
 body[data-hand=left] .notification-panel{left:0;right:auto}
-body[data-hand=left] .account-bar{flex-direction:row-reverse}
-body[data-hand=left] .account-bar .account-greeting{text-align:right}
 body[data-hand=left] .library-heading:has(>.app-close),body[data-hand=left] .results-heading:has(>.app-close),body[data-hand=left] .notification-heading{flex-direction:row-reverse}
 body[data-hand=left] .library-dialog-actions:not(.ean-navigation):not(#moderationPagination):not(:has([aria-label*="anterior"])),body[data-hand=left] .library-product-actions,body[data-hand=left] .library-add-actions,body[data-hand=left] .library-preview-actions,body[data-hand=left] .stock-product-actions,body[data-hand=left] .scan-product-actions,body[data-hand=left] #palletTools{flex-direction:row;justify-content:flex-start}
 body[data-hand=left] .library-dialog-actions:has(>.app-close){flex-direction:row}
