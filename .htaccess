@@ -1,4 +1,9 @@
 DirectoryIndex index.php index.html
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^repotools2\.onrender\.com(?::[0-9]+)?$ [NC]
+    RewriteRule ^ https://repotools.online%{REQUEST_URI} [R=308,L]
+</IfModule>
 <FilesMatch "^(\.env.*|\.neon|neon\.ts)$">
     Require all denied
 </FilesMatch>
