@@ -120,6 +120,7 @@
       const [config, lookup] = await Promise.all([request(), window.RepoProductInfo.get(ean).then(product => ({ product, missing: product === null })).catch(() => ({ product: null, missing: false }))]);
       const { product, missing } = lookup;
       if (version !== revision || !dialog.open) return;
+      if (config.can_submit === false) { status.textContent = 'Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.'; return; }
       active = { ean, csrf: config.csrf, key: crypto.randomUUID() };
       document.getElementById('productReportEan').textContent = `EAN ${ean}`;
       document.getElementById('productReportTitle').textContent = missing ? 'Agregar producto' : 'Reportar producto';

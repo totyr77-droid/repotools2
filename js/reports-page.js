@@ -24,6 +24,13 @@
         text('h2', `#${report.id} · ${labels[report.status]}`, card); text('p', `EAN ${report.ean}`, card); text('p', report.description, card);
         const button = text('button', queue ? 'Revisar' : 'Ver reporte', card); button.type = 'button'; button.className = 'library-secondary'; button.addEventListener('click', () => open(report.id)); list.append(card);
       }
+      if (queue && result.blocked_reports?.length) {
+        const section = document.createElement('details'); section.className = 'report-sender'; list.append(section);
+        text('summary', `Cuentas con reportes bloqueados (${result.blocked_reports.length})`, section);
+        for (const sender of result.blocked_reports) {
+          const button = text('button', sender.name, section); button.type = 'button'; button.className = 'library-secondary'; button.addEventListener('click', () => open(sender.report_id));
+        }
+      }
     } catch (error) { if (attempt === listVersion) status.textContent = error.message; }
   }
   async function open(id) {
@@ -33,6 +40,30 @@
       active = result.report; csrf = result.csrf; document.getElementById('reviewReportTitle').textContent = `Reporte #${id}`;
       message.textContent = labels[active.status];const barcode=document.createElementNS('http://www.w3.org/2000/svg','svg'),barcodeBox=document.createElement('figure');barcodeBox.className='report-barcode';barcode.setAttribute('role','img');barcode.setAttribute('aria-label','Código de barras '+active.ean);text('figcaption','EAN del reporte',barcodeBox);barcodeBox.append(barcode);details.append(barcodeBox);try{window.JsBarcode(barcode,active.ean,{format:active.ean.length===8?'EAN8':'EAN13',width:2,height:72,displayValue:true,fontSize:16,margin:12});}catch{barcode.remove();text('p','EAN '+active.ean,barcodeBox);} text('p', active.description);
       if (active.review_note) text('p', active.review_note);
+      if (result.can_review && active.submitter) {
+        const sender = active.submitter, section = document.createElement('section'); section.className = 'report-sender'; details.append(section);
+        text('h3', 'Enviado por', section); text('p', sender.name + (sender.company ? ` · ${sender.company}` : ''), section);
+        if (sender.email) text('p', sender.email, section);
+        text('p', `IP registrada: ${active.submitter_ip || 'No disponible'}`, section);
+        text('p', new Date(active.created_at).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' }), section);
+        if (sender.can_manage) {
+          const button = text('button', sender.blocked ? '↺ Habilitar reportes' : '⊘ Bloquear reportes', section); button.type = 'button'; button.className = 'library-secondary';
+          const hint = text('p', sender.blocked ? 'Esta cuenta no puede enviar nuevos reportes.' : 'El bloqueo solo afecta al envío de reportes.', section);
+          let confirm = false;
+          button.addEventListener('click', async () => {
+            if (busy) return;
+            if (!confirm) { confirm = true; button.textContent = sender.blocked ? 'Confirmar habilitación' : 'Confirmar bloqueo'; return; }
+            busy = true; button.disabled = approve.disabled = reject.disabled = close.disabled = true;
+            try {
+              const body = new FormData(); body.set('csrf', csrf); body.set('id', active.id); body.set('action', sender.blocked ? 'unblock_reports' : 'block_reports');
+              const response = await RepoReports.request('', body); sender.blocked = response.report.submitter.blocked;
+              hint.textContent = sender.blocked ? 'Bloqueado. Esta cuenta no puede enviar nuevos reportes.' : 'Habilitado. Esta cuenta puede volver a enviar reportes.';
+              await load();
+            } catch (error) { hint.textContent = error.message; }
+            finally { busy = false; confirm = false; button.disabled = approve.disabled = reject.disabled = close.disabled = false; button.textContent = sender.blocked ? '↺ Habilitar reportes' : '⊘ Bloquear reportes'; }
+          });
+        }
+      }
       const comparison = document.createElement('div'); comparison.className = 'report-comparison'; details.append(comparison);
       for (const [heading, product] of [['Ficha actual', active.current], ['Propuesta', active.proposed]]) {
         const section = document.createElement('section'); text('h3', heading, section);

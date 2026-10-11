@@ -39,4 +39,9 @@
 #reviewReportForm .library-dialog-actions svg { width: 18px; height: 18px; flex-shrink: 0; }
 #rejectReport { background: #c92a38; color: white; }
 #reviewReportDetails figure.report-barcode { margin-top: 0; }
+.report-sender { padding: 12px 0; border-top: 1px solid #e1e5ed; overflow-wrap: anywhere; }
+.report-sender h3 { margin: 0 0 8px; font-size: .95rem; }
+.report-sender p { margin: 5px 0; font-size: .85rem; color: #626b7a; }
+.report-sender button { margin-top: 8px; min-height: 44px; }
+.report-sender summary { cursor: pointer; padding: 8px 0; }
 @media (max-width: 480px) { .reports-panel { padding: 16px; } .report-comparison { grid-template-columns: 1fr; } }

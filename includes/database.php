@@ -118,6 +118,12 @@ function initialize_database(PDO $db): void {
             $db->exec("ALTER TABLE users ADD COLUMN company TEXT NOT NULL DEFAULT ''");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(9)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 10')->fetchColumn()) {
+            $db->exec("ALTER TABLE product_reports ADD COLUMN submitter_ip TEXT NOT NULL DEFAULT ''");
+            $db->exec("CREATE TABLE report_blocks (user_id {$ref} PRIMARY KEY REFERENCES users(id), blocked_by {$ref} NOT NULL REFERENCES users(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE report_block_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), actor_id {$ref} NOT NULL REFERENCES users(id), action TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(10)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

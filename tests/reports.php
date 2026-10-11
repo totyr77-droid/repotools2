@@ -20,6 +20,16 @@ $uuid = static fn() => sprintf('%s-%s-%s-%s-%s', bin2hex(random_bytes(4)), bin2h
 $input = [...$fields, 'ean' => $ean, 'description' => 'La presentación correcta es 500 ml.', 'submission_key' => $uuid()];
 $report = submit_product_report($db, $user, $owner, $input, ['ean' => 'photo-ean', 'product' => 'photo-product'], $storage);
 check_report(count($report['photos']) === 2 && count($objects) === 2, 'Guarda las dos evidencias.');
+check_report(!isset($report['submitter_ip'], $report['submitter']), 'Datos privados fuera de la respuesta del usuario.');
+$private = report_detail($db, (int) $report['id'], 'user:' . $mod['id'], true);
+check_report($private['submitter']['email'] === $suffix . 'usuario@example.invalid', 'Moderación identifica al remitente.');
+denied_report(fn() => report_set_block($db, $user, (int) $report['id'], true), 403);
+report_set_block($db, $mod, (int) $report['id'], true);
+denied_report(fn() => submit_product_report($db, $user, $owner, $input, ['ean' => 'blocked-photo'], $storage), 403);
+check_report(count($objects) === 2 && !report_is_blocked($db, $users['administrador']), 'Bloqueo previo a subir fotos y exclusivo de la cuenta.');
+report_set_block($db, $mod, (int) $report['id'], false);
+check_report(!report_is_blocked($db, $user), 'Permite habilitar los reportes nuevamente.');
+check_report(report_client_ip(['REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => 'malformed']) === '127.0.0.1', 'Rechaza IP inválida.');
 check_report(catalog_product($db, $ean) === $original, 'El reporte no debe modificar la ficha.');
 check_report(submit_product_report($db, $user, $owner, $input, [], $storage)['id'] === $report['id'], 'Reintentos no deben duplicar tickets.');
 denied_report(fn() => report_detail($db, (int) $report['id'], report_owner(null, str_repeat('a', 64)), false), 404);

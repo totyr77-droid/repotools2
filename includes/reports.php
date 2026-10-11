@@ -2,6 +2,43 @@
 declare(strict_types=1);
 require_once __DIR__ . '/report-storage.php';
 
+// Forwarded IPs are diagnostic metadata, never the identity used for a block.
+function report_client_ip(array $server): string {
+    if (getenv('RENDER') === 'true') {
+        foreach (explode(',', (string) ($server['HTTP_X_FORWARDED_FOR'] ?? '')) as $ip) {
+            $ip = trim($ip);
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) return $ip;
+        }
+    }
+    $ip = (string) ($server['REMOTE_ADDR'] ?? '');
+    return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '';
+}
+function report_is_blocked(PDO $db, ?array $user): bool {
+    if (!$user) return false;
+    $stmt = $db->prepare('SELECT user_id FROM report_blocks WHERE user_id = ?'); $stmt->execute([$user['id']]);
+    return $stmt->fetchColumn() !== false;
+}
+function report_require_submission(PDO $db, ?array $user): void {
+    if (report_is_blocked($db, $user)) throw new CatalogException('Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.', 403);
+}
+function report_set_block(PDO $db, array $actor, int $id, bool $blocked): array {
+    if (!can_edit_catalog($db, $actor)) throw new CatalogException('No tienes permiso para gestionar reportes.', 403);
+    $db->beginTransaction();
+    try {
+        report_lock($db);
+        $report = report_detail($db, $id, 'user:' . $actor['id'], true);
+        $target = $report['submitter'];
+        $stmt = $db->prepare('SELECT role FROM users WHERE id = ?'); $stmt->execute([$actor['id']]); $role = $stmt->fetchColumn();
+        if (!$target['id'] || (int) $target['id'] === (int) $actor['id'] || $target['role'] === 'administrador' || ($target['role'] !== 'usuario' && $role !== 'administrador')) throw new CatalogException('No puedes cambiar el permiso de reportes de esta cuenta.', 403);
+        if (report_is_blocked($db, $target) !== $blocked) {
+            if ($blocked) $db->prepare('INSERT INTO report_blocks(user_id, blocked_by) VALUES (?, ?)')->execute([$target['id'], $actor['id']]);
+            else $db->prepare('DELETE FROM report_blocks WHERE user_id = ?')->execute([$target['id']]);
+            $db->prepare('INSERT INTO report_block_events(user_id, actor_id, action) VALUES (?, ?, ?)')->execute([$target['id'], $actor['id'], $blocked ? 'blocked' : 'unblocked']);
+        }
+        $db->commit(); return report_detail($db, $id, 'user:' . $actor['id'], true);
+    } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
+}
+
 function report_owner(?array $user, $token): string {
     if ($user) return 'user:' . (int) $user['id'];
     if (!is_string($token) || !preg_match('/^[a-f0-9]{64}$/D', $token)) throw new CatalogException('Recarga la página para enviar el reporte.', 422);
@@ -31,10 +68,22 @@ function report_detail(PDO $db, int $id, string $owner, bool $moderator): array 
     $report['current'] = catalog_product($db, $report['ean']);
     $stmt = $db->prepare('SELECT kind FROM report_photos WHERE report_id = ?'); $stmt->execute([$id]);
     $report['photos'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    if ($moderator) {
+        $stmt = $db->prepare('SELECT submitter_ip FROM product_reports WHERE id = ?'); $stmt->execute([$id]);
+        $report['submitter_ip'] = $stmt->fetchColumn();
+        $stmt = $db->prepare('SELECT id, name, email, company, role FROM users WHERE id = ?'); $stmt->execute([$report['user_id']]);
+        $report['submitter'] = $stmt->fetch() ?: ['id' => null, 'name' => 'Invitado', 'email' => '', 'company' => '', 'role' => ''];
+        $report['submitter']['blocked'] = report_is_blocked($db, $report['submitter']['id'] ? $report['submitter'] : null);
+        $actorId = str_starts_with($owner, 'user:') ? (int) substr($owner, 5) : 0;
+        $stmt = $db->prepare('SELECT role FROM users WHERE id = ?'); $stmt->execute([$actorId]); $actorRole = $stmt->fetchColumn();
+        $target = $report['submitter'];
+        $report['submitter']['can_manage'] = $target['id'] && (int) $target['id'] !== $actorId && $target['role'] !== 'administrador' && ($target['role'] === 'usuario' || $actorRole === 'administrador');
+    }
     return $report;
 }
 function submit_product_report(PDO $db, ?array $user, string $owner, array $input, array $photos = [], ?callable $storage = null): array {
     $storage ??= 'report_object';
+    report_require_submission($db, $user);
     $key = $input['submission_key'] ?? ''; $ean = $input['ean'] ?? ''; $description = $input['description'] ?? '';
     if (!is_string($key) || !preg_match('/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/D', $key) || !is_string($ean) || !valid_product_ean($ean)) throw new CatalogException('Revisa el EAN del reporte.', 422);
     $existing = $db->prepare('SELECT id, owner_key FROM product_reports WHERE submission_key = ?'); $existing->execute([$key]);
@@ -66,6 +115,7 @@ function submit_product_report(PDO $db, ?array $user, string $owner, array $inpu
             $objects[$kind] = ['key' => $object, 'bytes' => strlen($photos[$kind])];
         }
         $db->beginTransaction(); report_lock($db);
+        report_require_submission($db, $user);
         $existing->execute([$key]);
         if ($row = $existing->fetch()) {
             if (!hash_equals($row['owner_key'], $owner)) throw new CatalogException('Solicitud no válida.', 409);
@@ -76,8 +126,8 @@ function submit_product_report(PDO $db, ?array $user, string $owner, array $inpu
         $stmt = $db->prepare('SELECT COUNT(*) FROM product_reports WHERE owner_key = ? AND submitted_at > ?'); $stmt->execute([$owner, time() - 86400]);
         if ((int) $stmt->fetchColumn() >= ($user ? 10 : 3)) throw new CatalogException('Alcanzaste el límite diario de reportes.', 429);
         $original = catalog_product($db, $ean);
-        $stmt = $db->prepare('INSERT INTO product_reports (submission_key, owner_key, user_id, ean, description, proposed_data, original_data, submitted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id');
-        $stmt->execute([$key, $owner, $user['id'] ?? null, $ean, trim($description), json_encode($fields, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), json_encode($original, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), time()]);
+        $stmt = $db->prepare('INSERT INTO product_reports (submission_key, owner_key, user_id, ean, description, proposed_data, original_data, submitted_at, submitter_ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id');
+        $stmt->execute([$key, $owner, $user['id'] ?? null, $ean, trim($description), json_encode($fields, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), json_encode($original, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), time(), report_client_ip($_SERVER)]);
         $id = (int) $stmt->fetchColumn(); $stmt->closeCursor();
         foreach ($objects as $kind => $object) $db->prepare('INSERT INTO report_photos (report_id, kind, object_key, mime, bytes) VALUES (?, ?, ?, ?, ?)')->execute([$id, $kind, $object['key'], 'image/jpeg', $object['bytes']]);
         $db->commit(); $saved = true;

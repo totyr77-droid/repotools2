@@ -22,7 +22,12 @@ try {
         if (($_POST['action'] ?? '') === 'review') {
             if (!$user) throw new CatalogException('Inicia sesión para revisar reportes.', 401);
             $report = review_product_report($db, $user, (int) ($_POST['id'] ?? 0), $_POST);
+        } elseif (in_array($_POST['action'] ?? '', ['block_reports', 'unblock_reports'], true)) {
+            if (!$user) throw new CatalogException('Inicia sesión para gestionar reportes.', 401);
+            $report = report_set_block($db, $user, (int) ($_POST['id'] ?? 0), $_POST['action'] === 'block_reports');
         } else {
+            if (!in_array($_POST['action'] ?? '', ['', 'submit'], true)) throw new CatalogException('Solicitud no válida.', 422);
+            report_require_submission($db, $user);
             $photos = [];
             foreach (['ean', 'product'] as $kind) if ($jpeg = prepare_report_photo($_FILES['photo_' . $kind] ?? [])) $photos[$kind] = $jpeg;
             $report = submit_product_report($db, $user, $owner, $_POST, $photos);
@@ -42,6 +47,8 @@ try {
     }
     $queue = $moderator && ($_GET['queue'] ?? '') === '1';
     $stmt = $db->prepare('SELECT id, ean, description, status, created_at, review_note FROM product_reports WHERE ' . ($queue ? "status = 'pending' AND (user_id IS NULL OR user_id <> ?)" : 'owner_key = ?') . ' ORDER BY id DESC LIMIT 50'); $stmt->execute($queue ? [$user['id']] : [$owner]);
-    report_response(200, ['reports' => $stmt->fetchAll(), 'csrf' => $csrf, 'can_review' => $moderator, 'photos_enabled' => report_storage_ready(), 'registered' => $user !== null]);
+    $reports = $stmt->fetchAll(); $blocked = [];
+    if ($queue) $blocked = $db->query('SELECT u.name, u.email, (SELECT MAX(r.id) FROM product_reports r WHERE r.user_id = u.id) AS report_id FROM report_blocks b JOIN users u ON u.id = b.user_id ORDER BY b.created_at DESC')->fetchAll();
+    report_response(200, ['reports' => $reports, 'blocked_reports' => $blocked, 'csrf' => $csrf, 'can_review' => $moderator, 'can_submit' => !report_is_blocked($db, $user), 'photos_enabled' => report_storage_ready(), 'registered' => $user !== null]);
 } catch (CatalogException $error) { report_response($error->status, ['error' => $error->getMessage()]); }
 catch (Throwable $error) { error_log('Repotools reports error: ' . get_class($error) . ' code=' . $error->getCode()); report_response(503, ['error' => 'No pudimos acceder a los reportes. Intenta nuevamente.']); }
