@@ -18,7 +18,7 @@
   .library-product, .report-card { min-width: 0; }
   .library-scan { width: auto; min-width: 260px; margin-right: 12px; }
   .reports-main { width: 100%; padding: 40px clamp(24px, 4vw, 64px); justify-content: flex-start; align-items: stretch; }
-  .reports-panel { width: 100%; max-width: 1440px; margin: 0 auto; padding: 32px; border: 1px solid #e1e5ed; }
+  .reports-panel { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0; border: 0; }
   .reports-list { display: grid; grid-template-columns: 1fr; }
   .report-card { display: grid; grid-template-columns: 170px 150px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 20px; }
   .report-card h2, .report-card p, .report-card button { margin: 0; }
