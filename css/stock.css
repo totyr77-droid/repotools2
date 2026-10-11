@@ -59,6 +59,11 @@
 @media(max-width:540px) { .stock-palets-block { padding: 14px; } .stock-tabs button { font-size: .8rem; padding: 10px; } }
 #palletTools .library-settings-menu button,#palletTools .library-settings-menu a { justify-content: flex-start; gap: 10px; width: 100%; padding: 12px; min-height: 44px; text-align: left; text-decoration: none; }
 #palletTools .library-settings-menu .stock-delete { background: #c92a38; color: white; }
+#palletTools[data-inline="true"] { flex-wrap: wrap; }
+#palletTools[data-inline="true"] .library-settings { width: 100%; }
+#palletTools[data-inline="true"] .library-settings-menu { position: static; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; width: 100%; padding: 0; border: 0; box-shadow: none; overflow: visible; }
+#palletTools[data-inline="true"] .library-settings-menu button,#palletTools[data-inline="true"] .library-settings-menu a { display: flex; align-items: center; background: #f0eef8; color: #27187e; border-radius: 10px; font-size: .85rem; margin: 0; }
+#palletTools[data-inline="true"] .library-settings-menu .stock-delete { background: #c92a38; color: white; }
 .stock-metadata { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding: 12px; font-size: .8rem; }
 .stock-metadata svg { width: 18px; height: 18px; }
 #palletDescriptionInput { width: 100%; padding: 12px; border: 1px solid #b8bfd0; border-radius: 10px; font: inherit; }
