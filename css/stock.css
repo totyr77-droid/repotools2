@@ -164,3 +164,4 @@ body[data-hand="left"] .account-panel-auth .account-password-field input {paddin
 @media(max-width:768px) and (pointer:coarse){body[data-hand=left] #accountSecurityForm .account-password-field .password-toggle{right:auto;left:1px}body[data-hand=left] #accountSecurityForm .account-password-field input{padding-left:50px;padding-right:12px}}
 
 #accountSecurityForm .account-password-field input:focus{outline:2px solid #d8d1f1;outline-offset:1px;border-color:#8372d8}
+.account-panel-profile .account-security-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.account-panel-profile .account-security-actions button{width:100%;min-width:0;margin:0;justify-content:center;line-height:1.35;padding:10px 8px;text-transform:none}.account-panel-profile #closeOtherSessions{background:#fbe8ec;color:#a22432;border:1px solid #f0ccd0}.account-panel-profile #closeOtherSessions:hover{background:#f7dbe2;transform:none}
