@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
                     $stmt = $db->prepare('INSERT INTO users (name, email, password_hash, company) VALUES (?, ?, ?, ?)');
                     $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $company]);
                 }
-                $stmt = $db->prepare('SELECT id, name, email, role, company, password_hash FROM users WHERE email = ?');
+                $stmt = $db->prepare('SELECT id, name, email, role, company, password_hash, auth_version FROM users WHERE email = ?');
                 $stmt->execute([$email]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($user && password_verify($password, $user['password_hash'])) {
@@ -105,6 +105,7 @@ include __DIR__ . '/vistas/header.vista.php';
     </form>
     <?php if (!$register): ?><a class="account-create-button" href="cuenta.php?mode=registro&amp;next=<?= escape($next) ?>"><?= account_icon('user') ?><span>Crear cuenta</span></a><?php endif; ?>
     <nav class="account-auth-links" aria-label="Opciones de acceso"><?php if ($register): ?><a href="cuenta.php?mode=login&amp;next=<?= escape($next) ?>">Ya tengo cuenta</a><?php endif; ?>
+    <?php if (!$register): ?><a href="recuperar.php">Olvidé mi contraseña</a><?php endif; ?>
     <a href="index.php">Continuar sin cuenta</a>
     <a href="tops.php">Ver TOPs</a>
     <a href="reportes.php">Mis reportes</a>

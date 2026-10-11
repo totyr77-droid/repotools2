@@ -20,6 +20,7 @@
       return new Promise((resolve,reject)=>{const tx=db.transaction('palets','readwrite'),store=tx.objectStore('palets'),request=store.getAll();request.onsuccess=()=>{const previous=request.result.filter(r=>r.user===user&&r.key!==key).sort((a,b)=>b.at-a.at);previous.forEach((r,i)=>{if(i>=49||r.at<at-7*86400000)store.delete(r.key);});store.put({key,user,pallet:{...snapshot,members:[]},at});};tx.oncomplete=resolve;tx.onerror=tx.onabort=()=>reject(Error('No pudimos conservar la consulta de este palet.'));});
     },
     async cached(code){const row=await transact('palets','readonly',s=>s.get(user+':'+code));return row&&row.at>Date.now()-7*86400000?row:null;},
+    async clearCached(){const rows=await transact('palets','readonly',s=>s.getAll());for(const row of rows)if(row.user===user)await transact('palets','readwrite',s=>s.delete(row.key));},
     async advance(code,before,after){
       const db=await ready;
       return new Promise((resolve,reject)=>{const tx=db.transaction('loads','readwrite'),store=tx.objectStore('loads'),r=store.getAll();r.onsuccess=()=>{for(const row of r.result)if(row.user===user&&row.data.code===code&&Number(row.data.offline_revision)===Number(before)){row.data.offline_revision=after;store.put(row);}};tx.oncomplete=resolve;tx.onerror=tx.onabort=()=>reject(Error('No pudimos actualizar las cargas pendientes.'));});

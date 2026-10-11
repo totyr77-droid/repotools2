@@ -24,6 +24,7 @@
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
 <!-- SCRIPTS -->
+<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261011-offline2"></script>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-timeout1"></script>
 <script src="js/action-notices.js?v=20261011-profile1"></script>
@@ -35,13 +36,13 @@
 <script src="js/product-info.js?v=20261011-fresh2"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261011-orientation4"></script>
-<script src="js/biblioteca.js?v=20261011-librarycatalog2"></script>
+<script src="js/biblioteca.js?v=20261011-offline3"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261011-orientation4"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/ean-scanner.js?v=20261011-orientation4"></script>
-<script src="js/reports-page.js?v=20261011-blockpolicy5"></script>
+<script src="js/reports-page.js?v=20261011-changes6"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
@@ -51,7 +52,7 @@
 <script src="js/stock-utils.js?v=20261010-stock13"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 <script src="js/stock-offline.js?v=20261011-offline1"></script>
-<script src="js/stock.js?v=20261011-empty2"></script>
+<script src="js/stock.js?v=20261011-search3"></script>
 <script src="js/public-pallet.js?v=20261010-stock13"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>

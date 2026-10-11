@@ -119,21 +119,26 @@
           });
         } else if (sender.blocked) { const state = text('span', 'Reportes bloqueados', section); state.className = 'report-blocked-state'; }
       }
-      const comparison = document.createElement('div'); comparison.className = 'report-comparison'; details.append(comparison);
       const resolved=active.status!=='pending', baseline=resolved?active.original:active.current;
       const changed = Object.keys(fields).filter(key => (baseline?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
       const shownFields = Object.keys(fields).filter(key => baseline?.[key] || active.proposed?.[key]);
-      comparison.style.setProperty('--report-rows', String(shownFields.length ? shownFields.length + 2 : 3));
+      const changedFields=shownFields.filter(key=>changed.includes(key)),unchangedFields=shownFields.filter(key=>!changed.includes(key));
+      function compare(keys,container) {
+      const comparison = document.createElement('div'); comparison.className = 'report-comparison'; container.append(comparison);
+      comparison.style.setProperty('--report-rows', String(keys.length ? keys.length + 2 : 3));
       for (const [heading, product, proposed] of [[resolved?'Ficha anterior':'Ficha actual', baseline, false], ['Propuesta', active.proposed, true]]) {
         const section = document.createElement('section'); section.className = proposed ? 'report-proposed' : 'report-current'; const title=text('h3', heading, section);icon(title,proposed?'edit':'file');
-        text('small', proposed ? (changed.length ? `${changed.length} ${changed.length === 1 ? 'dato modificado' : 'datos modificados'}` : 'Sin cambios en los datos') : 'Datos guardados', section);
-        for (const [key, label] of Object.entries(fields)) if (product?.[key] || changed.includes(key)) {
+        text('small', proposed ? (keys.some(key=>changed.includes(key)) ? `${changed.length} ${changed.length === 1 ? 'dato modificado' : 'datos modificados'}` : 'Sin cambios en los datos') : 'Datos guardados', section);
+        for (const key of keys) { const label=fields[key];
           const row = document.createElement('div'); row.className = 'report-field' + (changed.includes(key) ? ' report-field-changed' : ''); section.append(row);
           const labelNode=text('small', label, row);icon(labelNode,key); text('p', product?.[key] || 'Sin datos', row);
         }
-        if (!shownFields.length) text('p', 'Sin datos.', section);
+        if (!keys.length) text('p', 'Sin cambios en los datos.', section);
         comparison.append(section);
       }
+      }
+      compare(changedFields,details);
+      if(unchangedFields.length){const more=text('details','',details);more.className='report-unchanged';text('summary',`Datos sin cambios (${unchangedFields.length})`,more);compare(unchangedFields,more);}
       for (const kind of active.photos) {
         const wrapper = document.createElement('figure'); wrapper.className = 'report-photo-evidence'; text('figcaption', kind === 'ean' ? 'Foto del EAN' : 'Foto del producto', wrapper); details.append(wrapper);
         if (kind === 'ean') { barcodeBox.classList.add('report-barcode-attached'); wrapper.append(barcodeBox); }

@@ -1,6 +1,7 @@
 <?php
 function stock_icon(string $name): string {
     $paths = [
+        'search'=>'<circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/>',
         'qr'=>'<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h3v3h3v3h-6zM21 12v3M12 3v3M12 12h3M12 18v3"/>',
         'chart'=>'<path d="M4 3v18h17M8 16v-4M13 16V8M18 16V5"/>',
         'book'=>'<path d="M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 6v15"/>',

@@ -58,6 +58,7 @@
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'No pudimos cargar tu biblioteca.');
+    window.RepoOfflineView?.save('libraries',result.libraries);
     return result.libraries;
   }
   async function mutate(data) {

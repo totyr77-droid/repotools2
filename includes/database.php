@@ -138,6 +138,12 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX app_sessions_expiry ON app_sessions(expires_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(13)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 14')->fetchColumn()) {
+            $db->exec('ALTER TABLE users ADD COLUMN auth_version INTEGER NOT NULL DEFAULT 1');
+            $db->exec("CREATE TABLE password_resets (token_hash TEXT PRIMARY KEY, user_id {$ref} NOT NULL REFERENCES users(id), expires_at BIGINT NOT NULL)");
+            $db->exec('CREATE INDEX password_resets_user ON password_resets(user_id)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(14)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

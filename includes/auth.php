@@ -25,7 +25,13 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 require_once __DIR__ . '/database.php';
 
 function current_user(): ?array {
-    return $_SESSION['user'] ?? null;
+    $user=$_SESSION['user']??null;
+    if (!$user) return null;
+    static $versions=[];
+    if(!array_key_exists($user['id'],$versions)){$q=database()->prepare('SELECT auth_version FROM users WHERE id=?');$q->execute([$user['id']]);$versions[$user['id']]=$q->fetchColumn();}
+    $version=$versions[$user['id']];
+    if($version===false||(int)$version!==(int)($user['auth_version']??1)){unset($_SESSION['user']);return null;}
+    return $user;
 }
 
 function escape(string $value): string {

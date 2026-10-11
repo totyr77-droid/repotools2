@@ -13,7 +13,18 @@ try {
     else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
     stock_expire($db);
     if ($method==='GET') {
-        if (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid)];
+        if (isset($_GET['search'])||isset($_GET['expiries'])) {
+            if(!$uid)throw new CatalogException('Inicia sesión para consultar Stock.',401);
+            $search=is_string($_GET['search']??null)?trim($_GET['search']):'';
+            if(mb_strlen($search)>100)throw new CatalogException('La búsqueda admite hasta 100 caracteres.',422);
+            $sql="SELECT b.name,b.ean,b.expires,b.units,p.code FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))";
+            $params=[$uid,$uid];
+            if($search!==''){$sql.=' AND (LOWER(b.name) LIKE ? OR b.ean LIKE ?)';$term='%'.mb_strtolower($search).'%';$params[]=$term;$params[]=$term;}
+            if(isset($_GET['expiries'])){$sql.=" AND b.expires<>'' AND b.expires<=?";$params[]=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$uid).' days')->format('Y-m-d');}
+            $result=['items'=>stock_query($db,$sql." ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,p.code,b.id LIMIT 201",$params)->fetchAll(),'warning_days'=>stock_warning_days($db,$uid)];
+            $result['has_more']=count($result['items'])>200;$result['items']=array_slice($result['items'],0,200);
+        }
+        elseif (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid)];
         elseif (isset($_GET['ean'])) {
             if (!$uid) throw new CatalogException('Inicia sesión para agregar productos.',401);
             $ean=$_GET['ean'];
