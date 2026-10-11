@@ -1,5 +1,7 @@
 # Próximos pasos de Repotools
 
+Alineación en modo zurdo: títulos y descripciones junto a controles desplazados, nombres de productos y sus EAN se alinean a la derecha, sin invertir cifras ni iconos. Formularios y textos largos conservan su alineación. Verificado con las pruebas visuales de Biblioteca y Stock en móvil/PC. Reversión: commit «Align accompanying text for left-handed layouts».
+
 Biblioteca y prioridad de alcance: en modo zurdo, el encabezado de colección muestra escanear, manual, compartir, ruedita y nombre, en ese orden visual. Inicio mueve el grupo de acciones de la lista a la izquierda; Crear colección y Generar etiquetas también se ubican a ese lado. Se conserva el orden interno de los botones, la navegación anterior/siguiente y la disposición de cámara. El diseño diestro se conserva. Comprobado con nombre largo, menús dentro del viewport y acciones en 320, 390 y 1366 px mediante `tmp/library-hand-priority.cjs`; se repitió `tmp/hand-placement-ui.cjs`. Reversión: commit «Prioritize scan controls in left-handed collection headers».
 
 Preferencia zurda ajustada: los grupos de acciones se ubican a la izquierda manteniendo el orden de sus botones. Escanear/configuración no se invierten; zoom, flash y teclado de la cámara conservan su disposición habitual. Se mantiene cerrar a la izquierda. Comprobado en 320, 390 y 1366 px con `tmp/hand-placement-ui.cjs`. Este criterio reemplaza el reflejo de controles de cámara de la primera entrega de preferencias.
