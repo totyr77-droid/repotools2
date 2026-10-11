@@ -119,14 +119,16 @@
       const comparison = document.createElement('div'); comparison.className = 'report-comparison'; details.append(comparison);
       const resolved=active.status!=='pending', baseline=resolved?active.original:active.current;
       const changed = Object.keys(fields).filter(key => (baseline?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
+      const shownFields = Object.keys(fields).filter(key => baseline?.[key] || active.proposed?.[key]);
+      comparison.style.setProperty('--report-rows', String(shownFields.length ? shownFields.length + 2 : 3));
       for (const [heading, product, proposed] of [[resolved?'Antes de la propuesta':'Ficha actual', baseline, false], ['Propuesta del usuario', active.proposed, true]]) {
         const section = document.createElement('section'); section.className = proposed ? 'report-proposed' : 'report-current'; const title=text('h3', heading, section);icon(title,proposed?'edit':'file');
-        if (proposed) text('small', changed.length ? `${changed.length} ${changed.length === 1 ? 'dato modificado' : 'datos modificados'}` : 'Sin cambios en los datos', section);
+        text('small', proposed ? (changed.length ? `${changed.length} ${changed.length === 1 ? 'dato modificado' : 'datos modificados'}` : 'Sin cambios en los datos') : 'Datos guardados', section);
         for (const [key, label] of Object.entries(fields)) if (product?.[key] || changed.includes(key)) {
           const row = document.createElement('div'); row.className = 'report-field' + (changed.includes(key) ? ' report-field-changed' : ''); section.append(row);
           const labelNode=text('small', label + (proposed && changed.includes(key) ? ' · Modificado' : ''), row);icon(labelNode,key); text('p', product?.[key] || 'Sin datos', row);
         }
-        if (!product || !Object.keys(fields).some(key => product[key])) text('p', 'Sin datos.', section);
+        if (!shownFields.length) text('p', 'Sin datos.', section);
         comparison.append(section);
       }
       for (const kind of active.photos) {

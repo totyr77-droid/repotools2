@@ -8,7 +8,7 @@
 .report-card h2 { font-size: 1rem; margin-bottom: 8px; }
 .report-card p, #reviewReportDetails p { overflow-wrap: anywhere; line-height: 1.5; margin: 8px 0; }
 .report-card button { margin-top: 8px; }
-.report-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+.report-comparison { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin: 16px 0; }
 .report-comparison section { background: #f4f3f9; border-radius: 10px; padding: 12px; min-width: 0; }
 .report-comparison h3 { font-size: 1rem; color: #27187e; }
 .report-evidence { display: block; width: 100%; max-height: 420px; object-fit: contain; margin: 8px 0 16px; }
@@ -58,7 +58,7 @@
 #reviewReportDetails .report-barcode-attached { margin: 0; padding: 8px 12px; border: 0; border-bottom: 1px solid #e1e5ed; border-radius: 0; }
 .report-barcode-attached figcaption { display: none; }
 .report-photo-evidence .report-evidence { margin: 0; }
-@media (max-width: 480px) { .reports-panel { padding: 16px; } .report-comparison { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .reports-panel { padding: 16px; } }
 .reports-list { gap: 8px; }
 .report-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px; }
 .report-card-info { min-width: 0; }
@@ -111,3 +111,5 @@
 .reports-tabs button{display:inline-flex;align-items:center;gap:6px}
 .reports-tabs,.reports-state-tabs{display:grid;gap:6px;width:100%;box-sizing:border-box;padding:4px;border:0;border-radius:12px;background:#f0eef8}.reports-tabs{grid-template-columns:repeat(3,minmax(0,1fr));margin:12px 0 8px}.reports-state-tabs{grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 16px}.reports-tabs button,.reports-state-tabs button{display:inline-flex;justify-content:center;align-items:center;gap:6px;min-width:0;min-height:44px;padding:10px 6px;border:0;border-radius:9px;background:transparent;color:#62577e;box-shadow:none;font-size:.85rem;white-space:nowrap}.reports-tabs button[aria-pressed=true],.reports-state-tabs button[aria-pressed=true]{background:#27187e;color:white;box-shadow:none}.reports-tabs svg{width:17px;height:17px}@media(max-width:380px){.reports-tabs button{font-size:.78rem;gap:4px;padding:10px 3px}.reports-tabs svg{width:16px;height:16px}}
 .reports-tabs button,.reports-state-tabs button{position:relative}.reports-tabs .report-pending-badge,.reports-state-tabs .report-pending-badge{position:absolute;top:-6px;right:-4px;border:2px solid white;line-height:1.2;pointer-events:none}
+
+.report-comparison>section{display:grid;grid-template-rows:subgrid;grid-row:span var(--report-rows,7);row-gap:0;align-content:start}.report-comparison .report-field{overflow-wrap:anywhere}
