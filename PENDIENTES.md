@@ -1,5 +1,7 @@
 # Próximos pasos de Repotools
 
+Preferencia zurda ajustada: los grupos de acciones se ubican a la izquierda manteniendo el orden de sus botones. Escanear/configuración no se invierten; zoom, flash y teclado de la cámara conservan su disposición habitual. Se mantiene cerrar a la izquierda. Comprobado en 320, 390 y 1366 px con `tmp/hand-placement-ui.cjs`. Este criterio reemplaza el reflejo de controles de cámara de la primera entrega de preferencias.
+
 Moderación: menú principal en una fila a ancho completo, estilo de palets; Pendientes/Resueltos debajo con dos columnas iguales. Validado a 320 y 1366 px, con contadores y cambio de sección. Archivos: `css/reports.css`, versión de estilos en `vistas/header.vista.php`. Revertir mediante el commit «Align moderation tabs with pallet navigation».
 
 Registro del 11 de octubre de 2026. Estas notas definen trabajo pendiente; no implican que las funciones estén implementadas.
