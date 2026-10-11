@@ -65,7 +65,7 @@ Reversión: esta entrega se publica en un commit separado titulado «Keep admini
 
 Prioridades al retomar:
 
-1. Validar visualmente la nueva búsqueda administrativa en móvil y PC, y confirmar carga y edición de un palet ajeno con permisos.
+1. Completado al retomar: búsqueda administrativa y edición autorizada de un palet ajeno comprobadas en Chrome a 320, 390 y 1366 px, sin desbordamiento horizontal ni errores JavaScript. Prueba local: `tmp/stock-lookup-ui.cjs`. Commit publicado: `13615e7`; la publicación no confirma por sí sola que Render terminó el despliegue.
 2. Auditar sesiones en Render: actualmente PHP conserva sesiones en archivos locales, que pueden perderse al reiniciar/desplegar. Diseñar almacenamiento persistente y seguro; no confundir cuenta borrada con sesión perdida. Probar cierre, revocación y caducidad antes de publicar.
 3. Implementar recuperación de contraseña con tokens de un solo uso, caducidad, límites y proveedor de correo definido. Falta elegir/configurar el servicio de correo; no inventar entregas.
 4. Implementar el alcance inicial sin conexión descrito arriba, con cola local por cuenta, identificadores idempotentes y resolución explícita de conflictos. No simular éxito cuando algo no se sincronizó.
@@ -75,3 +75,11 @@ Prioridades al retomar:
 Pruebas ya disponibles: `tests/stock-api.cjs`, `tests/reports-api.cjs`, `tests/user-profiles-api.cjs`, `tests/navigation.cjs`, `tests/navigation-timeouts.cjs` y `tests/date-time.cjs`. Los archivos `tmp/*` son apoyos locales de pruebas y no deben publicarse.
 
 Publicación utilizada: checkout Git en `tmp/upstream`, repositorio `totyr77-droid/repotools2`, rama `main`, despliegue automático en Render. Copiar y versionar solo los archivos de la entrega. La raíz del workspace no es un repositorio Git.
+
+### Auditoría de sesiones al retomar
+
+Confirmado en `includes/auth.php` y `Dockerfile`: se usa el almacenamiento de sesiones predeterminado de PHP, sin un manejador persistente ni configuración de duración propia. Los archivos del contenedor pueden desaparecer al desplegar o reiniciar; las cuentas en PostgreSQL no se eliminan por ello. La cookie dura la sesión del navegador y la limpieza de PHP puede caducar los archivos independientemente de esa cookie. La duración efectiva en Render requiere comprobar su configuración en ejecución.
+
+Solución siguiente: almacenamiento persistente de sesiones en la base, identificadores opacos y protección contra fijación de sesión, expiración explícita, revocación al salir y bloqueo ante fallos de almacenamiento. No guardar tokens en logs ni usar la IP como identidad. Antes de activar en producción, probar reinicio del servidor conservando la base, caducidad, cierre e invalidación del identificador previo al login, concurrencia y compatibilidad PostgreSQL/SQLite. Esta solución todavía no está implementada; no basta con alargar la cookie.
+
+Al retomar se repitieron satisfactoriamente `tests/stock-api.cjs`, `tests/navigation-timeouts.cjs` y `tests/date-time.cjs`, además de la prueba visual mencionada. Para revertir Stock sin perder otros cambios: `git revert 13615e7`.
