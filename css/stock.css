@@ -145,3 +145,22 @@ body[data-hand="left"] .account-panel-auth .account-password-field input {paddin
 .stock-pallet-card{padding:12px;gap:10px;min-height:64px;align-items:flex-start}.stock-pallet-card>svg{margin-top:2px}.stock-pallet-card-content{flex:1;min-width:0;overflow-wrap:anywhere}.stock-pallet-card strong{font-size:1rem;line-height:1.3;letter-spacing:.04em}.stock-pallet-card .stock-pallet-card-description{margin-top:3px;line-height:1.35;color:#536174}.stock-pallet-card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:3px 10px;margin-top:5px}.stock-pallet-card-meta small{margin:0;font-size:.8rem;line-height:1.3}.stock-pallet-card-meta .stock-expiry-past{background:transparent}
 
 .account-security{max-width:640px;margin-top:24px;padding-top:18px;border-top:1px solid #eceaf2}.account-security h2{display:flex;align-items:center;gap:8px;font-size:1rem;margin:0 0 12px}.account-security svg{width:20px;height:20px;flex-shrink:0}.account-security-actions{display:flex;flex-wrap:wrap;gap:8px}.account-security-actions button{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 12px;font-size:.85rem}#accountSecurityForm label[hidden]{display:none}#accountSecurityForm .password-toggle{margin:0}#accountSecurityStatus:empty{display:none}
+
+#accountSecurityDialog{width:min(440px,calc(100% - 32px));padding:20px}
+#accountSecurityDialog .account-edit-heading{margin-bottom:18px}
+#accountSecurityDialog .account-edit-heading h2{display:flex;align-items:center;gap:8px;min-width:0;font-size:1.05rem;line-height:1.4}
+#accountSecurityDialog svg{width:19px;height:19px;flex-shrink:0}
+#accountSecurityForm{display:grid;gap:14px;margin:0;padding:0}
+#accountSecurityForm label{display:grid;gap:6px;margin:0;font-size:.85rem}
+#accountSecurityForm .account-field-title{display:flex;align-items:center;gap:6px}
+#accountSecurityForm .account-field-title svg{width:16px;height:16px;color:#62577e}
+#accountSecurityForm .account-password-field{margin:0;min-width:0}
+#accountSecurityForm .account-password-field input{width:100%;height:46px;margin:0;box-sizing:border-box;padding:10px 50px 10px 12px;border:1px solid #dfe2eb;border-radius:10px;background:#fff;color:#172033;font:inherit}
+#accountSecurityForm .account-password-field .password-toggle{position:absolute;top:1px;right:1px;width:44px;height:44px;min-height:44px;padding:11px;border:0;border-radius:9px;display:grid;place-items:center;background:transparent;color:#62577e;box-shadow:none}
+#accountSecurityForm .password-toggle svg{width:21px;height:21px}
+#accountSecurityForm .password-toggle:hover{background:#f0eef8;transform:none}
+#accountSecurityForm #saveAccountSecurity{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:46px;margin:0;padding:11px 14px;border-radius:10px;background:#27187e;color:#fff;font-size:.9rem;text-transform:none}
+#securityFormStatus:empty{display:none}#securityFormStatus{margin:0;font-size:.82rem;line-height:1.4}
+@media(max-width:768px) and (pointer:coarse){body[data-hand=left] #accountSecurityForm .account-password-field .password-toggle{right:auto;left:1px}body[data-hand=left] #accountSecurityForm .account-password-field input{padding-left:50px;padding-right:12px}}
+
+#accountSecurityForm .account-password-field input:focus{outline:2px solid #d8d1f1;outline-offset:1px;border-color:#8372d8}
