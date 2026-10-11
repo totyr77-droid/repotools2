@@ -10,8 +10,8 @@
 
   <div id="cartelScaner">
     <div class="cartelscaner-box">
-      <div class="cartelscaner-box-titulo">
-        <i class="fa-solid fa-circle-check" aria-hidden="true"></i><span id="scanResultHeading">Producto guardado</span>
+      <div class="cartelscaner-box-titulo" role="status" data-state="success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span id="scanResultHeading">Producto guardado</span>
       </div>
 
       <div class="cartelscaner-box-info">

@@ -313,7 +313,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   els.resultado.textContent = codigo;
   const heading = document.getElementById("scanResultHeading");
   document.getElementById('mainScannerTitle').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto escaneado';
-  if (heading) heading.textContent = esDuplicado ? 'El código no se agregó otra vez.' : 'Guardado en tu lista.';
+  if (heading) {heading.textContent = esDuplicado ? 'Ya tienes este producto en la lista. No lo agregamos otra vez.' : 'Producto agregado a tu lista.';heading.parentElement.dataset.state=esDuplicado?'warning':'success';}
   document.getElementById('scanProductActions')?.replaceChildren();
   els.rescancelar.style.display = esDuplicado ? "none" : "block";
   actualizarContadores();
@@ -363,7 +363,7 @@ function cancelarUltimoEscaneo() {
   actualizarContadores();
   const heading = document.getElementById("scanResultHeading");
   document.getElementById('mainScannerTitle').textContent = 'Producto quitado';
-  if (heading) heading.textContent = "Producto quitado";
+  if (heading) {heading.textContent = 'Producto quitado de tu lista.';heading.parentElement.dataset.state='warning';}
   els.resultadoApi.textContent = "El código se quitó de tu lista.";
   els.rescancelar.style.display = "none";
 }
