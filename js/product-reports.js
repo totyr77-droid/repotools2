@@ -131,13 +131,14 @@
   page?.onLeave(() => { revision++; previews.forEach(url => URL.revokeObjectURL(url)); previews.clear(); capturedPhotos.clear(); });
   async function open(ean) {
     if (busy) return;
-    const scanPhoto = window.RepoEANScanner?.takeScanPhoto?.(ean);
+    const photoPending = window.RepoEANScanner?.takeScanPhoto?.(ean);
     stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto);
     const version = ++revision; active = null; form.reset(); form.hidden = true; status.textContent = 'Cargando…';
     if (!dialog.open) dialog.showModal();
     try {
       const [config, lookup] = await Promise.all([request(), window.RepoProductInfo.get(ean).then(product => ({ product, missing: product === null })).catch(() => ({ product: null, missing: false }))]);
       const { product, missing } = lookup;
+      const scanPhoto = await photoPending;
       if (version !== revision || !dialog.open) return;
       if (config.can_submit === false) { status.textContent = 'Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.'; return; }
       active = { ean, csrf: config.csrf, key: crypto.randomUUID() };
