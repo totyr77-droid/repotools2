@@ -25,6 +25,46 @@ function catalog_product(PDO $db, string $ean): ?array {
 function catalog_text($value, int $max): string {
     return is_string($value) ? mb_substr(trim($value), 0, $max) : '';
 }
+function catalog_approved_photo(PDO $db, string $ean): ?string {
+    $stmt = $db->prepare("SELECT p.object_key FROM report_photos p JOIN product_reports r ON r.id = p.report_id WHERE r.ean = ? AND r.status = 'approved' AND p.kind = 'product' ORDER BY r.reviewed_at DESC, r.id DESC LIMIT 1");
+    $stmt->execute([$ean]); return $stmt->fetchColumn() ?: null;
+}
+function catalog_external_image(array $external): string {
+    $image = catalog_text($external['image_front_small_url'] ?? '', 1000); $parts = parse_url($image);
+    return ($parts['scheme'] ?? '') === 'https' && preg_match('/^(?:[a-z0-9-]+\.)*openfoodfacts\.org$/iD', $parts['host'] ?? '') ? $image : '';
+}
+function catalog_product_image(PDO $db, array $product, ?callable $fetcher = null): array {
+    $ean = $product['ean'];
+    if (catalog_approved_photo($db, $ean)) {
+        $product['image'] = 'api/productos.php?ean=' . rawurlencode($ean) . '&photo=product';
+        $product['image_source'] = 'repotools'; return $product;
+    }
+    if ($product['image']) { $product['image_source'] = 'openfoodfacts'; return $product; }
+    $key = 'image:' . $ean; $now = time(); $token = bin2hex(random_bytes(16));
+    $db->beginTransaction();
+    try {
+        if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') $db->query('SELECT pg_advisory_xact_lock(72684622)');
+        else $db->exec('DELETE FROM product_api_requests WHERE requested_at < 0');
+        $stmt = $db->prepare('SELECT checked_at FROM product_lookup_state WHERE ean = ?'); $stmt->execute([$key]);
+        $checked = $stmt->fetchColumn();
+        $db->prepare('DELETE FROM product_api_requests WHERE requested_at <= ?')->execute([$now - 60]);
+        if (($checked !== false && (int) $checked > $now - 86400) || (int) $db->query('SELECT COUNT(*) FROM product_api_requests')->fetchColumn() >= 15) { $db->commit(); return $product; }
+        $db->prepare('INSERT INTO product_api_requests(requested_at) VALUES (?)')->execute([$now]);
+        $db->prepare('INSERT INTO product_lookup_state(ean, state, checked_at, token) VALUES (?, ?, ?, ?) ON CONFLICT(ean) DO UPDATE SET checked_at = excluded.checked_at, token = excluded.token')->execute([$key, 'image', $now, $token]);
+        $db->commit();
+    } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
+    try {
+        $external = ($fetcher ?? 'fetch_external_product')($ean);
+        if ($external !== null && (!isset($external['code']) || (string) $external['code'] === $ean)) {
+            $image = catalog_external_image($external);
+            if ($image !== '') $db->prepare("UPDATE products SET image = ? WHERE ean = ? AND image = ''")->execute([$image, $ean]);
+        }
+    } catch (Throwable $error) { /* A missing external photo never hides our product information. */ }
+    $product = catalog_product($db, $ean) ?? $product;
+    if (catalog_approved_photo($db, $ean)) { $product['image'] = 'api/productos.php?ean=' . rawurlencode($ean) . '&photo=product'; $product['image_source'] = 'repotools'; }
+    elseif ($product['image']) $product['image_source'] = 'openfoodfacts';
+    return $product;
+}
 
 function fetch_external_product(string $ean): ?array {
     if (!function_exists('curl_init')) throw new CatalogException('No pudimos consultar el producto. Intenta más tarde.');

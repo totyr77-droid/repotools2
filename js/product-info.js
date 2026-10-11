@@ -7,25 +7,26 @@
   const cache = new Map();
   const access = new Map();
   const activeRequests = new WeakMap();
-  async function get(ean, { fresh = false } = {}) {
+  async function get(ean, { fresh = false, image = false } = {}) {
     if (!/^(?:\d{8}|\d{13})$/.test(ean)) throw new Error('Código no válido.');
-    if (fresh) cache.delete(ean);
-    if (!cache.has(ean)) {
+    if (fresh) { cache.delete(ean); cache.delete(ean + ':image'); }
+    const key = image ? ean + ':image' : ean;
+    if (!cache.has(key)) {
       const pending = (async () => {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 20000);
         try {
-          const response = await fetch(`api/productos.php?ean=${encodeURIComponent(ean)}`, { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' });
+          const response = await fetch(`api/productos.php?ean=${encodeURIComponent(ean)}${image ? '&image=1' : ''}`, { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' });
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || 'No pudimos cargar el producto.');
           access.set(ean, { canEdit: result.can_edit === true, csrf: result.csrf });
           return result.product || null;
         } finally { clearTimeout(timeout); }
       })();
-      cache.set(ean, pending);
-      pending.catch(() => { if (cache.get(ean) === pending) cache.delete(ean); });
+      cache.set(key, pending);
+      pending.catch(() => { if (cache.get(key) === pending) cache.delete(key); });
     }
-    return cache.get(ean);
+    return cache.get(key);
   }
   function editButton(container, ean) {
     if (!container) return;
@@ -78,6 +79,7 @@
       const error = new Error(result.error || 'No pudimos guardar el producto.'); error.status = response.status; throw error;
     }
     cache.set(ean, Promise.resolve(result.product));
+    cache.delete(ean + ':image');
     access.set(ean, { canEdit: result.can_edit === true, csrf: result.csrf });
     window.dispatchEvent(new CustomEvent('repotools:product-updated', { detail: { ean, product: result.product } }));
     return result.product;
@@ -89,7 +91,7 @@
     const status = document.createElement('p'); status.className = 'product-details__status';
     status.setAttribute('role', 'status'); status.textContent = 'Buscando producto…'; container.append(status);
     try {
-      const product = await get(ean);
+      const product = await get(ean, { image: true });
       if (activeRequests.get(container) !== token) return;
       container.replaceChildren();
       if (!product) {
@@ -100,8 +102,9 @@
       editButton(container, ean);
       if (product.image) {
         try {
-          const url = new URL(product.image);
-          if (url.protocol === 'https:' && (url.hostname === 'openfoodfacts.org' || url.hostname.endsWith('.openfoodfacts.org'))) {
+          const url = new URL(product.image, location.href);
+          const ownPhoto = url.origin === location.origin && url.pathname.endsWith('/api/productos.php') && url.searchParams.get('ean') === ean && url.searchParams.get('photo') === 'product';
+          if (ownPhoto || (url.protocol === 'https:' && (url.hostname === 'openfoodfacts.org' || url.hostname.endsWith('.openfoodfacts.org')))) {
             const image = document.createElement('img'); image.src = url.href; image.alt = product.name || 'Foto del producto';
             image.className = 'product-details__image'; image.loading = 'lazy'; image.referrerPolicy = 'no-referrer';
             image.addEventListener('error', () => image.remove()); container.append(image);
@@ -116,7 +119,7 @@
       }
       container.append(list);
       if (!list.children.length && !product.name) { status.textContent = 'Este producto todavía no tiene características cargadas.'; container.append(status); }
-      if (product.source === 'openfoodfacts') {
+      if (product.source === 'openfoodfacts' || product.image_source === 'openfoodfacts') {
         const source = document.createElement('a'); source.href = `https://world.openfoodfacts.org/product/${ean}`;
         source.target = '_blank'; source.rel = 'noopener noreferrer'; source.className = 'product-details__source';
         source.textContent = 'Open Food Facts · ODbL ↗'; container.append(source);
