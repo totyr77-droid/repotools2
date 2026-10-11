@@ -13,8 +13,8 @@
   document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
   const logFilter=document.getElementById('reportLogFilter');logFilter?.addEventListener('change',()=>{auditPage=0;load();});
   const stamp = value => window.RepoDateTime.stamp(value);
-  const logLabels = {product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet',user_role:'Cambio de rango'};
-  const actionLabels = {approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
+  const logLabels = {product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet',user_role:'Cambio de rango',user_profile:'Datos de cuenta'};
+  const actionLabels = {approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',profile_updated:'Perfil actualizado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
   document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
     moderationView = button.dataset.moderationView; auditPage = 0;
     if(queue){const url=new URL(location.href);url.searchParams.set('view',moderationView);history.replaceState({...history.state},'',url);}
@@ -52,9 +52,9 @@
             const button=text('button','Ver cambios',card);icon(button,'eye');button.type='button';button.className='library-secondary';button.addEventListener('click',()=>open(item.id));
           }else{
             const heading=text('div','',info);heading.className='report-card-heading report-log-heading';
-            const typeIcon={product_edit:'edit',report_review:'file',report_block:'shield',pallet_admin:'pallet',user_role:'user'}[item.event_type]||'file';
+            const typeIcon={product_edit:'edit',report_review:'file',report_block:'shield',pallet_admin:'pallet',user_role:'user',user_profile:'edit'}[item.event_type]||'file';
             const title=text('h2',logLabels[item.event_type]||'Actividad',heading);icon(title,typeIcon);
-            const tone=['approved','unblocked','save_product'].includes(item.action)?'success':['rejected','blocked','delete','delete_product'].includes(item.action)?'danger':['revoke','leave'].includes(item.action)?'warning':item.event_type==='user_role'?'role':'info';
+            const tone=['approved','unblocked','save_product'].includes(item.action)?'success':['rejected','blocked','delete','delete_product'].includes(item.action)?'danger':['revoke','leave'].includes(item.action)?'warning':['user_role','user_profile'].includes(item.event_type)?'role':'info';
             const label=text('span',actionLabels[item.action]||(item.event_type==='user_role'?'Rango actualizado':'Cambio registrado'),heading);label.className='report-activity-badge report-activity-'+tone;icon(label,tone==='success'?'check':tone==='danger'?'cross':typeIcon);
             const actor=text('p',item.actor||'Staff',info);actor.className='report-inline';icon(actor,'user');
             const target=text('p',(item.event_type==='pallet_admin'?'Palet ':['product_edit','report_review'].includes(item.event_type)?'EAN ':'')+(item.target||''),info);target.className='report-inline';icon(target,item.event_type==='pallet_admin'?'pallet':['product_edit','report_review'].includes(item.event_type)?'ean':'user');

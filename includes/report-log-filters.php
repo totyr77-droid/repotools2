@@ -13,5 +13,6 @@ function report_log_filters(): array {
     'delete'=>['label'=>'Palet eliminado','type'=>'pallet_admin','action'=>'delete'],
     'invite'=>['label'=>'Invitación a palet','type'=>'pallet_admin','action'=>'invite'],
     'revoke'=>['label'=>'Acceso a palet eliminado','type'=>'pallet_admin','action'=>'revoke'],
-    'roles'=>['label'=>'Cambio de rango','type'=>'user_role']];
+    'roles'=>['label'=>'Cambio de rango','type'=>'user_role'],
+    'profiles'=>['label'=>'Datos de cuenta actualizados','type'=>'user_profile']];
 }

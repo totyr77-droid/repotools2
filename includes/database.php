@@ -144,6 +144,11 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX password_resets_user ON password_resets(user_id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(14)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 15')->fetchColumn()) {
+            $db->exec("CREATE TABLE user_profile_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), actor_id {$ref} NOT NULL REFERENCES users(id), before_data TEXT NOT NULL, after_data TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX user_profile_events_user ON user_profile_events(user_id,created_at)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(15)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

@@ -21,6 +21,7 @@ try {
     if ($method==='POST') {
         $action=$_POST['action']??'';
         if ($action==='role') profile_change_role($db,(int)$actor['id'],(int)($_POST['id']??0),(string)($_POST['role']??''));
+        elseif ($action==='profile') profile_update_information($db,(int)$actor['id'],(int)($_POST['id']??0),$_POST);
         elseif (in_array($action,['block_reports','unblock_reports'],true)) profile_block_reports($db,(int)$actor['id'],(int)($_POST['id']??0),$action==='block_reports');
         else throw new CatalogException('Solicitud no válida.',422);
         $actor=profile_user($db,(int)$actor['id']);
