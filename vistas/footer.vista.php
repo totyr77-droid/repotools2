@@ -24,7 +24,7 @@
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
 <!-- SCRIPTS -->
-<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261011-offline2"></script>
+<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261011-camera3"></script>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-timeout1"></script>
 <script src="js/action-notices.js?v=20261011-profile1"></script>
