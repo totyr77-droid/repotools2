@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/password-email.php';
 function reset_issue(PDO $db, int $user): string {
     $token=bin2hex(random_bytes(32));
     $db->prepare('INSERT INTO password_resets(token_hash,user_id,expires_at) VALUES(?,?,?)')->execute([hash('sha256',$token),$user,time()+1800]);
@@ -23,6 +24,6 @@ function reset_send(string $email,string $token): bool {
     if (!$key||!$from||!preg_match('~^https://[^\s]+$~D',$origin)) return false;
     $url=$origin.'/recuperar.php?token='.$token;
     $curl=curl_init('https://api.resend.com/emails');
-    curl_setopt_array($curl,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>12,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key,'Content-Type: application/json','Idempotency-Key: reset/'.hash('sha256',$token)],CURLOPT_POSTFIELDS=>json_encode(['from'=>$from,'to'=>[$email],'subject'=>'Recuperá tu acceso a Repotools','text'=>"Para elegir una nueva contraseña abrí este enlace:\n$url\n\nVence en 30 minutos. Si no lo pediste, podés ignorarlo."])]);
+    curl_setopt_array($curl,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>12,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key,'Content-Type: application/json','Idempotency-Key: reset/'.hash('sha256',$token)],CURLOPT_POSTFIELDS=>json_encode(['from'=>$from,'to'=>[$email],'subject'=>'Recuperá tu acceso a Repotools','html'=>reset_email_html($url),'text'=>"Para elegir una nueva contraseña abrí este enlace:\n$url\n\nVence en 30 minutos y funciona una sola vez. Si no lo pediste, podés ignorarlo. Al guardar la nueva contraseña se cerrarán las sesiones anteriores en todos tus dispositivos."])]);
     curl_exec($curl);$status=curl_getinfo($curl,CURLINFO_HTTP_CODE);curl_close($curl);return $status>=200&&$status<300;
 }
