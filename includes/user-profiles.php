@@ -31,6 +31,20 @@ function profile_change_role(PDO $db, int $actorId, int $targetId, string $role)
         $db->commit();
     } catch (Throwable $e) { if ($db->inTransaction()) $db->rollBack(); throw $e; }
 }
+function profile_block_reports(PDO $db, int $actorId, int $targetId, bool $blocked): void {
+    $db->beginTransaction();
+    try {
+        report_lock($db);
+        $actor=profile_user($db,$actorId);$target=profile_user($db,$targetId);
+        if (!in_array($actor['role'],['administrador','manager'],true) || !report_can_manage_sender($actor['role'],$actorId,$target,$blocked)) throw new CatalogException('No puedes cambiar el permiso de reportes de esta cuenta.',403);
+        if (report_is_blocked($db,$target)!==$blocked) {
+            if ($blocked) $db->prepare('INSERT INTO report_blocks(user_id,blocked_by) VALUES (?,?)')->execute([$targetId,$actorId]);
+            else $db->prepare('DELETE FROM report_blocks WHERE user_id=?')->execute([$targetId]);
+            $db->prepare('INSERT INTO report_block_events(user_id,actor_id,action) VALUES (?,?,?)')->execute([$targetId,$actorId,$blocked?'blocked':'unblocked']);
+        }
+        $db->commit();
+    } catch (Throwable $e) {if ($db->inTransaction()) $db->rollBack();throw $e;}
+}
 function profile_detail(PDO $db, array $actor, array $target, int $page = 0): array {
     $id = (int)$target['id']; $stats = [];
     foreach (['scans'=>'SELECT COUNT(*) FROM scan_events WHERE user_id=?','unique_codes'=>'SELECT COUNT(DISTINCT code) FROM scan_events WHERE user_id=?','reports'=>'SELECT COUNT(*) FROM product_reports WHERE user_id=?','approved'=>'SELECT COUNT(*) FROM report_rewards WHERE user_id=?','libraries'=>'SELECT COUNT(*) FROM libraries WHERE user_id=?','pallets'=>'SELECT COUNT(*) FROM pallets WHERE owner_id=? AND released=0'] as $key=>$sql) {
@@ -51,5 +65,6 @@ function profile_detail(PDO $db, array $actor, array $target, int $page = 0): ar
         UNION ALL SELECT 'block',a.name || ': ' || u.name || ' · ' || e.action,e.created_at,e.id FROM report_block_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE e.user_id=? OR e.actor_id=?
     ) events ORDER BY created_at DESC,kind,event_id DESC LIMIT 31 OFFSET {$offset}");
     $s->execute(array_fill(0,9,$id));$events=$s->fetchAll();
-    return ['user'=>$target,'stats'=>$stats,'roles'=>profile_roles($actor,$target),'events'=>array_slice($events,0,30),'has_more'=>count($events)>30];
+    $blocked=report_is_blocked($db,$target);
+    return ['user'=>$target,'stats'=>$stats,'roles'=>profile_roles($actor,$target),'reports_blocked'=>$blocked,'can_manage_reports'=>report_can_manage_sender($actor['role'],(int)$actor['id'],$target,!$blocked),'events'=>array_slice($events,0,30),'has_more'=>count($events)>30];
 }

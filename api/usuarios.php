@@ -19,8 +19,10 @@ try {
         user_response(200,['users'=>array_slice($users,0,20),'page'=>$page,'page_size'=>20,'has_more'=>count($users)>20]);
     }
     if ($method==='POST') {
-        if (($_POST['action']??'')!=='role') throw new CatalogException('Solicitud no válida.',422);
-        profile_change_role($db,(int)$actor['id'],(int)($_POST['id']??0),(string)($_POST['role']??''));
+        $action=$_POST['action']??'';
+        if ($action==='role') profile_change_role($db,(int)$actor['id'],(int)($_POST['id']??0),(string)($_POST['role']??''));
+        elseif (in_array($action,['block_reports','unblock_reports'],true)) profile_block_reports($db,(int)$actor['id'],(int)($_POST['id']??0),$action==='block_reports');
+        else throw new CatalogException('Solicitud no válida.',422);
         $actor=profile_user($db,(int)$actor['id']);
         if (!in_array($actor['role'],['administrador','manager'],true)) user_response(200,['changed'=>true,'access_removed'=>true]);
         $target=profile_user($db,(int)$_POST['id']);
