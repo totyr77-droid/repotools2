@@ -65,7 +65,7 @@
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/botones.js?v=20261011-password1"></script>
-<script src="js/report-notifications.js?v=20261011-stock1"></script>
+<script src="js/report-notifications.js?v=20261011-pendingcounts1"></script>
 <script src="js/notifications.js?v=20261011-stock1"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261010-stock13"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-dates1"></script><?php endif; ?>

@@ -19,4 +19,5 @@
   }
   setInterval(refresh, 60000); (page ? page.listen : window.addEventListener.bind(window))('focus', refresh); (page ? page.listen : window.addEventListener.bind(window))('repotools:reports-changed', refresh);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  refresh();
 })();
