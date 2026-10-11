@@ -131,3 +131,5 @@ body:has(.library-dialog[open]) { overflow: hidden; }
 }
 
 #newCollection,#generateLabels{background:#dce9ff;color:#234b8b;border:1px solid #b4cef4;box-shadow:0 2px 5px #234b8b12}#newCollection:hover,#generateLabels:hover{background:#cbdfff}#newCollection:focus-visible,#generateLabels:focus-visible{outline:2px solid #234b8b;outline-offset:3px}
+
+#shareLibrary[hidden]{display:none}

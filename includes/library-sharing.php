@@ -20,7 +20,7 @@ function library_share_create(PDO $db, int $userId, int $libraryId): string {
     $stmt = $db->prepare('SELECT ean, name FROM library_products WHERE library_id = ? ORDER BY id');
     $stmt->execute([$libraryId]);
     $products = $stmt->fetchAll();
-    if (count($products) < 2) throw new DomainException('Agrega al menos dos productos para compartir.');
+    if (count($products) < 1) throw new DomainException('Agrega un producto para compartir.');
     $token = bin2hex(random_bytes(32));
     $payload = json_encode(['name' => $name, 'products' => $products], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     $db->prepare('INSERT INTO library_shares (token, source_library_id, owner_id, payload) VALUES (?, ?, ?, ?) ON CONFLICT(source_library_id) DO UPDATE SET payload = excluded.payload')->execute([$token, $libraryId, $userId, $payload]);

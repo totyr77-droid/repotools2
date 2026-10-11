@@ -37,23 +37,23 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/mobile.css" rel="stylesheet" type="text/css">
     <link href="css/footer.css" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-linear-tabs1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261011-create2" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261010-result2" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <link href="css/notifications.css?v=20261011-roles1" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261011-account-gap5" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
-    <link href="css/navigation.css?v=20261010-motion1" rel="stylesheet" type="text/css">
+    <link href="css/navigation.css?v=20261011-lock1" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261010" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=20261011-scanmeta3" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261010-compact1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><?php endif; ?>
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-profile2" rel="stylesheet"><?php endif; ?>
-<?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons1" rel="stylesheet">
 </head>

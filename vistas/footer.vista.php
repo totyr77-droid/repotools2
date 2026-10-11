@@ -35,7 +35,7 @@
 <script src="js/product-info.js?v=20261011-summary1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261011-scanphoto2"></script>
-<script src="js/biblioteca.js?v=20261010-manual1"></script>
+<script src="js/biblioteca.js?v=20261011-shareone1"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261011-scanphoto2"></script>
@@ -65,6 +65,7 @@
 <script src="js/script.js?v=20261011-summary1"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>
 <?php endif; ?>
+<script src="js/dialog-scroll.js?v=20261011-lock1"></script>
 <script src="js/title-icons.js?v=20261011-icons1"></script>
 <script src="js/botones.js?v=20261011-password1"></script>
 <script src="js/report-notifications.js?v=20261011-pendingcounts1"></script>

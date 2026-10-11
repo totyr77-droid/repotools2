@@ -71,7 +71,7 @@
     } finally {
       busy = false;
       document.querySelectorAll('.library-app button, .library-dialog button[type="submit"]').forEach(b => b.disabled = false);
-      get('shareLibrary').disabled = !activeLibrary() || activeLibrary().products.length < 2;
+      get('shareLibrary').hidden = !activeLibrary() || activeLibrary().products.length < 1; get('shareLibrary').disabled = busy || get('shareLibrary').hidden;
     }
   }
   function render() {
@@ -92,8 +92,8 @@
     if (!library) return;
     get('collectionTitle').textContent = library.name;
     get('collectionTitle').title = library.name;
-    get('shareLibrary').disabled = library.products.length < 2;
-    get('shareLibrary').title = library.products.length < 2 ? 'Agrega al menos dos productos para compartir' : 'Compartir colección';
+    get('shareLibrary').hidden = library.products.length < 1; get('shareLibrary').disabled = busy || get('shareLibrary').hidden;
+    get('shareLibrary').title = 'Compartir colección';
     if (!library.products.length) {
       const empty = document.createElement('p'); empty.textContent = 'Escanea tu primer producto.';
       get('libraryProducts').append(empty);
@@ -309,7 +309,7 @@
   }
   get('shareLibrary').addEventListener('click', async () => {
     const library = activeLibrary();
-    if (!library || library.products.length < 2 || busy) return;
+    if (!library || library.products.length < 1 || busy) return;
     const control = get('shareLibrary'); control.disabled = true;
     try {
       const result = await shareRequest({ action: 'share', library_id: library.id });
@@ -320,7 +320,7 @@
         catch (error) { if (error.name !== 'AbortError') showLink(); }
       } else showLink();
     } catch (error) { message(error.message); }
-    finally { control.disabled = !activeLibrary() || activeLibrary().products.length < 2; }
+    finally { control.hidden = !activeLibrary() || activeLibrary().products.length < 1; control.disabled = control.hidden; }
   });
   get('copyLibraryShare').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(get('libraryShareUrl').value); get('libraryShareDialog').close(); message('Enlace copiado.'); }

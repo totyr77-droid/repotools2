@@ -34,3 +34,5 @@
 #contenedormax .cartelscaner-box-titulo { text-align: left; }
 #contenedormax #scanCopyStatus:empty { display: none; }
 #verc { z-index: 4; }
+
+.ean-camera-controls .ean-camera-zoom{touch-action:none;overscroll-behavior:none}

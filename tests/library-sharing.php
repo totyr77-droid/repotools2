@@ -22,7 +22,10 @@ $stmt = $db->prepare('INSERT INTO libraries (user_id, name) VALUES (?, ?) RETURN
 $stmt->execute([$users[0], 'Bebidas']); $source = (int) $stmt->fetchColumn(); $stmt->closeCursor();
 rejected_share(fn() => library_share_create($db, $users[0], $source));
 $insert = $db->prepare('INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?)');
-$insert->execute([$source, '96385074', 'Agua']); $insert->execute([$source, '9002490100070', 'Energizante']);
+$insert->execute([$source, '96385074', 'Agua']);
+$oneToken = library_share_create($db, $users[0], $source);
+verify_share(count(library_share_preview($db, $oneToken)['collection']['products']) === 1, 'Permite compartir un solo producto.');
+$insert->execute([$source, '9002490100070', 'Energizante']);
 rejected_share(fn() => library_share_create($db, $users[1], $source));
 $token = library_share_create($db, $users[0], $source);
 verify_share(strlen($token) === 64 && library_share_preview($db, 'wrong') === null, 'Enlaces impredecibles y validados.');
