@@ -20,7 +20,7 @@
     const filters=document.getElementById('reportStateTabs'); if(filters)filters.hidden=!reports;
     document.getElementById('moderationReports')?.setAttribute('aria-pressed',String(reports));
     document.querySelectorAll('[data-moderation-view]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
-    document.querySelector('.reports-panel h1').textContent = {pending:'Reportes pendientes',history:'Reportes resueltos',logs:'Registros de actividad',users:'Usuarios'}[moderationView]; load();
+    load();
   }));
   document.getElementById('moderationPrevious').addEventListener('click', () => { if(auditPage>0){auditPage--;load();} });
   document.getElementById('moderationNext').addEventListener('click', () => { auditPage++;load(); });

@@ -41,7 +41,7 @@
 <script src="js/product-reports.js?v=20261011-audit1"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/ean-scanner.js?v=20261010-palletzoom1"></script>
-<script src="js/reports-page.js?v=20261011-loglabels1"></script>
+<script src="js/reports-page.js?v=20261011-tabs1"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
