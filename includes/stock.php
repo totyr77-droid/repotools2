@@ -32,7 +32,7 @@ function stock_generate(PDO $db, int $user): array {
     stock_query($db,'UPDATE pallet_labels SET reserved_by=?,reserved_until=? WHERE code=?',[$user,time()+259200,$code]);
     return stock_label($db,$code);
 }
-function stock_is_admin(PDO $db,?int $user): bool { return $user!==null && stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn()==='administrador'; }
+function stock_is_admin(PDO $db,?int $user): bool { return $user!==null && in_array(stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn(),['administrador','manager'],true); }
 function stock_detail(PDO $db, string $code, ?int $user): array {
     $label=stock_label($db,$code); $admin=stock_is_admin($db,$user);
     if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];

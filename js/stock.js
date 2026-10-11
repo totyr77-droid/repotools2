@@ -13,6 +13,7 @@
   function configureSettings(pallet) {
     if (nativePopover && settingsMenu.matches(':popover-open')) settingsMenu.hidePopover();
     inlineSettings = !!pallet.available;
+    $('sharePalletLabel').hidden = inlineSettings;
     $('palletTools').dataset.inline = String(inlineSettings);
     settings.querySelector('summary').hidden = inlineSettings;
     if (inlineSettings) settingsMenu.removeAttribute('popover');
@@ -87,7 +88,7 @@
   let generateKey; $('generateDialog').addEventListener('close',()=>generateKey=null);
   $('generateForm').addEventListener('submit',async e=>{e.preventDefault();await run('generateForm',async()=>{try{generateKey??=crypto.randomUUID();const result=await api('',{action:'generate',count:$('labelCount').value},generateKey);generateKey=null;$('generatedLabelLinks').replaceChildren();for(const label of result.labels){const row=text('div','',$('generatedLabelLinks'),'stock-member');button(label.code,row,async()=>{$('generateDialog').close();await openPallet(label.code);});iconButton('Compartir etiqueta','sharePalletLabel',row,async()=>{try{$('generateStatus').textContent=await RepoPalletLabel.share(label);}catch(e){if(e.name!=='AbortError')$('generateStatus').textContent=e.message;}});} $('printGenerated').href='etiqueta.php?codigos='+result.labels.map(l=>l.code).join(',');$('generatedPreview').src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(RepoPalletLabel.vector(result.labels[0]));$('generatedLabels').querySelector('h3').textContent=result.labels.length===1?'Tu imagen está lista':result.labels.length+' etiquetas listas';$('generateForm').hidden=true;$('generatedLabels').hidden=false;$('generateStatus').textContent='Etiquetas listas. Se reservaron durante 3 días.';selectedPanel='pendingPanel';await load();}catch(e){$('generateStatus').textContent=e.message;}});});
   $('sharePalletLabel').addEventListener('click',async()=>{
-    if(!active?.can_edit&&!active?.can_print)return;
+    if(active?.available||(!active?.can_edit&&!active?.can_print))return;
     const url=RepoPalletLabel.url(active.code);
     try {
       if(navigator.share){await navigator.share({title:'Palet '+active.code,text:'Consulta el contenido actualizado de este palet en Repotools.',url});$('palletStatus').textContent='Enlace del palet compartido.';}
