@@ -52,7 +52,7 @@
 <script src="js/stock-utils.js?v=20261010-stock13"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 <script src="js/stock-offline.js?v=20261011-offline1"></script>
-<script src="js/stock.js?v=20261011-search3"></script>
+<script src="js/stock.js?v=20261011-clear4"></script>
 <script src="js/public-pallet.js?v=20261010-stock13"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
