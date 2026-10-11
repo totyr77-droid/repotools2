@@ -59,7 +59,9 @@ document.querySelectorAll('.password-toggle').forEach((button) => {
     const input = button.closest('form').querySelector('input[name="password"]');
     const visible = input.type === 'password';
     input.type = visible ? 'text' : 'password';
-    button.textContent = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';
+    const label = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';
+    button.setAttribute('aria-label', label);
+    button.title = label;
     button.setAttribute('aria-pressed', String(visible));
   });
 });
