@@ -24,4 +24,12 @@ assert.equal((await manager('api/usuarios.php',{action:'role',id:4,role:'usuario
 // Existing sessions lose privileges immediately after demotion.
 assert.equal((await manager('api/usuarios.php',{action:'role',id:3,role:'usuario',csrf:m.csrf})).status,200);assert.equal((await admin('api/usuarios.php?token='+token)).status,403);
 console.log('OK: profile API authentication, QR privacy, CSRF, hierarchy, last manager, audit and immediate demotion');
+const pref=JSON.parse((await user('api/preferencias.php')).text);assert.equal(pref.handedness,'');assert.equal(pref.profile_pending,true);
+assert.equal((await guest('api/preferencias.php')).status,401);
+assert.equal((await user('api/preferencias.php',{handedness:'left'})).status,403);
+assert.equal((await user('api/preferencias.php',{handedness:'invalid',csrf:pref.csrf})).status,422);
+assert.equal((await user('api/preferencias.php',{handedness:'left',csrf:pref.csrf})).status,200);
+assert.equal(JSON.parse((await user('api/preferencias.php')).text).handedness,'left');assert.match((await user('biblioteca.php')).text,/data-hand="left"/);assert.doesNotMatch((await user('biblioteca.php')).text,/data-profile-pending/);
+assert.equal((await user('api/preferencias.php',{handedness:'right',csrf:pref.csrf})).status,200);assert.match((await user('biblioteca.php')).text,/data-hand="right"/);
+console.log('OK: handedness preferences, default reminder, persistence, authentication and CSRF');
 })().finally(()=>{server.kill();fs.rmSync(dir,{recursive:true,force:true});}).catch(e=>{console.error(e);process.exitCode=1;});

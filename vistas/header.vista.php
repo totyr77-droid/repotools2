@@ -1,13 +1,14 @@
 <?php
 require_once __DIR__ . "/../includes/auth.php";
 require_once __DIR__ . "/../includes/catalog.php";
+$userHand = '';
 $navModerator = false; $navPending = 0; $navRole = '';
 if (current_user()) {
     try { $navDb = database(); $navModerator = can_edit_catalog($navDb, current_user()); if ($navModerator) { $navCount = $navDb->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $navCount->execute([current_user()['id']]); $navPending = (int) $navCount->fetchColumn(); } }
     catch (Throwable $error) { error_log('Repotools: no se pudo consultar el menú de moderación.'); }
 }
 if (isset($navDb) && current_user()) {
-    try { $roleQuery = $navDb->prepare('SELECT role FROM users WHERE id = ?'); $roleQuery->execute([current_user()['id']]); $navRole = (string) $roleQuery->fetchColumn(); } catch (Throwable $ignored) {}
+    try { $roleQuery = $navDb->prepare('SELECT role,handedness FROM users WHERE id = ?'); $roleQuery->execute([current_user()['id']]); $navProfile = $roleQuery->fetch(); $navRole = (string) ($navProfile['role'] ?? ''); $userHand = (string) ($navProfile['handedness'] ?? ''); } catch (Throwable $ignored) {}
 }
 $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => ['ADM', 'Administrador', 'fa-user-gear'], 'moderador' => ['MOD', 'Moderador', 'fa-shield-halved'], 'supervisor' => ['SUP', 'Supervisor', 'fa-user-tie'], 'empresa' => ['EMP', 'Empresa', 'fa-building']];
 ?>
@@ -53,8 +54,9 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261010-compact1" rel="stylesheet" type="text/css"><?php endif; ?>
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-profile1" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet"><?php endif; ?>
+<link href="css/hand-preferences.css?v=20261011-hand1" rel="stylesheet">
 </head>
-  <body<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
+  <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
       <div class="header-contenedor">
         <a class="logo" href="./" aria-label="Inicio Repotools"><p>REPOTOOLS</p></a>
@@ -95,3 +97,5 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (current_user()): ?>
     <div class="account-bar"><span class="account-greeting" title="Hola, <?= escape(current_user()['name']) ?>">Hola, <strong><?= escape(current_user()['name']) ?></strong><?php if (isset($roleLabels[$navRole])): $badge = $roleLabels[$navRole]; ?><span class="account-role account-role-<?= escape($navRole) ?>" title="<?= escape($badge[1]) ?>" aria-label="<?= escape($badge[1]) ?>"><i class="fa-solid <?= escape($badge[2]) ?>" aria-hidden="true"></i><?= escape($badge[0]) ?></span><?php endif; ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/></svg><span>Salir</span></button></form></div>
     <?php endif; ?>
+
+<?php if (current_user() && $userHand === ''): ?><aside class="profile-pending" data-profile-pending role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3h.01"/></svg><span>Tienes información por completar en tu perfil.</span><a href="cuenta.php#handPreferences">Completar <span aria-hidden="true">→</span></a></aside><?php endif; ?>

@@ -68,5 +68,6 @@
 <script src="js/notifications.js?v=20261011-stock1"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261010-stock13"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-profile1"></script><?php endif; ?>
+<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-hand1"></script><?php endif; ?>
 </body>
 </html>
