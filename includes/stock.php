@@ -33,6 +33,15 @@ function stock_generate(PDO $db, int $user): array {
     return stock_label($db,$code);
 }
 function stock_is_admin(PDO $db,?int $user): bool { return $user!==null && in_array(stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn(),['administrador','manager'],true); }
+function stock_product_names(array $product): array {
+    $name=trim((string)($product['catalog_product']??'')); $brand=trim((string)($product['catalog_brand']??''));
+    if ($brand!=='' && mb_stripos($name,$brand)===false) $name=trim($brand.' '.$name);
+    $product['catalog_name']=trim($name.' '.trim((string)($product['catalog_quantity']??'')));
+    $product['reference_name']=trim((string)$product['name']);
+    $product['display_name']=$product['reference_name']?:$product['catalog_name'];
+    unset($product['catalog_product'],$product['catalog_brand'],$product['catalog_quantity']);
+    return $product;
+}
 function stock_detail(PDO $db, string $code, ?int $user): array {
     $label=stock_label($db,$code); $admin=stock_is_admin($db,$user);
     if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
@@ -42,7 +51,9 @@ function stock_detail(PDO $db, string $code, ?int $user): array {
     $owner=$user !== null && (int)$p['owner_id']===$user;
     $access=$user ? stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$p['id'],$user])->fetchColumn() : false;
     $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted'; $p['pending_invitation']=$access==='pending';
-    $p['products']=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? ORDER BY CASE WHEN expires=\'\' THEN 1 ELSE 0 END,expires,name,id',[$p['id']])->fetchAll();
+    $p['products']=stock_query($db,'SELECT b.*,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id=? ORDER BY CASE WHEN b.expires=\'\' THEN 1 ELSE 0 END,b.expires,b.name,b.id',[$p['id']])->fetchAll();
+    foreach ($p['products'] as &$product) $product=stock_product_names($product);
+    unset($product);
     if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
     if (!$p['can_edit']) unset($p['description']);
     // Only names and product details are public; account identifiers/access are private.

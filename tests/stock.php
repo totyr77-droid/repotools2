@@ -16,6 +16,11 @@ $input=['pallet_id'=>$first['id'],'ean'=>'96385074','name'=>'Marca Agua 1 L','am
 $p=stock_detail($db,$first['code'],null);check_stock($p['products'][0]['units']==42,'Mismo EAN y fecha suman unidades.');check_stock($p['owner_name']==='Juan'&&!isset($p['owner_id']),'Ficha pública sin identificadores privados.');
 stock_save_product($db,$juan,[...$input,'amount'=>3,'kind'=>'units','expires'=>'']);$p=stock_detail($db,$first['code'],$juan);check_stock(count($p['products'])===2,'Distinto vencimiento crea otro lote.');$product=array_values(array_filter($p['products'],fn($b)=>$b['expires']===''))[0];
 stock_save_product($db,$juan,[...$input,'product_id'=>$product['id'],'revision'=>$product['revision'],'amount'=>3,'kind'=>'units']);$p=stock_detail($db,$first['code'],$juan);check_stock(count($p['products'])===1&&$p['products'][0]['units']==45,'Editar vencimiento combina los lotes.');
+stock_query($db,'INSERT INTO products(ean,name,brand,quantity) VALUES(?,?,?,?)',[$input['ean'],'Agua','Marca','500 ml']);
+$catalogDetail=stock_detail($db,$first['code'],$juan)['products'][0];
+check_stock($catalogDetail['name']==='Marca Agua 1 L' && $catalogDetail['catalog_name']==='Marca Agua 500 ml','Referencia conservada y catálogo diferenciado.');
+stock_query($db,'UPDATE products SET quantity=? WHERE ean=?',['750 ml',$input['ean']]);
+check_stock(stock_detail($db,$first['code'],null)['products'][0]['catalog_name']==='Marca Agua 750 ml','Catálogo actualizado también en vista pública.');
 stock_denied(fn()=>stock_save_product($db,$juan,[...$input,'product_id'=>$p['products'][0]['id'],'revision'=>0]),409);
 stock_denied(fn()=>stock_product_input([...$input,'expires'=>'2026-02-30']),422);stock_denied(fn()=>stock_product_input([...$input,'amount'=>-1]),422);stock_denied(fn()=>stock_product_input([...$input,'ean'=>'55007732']),422);
 stock_query($db,"INSERT INTO pallet_access(pallet_id,user_id,status) VALUES(?,?,'pending')",[$first['id'],$guest]);stock_denied(fn()=>stock_editable($db,$first['id'],$guest),403);stock_query($db,"UPDATE pallet_access SET status='accepted' WHERE pallet_id=? AND user_id=?",[$first['id'],$guest]);check_stock(stock_editable($db,$first['id'],$guest)['id']===$first['id'],'Aceptado puede editar.');stock_denied(fn()=>stock_editable($db,$first['id'],$guest,true),403);

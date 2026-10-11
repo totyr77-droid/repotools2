@@ -17,11 +17,12 @@ try {
             if(!$uid)throw new CatalogException('Inicia sesión para consultar Stock.',401);
             $search=is_string($_GET['search']??null)?trim($_GET['search']):'';
             if(mb_strlen($search)>100)throw new CatalogException('La búsqueda admite hasta 100 caracteres.',422);
-            $sql="SELECT b.name,b.ean,b.expires,b.units,p.code FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))";
+            $sql="SELECT b.id,b.name,b.ean,b.expires,b.units,p.code,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN products c ON c.ean=b.ean WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))";
             $params=[$uid,$uid];
-            if($search!==''){$sql.=' AND (LOWER(b.name) LIKE ? OR b.ean LIKE ?)';$term='%'.mb_strtolower($search).'%';$params[]=$term;$params[]=$term;}
+            if($search!==''){$sql.=' AND (LOWER(b.name) LIKE ? OR b.ean LIKE ? OR LOWER(c.name) LIKE ? OR LOWER(c.brand) LIKE ?)';$term='%'.mb_strtolower($search).'%';$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;}
             if(isset($_GET['expiries'])){$sql.=" AND b.expires<>'' AND b.expires<=?";$params[]=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$uid).' days')->format('Y-m-d');}
             $result=['items'=>stock_query($db,$sql." ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,p.code,b.id LIMIT 201",$params)->fetchAll(),'warning_days'=>stock_warning_days($db,$uid)];
+            $result['items']=array_map('stock_product_names',$result['items']);
             $result['has_more']=count($result['items'])>200;$result['items']=array_slice($result['items'],0,200);
         }
         elseif (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid)];

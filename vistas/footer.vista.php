@@ -49,10 +49,10 @@
 <script src="js/ean-scanner.js?v=20261011-orientation4"></script>
 <script src="js/product-info.js?v=20261011-fresh2"></script>
 <script src="js/vendor/qrcode.min.js"></script>
-<script src="js/stock-utils.js?v=20261010-stock13"></script>
+<script src="js/stock-utils.js?v=20261011-reference14"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 <script src="js/stock-offline.js?v=20261011-offline1"></script>
-<script src="js/stock.js?v=20261011-searchcamera6"></script>
+<script src="js/stock.js?v=20261011-stockreference7"></script>
 <script src="js/public-pallet.js?v=20261010-stock13"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
