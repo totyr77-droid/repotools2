@@ -141,8 +141,14 @@
       }
       compare(changedFields,details);
       if(unchangedFields.length){const more=text('details','',details);more.className='report-unchanged';text('summary',`Datos sin cambios (${unchangedFields.length})`,more);compare(unchangedFields,more);}
+      if(!active.photos.includes('product')){
+        const wrapper=text('figure','',details);wrapper.className='report-photo-evidence report-reference-photo';
+        text('figcaption','Foto de referencia',wrapper);
+        const note=text('p',active.reference_image?'El usuario no adjuntó una foto del producto. Mostramos la imagen que ya tenemos.':'El usuario no adjuntó una foto del producto y no tenemos una imagen guardada.',wrapper);note.className='product-edit-note';icon(note,'file');
+        if(active.reference_image){const image=document.createElement('img');image.src=active.reference_image;image.alt='Foto existente del producto; no enviada en este reporte';image.className='report-evidence';image.addEventListener('error',()=>{image.remove();note.textContent='El usuario no adjuntó una foto del producto. No pudimos cargar la imagen de referencia.';},{once:true});wrapper.append(image);}
+      }
       for (const kind of active.photos) {
-        const wrapper = document.createElement('figure'); wrapper.className = 'report-photo-evidence'; text('figcaption', kind === 'ean' ? 'Foto del EAN' : 'Foto del producto', wrapper); details.append(wrapper);
+        const wrapper = document.createElement('figure'); wrapper.className = 'report-photo-evidence'; text('figcaption', kind === 'ean' ? 'Foto del EAN' : 'Foto enviada por el usuario', wrapper); details.append(wrapper);
         if (kind === 'ean') { barcodeBox.classList.add('report-barcode-attached'); wrapper.append(barcodeBox); }
         const hint = text('p', 'Cargando foto…', wrapper);
         RepoReports.photo(id, kind).then(url => {

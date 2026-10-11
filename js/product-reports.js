@@ -48,7 +48,8 @@
   const flash=document.getElementById('reportCameraFlash');let lightOn=false;
   const capturedPhotos = new Map(), previews = new Map();
   let cameraVersion = 0, cameraKind, stream;
-  let revision = 0, active, busy = false;
+  let revision = 0, active, busy = false, catalogPhoto='';
+  function showProductPhoto(){const preview=document.getElementById('reportPreviewProduct'),fresh=capturedPhotos.has('product');const src=fresh?previews.get('product'):catalogPhoto;preview.hidden=!src;if(src)preview.src=src;else preview.removeAttribute('src');const note=document.getElementById('reportProductPhotoNote');note.textContent=fresh?'Foto nueva para este reporte.':src?'Foto actual del producto.':'';form.querySelector('[data-report-camera="product"]').textContent=fresh?'Volver a tomar':src?'Cambiar foto':'Tomar foto del producto';form.querySelector('[data-report-remove="product"]').hidden=!fresh;}
   function stopCamera() {
     ++cameraVersion; capture.disabled = true;lightOn=false;flash.hidden=true;flash.disabled=false;flash.setAttribute('aria-pressed','false');
     stream?.getTracks().forEach(track => track.stop()); stream = null; video.srcObject = null;
@@ -57,7 +58,7 @@
     if (previews.has(kind)) URL.revokeObjectURL(previews.get(kind)); previews.delete(kind); capturedPhotos.delete(kind);
     const preview = document.getElementById(kind === 'ean' ? 'reportPreviewEan' : 'reportPreviewProduct'); preview.removeAttribute('src'); preview.hidden = true;
     form.querySelector(`[data-report-remove="${kind}"]`).hidden = true;
-    form.querySelector(`[data-report-camera="${kind}"]`).textContent = kind === 'ean' ? 'Tomar foto del EAN' : 'Tomar foto del producto';
+    form.querySelector(`[data-report-camera="${kind}"]`).textContent = kind === 'ean' ? 'Tomar foto del EAN' : 'Tomar foto del producto';if(kind==='product')showProductPhoto();
   }
   async function openCamera(kind) {
     if (busy || !active || document.getElementById('reportPhotos').disabled || !['ean', 'product'].includes(kind)) return;
@@ -122,7 +123,7 @@
       removePhoto(kind); capturedPhotos.set(kind, blob); const url = URL.createObjectURL(blob); previews.set(kind, url);
       const preview = document.getElementById(kind === 'ean' ? 'reportPreviewEan' : 'reportPreviewProduct'); preview.src = url; preview.hidden = false;
       form.querySelector(`[data-report-remove="${kind}"]`).hidden = false; form.querySelector(`[data-report-camera="${kind}"]`).textContent = 'Volver a tomar';
-      stopCamera(); camera.close();
+      if(kind==='product')showProductPhoto();stopCamera(); camera.close();
     } catch (error) { if (attempt === cameraVersion && camera.open) { cameraStatus.textContent = error.message; capture.disabled = false; } }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { stopCamera(); if (camera.open) camera.close(); } });
@@ -132,16 +133,16 @@
   async function open(ean) {
     if (busy) return;
     const photoPending = window.RepoEANScanner?.takeScanPhoto?.(ean);
-    stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto);
+    stopCamera(); if (camera.open) camera.close();catalogPhoto=''; ['ean', 'product'].forEach(removePhoto);
     const version = ++revision; active = null; form.reset(); form.hidden = true; status.textContent = 'Cargando…';
     if (!dialog.open) dialog.showModal();
     try {
-      const [config, lookup] = await Promise.all([request(), window.RepoProductInfo.get(ean).then(product => ({ product, missing: product === null })).catch(() => ({ product: null, missing: false }))]);
+      const [config, lookup] = await Promise.all([request(), window.RepoProductInfo.get(ean,{image:true,fresh:true}).then(product => ({ product, missing: product === null })).catch(() => ({ product: null, missing: false }))]);
       const { product, missing } = lookup;
       const scanPhoto = await photoPending;
       if (version !== revision || !dialog.open) return;
       if (config.can_submit === false) { status.textContent = 'Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.'; return; }
-      active = { ean, csrf: config.csrf, key: crypto.randomUUID() };
+      active = { ean, csrf: config.csrf, key: crypto.randomUUID() };catalogPhoto=product?.image||'';showProductPhoto();
       document.getElementById('productReportEan').textContent = `EAN ${ean}`;
       document.getElementById('productReportTitle').textContent = missing ? 'Agregar producto' : 'Reportar producto';
       document.getElementById('reportProblem').hidden = missing;

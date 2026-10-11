@@ -89,6 +89,9 @@ function report_detail(PDO $db, int $id, string $owner, bool $moderator): array 
     $report['original'] = json_decode($report['original_data'], true);
     unset($report['proposed_data'], $report['original_data']);
     $report['current'] = catalog_product($db, $report['ean']);
+    $report['reference_image']='';$report['reference_image_source']='';
+    if(catalog_approved_photo($db,$report['ean'])){$report['reference_image']='api/productos.php?ean='.rawurlencode($report['ean']).'&photo=product';$report['reference_image_source']='repotools';}
+    elseif(!empty($report['current']['image'])){$report['reference_image']=$report['current']['image'];$report['reference_image_source']='openfoodfacts';}
     $stmt = $db->prepare('SELECT kind FROM report_photos WHERE report_id = ?'); $stmt->execute([$id]);
     $report['photos'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
     if ($moderator) {
