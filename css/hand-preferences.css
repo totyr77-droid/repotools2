@@ -4,6 +4,10 @@ body[data-hand=left] .library-heading:has(>.app-close),body[data-hand=left] .res
 body[data-hand=left] .library-dialog-actions:not(.ean-navigation):not(#moderationPagination):not(:has([aria-label*="anterior"])),body[data-hand=left] .library-product-actions,body[data-hand=left] .library-add-actions,body[data-hand=left] .library-preview-actions,body[data-hand=left] .stock-product-actions,body[data-hand=left] .scan-product-actions,body[data-hand=left] #palletTools{flex-direction:row;justify-content:flex-start}
 body[data-hand=left] .library-dialog-actions:has(>.app-close){flex-direction:row}
 body[data-hand=left] .library-product,body[data-hand=left] .stock-product,body[data-hand=left] .library-heading:has(>.library-add-actions){flex-direction:row-reverse}
+body[data-hand=left] .library-collection-header,body[data-hand=left] .home-list-heading,body[data-hand=left] .library-heading:has(>#newCollection),body[data-hand=left] .library-heading:has(>#generateLabels){flex-direction:row-reverse}
+body[data-hand=left] .library-collection-name{flex-direction:row}
+body[data-hand=left] #collectionSettings{order:-1}
+body[data-hand=left] .home-list-actions,body[data-hand=left] .home-list-actions .box-tools{flex-direction:row}
 body[data-hand=left] #palletTools .library-settings-menu:not([popover]){right:auto;left:0}
 body[data-hand=left] .alerta-cerrar,body[data-hand=left] .stock-close,body[data-hand=left] .palet-editor__close{right:auto;left:12px}
 @media(max-width:768px){.profile-pending{margin:8px 12px}.profile-pending a{white-space:nowrap}}
