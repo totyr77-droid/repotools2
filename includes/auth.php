@@ -1,11 +1,25 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/sessions.php';
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    ini_set('session.gc_maxlifetime', (string)DatabaseSessions::LIFETIME);
     session_name('repotools_session');
-    session_set_cookie_params(['httponly' => true, 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'samesite' => 'Lax']);
-    session_start();
+    $secureCookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (getenv('RENDER') === 'true');
+    session_set_cookie_params(['lifetime' => DatabaseSessions::LIFETIME, 'path' => '/', 'httponly' => true, 'secure' => $secureCookie, 'samesite' => 'Lax']);
+    try {
+        session_set_save_handler(new DatabaseSessions(database()), true);
+        if (!session_start()) throw new RuntimeException('Session unavailable');
+    } catch (Throwable $error) {
+        http_response_code(503);
+        header('Retry-After: 30');
+        header('Content-Type: text/plain; charset=UTF-8');
+        exit('No pudimos acceder a tu sesión. Intenta nuevamente en unos momentos.');
+    }
 }
 
 require_once __DIR__ . '/database.php';

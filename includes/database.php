@@ -133,6 +133,11 @@ function initialize_database(PDO $db): void {
             $db->exec("ALTER TABLE users ADD COLUMN handedness TEXT NOT NULL DEFAULT ''");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(12)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 13')->fetchColumn()) {
+            $db->exec("CREATE TABLE app_sessions (id_hash TEXT PRIMARY KEY, payload TEXT NOT NULL DEFAULT '', expires_at BIGINT NOT NULL, lock_token TEXT NOT NULL DEFAULT '', locked_until BIGINT NOT NULL DEFAULT 0)");
+            $db->exec('CREATE INDEX app_sessions_expiry ON app_sessions(expires_at)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(13)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();
