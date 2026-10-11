@@ -11,7 +11,7 @@
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   let moderationView = 'pending', auditPage = 0, reportState = 'pending';
   document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
-  const stamp = value => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)?value:value.replace(' ','T')+'Z').toLocaleString('es-AR', { timeZone: 'America/Buenos_Aires', dateStyle: 'short', timeStyle: 'short', hourCycle: 'h23' });
+  const stamp = value => window.RepoDateTime.stamp(value);
   const logLabels = {product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet',user_role:'Cambio de rango'};
   const actionLabels = {approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
   document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
@@ -27,7 +27,7 @@
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
   function icon(container, type) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '1.8');
-    const shapes={edit:'M12 20H4v-8M16 3l5 5-11 11-5 1 1-5Z',eye:'M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0',file:'M6 3h12v18H6zM9 7h6m-6 5h6m-6 5h4',brand:'M3 3h8l10 10-8 8L3 11ZM7 7h.01',name:'M3 7l9-4 9 4v10l-9 4-9-4ZM3 7l9 5 9-5M12 12v9',quantity:'M3 8h18v8H3zM7 8v4m5-4v4m5-4v4',category:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',packaging:'M3 7h18v14H3zM3 3h18v4M9 11h6'};
+    const shapes={clock:'M12 3a9 9 0 1 1-9 9 9 9 0 0 1 9-9ZM12 7v5l3 2',check:'m5 12 4 4L19 6',cross:'m6 6 12 12M18 6 6 18',shield:'M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z',pallet:'M3 21h18M4 17h16V4H4zM4 10h16M12 4v13',edit:'M12 20H4v-8M16 3l5 5-11 11-5 1 1-5Z',eye:'M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0',file:'M6 3h12v18H6zM9 7h6m-6 5h6m-6 5h4',brand:'M3 3h8l10 10-8 8L3 11ZM7 7h.01',name:'M3 7l9-4 9 4v10l-9 4-9-4ZM3 7l9 5 9-5M12 12v9',quantity:'M3 8h18v8H3zM7 8v4m5-4v4m5-4v4',category:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',packaging:'M3 7h18v14H3zM3 3h18v4M9 11h6'};
     const path = document.createElementNS(svg.namespaceURI, 'path'); path.setAttribute('d', shapes[type] || (type === 'ean' ? 'M3 4v16m3-16v16m4-16v16m3-16v16m4-16v16m3-16v16' : type === 'user' ? 'M20 21v-2a6 6 0 0 0-12 0v2M18 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0' : 'M4 4l16 16M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0')); svg.append(path); container.prepend(svg);
   }
   function badge(container, state) { const node = text('span', labels[state], container); node.className = 'report-badge report-badge-' + state; }
@@ -48,7 +48,15 @@
             const changes=text('div','',info);changes.className='report-change-tags';for(const change of item.changes||[]){const chip=text('span',fields[change.field],changes);chip.className='report-change-tag';icon(chip,'edit');}if(!item.changes?.length)text('span','Fotos o comentarios',changes);
             const button=text('button','Ver cambios',card);icon(button,'eye');button.type='button';button.className='library-secondary';button.addEventListener('click',()=>open(item.id));
           }else{
-            text('h2',logLabels[item.event_type]||'Actividad',info);text('p',`${item.actor} · ${actionLabels[item.action]||(item.event_type==='user_role'?item.action:'Cambio registrado')}`,info);text('p',item.target,info);text('p',stamp(item.created_at),info);
+            const heading=text('div','',info);heading.className='report-card-heading report-log-heading';
+            const typeIcon={product_edit:'edit',report_review:'file',report_block:'shield',pallet_admin:'pallet',user_role:'user'}[item.event_type]||'file';
+            const title=text('h2',logLabels[item.event_type]||'Actividad',heading);icon(title,typeIcon);
+            const tone=['approved','unblocked','save_product'].includes(item.action)?'success':['rejected','blocked','delete','delete_product'].includes(item.action)?'danger':['revoke','leave'].includes(item.action)?'warning':item.event_type==='user_role'?'role':'info';
+            const label=text('span',actionLabels[item.action]||(item.event_type==='user_role'?'Rango actualizado':'Cambio registrado'),heading);label.className='report-activity-badge report-activity-'+tone;icon(label,tone==='success'?'check':tone==='danger'?'cross':typeIcon);
+            const actor=text('p',item.actor||'Staff',info);actor.className='report-inline';icon(actor,'user');
+            const target=text('p',(item.event_type==='pallet_admin'?'Palet ':['product_edit','report_review'].includes(item.event_type)?'EAN ':'')+(item.target||''),info);target.className='report-inline';icon(target,item.event_type==='pallet_admin'?'pallet':['product_edit','report_review'].includes(item.event_type)?'ean':'user');
+            if(item.event_type==='user_role')text('p',item.action,info);
+            const date=text('p',stamp(item.created_at),info);date.className='report-inline report-log-date';icon(date,'clock');
           }
         }
         const pagination=document.getElementById('moderationPagination');pagination.hidden=!auditPage&&!result.has_more;document.getElementById('moderationPrevious').disabled=auditPage===0;document.getElementById('moderationNext').disabled=!result.has_more;document.getElementById('moderationPageNumber').textContent=String(auditPage+1);return;

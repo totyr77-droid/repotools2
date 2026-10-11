@@ -12,7 +12,7 @@
   const search=document.getElementById('userSearch'),status=document.getElementById('userStatus'),holder=document.getElementById('userProfile'),dialog=document.getElementById('userScannerDialog');
   const roles={usuario:'Usuario',moderador:'Moderador',administrador:'Administrador',manager:'Manager'};
   let query='',currentPage=0,version=0,leaving=false;
-  const stamp=value=>new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)?value:value.replace(' ','T')+'Z').toLocaleString('es-AR',{timeZone:'America/Buenos_Aires',dateStyle:'short',timeStyle:'short',hourCycle:'h23'});
+  const stamp = value => window.RepoDateTime.stamp(value);
   function node(tag,value,parent,className){const el=document.createElement(tag);if(value!==null)el.textContent=value;if(className)el.className=className;parent.append(el);return el;}
   function icon(parent,name){parent.prepend(svgIcon(name));}
   async function load(body){if(body)currentPage=0;const attempt=++version;status.textContent='Cargando cuenta…';holder.setAttribute('aria-busy','true');try{const data=await request(body?'':query+'&page='+currentPage,body);if(leaving||attempt!==version)return;if(data.access_removed){holder.replaceChildren();status.textContent='Rango actualizado. Tu cuenta ya no tiene acceso a esta sección.';return;}render(data);status.textContent=body?'Rango actualizado.':'';if(body)status.classList.add('is-success');}catch(error){if(attempt===version){holder.replaceChildren();status.textContent=error.message;status.classList.remove('is-success');}}finally{if(attempt===version)holder.removeAttribute('aria-busy');}}

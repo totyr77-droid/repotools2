@@ -24,6 +24,7 @@
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
 <!-- SCRIPTS -->
+<script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-timeout1"></script>
 <script src="js/action-notices.js?v=20261011-profile1"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
@@ -40,7 +41,7 @@
 <script src="js/product-reports.js?v=20261011-audit1"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/ean-scanner.js?v=20261010-palletzoom1"></script>
-<script src="js/reports-page.js?v=20261011-historychanges1"></script>
+<script src="js/reports-page.js?v=20261011-loglabels1"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
@@ -67,7 +68,7 @@
 <script src="js/report-notifications.js?v=20261011-stock1"></script>
 <script src="js/notifications.js?v=20261011-stock1"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261010-stock13"></script><?php endif; ?>
-<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-profile1"></script><?php endif; ?>
+<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-dates1"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-autohand1"></script><?php endif; ?>
 </body>
 </html>
