@@ -149,6 +149,16 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX user_profile_events_user ON user_profile_events(user_id,created_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(15)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 16')->fetchColumn()) {
+            $db->exec("CREATE TABLE stock_branches (id {$id}, owner_id {$ref} NOT NULL REFERENCES users(id), name TEXT NOT NULL, address TEXT NOT NULL, locality TEXT NOT NULL, province TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', revision INTEGER NOT NULL DEFAULT 1)");
+            $db->exec("ALTER TABLE pallets ADD COLUMN branch_id {$ref} REFERENCES stock_branches(id)");
+            $db->exec('CREATE INDEX stock_branches_owner ON stock_branches(owner_id,id)');
+            $db->exec('CREATE INDEX pallets_branch ON pallets(branch_id,released)');
+            $db->exec("CREATE TABLE stock_shares (id {$id}, owner_id {$ref} NOT NULL REFERENCES users(id), token TEXT NOT NULL UNIQUE, branch_id {$ref} REFERENCES stock_branches(id), title TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE stock_share_pallets (share_id {$ref} NOT NULL REFERENCES stock_shares(id), pallet_id {$ref} NOT NULL REFERENCES pallets(id), PRIMARY KEY(share_id,pallet_id))");
+            $db->exec('CREATE INDEX stock_shares_owner ON stock_shares(owner_id,active)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(16)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

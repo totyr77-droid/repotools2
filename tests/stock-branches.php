@@ -1,0 +1,31 @@
+<?php
+require_once __DIR__.'/../includes/database.php'; require_once __DIR__.'/../includes/stock-branches.php';
+function branch_check(bool $ok,string $message): void {if(!$ok)throw new RuntimeException($message);}
+function branch_denied(callable $fn,int $status): void {try{$fn();}catch(CatalogException $e){branch_check($e->status===$status,$e->getMessage());return;}throw new RuntimeException('Expected denial');}
+$url=getenv('REPOTOOLS_TEST_DATABASE_URL');
+if($url){$c=postgres_connection($url);$db=new PDO($c['dsn'],$c['user'],$c['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC,PDO::PGSQL_ATTR_DISABLE_PREPARES=>true]);}
+else $db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+initialize_database($db);initialize_database($db);$db->beginTransaction();
+try {
+ $suffix=bin2hex(random_bytes(10));$users=[];foreach(['Owner','Other','Manager'] as $name)$users[]=(int)stock_query($db,'INSERT INTO users(name,email,password_hash,role) VALUES(?,?,?,?) RETURNING id',[$name,$suffix.$name.'@example.invalid','unused',$name==='Manager'?'manager':'usuario'])->fetchColumn();[$owner,$other,$manager]=$users;
+ $input=['name'=>'Carrefour Centro','address'=>'Colon 1234','locality'=>'Cordoba','province'=>'Cordoba','description'=>'Entrada lateral'];
+ $branch=branch_save($db,$owner,$input)['branch'];branch_denied(fn()=>branch_owned($db,(int)$branch['id'],$other),404);branch_denied(fn()=>branch_save($db,$owner,[...$input,'name'=>'']),422);branch_denied(fn()=>branch_save($db,$owner,$input),422);
+ $p=stock_claim($db,stock_generate($db,$owner)['code'],$owner);stock_save_product($db,$owner,['pallet_id'=>$p['id'],'ean'=>'96385074','name'=>'Referencia','amount'=>2,'kind'=>'units','expires'=>'']);
+ $detail=stock_detail($db,$p['code'],$owner);branch_assign($db,$owner,['pallet_id'=>$p['id'],'branch_id'=>$branch['id'],'revision'=>$detail['revision']]);
+ branch_denied(fn()=>branch_assign($db,$manager,['pallet_id'=>$p['id'],'branch_id'=>$branch['id'],'revision'=>1]),403);
+ branch_denied(fn()=>branch_assign($db,$owner,['pallet_id'=>$p['id'],'branch_id'=>$branch['id'],'revision'=>1]),409);
+ $own=stock_detail($db,$p['code'],$owner);branch_check($own['branch']['description']==='Entrada lateral','Branch detail');branch_check(!isset(stock_detail($db,$p['code'],null)['branch_id']),'Private branch association');
+ $share=branch_share_create($db,$owner,['branch_id'=>$branch['id']])['share'];$selection=branch_share_create($db,$owner,['pallet_ids'=>json_encode([(int)$p['id']]),'title'=>'Seleccion'])['share'];
+ stock_query($db,'UPDATE pallets SET description=? WHERE id=?',['Pasillo 3',$p['id']]);
+ $public=branch_public($db,$share['token']);branch_check(count($public['pallets'])===1&&$public['pallets'][0]['description']==='Pasillo 3','Public descriptions');branch_check(!isset($public['branch']['owner_id'])&&!isset($public['pallets'][0]['owner_id']),'Private fields');branch_check(branch_public($db,$selection['token'])['pallets'][0]['branch']['description']==='Entrada lateral','Selected branch information');
+ $new=stock_claim($db,stock_generate($db,$owner)['code'],$owner);stock_save_product($db,$owner,['pallet_id'=>$new['id'],'ean'=>'96385074','amount'=>3,'expires'=>'']);branch_assign($db,$owner,['pallet_id'=>$new['id'],'branch_id'=>$branch['id'],'revision'=>stock_detail($db,$new['code'],$owner)['revision']]);
+ branch_check(count(branch_public($db,$share['token'])['pallets'])===2,'Live branch includes future pallets');branch_check(count(branch_public($db,$selection['token'])['pallets'])===1,'Selection fixed');
+ $foreign=stock_claim($db,stock_generate($db,$other)['code'],$other);stock_save_product($db,$other,['pallet_id'=>$foreign['id'],'ean'=>'96385074','amount'=>1,'expires'=>'']);branch_denied(fn()=>branch_share_create($db,$owner,['pallet_ids'=>json_encode([(int)$foreign['id']])]),403);
+ stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$p['id']]);stock_expire($db);$reused=stock_claim($db,$p['code'],$other);stock_save_product($db,$other,['pallet_id'=>$reused['id'],'ean'=>'96385074','amount'=>1,'expires'=>'']);branch_check(count(branch_public($db,$selection['token'])['pallets'])===0,'Reused code cannot leak another pallet');
+ branch_denied(fn()=>branch_save($db,$owner,[...$input,'id'=>$branch['id'],'revision'=>0]),409);
+ $branch=branch_save($db,$owner,[...$input,'id'=>$branch['id'],'revision'=>1,'name'=>'Sucursal editada'])['branch'];branch_check(branch_public($db,$share['token'])['title']==='Sucursal editada','Live branch metadata');
+ branch_delete($db,$owner,['id'=>$branch['id'],'revision'=>$branch['revision']]);branch_denied(fn()=>branch_public($db,$share['token']),404);branch_check(stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$new['id']])->fetchColumn()===null,'Delete preserves pallets');
+ for($i=0;$i<22;$i++){$more=stock_claim($db,stock_generate($db,$owner)['code'],$owner);stock_save_product($db,$owner,['pallet_id'=>$more['id'],'ean'=>'96385074','amount'=>1,'expires'=>'']);$allIds[]=(int)$more['id'];}
+ $paged=branch_share_create($db,$owner,['pallet_ids'=>json_encode($allIds)])['share'];$page1=branch_public($db,$paged['token']);$page2=branch_public($db,$paged['token'],1);branch_check(count($page1['pallets'])===20&&$page1['has_more']&&count($page2['pallets'])===2&&!$page2['has_more'],'Public pagination');
+ $db->rollBack();echo "OK: migration16, private branches, owner-only assignment, live sharing, selected IDs, conflicts, deletion, pagination and code reuse.\n";
+}catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}

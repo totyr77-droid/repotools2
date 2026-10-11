@@ -1,0 +1,40 @@
+.stock-branches { margin:20px 0; }
+.stock-branches details { border-bottom:1px solid #e1e5ed; margin-bottom:12px; padding-bottom:10px; }
+.stock-branches summary { display:flex; align-items:center; gap:8px; cursor:pointer; list-style:none; color:#27187e; font-weight:600; padding:8px 0; }
+.stock-branches summary::-webkit-details-marker { display:none; }
+.stock-branches summary svg { width:20px;height:20px;flex-shrink:0; }
+.stock-branches summary svg:last-child { margin-left:auto;transition:transform .18s; }
+.stock-branches details[open]>summary svg:last-child { transform:rotate(180deg); }
+.branch-toolbar { display:flex; align-items:center; gap:10px; margin:12px 0; flex-wrap:wrap; }
+.branch-toolbar label { display:flex;align-items:center;gap:8px; flex:1;min-width:0;margin:0; }
+.branch-toolbar svg,.branch-pallet-info svg,.branch-card-name svg,.branch-dialog svg,.branch-public-pallet h2 svg,#publicStockShare h1 svg { width:20px;height:20px;flex-shrink:0; }
+.branch-toolbar input,.branch-toolbar select,.branch-dialog input,.branch-dialog select,.branch-dialog textarea { width:100%;min-width:0;box-sizing:border-box; padding:11px 12px; border:1px solid #dce1eb; border-radius:10px;background:white;color:#172033;font:inherit;min-height:44px; }
+.branch-toolbar button,.branch-dialog button,.branch-dialog a { display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px; }
+.branch-stock-filter select { max-width:400px; }
+.branch-row { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #edf0f5; }
+.branch-row>div:first-child { min-width:0;overflow-wrap:anywhere; }
+.branch-row small { display:block;color:#626b7a;font-size:.83rem;margin-top:3px;line-height:1.4; }
+.branch-actions { display:flex;gap:6px;flex-shrink:0; }
+.branch-actions .stock-icon { width:40px;min-height:40px;padding:9px;border-radius:10px; }
+.branch-dialog { width:min(520px,calc(100% - 24px));box-sizing:border-box;--dialog-padding-x:20px;--dialog-padding-y:20px;padding:20px; }
+.branch-dialog form { display:grid;gap:12px;margin:0; }
+.branch-dialog label { display:grid;gap:6px;font-size:.9rem;margin:0; }
+.branch-dialog label small { color:#626b7a; }
+.branch-dialog .library-dialog-heading h2 { display:flex;align-items:center;gap:8px; }
+.branch-form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+.branch-share-choices { max-height:42vh;overflow:auto; }
+.branch-share-choices label { display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #edf0f5;overflow-wrap:anywhere; }
+.branch-share-choices input { width:20px;height:20px;min-height:20px;flex-shrink:0;accent-color:#27187e; }
+.branch-pallet-info { display:flex;align-items:center;flex-wrap:wrap;gap:6px;color:#626b7a;font-size:.85rem;margin:8px 0 12px; }
+.branch-pallet-info small { flex-basis:100%; }
+.stock-pallet-card .branch-card-name { display:flex;gap:5px;align-items:center;color:#27187e; }
+.branch-card-name svg { width:15px;height:15px; }
+.branch-public-pallet { border-bottom:1px solid #dce1eb;padding:16px 0; }
+.branch-public-pallet h2,#publicStockShare h1 { display:flex;gap:8px;align-items:center; }
+.branch-public-pallet svg { width:20px;height:20px;vertical-align:middle;margin-right:6px; }
+.branch-public-pallet .stock-product { padding:10px 0; }
+.branch-public-pallet .stock-product p { margin:4px 0; }
+.stock-card[hidden],.branch-pallet-info[hidden] { display:none!important; }
+@media(max-width:600px) { .branch-row { flex-wrap:wrap; } .branch-actions { margin-left:auto; } .branch-stock-filter label { flex-basis:100%; } .branch-stock-filter select { max-width:none; } .branch-form-row { grid-template-columns:1fr; } }
+@media(max-width:768px) and (pointer:coarse) { body[data-hand="left"] .branch-row { flex-direction:row-reverse; } body[data-hand="left"] .branch-actions { margin-left:0;margin-right:auto; } body[data-hand="left"] .branch-row>div:first-child { text-align:right; } body[data-hand="left"] .branch-toolbar { flex-direction:row-reverse; } }
+@media(prefers-reduced-motion:reduce) { .stock-branches summary svg { transition:none; } }

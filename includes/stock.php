@@ -55,7 +55,8 @@ function stock_detail(PDO $db, string $code, ?int $user): array {
     foreach ($p['products'] as &$product) $product=stock_product_names($product);
     unset($product);
     if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
-    if (!$p['can_edit']) unset($p['description']);
+    if ($p['can_edit'] && $p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=? AND owner_id=?',[$p['branch_id'],$p['owner_id']])->fetch() ?: null;
+    if (!$p['can_edit']) unset($p['description'],$p['branch_id']);
     // Only names and product details are public; account identifiers/access are private.
     if (!$p['can_edit'] && !$p['pending_invitation']) unset($p['owner_id'],$p['updated_by']);
     return $p;
