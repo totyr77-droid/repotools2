@@ -5,7 +5,7 @@ include __DIR__ . '/vistas/header.vista.php';
 $moderationView = $navModerator && ($_GET['queue'] ?? '') === '1';
 ?>
 <main class="reports-main" data-report-view="<?= $moderationView ? 'queue' : 'own' ?>"><section class="reports-panel">
-  <div class="library-heading"><div><p class="app-resumen__eyebrow"><?= $moderationView ? 'Moderación' : 'Mi cuenta' ?></p><h1><?= $moderationView ? 'Reportes pendientes' : 'Mis reportes' ?></h1></div><a href="cuenta.php" class="library-secondary">Mi cuenta</a></div>
+  <div class="library-heading"><div><p class="app-resumen__eyebrow"><?= $moderationView ? 'Moderación' : 'Mi cuenta' ?></p><h1><?= $moderationView ? 'Reportes pendientes' : 'Mis reportes' ?></h1></div><?php if (!$moderationView): ?><a href="cuenta.php" class="library-secondary">Mi cuenta</a><?php endif; ?></div>
   <p id="reportActionStatus" class="library-status" role="status"></p><p id="reportsStatus" class="library-status" role="status"></p><div id="reportsList" class="reports-list"></div>
 </section></main>
 <dialog id="reviewReportDialog" class="library-dialog product-edit-dialog" aria-labelledby="reviewReportTitle">

@@ -10,6 +10,11 @@
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
+  function icon(container, type) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '1.8');
+    const path = document.createElementNS(svg.namespaceURI, 'path'); path.setAttribute('d', type === 'ean' ? 'M3 4v16m3-16v16m4-16v16m3-16v16m4-16v16m3-16v16' : type === 'user' ? 'M20 21v-2a6 6 0 0 0-12 0v2M18 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0' : 'M4 4l16 16M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'); svg.append(path); container.prepend(svg);
+  }
+  function badge(container, state) { const node = text('span', labels[state], container); node.className = 'report-badge report-badge-' + state; }
   function clearPhotos() { photos.forEach(url => URL.revokeObjectURL(url)); photos = []; }
   page?.onLeave(() => { ++version; ++listVersion; clearPhotos(); });
   async function load() {
@@ -21,7 +26,11 @@
       status.textContent = result.reports.length ? '' : (queue ? 'No hay reportes pendientes.' : 'Todavía no enviaste reportes.');
       for (const report of result.reports) {
         const card = document.createElement('article'); card.className = 'report-card';
-        text('h2', `#${report.id} · ${labels[report.status]}`, card); text('p', `EAN ${report.ean}`, card); text('p', report.description, card);
+        const info = document.createElement('div'); info.className = 'report-card-info'; card.append(info);
+        const heading = document.createElement('div'); heading.className = 'report-card-heading'; info.append(heading); text('h2', `#${report.id}`, heading); badge(heading, report.status);
+        const ean = text('p', report.ean, info); ean.className = 'report-inline'; ean.setAttribute('aria-label', 'EAN ' + report.ean); icon(ean, 'ean');
+        if (queue) { const sender = text('p', report.submitter_name || 'Invitado', info); sender.className = 'report-inline report-card-sender'; icon(sender, 'user'); }
+        else text('p', report.description, info);
         const button = text('button', queue ? 'Revisar' : 'Ver reporte', card); button.type = 'button'; button.className = 'library-secondary'; button.addEventListener('click', () => open(report.id)); list.append(card);
       }
       if (queue && result.blocked_reports?.length) {
@@ -38,29 +47,31 @@
     try {
       const result = await RepoReports.request('?id=' + id); if (attempt !== version || !dialog.open) return;
       active = result.report; csrf = result.csrf; document.getElementById('reviewReportTitle').textContent = `Reporte #${id}`;
-      message.textContent = labels[active.status];const barcode=document.createElementNS('http://www.w3.org/2000/svg','svg'),barcodeBox=document.createElement('figure');barcodeBox.className='report-barcode';barcode.setAttribute('role','img');barcode.setAttribute('aria-label','Código de barras '+active.ean);text('figcaption','EAN del reporte',barcodeBox);barcodeBox.append(barcode);details.append(barcodeBox);try{window.JsBarcode(barcode,active.ean,{format:active.ean.length===8?'EAN8':'EAN13',width:2,height:72,displayValue:true,fontSize:16,margin:12});}catch{barcode.remove();text('p','EAN '+active.ean,barcodeBox);} text('p', active.description);
+      message.replaceChildren(); badge(message, active.status);const barcode=document.createElementNS('http://www.w3.org/2000/svg','svg'),barcodeBox=document.createElement('figure');barcodeBox.className='report-barcode';barcode.setAttribute('role','img');barcode.setAttribute('aria-label','Código de barras '+active.ean);text('figcaption','EAN del reporte',barcodeBox);barcodeBox.append(barcode);details.append(barcodeBox);try{window.JsBarcode(barcode,active.ean,{format:active.ean.length===8?'EAN8':'EAN13',width:2,height:72,displayValue:true,fontSize:16,margin:12});}catch{barcode.remove();text('p','EAN '+active.ean,barcodeBox);} if (!/^Revisar las fotos adjuntas|^Correcci\u00f3n propuesta:|^Solicitud de alta de producto\./.test(active.description)) text('p', active.description);
       if (active.review_note) text('p', active.review_note);
       if (result.can_review && active.submitter) {
         const sender = active.submitter, section = document.createElement('section'); section.className = 'report-sender'; details.append(section);
-        text('h3', 'Enviado por', section); text('p', sender.name + (sender.company ? ` · ${sender.company}` : ''), section);
-        if (sender.email) text('p', sender.email, section);
-        text('p', `IP registrada: ${active.submitter_ip || 'No disponible'}`, section);
-        text('p', new Date(active.created_at).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' }), section);
+        const identity = text('p', sender.name, section); identity.className = 'report-inline'; identity.setAttribute('aria-label', 'Enviado por ' + sender.name); icon(identity, 'user');
+        const more = document.createElement('details'); more.className = 'report-sender-more'; section.append(more); text('summary', 'Datos', more);
+        if (sender.email) text('p', sender.email, more);
+        if (sender.company) text('p', sender.company, more);
+        text('p', `IP registrada: ${active.submitter_ip || 'No disponible'}`, more);
         if (sender.can_manage) {
-          const button = text('button', sender.blocked ? '↺ Habilitar reportes' : '⊘ Bloquear reportes', section); button.type = 'button'; button.className = 'library-secondary';
-          const hint = text('p', sender.blocked ? 'Esta cuenta no puede enviar nuevos reportes.' : 'El bloqueo solo afecta al envío de reportes.', section);
-          let confirm = false;
+          const button = text('button', sender.blocked ? 'Habilitar' : 'Bloquear', section); button.type = 'button'; button.className = 'library-secondary report-block-button'; icon(button, 'block');
+          const hint = text('p', '', section); hint.className = 'report-block-status'; hint.setAttribute('role', 'status');
           button.addEventListener('click', async () => {
             if (busy) return;
-            if (!confirm) { confirm = true; button.textContent = sender.blocked ? 'Confirmar habilitación' : 'Confirmar bloqueo'; return; }
+            const id = active.id, attempt = version;
+            if (!await window.RepoConfirm({ title: sender.blocked ? 'Habilitar reportes' : 'Bloquear reportes', message: sender.blocked ? `¿Permitir que ${sender.name} vuelva a enviar reportes?` : `¿Bloquear los reportes de ${sender.name}? Podrá seguir usando las demás funciones.`, confirmLabel: sender.blocked ? 'Habilitar' : 'Bloquear' })) return;
+            if (attempt !== version || !dialog.open || busy) return;
             busy = true; button.disabled = approve.disabled = reject.disabled = close.disabled = true;
             try {
-              const body = new FormData(); body.set('csrf', csrf); body.set('id', active.id); body.set('action', sender.blocked ? 'unblock_reports' : 'block_reports');
+              const body = new FormData(); body.set('csrf', csrf); body.set('id', id); body.set('action', sender.blocked ? 'unblock_reports' : 'block_reports');
               const response = await RepoReports.request('', body); sender.blocked = response.report.submitter.blocked;
               hint.textContent = sender.blocked ? 'Bloqueado. Esta cuenta no puede enviar nuevos reportes.' : 'Habilitado. Esta cuenta puede volver a enviar reportes.';
               await load();
             } catch (error) { hint.textContent = error.message; }
-            finally { busy = false; confirm = false; button.disabled = approve.disabled = reject.disabled = close.disabled = false; button.textContent = sender.blocked ? '↺ Habilitar reportes' : '⊘ Bloquear reportes'; }
+            finally { busy = false; button.disabled = approve.disabled = reject.disabled = close.disabled = false; button.textContent = sender.blocked ? 'Habilitar' : 'Bloquear'; icon(button, 'block'); }
           });
         }
       }
