@@ -27,8 +27,8 @@
 #reportPhotos:disabled .report-photo-actions button { opacity: .45; cursor: not-allowed; }
 #reportPhotosNote:not(:empty) { padding: 12px; border-radius: 10px; background: #fff5df; color: #76551c; }
 .report-photo-preview { display: block; width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; margin-top: 8px; }
-#reportCameraVideo { display: block; width: 100%; max-height: 55dvh; background: #172033; border-radius: 12px; object-fit: contain; }
-.report-camera-frame { position: relative; overflow: hidden; border-radius: 12px; }
+#reportCameraVideo { display: block; width: 100%; height: 100%; background: #172033; object-fit: cover; }
+.report-camera-frame { position: relative; overflow: hidden; border-radius: 12px; height: min(55dvh, 420px); }
 .report-camera-flash { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 48px; height: 48px; padding: 12px; border: 1px solid #ffffff59; border-radius: 50%; background: #f5f8ff29; color: white; box-shadow: inset 0 1px 0 #ffffff40,0 4px 16px #00000029; backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%); cursor: pointer; }
 .report-camera-flash svg { width: 22px; height: 22px; }
 .report-camera-flash[aria-pressed="true"] { background: #facc15; color: #172033; }
@@ -44,4 +44,18 @@
 .report-sender p { margin: 5px 0; font-size: .85rem; color: #626b7a; }
 .report-sender button { margin-top: 8px; min-height: 44px; }
 .report-sender summary { cursor: pointer; padding: 8px 0; }
+.report-comparison .report-current { background: #f3f5f8; border: 1px solid #e1e5ed; }
+.report-comparison .report-proposed { background: #f5f2ff; border: 1px solid #bfb3ed; }
+.report-current h3 { color: #526075; }
+.report-field { padding: 8px; margin-top: 6px; border-radius: 8px; }
+.report-field small { color: #626b7a; font-size: .75rem; }
+#reviewReportDetails .report-field p { margin: 3px 0 0; }
+.report-current .report-field-changed { background: #fff1df; border-left: 3px solid #c58932; }
+.report-proposed .report-field-changed { background: #e7f5ed; border-left: 3px solid #278450; }
+.report-proposed .report-field-changed small { color: #216b43; font-weight: 600; }
+.report-photo-evidence { overflow: hidden; border: 1px solid #e1e5ed; border-radius: 12px; background: #fff; }
+.report-photo-evidence > figcaption { padding: 10px 12px; font-size: .8rem; color: #626b7a; }
+#reviewReportDetails .report-barcode-attached { margin: 0; padding: 8px 12px; border: 0; border-bottom: 1px solid #e1e5ed; border-radius: 0; }
+.report-barcode-attached figcaption { display: none; }
+.report-photo-evidence .report-evidence { margin: 0; }
 @media (max-width: 480px) { .reports-panel { padding: 16px; } .report-comparison { grid-template-columns: 1fr; } }

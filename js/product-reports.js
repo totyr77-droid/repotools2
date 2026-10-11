@@ -66,9 +66,16 @@
     cameraStatus.textContent = 'Abriendo cámara…'; retryCamera.hidden = true; if (!camera.open) camera.showModal();
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
-      const next = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } } });
+      const next = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, zoom: { ideal: 1 }, width: { ideal: 1280 }, height: { ideal: 960 } } });
       if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) { next.getTracks().forEach(track => track.stop()); return; }
-      stream = next; video.srcObject = next; await video.play();
+      stream = next;
+      const track = next.getVideoTracks()[0], capabilities = track?.getCapabilities?.();
+      if (capabilities?.zoom) {
+        const zoom = Math.min(capabilities.zoom.max, Math.max(1, capabilities.zoom.min));
+        try { await track.applyConstraints({ advanced: [{ zoom }] }); } catch {}
+      }
+      if (attempt !== cameraVersion || !camera.open) return;
+      video.srcObject = next; await video.play();
       if (attempt !== cameraVersion || !camera.open) return;
       flash.hidden=stream.getVideoTracks()[0]?.getCapabilities?.().torch!==true;flash.setAttribute('aria-label','Encender luz');flash.title='Encender luz';
       capture.disabled = !video.videoWidth || !video.videoHeight;
@@ -95,9 +102,11 @@
     if (!stream || capture.disabled || !video.videoWidth || !video.videoHeight) return;
     const attempt = cameraVersion, reportVersion = revision, kind = cameraKind; capture.disabled = true;
     try {
-      const scale = Math.min(1, 1280 / Math.max(video.videoWidth, video.videoHeight)); const canvas = document.createElement('canvas');
-      canvas.width = Math.max(1, Math.round(video.videoWidth * scale)); canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      const frame = video.getBoundingClientRect(), ratio = frame.width / frame.height;
+      const sourceWidth = Math.min(video.videoWidth, video.videoHeight * ratio), sourceHeight = sourceWidth / ratio;
+      const scale = Math.min(1, 1280 / Math.max(sourceWidth, sourceHeight)); const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(sourceWidth * scale)); canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+      canvas.getContext('2d').drawImage(video, (video.videoWidth - sourceWidth) / 2, (video.videoHeight - sourceHeight) / 2, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
       if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) return;
       if (!blob || blob.size > 1024 * 1024) throw new Error('No pudimos guardar la foto. Intenta otra vez.');

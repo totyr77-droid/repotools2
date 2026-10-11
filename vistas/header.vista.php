@@ -31,7 +31,7 @@ if (current_user()) {
     <link href="css/contador.css" rel="stylesheet" type="text/css">
     <link href="css/mobile.css" rel="stylesheet" type="text/css">
     <link href="css/footer.css" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-abuse1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-review3" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/product-info.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261010-result2" rel="stylesheet" type="text/css"><?php endif; ?>

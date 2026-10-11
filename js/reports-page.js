@@ -65,15 +65,20 @@
         }
       }
       const comparison = document.createElement('div'); comparison.className = 'report-comparison'; details.append(comparison);
-      for (const [heading, product] of [['Ficha actual', active.current], ['Propuesta', active.proposed]]) {
-        const section = document.createElement('section'); text('h3', heading, section);
-        for (const [key, label] of Object.entries(fields)) if (product?.[key]) text('p', `${label}: ${product[key]}`, section);
+      const changed = Object.keys(fields).filter(key => (active.current?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
+      for (const [heading, product, proposed] of [['Ficha actual', active.current, false], ['Propuesta', active.proposed, true]]) {
+        const section = document.createElement('section'); section.className = proposed ? 'report-proposed' : 'report-current'; text('h3', heading, section);
+        if (proposed) text('small', changed.length ? `${changed.length} ${changed.length === 1 ? 'dato modificado' : 'datos modificados'}` : 'Sin cambios en los datos', section);
+        for (const [key, label] of Object.entries(fields)) if (product?.[key] || changed.includes(key)) {
+          const row = document.createElement('div'); row.className = 'report-field' + (changed.includes(key) ? ' report-field-changed' : ''); section.append(row);
+          text('small', label + (proposed && changed.includes(key) ? ' · Modificado' : ''), row); text('p', product?.[key] || 'Sin datos', row);
+        }
         if (!product || !Object.keys(fields).some(key => product[key])) text('p', 'Sin datos.', section);
         comparison.append(section);
       }
       for (const kind of active.photos) {
-        if(kind==='ean')details.append(barcodeBox);
-        const wrapper = document.createElement('figure'); text('figcaption', kind === 'ean' ? 'Foto del EAN' : 'Foto del producto', wrapper); details.append(wrapper);
+        const wrapper = document.createElement('figure'); wrapper.className = 'report-photo-evidence'; text('figcaption', kind === 'ean' ? 'Foto del EAN' : 'Foto del producto', wrapper); details.append(wrapper);
+        if (kind === 'ean') { barcodeBox.classList.add('report-barcode-attached'); wrapper.append(barcodeBox); }
         const hint = text('p', 'Cargando foto…', wrapper);
         RepoReports.photo(id, kind).then(url => {
           if (attempt !== version || !dialog.open) { URL.revokeObjectURL(url); return; }
