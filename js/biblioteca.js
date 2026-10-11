@@ -105,6 +105,7 @@
       const code = document.createElement('p'); code.className = 'library-product-code';
       code.append(barcodeIcon(), document.createTextNode(product.ean));
       const description = document.createElement('div'); description.className = 'library-product-description'; description.append(title, code);
+      if (product.reference_name && product.catalog_name && product.catalog_name !== product.name) { const catalog=document.createElement('p');catalog.className='library-catalog-name';catalog.textContent=product.catalog_name;description.insertBefore(catalog,code); }
       const actions = document.createElement('div'); actions.className = 'library-product-actions';
       const view = button('', 'library-primary library-view-code', () => {
         viewerId = Number(library.id); viewerIndex = index;
@@ -136,6 +137,8 @@
       option.selected = Number(l.id) === viewerId; selector.append(option);
     });
     get('eanProductName').textContent = product.name || 'Producto sin nombre';
+    get('eanCatalogName').textContent=product.catalog_name||'';
+    get('eanCatalogName').hidden=!product.reference_name||!product.catalog_name||product.catalog_name===product.name;
     get('eanValue').textContent = product.ean;
     get('eanPosition').textContent = `${viewerIndex + 1} de ${library.products.length}`;
     get('librarySwipeHint').hidden = library.products.length < 2;

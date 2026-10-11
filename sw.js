@@ -1,4 +1,4 @@
-const CACHE='repotools-shell-v2';
+const CACHE='repotools-shell-v3';
 const ASSETS=['offline.html','css/offline.css','js/offline-page.js','js/stock-offline.js','js/stock-utils.js','js/vendor/html5-qrcode-2.3.8.min.js','js/vendor/quagga-1.12.1.min.js','js/ean-scanner.js','js/dialog-scroll.js','css/ean-scanner.css'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('repotools-shell-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

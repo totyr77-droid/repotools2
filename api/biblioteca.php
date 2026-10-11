@@ -87,12 +87,11 @@ try {
     $stmt->execute([$userId]);
     $products = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $product) {
-        if (trim((string) $product['name']) === '') {
-            $name = trim((string) ($product['catalog_name'] ?? '')); $brand = trim((string) ($product['catalog_brand'] ?? ''));
-            if ($brand !== '' && mb_stripos($name, $brand) === false) $name = trim($brand . ' ' . $name);
-            $product['name'] = trim($name . ' ' . trim((string) ($product['catalog_quantity'] ?? '')));
-        }
-        $products[$product['library_id']][] = ['ean' => $product['ean'], 'name' => $product['name']];
+        $reference = trim((string) $product['name']);
+        $name = trim((string) ($product['catalog_name'] ?? '')); $brand = trim((string) ($product['catalog_brand'] ?? ''));
+        if ($brand !== '' && mb_stripos($name, $brand) === false) $name = trim($brand . ' ' . $name);
+        $catalogName = trim($name . ' ' . trim((string) ($product['catalog_quantity'] ?? '')));
+        $products[$product['library_id']][] = ['ean' => $product['ean'], 'name' => $reference !== '' ? $reference : $catalogName, 'reference_name' => $reference, 'catalog_name' => $catalogName];
     }
     foreach ($libraries as &$library) {
         $library['products'] = $products[$library['id']] ?? [];
