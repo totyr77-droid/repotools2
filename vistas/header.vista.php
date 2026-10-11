@@ -54,7 +54,8 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261010-compact1" rel="stylesheet" type="text/css"><?php endif; ?>
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-profile2" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet"><?php endif; ?>
-<link href="css/hand-preferences.css?v=20261011-hand-account8" rel="stylesheet">
+<link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
+<link href="css/title-icons.css?v=20261011-icons1" rel="stylesheet">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
@@ -66,7 +67,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK<span class="stock-nav-expiry" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-shield-halved"></i>MODERACIÓN <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
-          <a href="cuenta.php"><i class="fa-solid <?= current_user() ? 'fa-gear' : 'fa-user' ?>"></i><?= current_user() ? 'AJUSTES' : 'INGRESAR' ?></a>
+          <a href="cuenta.php"><i class="fa-solid <?= current_user() ? 'fa-gear' : 'fa-user' ?>"></i><?= current_user() ? 'AJUSTES' : 'INGRESAR' ?><?php if (current_user()): ?><span class="profile-pending-dot" data-profile-pending aria-label="Perfil por completar"<?= $userHand !== '' ? ' hidden' : '' ?>></span><?php endif; ?></a>
         </nav>
 
         <nav class="nav-celular" id="nav-celular" aria-label="Navegación móvil">
@@ -74,7 +75,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
           <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK<span class="stock-nav-expiry" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-shield-halved"></i>MODERACIÓN <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
-          <a href="cuenta.php"><i class="fa-solid <?= current_user() ? 'fa-gear' : 'fa-user' ?>"></i><?= current_user() ? 'AJUSTES' : 'INGRESAR' ?></a>
+          <a href="cuenta.php"><i class="fa-solid <?= current_user() ? 'fa-gear' : 'fa-user' ?>"></i><?= current_user() ? 'AJUSTES' : 'INGRESAR' ?><?php if (current_user()): ?><span class="profile-pending-dot" data-profile-pending aria-label="Perfil por completar"<?= $userHand !== '' ? ' hidden' : '' ?>></span><?php endif; ?></a>
         </nav>
 
         <?php if (current_user()): ?>
@@ -98,4 +99,3 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <div class="account-bar"><span class="account-greeting" title="Hola, <?= escape(current_user()['name']) ?>">Hola, <strong><?= escape(current_user()['name']) ?></strong><?php if (isset($roleLabels[$navRole])): $badge = $roleLabels[$navRole]; ?><span class="account-role account-role-<?= escape($navRole) ?>" title="<?= escape($badge[1]) ?>" aria-label="<?= escape($badge[1]) ?>"><i class="fa-solid <?= escape($badge[2]) ?>" aria-hidden="true"></i><?= escape($badge[0]) ?></span><?php endif; ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/></svg><span>Salir</span></button></form></div>
     <?php endif; ?>
 
-<?php if (current_user() && $userHand === ''): ?><aside class="profile-pending" data-profile-pending role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3h.01"/></svg><span>Tienes información por completar en tu perfil.</span><a href="cuenta.php#handPreferences">Completar <span aria-hidden="true">→</span></a></aside><?php endif; ?>

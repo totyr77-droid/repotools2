@@ -26,3 +26,5 @@ body[data-hand=left] #cartelScaner .resultado-box:has(.product-summary-quantity)
 body[data-hand=left] #cartelScaner .resultado-box:has(.product-summary-quantity) .resultado-title{justify-content:flex-end}
 }
 @media(max-width:768px){.profile-pending{margin:8px 12px}.profile-pending a{white-space:nowrap}}
+
+.profile-pending-dot{display:inline-block;width:8px;height:8px;min-width:8px;border-radius:50%;background:#e5ad26;box-shadow:0 0 0 2px #fff2ca;vertical-align:middle;margin-left:6px;flex-shrink:0}.profile-pending-dot[hidden]{display:none}.nav-celular a:has(.profile-pending-dot){position:relative}.nav-celular a>.profile-pending-dot{position:absolute;top:7px;right:8px;margin:0}.home-page .contenedor-main>.profile-pending{grid-column:1/-1;width:100%;max-width:none;margin:0 0 12px}.hand-preferences:has(.profile-pending-dot:not([hidden])){border:1px solid #f0d68d;border-radius:12px;background:#fff7dd;padding:14px}.hand-preferences:has(.profile-pending-dot:not([hidden])) h2{color:#705315}

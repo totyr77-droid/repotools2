@@ -65,11 +65,12 @@
 <script src="js/script.js?v=20261011-summary1"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>
 <?php endif; ?>
+<script src="js/title-icons.js?v=20261011-icons1"></script>
 <script src="js/botones.js?v=20261011-password1"></script>
 <script src="js/report-notifications.js?v=20261011-pendingcounts1"></script>
 <script src="js/notifications.js?v=20261011-stock1"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261010-stock13"></script><script src="js/account-edit.js?v=20261011-dialog2"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-qr2"></script><?php endif; ?>
-<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-autohand1"></script><?php endif; ?>
+<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-alert2"></script><?php endif; ?>
 </body>
 </html>
