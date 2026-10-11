@@ -63,6 +63,8 @@
     if (busy || !active || document.getElementById('reportPhotos').disabled || !['ean', 'product'].includes(kind)) return;
     stopCamera(); cameraKind = kind; const attempt = cameraVersion, reportVersion = revision;
     document.getElementById('reportCameraTitle').textContent = kind === 'ean' ? 'Foto del EAN' : 'Foto del producto';
+    camera.dataset.photoKind = kind;
+    document.getElementById('reportEanGuide').hidden = kind !== 'ean';
     cameraStatus.textContent = 'Abriendo cámara…'; retryCamera.hidden = true; if (!camera.open) camera.showModal();
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
@@ -79,7 +81,7 @@
       if (attempt !== cameraVersion || !camera.open) return;
       flash.hidden=stream.getVideoTracks()[0]?.getCapabilities?.().torch!==true;flash.setAttribute('aria-label','Encender luz');flash.title='Encender luz';
       capture.disabled = !video.videoWidth || !video.videoHeight;
-      cameraStatus.textContent = kind === 'ean' ? 'Enfoca el código completo.' : 'Enfoca el frente del producto.';
+      cameraStatus.textContent = kind === 'ean' ? 'Alinea el código horizontal dentro del marco, incluidos los números.' : 'Enfoca el frente del producto.';
     } catch (error) {
       if (attempt !== cameraVersion || !camera.open) return;
       stopCamera(); retryCamera.hidden = false;
@@ -103,10 +105,17 @@
     const attempt = cameraVersion, reportVersion = revision, kind = cameraKind; capture.disabled = true;
     try {
       const frame = video.getBoundingClientRect(), ratio = frame.width / frame.height;
-      const sourceWidth = Math.min(video.videoWidth, video.videoHeight * ratio), sourceHeight = sourceWidth / ratio;
+      let sourceWidth = Math.min(video.videoWidth, video.videoHeight * ratio), sourceHeight = sourceWidth / ratio;
+      let sourceX = (video.videoWidth - sourceWidth) / 2, sourceY = (video.videoHeight - sourceHeight) / 2;
+      if (kind === 'ean') {
+        const guide = document.getElementById('reportEanGuide').getBoundingClientRect();
+        sourceX += (guide.left - frame.left) / frame.width * sourceWidth;
+        sourceY += (guide.top - frame.top) / frame.height * sourceHeight;
+        sourceWidth *= guide.width / frame.width; sourceHeight *= guide.height / frame.height;
+      }
       const scale = Math.min(1, 1280 / Math.max(sourceWidth, sourceHeight)); const canvas = document.createElement('canvas');
       canvas.width = Math.max(1, Math.round(sourceWidth * scale)); canvas.height = Math.max(1, Math.round(sourceHeight * scale));
-      canvas.getContext('2d').drawImage(video, (video.videoWidth - sourceWidth) / 2, (video.videoHeight - sourceHeight) / 2, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
+      canvas.getContext('2d').drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
       if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) return;
       if (!blob || blob.size > 1024 * 1024) throw new Error('No pudimos guardar la foto. Intenta otra vez.');

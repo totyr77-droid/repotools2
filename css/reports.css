@@ -1,5 +1,5 @@
 .reports-main { padding: 24px 16px; flex: 1; }
-.reports-panel { max-width: 840px; margin: auto; padding: 24px; background: #fff; border-radius: 16px; color: #172033; }
+.reports-panel { width: min(1200px,100%); box-sizing: border-box; margin: auto; padding: 24px; background: #fff; border-radius: 16px; color: #172033; }
 .reports-panel h1 { font-size: 1.5rem; color: #27187e; }
 .reports-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
 .reports-tabs [aria-pressed="true"] { background: #27187e; color: #fff; }
@@ -94,3 +94,11 @@
 #reviewReportForm label { margin-top: 8px; font-size: .85rem; }
 #reviewReportForm input, #reviewReportForm textarea { padding: 9px 10px; }
 #reviewReportDetails figure { margin: 10px 0; }
+.report-ean-guide { position: absolute; width: 88%; aspect-ratio: 2.4; box-sizing: border-box; left: 50%; top: 50%; transform: translate(-50%,-50%); border: 2px solid #fff; border-radius: 10px; box-shadow: 0 0 0 100vmax #0007; pointer-events: none; }
+.report-ean-guide-numbers { position: absolute; left: 0; right: 0; bottom: -32px; color: #fff; text-shadow: 0 1px 3px #000; text-align: center; font-size: .75rem; }
+#reportCameraDialog[data-photo-kind="ean"] .report-camera-flash { top: 12px; transform: none; }
+#reviewReportDialog .library-heading h2 { font-size: 1.25rem; }
+.report-comparison h3 { font-size: 1rem; }
+#reviewReportDetails .report-field p { font-size: .95rem; }
+#reviewReportForm label { font-size: .95rem; }
+.report-card p { font-size: .9rem; }
