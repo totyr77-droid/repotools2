@@ -28,4 +28,15 @@
 #reportPhotosNote:not(:empty) { padding: 12px; border-radius: 10px; background: #fff5df; color: #76551c; }
 .report-photo-preview { display: block; width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; margin-top: 8px; }
 #reportCameraVideo { display: block; width: 100%; max-height: 55dvh; background: #172033; border-radius: 12px; object-fit: contain; }
+.report-camera-frame { position: relative; overflow: hidden; border-radius: 12px; }
+.report-camera-flash { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 48px; height: 48px; padding: 12px; border: 1px solid #ffffff59; border-radius: 50%; background: #f5f8ff29; color: white; box-shadow: inset 0 1px 0 #ffffff40,0 4px 16px #00000029; backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%); cursor: pointer; }
+.report-camera-flash svg { width: 22px; height: 22px; }
+.report-camera-flash[aria-pressed="true"] { background: #facc15; color: #172033; }
+.report-barcode { background: white; border: 1px solid #e1e5ed; border-radius: 12px; padding: 12px; text-align: center; }
+.report-barcode figcaption { color: #626b7a; font-size: .8rem; margin-bottom: 8px; }
+.report-barcode svg { display: block; width: 100%; height: auto; max-height: 120px; }
+#reviewReportForm .library-dialog-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
+#reviewReportForm .library-dialog-actions svg { width: 18px; height: 18px; flex-shrink: 0; }
+#rejectReport { background: #c92a38; color: white; }
+#reviewReportDetails figure.report-barcode { margin-top: 0; }
 @media (max-width: 480px) { .reports-panel { padding: 16px; } .report-comparison { grid-template-columns: 1fr; } }

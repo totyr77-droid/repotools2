@@ -11,7 +11,7 @@
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
   function clearPhotos() { photos.forEach(url => URL.revokeObjectURL(url)); photos = []; }
-  page?.onLeave(() => { ++version; clearPhotos(); });
+  page?.onLeave(() => { ++version; ++listVersion; clearPhotos(); });
   async function load() {
     const attempt = ++listVersion; status.textContent = 'Cargando…'; list.replaceChildren();
     try {
@@ -31,7 +31,7 @@
     try {
       const result = await RepoReports.request('?id=' + id); if (attempt !== version || !dialog.open) return;
       active = result.report; csrf = result.csrf; document.getElementById('reviewReportTitle').textContent = `Reporte #${id}`;
-      message.textContent = labels[active.status]; text('p', `EAN ${active.ean}`); text('p', active.description);
+      message.textContent = labels[active.status];const barcode=document.createElementNS('http://www.w3.org/2000/svg','svg'),barcodeBox=document.createElement('figure');barcodeBox.className='report-barcode';barcode.setAttribute('role','img');barcode.setAttribute('aria-label','Código de barras '+active.ean);text('figcaption','EAN del reporte',barcodeBox);barcodeBox.append(barcode);details.append(barcodeBox);try{window.JsBarcode(barcode,active.ean,{format:active.ean.length===8?'EAN8':'EAN13',width:2,height:72,displayValue:true,fontSize:16,margin:12});}catch{barcode.remove();text('p','EAN '+active.ean,barcodeBox);} text('p', active.description);
       if (active.review_note) text('p', active.review_note);
       const comparison = document.createElement('div'); comparison.className = 'report-comparison'; details.append(comparison);
       for (const [heading, product] of [['Ficha actual', active.current], ['Propuesta', active.proposed]]) {
@@ -41,6 +41,7 @@
         comparison.append(section);
       }
       for (const kind of active.photos) {
+        if(kind==='ean')details.append(barcodeBox);
         const wrapper = document.createElement('figure'); text('figcaption', kind === 'ean' ? 'Foto del EAN' : 'Foto del producto', wrapper); details.append(wrapper);
         const hint = text('p', 'Cargando foto…', wrapper);
         RepoReports.photo(id, kind).then(url => {
@@ -60,7 +61,7 @@
     busy = true; approve.disabled = reject.disabled = close.disabled = true; message.textContent = 'Guardando…';
     try {
       const body = new FormData(form); body.set('action', 'review'); body.set('id', active.id); body.set('decision', decision); body.set('revision', active.current?.revision || 0); body.set('csrf', csrf);
-      const result = await RepoReports.request('', body); active = result.report; form.hidden = true; message.textContent = decision === 'approved' ? 'Aprobado. Producto actualizado.' : 'Reporte rechazado.'; window.dispatchEvent(new Event('repotools:reports-changed')); await load();
+      const result = await RepoReports.request('', body); active = result.report;form.hidden=true;const notice=document.getElementById('reportActionStatus');notice.textContent=decision==='approved'?'Aprobado. Producto actualizado.':'Reporte rechazado.';dialog.close(); window.dispatchEvent(new Event('repotools:reports-changed'));await load();list.querySelector('button')?.focus();
     } catch (error) { message.textContent = error.message + (error.status === 409 ? ' Cierra y abre el reporte para revisar los datos actuales.' : ''); }
     finally { busy = false; approve.disabled = reject.disabled = close.disabled = false; }
   }

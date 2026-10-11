@@ -45,11 +45,12 @@
   const send = document.getElementById('sendProductReport'); const close = document.getElementById('closeProductReport');
   const camera = document.getElementById('reportCameraDialog'), video = document.getElementById('reportCameraVideo');
   const cameraStatus = document.getElementById('reportCameraStatus'), capture = document.getElementById('captureReportPhoto'), retryCamera = document.getElementById('retryReportCamera');
+  const flash=document.getElementById('reportCameraFlash');let lightOn=false;
   const capturedPhotos = new Map(), previews = new Map();
   let cameraVersion = 0, cameraKind, stream;
   let revision = 0, active, busy = false;
   function stopCamera() {
-    ++cameraVersion; capture.disabled = true;
+    ++cameraVersion; capture.disabled = true;lightOn=false;flash.hidden=true;flash.disabled=false;flash.setAttribute('aria-pressed','false');
     stream?.getTracks().forEach(track => track.stop()); stream = null; video.srcObject = null;
   }
   function removePhoto(kind) {
@@ -69,6 +70,7 @@
       if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) { next.getTracks().forEach(track => track.stop()); return; }
       stream = next; video.srcObject = next; await video.play();
       if (attempt !== cameraVersion || !camera.open) return;
+      flash.hidden=stream.getVideoTracks()[0]?.getCapabilities?.().torch!==true;flash.setAttribute('aria-label','Encender luz');flash.title='Encender luz';
       capture.disabled = !video.videoWidth || !video.videoHeight;
       cameraStatus.textContent = kind === 'ean' ? 'Enfoca el código completo.' : 'Enfoca el frente del producto.';
     } catch (error) {
@@ -82,6 +84,7 @@
   document.getElementById('closeReportCamera').addEventListener('click', () => { stopCamera(); camera.close(); });
   camera.addEventListener('cancel', stopCamera);
   camera.addEventListener('close', () => { if (!camera.open) stopCamera(); });
+  flash.addEventListener('click',async()=>{const track=stream?.getVideoTracks()[0],attempt=cameraVersion;if(!track||flash.disabled)return;flash.disabled=true;try{const enabled=!lightOn,constraints=track.getConstraints?.()||{};await track.applyConstraints({...constraints,advanced:[{...Object.assign({},...(constraints.advanced||[])),torch:enabled}]});if(attempt!==cameraVersion||!camera.open)return;lightOn=track.getSettings?.().torch??enabled;flash.setAttribute('aria-pressed',String(lightOn));const label=lightOn?'Apagar luz':'Encender luz';flash.setAttribute('aria-label',label);flash.title=label;}catch{if(attempt===cameraVersion)cameraStatus.textContent='No pudimos cambiar la luz. Puedes tomar la foto igualmente.';}finally{if(attempt===cameraVersion)flash.disabled=false;}});
   retryCamera.addEventListener('click', () => openCamera(cameraKind));
   function cameraReady() {
     if (stream && camera.open && video.videoWidth && video.videoHeight) capture.disabled = false;
