@@ -14,6 +14,7 @@ function stock_icon(string $name): string {
         'user'=>'<circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/>',
         'clock'=>'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         'plus'=>'<path d="M12 4v16M4 12h16"/>',
+        'check'=>'<path d="m5 12 4 4 10-10"/>',
         'close'=>'<path d="m6 6 12 12M18 6 6 18"/>',
         'chevron'=>'<path d="m6 9 6 6 6-6"/>',
         'exit'=>'<path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/>',

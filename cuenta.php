@@ -79,11 +79,11 @@ include __DIR__ . '/vistas/header.vista.php';
   <section class="account-panel<?= current_user() ? ' account-panel-profile' : ' account-panel-auth' ?>">
     <?php if (current_user() && $error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
     <?php if (current_user()): ?>
-    <h1 class="account-title"><?= stock_icon('settings') ?>Configuración</h1>
-    <p>Hola, <?= escape(current_user()['name']) ?>.</p>
-    <p class="account-email"><?= escape(current_user()['email']) ?></p>
+    <div class="account-profile-heading"><h1 class="account-title"><?= stock_icon('settings') ?>Configuración</h1><p id="accountGreeting">Hola, <?= escape(current_user()['name']) ?>.</p></div>
+    <div class="account-profile-contact"><div class="account-mail-tools"><p class="account-email"><?= escape(current_user()['email']) ?></p><button id="editAccount" type="button" aria-label="Editar información de la cuenta" title="Editar información de la cuenta"><?= stock_icon('settings') ?></button></div><p id="accountCompany" class="account-company"<?= empty(current_user()['company']) ? ' hidden' : '' ?>><?= account_icon('company') ?><span><?= escape(current_user()['company'] ?? '') ?></span></p></div>
+    <dialog id="accountEditDialog" class="account-edit-dialog"><div class="account-edit-heading"><h2>Información de la cuenta</h2><button type="button" class="app-close" aria-label="Cerrar" title="Cerrar"><?= stock_icon('close') ?></button></div><form id="accountEditForm"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><label><span class="account-field-title"><?= account_icon('user') ?>Nombre</span><input name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Tu nombre" required value="<?= escape(current_user()['name']) ?>"></label><label><span class="account-field-title"><?= account_icon('company') ?>Empresa o agencia <small>(opcional)</small></span><input name="company" autocomplete="organization" maxlength="100" placeholder="Marca, empresa o agencia" value="<?= escape(current_user()['company'] ?? '') ?>"></label><p id="accountEditStatus" role="status"></p><button type="submit">Guardar cambios</button></form></dialog><p id="accountSavedStatus" class="account-saved-status" role="status" hidden><?= stock_icon('check') ?><span>Información actualizada.</span></p>
     <details id="myProfileQR" class="profile-qr"><summary><?= stock_icon('qr') ?>Mi QR de perfil<span class="profile-chevron"><?= stock_icon('chevron') ?></span></summary><div class="profile-qr-image"></div><p role="status"></p></details>
-    <?php if (!empty(current_user()['company'])): ?><p class="account-company"><?= account_icon('company') ?><?= escape(current_user()['company']) ?></p><?php endif; ?>
+
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
