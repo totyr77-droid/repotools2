@@ -22,7 +22,7 @@ try {
         $comparison = $_POST['action'] === 'read_all' ? '<=' : '=';
         $db->prepare("UPDATE notifications SET read_at = CURRENT_TIMESTAMP WHERE user_id = ? AND id {$comparison} ? AND read_at IS NULL")->execute([$userId, $id]);
     }
-    $stmt = $db->prepare('SELECT id, type, title, body, report_id, created_at, read_at FROM notifications WHERE user_id = ? ORDER BY id DESC LIMIT 40');
+    $stmt = $db->prepare('SELECT n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? ORDER BY n.id DESC LIMIT 40');
     $stmt->execute([$userId]); $items = $stmt->fetchAll();
     $stmt = $db->prepare('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read_at IS NULL');
     $stmt->execute([$userId]);

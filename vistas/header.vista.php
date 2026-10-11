@@ -38,7 +38,7 @@ if (current_user()) {
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
-    <link href="css/notifications.css" rel="stylesheet" type="text/css">
+    <link href="css/notifications.css?v=20261011-status1" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261010-stock13" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
