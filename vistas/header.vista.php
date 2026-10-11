@@ -50,7 +50,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261010-motion1" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261010" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=20261011-scanmeta2" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=20261011-scanmeta3" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261010-compact1" rel="stylesheet" type="text/css"><?php endif; ?>
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-profile1" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet"><?php endif; ?>
