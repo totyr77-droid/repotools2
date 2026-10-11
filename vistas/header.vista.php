@@ -45,7 +45,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <link href="css/notifications.css?v=20261011-roles1" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261011-registergray1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261011-offline1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261010-motion1" rel="stylesheet" type="text/css">

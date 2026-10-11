@@ -48,6 +48,8 @@
 #palletDialog > .library-heading > div { min-width: 0; }
 .stock-scanner-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
 .stock-palets-block { padding: 20px; border: 1px solid #e1e5ed; border-radius: 16px; background: white; }
+.stock-offline{margin:12px 0;padding:12px;border:1px solid #ead69e;border-radius:12px;background:#fff8e6;color:#735511}.stock-offline[hidden]{display:none}.stock-offline .stock-toolbar{justify-content:space-between;flex-wrap:wrap;gap:8px}.stock-offline p{margin:0}.stock-offline-row{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0;border-top:1px solid #ead69e;font-size:.85rem}.stock-offline-row strong,.stock-offline-row small{width:100%;overflow-wrap:anywhere}.stock-offline-row button{min-height:44px;font-size:.8rem}
+.stock-offline svg{width:18px;height:18px;flex-shrink:0}.stock-offline-row button{display:inline-flex;align-items:center;gap:6px}
 .stock-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 4px; margin: 12px 0 20px; border-radius: 12px; background: #f0eef8; }
 .stock-tabs button { flex: 1; flex-shrink: 0; min-height: 44px; padding: 10px 12px; border-radius: 9px; color: #62577e; background: transparent; white-space: nowrap; cursor: pointer; }
 .stock-tabs button[aria-selected="true"] { background: #27187e; color: white; }

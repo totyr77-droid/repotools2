@@ -26,6 +26,7 @@ try {
         }
     } else {
         $key=$_POST['operation_key']??'';
+        if (isset($_POST['offline_owner']) && (int)$_POST['offline_owner']!==$uid) throw new CatalogException('Esta carga pertenece a otra cuenta. Inicia sesión con la cuenta original.',403);
         if (!is_string($key)||!preg_match('/^[a-f0-9-]{36}$/D',$key)) throw new CatalogException('Recarga el formulario e intenta nuevamente.',422);
         $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
         if ($cached!==false) { $db->commit(); stock_response(200,json_decode($cached,true)); }
@@ -36,7 +37,14 @@ try {
                 if (!$count) throw new CatalogException('Elige entre 1 y 100 etiquetas.',422);
                 $result['labels']=[]; for($i=0;$i<$count;$i++) $result['labels'][]=stock_generate($db,$uid); break;
             case 'claim': $result=stock_claim($db,(string)($_POST['code']??''),$uid); break;
-            case 'save_product': $result=stock_save_product($db,$uid,$_POST); break;
+            case 'save_product':
+                if (isset($_POST['offline_revision'])) {
+                    $current=stock_editable($db,$id,$uid);
+                    if ($current['code']!==($_POST['code']??'') || (int)$current['revision']!==(int)$_POST['offline_revision']) throw new CatalogException('El palet cambió desde tu última consulta. Revisa la carga pendiente antes de enviarla.',409);
+                }
+                $result=stock_save_product($db,$uid,$_POST);
+                $result['pallet_revision']=(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$id])->fetchColumn();
+                break;
             case 'import':
                 $products=json_decode(is_string($_POST['products']??null)?$_POST['products']:'',true);
                 if (!is_array($products)||count($products)>500) throw new CatalogException('No pudimos leer este palet del dispositivo.',422);
@@ -97,6 +105,6 @@ try {
         }
         $result['ok']=true; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }
-    $db->commit(); $result['csrf']=$csrf; stock_response(200,$result);
+    $db->commit(); $result['csrf']=$csrf; $result['user_id']=$uid; stock_response(200,$result);
 } catch(CatalogException $error) { if($db?->inTransaction())$db->rollBack(); stock_response($error->status,['error'=>$error->getMessage()]); }
 catch(Throwable $error) { if($db?->inTransaction())$db->rollBack(); error_log('Repotools stock error: '.get_class($error).' code='.$error->getCode()); stock_response(503,['error'=>'No pudimos guardar el palet. Tu formulario sigue disponible para reintentar.']); }

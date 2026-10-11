@@ -28,10 +28,18 @@ async function post(request,csrf,data,key=randomUUID()){const r=await request('a
  const productKey=randomUUID();assert.equal((await post(a,csrfA,product,productKey)).status,200);assert.equal((await post(a,csrfA,product,productKey)).status,200);let detail=(await a('api/stock.php?code='+code)).json().pallet;assert.equal(detail.products[0].units,40);
  assert.equal((await guest('api/stock.php?ean=96385074')).status,401);assert.equal((await b('api/stock.php?ean=96385074')).json().references[0].pack_size,5);assert.equal((await b('api/stock.php?ean=55007732')).status,422);
  assert.equal(Number((await a('api/stock.php')).json().pallets.find(p=>p.code===code).expiry_count),1);assert.equal((await a('api/notificaciones.php')).json().has_expiring_stock,true);await post(a,csrfA,{action:'preferences',expiry_days:29});assert.equal(Number((await a('api/stock.php')).json().pallets.find(p=>p.code===code).expiry_count),0);assert.equal((await a('api/notificaciones.php')).json().has_expiring_stock,false);await post(a,csrfA,{action:'preferences',expiry_days:30});
+ const offlineBase=(await a('api/stock.php?code='+code)).json().pallet.revision;
+ const offlineLoad={...product,code,amount:1,kind:'units',offline_owner:1,offline_revision:offlineBase};
+ assert.equal((await post(b,csrfB,offlineLoad)).status,403);
+ assert.equal((await post(a,csrfA,{...offlineLoad,offline_revision:offlineBase-1})).status,409);
+ const offlineKey=randomUUID(),offlineSaved=await post(a,csrfA,offlineLoad,offlineKey);assert.equal(offlineSaved.status,200,offlineSaved.text);assert.equal(offlineSaved.json().pallet_revision,offlineBase+1);
+ assert.equal((await post(a,csrfA,offlineLoad,offlineKey)).status,200);
+ assert.equal((await a('api/stock.php?code='+code)).json().pallet.products[0].units,41);
+ assert.equal((await post(a,csrfA,offlineLoad)).status,409);
  const raced=await post(b,csrfB,{...product,pallet_id:0,code});assert.equal(raced.status,200,raced.text);assert.equal(raced.json().relocated,true);assert.notEqual(raced.json().code,code);assert.equal((await b('api/stock.php?code='+raced.json().code)).json().pallet.products[0].units,40);
  assert.equal((await post(a,csrfA,{action:'invite',pallet_id:id,email:'Pedro@example.invalid'.toLowerCase()})).status,200);const invited=(await b('api/notificaciones.php')).json();assert.ok(invited.notifications.some(n=>n.type==='stock_invitation'));
  assert.equal((await post(b,csrfB,{...product,pallet_id:id})).status,403);assert.equal((await post(b,csrfB,{action:'accept',pallet_id:id})).status,200);assert.equal((await post(b,csrfB,{...product,amount:2,kind:'units'})).status,200);
- assert.equal((await b('api/stock.php?code='+code)).json().pallet.description,'Ubicacion privada');detail=(await a('api/stock.php?code='+code)).json().pallet;assert.equal(detail.products[0].units,42);assert.equal((await post(b,csrfB,{action:'invite',pallet_id:id,email:'Juan@example.invalid'.toLowerCase()})).status,403);assert.equal((await b('etiqueta.php?codigo='+code)).status,200);
+ assert.equal((await b('api/stock.php?code='+code)).json().pallet.description,'Ubicacion privada');detail=(await a('api/stock.php?code='+code)).json().pallet;assert.equal(detail.products[0].units,43);assert.equal((await post(b,csrfB,{action:'invite',pallet_id:id,email:'Juan@example.invalid'.toLowerCase()})).status,403);assert.equal((await b('etiqueta.php?codigo='+code)).status,200);
  assert.equal((await post(b,csrfB,{action:'leave',pallet_id:id})).status,200);assert.equal((await post(b,csrfB,product)).status,403);
  const admin=client(),csrfAdmin=await register(admin,'Admin');
  function adminRole(role){const r=spawnSync('C:/xampp/php/php.exe',['-r',"require 'includes/database.php'; database()->prepare('UPDATE users SET role=? WHERE email=?')->execute([$argv[1],'admin@example.invalid']);",role],{env,encoding:'utf8'});assert.equal(r.status,0,r.stderr);}

@@ -16,7 +16,13 @@ Alcance inicial acordado: guardar nuevas cargas temporalmente en el dispositivo 
 - Si hubo modificaciones simultáneas, mostrar el conflicto antes de aplicar un cambio.
 - Reclamar o crear palets, gestionar permisos y moderar reportes requerirá conexión en la primera versión.
 
-Pendiente de diseño técnico: almacenamiento local, límites y limpieza de datos por cuenta, recuperación de cargas pendientes y tratamiento de cambios de sesión. No confundir «guardado en este dispositivo» con «sincronizado».
+Primera entrega implementada en Stock: cargas nuevas en palets existentes y previamente abiertos, con cantidad y vencimiento. IndexedDB conserva la cola por cuenta (hasta 200 cargas); las consultas recientes de hasta 50 palets por cuenta se conservan durante 7 días, sin los correos de los invitados. La cola no caduca automáticamente. Se distingue «guardado en este dispositivo» de «enviado» y se permite descartar con confirmación.
+
+Al recuperar conexión, o entrar nuevamente a Stock, se envían las cargas con su identificador original, renovando CSRF y comprobando la cuenta. La API vuelve a validar permisos y versión del palet dentro de la transacción: cambios externos se detienen para revisión explícita. Los reintentos tras perder la confirmación no suman unidades nuevamente. Las pestañas con Web Locks coordinan envío, revisión y descarte. Si el navegador no ofrece almacenamiento, se mantiene el formulario y no se declara éxito.
+
+Alcance pendiente: abrir la web desde cero o recargarla sin conexión (no hay un service worker nuevo); se debe abrir Stock con conexión antes de trabajar sin señal. No hay edición offline, reclamación/creación de palets offline, ni cola de Biblioteca o fotos. Quedan pendientes el catálogo local de productos y el registro diferido de escaneos para TOPs. El nombre de referencia cargado se conserva; no se reemplaza automáticamente con la API al sincronizar. Las cargas locales dependen de conservar los datos del navegador en ese dispositivo.
+
+Pruebas: `node tests/stock-api.cjs` (cuenta original, revisión, idempotencia y permisos); `node tests/stock-offline-ui.cjs` (requiere Playwright disponible en `tmp/ui-check/node_modules`, Chrome local; incluye dos cargas sin conexión, recarga posterior, separación por cuenta, bloqueo y resolución explícita de conflictos, y pérdida de confirmación después de guardar). También se verificaron búsqueda administrativa en móvil/PC, navegación y limpieza de recursos. Reversión: revertir el commit «Queue Stock product loads locally and synchronize safely»; revisar/exportar cargas locales antes, ya que el código anterior no muestra la cola nueva.
 
 ## Supervisores
 
@@ -70,7 +76,7 @@ Prioridades al retomar:
 1. Completado al retomar: búsqueda administrativa y edición autorizada de un palet ajeno comprobadas en Chrome a 320, 390 y 1366 px, sin desbordamiento horizontal ni errores JavaScript. Prueba local: `tmp/stock-lookup-ui.cjs`. Commit publicado: `13615e7`; la publicación no confirma por sí sola que Render terminó el despliegue.
 2. Implementado: sesiones persistentes en la base (migración 13), duración fija de 30 días, cookie HttpOnly/SameSite Lax/Secure en Render, identificador renovado al ingresar, cierre y caducidad verificados. El primer despliegue invalida las antiguas sesiones de archivos: iniciar sesión nuevamente una vez. Confirmar el despliegue de Render y hacer seguimiento en uso real.
 3. Implementar recuperación de contraseña con tokens de un solo uso, caducidad, límites y proveedor de correo definido. Falta elegir/configurar el servicio de correo; no inventar entregas.
-4. Implementar el alcance inicial sin conexión descrito arriba, con cola local por cuenta, identificadores idempotentes y resolución explícita de conflictos. No simular éxito cuando algo no se sincronizó.
+4. Continuar el uso sin conexión descrito arriba: la cola inicial de Stock está implementada y probada. Falta abrir la web desde cero sin conexión y extender el almacenamiento a productos/Biblioteca. No simular éxito cuando algo no se sincronizó.
 5. Agregar búsqueda de productos/EAN en Stock y vista reunida de vencimientos.
 6. Retomar supervisores; empresas sigue pendiente de definición. La restricción de dispositivos para suscripciones está discutida, no aprobada ni implementada.
 
