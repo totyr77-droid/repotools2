@@ -53,9 +53,9 @@
         const sender = active.submitter, section = document.createElement('section'); section.className = 'report-sender'; details.append(section);
         const identity = text('p', sender.name, section); identity.className = 'report-inline'; identity.setAttribute('aria-label', 'Enviado por ' + sender.name); icon(identity, 'user');
         const more = document.createElement('details'); more.className = 'report-sender-more'; section.append(more); text('summary', 'Datos', more);
-        if (sender.email) text('p', sender.email, more);
-        if (sender.company) text('p', sender.company, more);
-        text('p', `IP registrada: ${active.submitter_ip || 'No disponible'}`, more);
+        text('p', `Correo: ${sender.email || 'No disponible'}`, more);
+        text('p', `Empresa: ${sender.company || 'No indicada'}`, more);
+        if (Object.hasOwn(active, 'submitter_ip')) text('p', `IP registrada: ${active.submitter_ip || 'No disponible'}`, more);
         if (sender.can_manage) {
           const button = text('button', sender.blocked ? 'Habilitar' : 'Bloquear', section); button.type = 'button'; button.className = 'library-secondary report-block-button'; icon(button, 'block');
           const hint = text('p', '', section); hint.className = 'report-block-status'; hint.setAttribute('role', 'status');

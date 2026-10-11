@@ -14,7 +14,7 @@
       <div class="report-photo"><p>Foto del producto</p><img id="reportPreviewProduct" class="report-photo-preview" alt="Foto del producto" hidden><div class="report-photo-actions"><button type="button" class="library-secondary" data-report-camera="product">Tomar foto del producto</button><button type="button" class="library-secondary" data-report-remove="product" hidden>Quitar foto</button></div></div>
     </fieldset>
     <p id="reportPhotosNote" class="product-edit-note" role="status"></p>
-    <p class="product-edit-note">Registramos tu IP junto al reporte para prevenir abusos. Solo Moderación puede verla.</p>
+    <p class="product-edit-note">Registramos tu IP junto al reporte para prevenir abusos. Solo los managers pueden verla.</p>
     <div class="library-dialog-actions"><a href="reportes.php" class="library-secondary">Mis reportes</a><button id="sendProductReport" type="submit" class="library-primary">Enviar reporte</button></div>
   </form>
 </dialog>

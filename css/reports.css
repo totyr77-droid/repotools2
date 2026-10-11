@@ -79,7 +79,7 @@
 #reviewReportStatus { margin: 6px 0; min-height: 0; }
 #reviewReportDetails > .report-sender { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 0; }
 #reviewReportDetails .report-sender > .report-inline { flex: 1; margin: 0; font-weight: 600; color: #172033; }
-.report-sender-more { position: relative; }
+.report-sender-more { position: relative; flex-basis: 100%; order: 3; }
 .report-sender-more summary { font-size: .75rem; min-height: 44px; }
 .report-sender-more[open] { flex-basis: 100%; order: 3; }
 #reviewReportDetails .report-block-button { display: inline-flex; align-items: center; gap: 5px; background: #c92a38; color: white; min-height: 44px; padding: 8px 10px; margin: 0; font-size: .8rem; }

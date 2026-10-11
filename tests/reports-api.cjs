@@ -50,7 +50,7 @@ async function create(request, more = {}) {
   assert.equal((await user('api/reportes.php', badPhoto)).status, 422);
   await login(mod, 'moderador'); const modCsrf = (await mod('api/reportes.php?queue=1')).json().csrf;
   const privateReport = (await mod('api/reportes.php?id=' + registered.report.id)).json().report;
-  assert.equal(privateReport.submitter.email, 'usuario@example.invalid'); assert.equal(privateReport.submitter_ip, '127.0.0.1');
+  assert.equal(privateReport.submitter.email, 'usuario@example.invalid'); assert.equal(privateReport.submitter_ip, undefined);
   const ownReport = (await user('api/reportes.php?id=' + registered.report.id)).json().report;
   assert.equal(ownReport.submitter, undefined); assert.equal(ownReport.submitter_ip, undefined);
   const block = { action: 'block_reports', id: registered.report.id, csrf: modCsrf };

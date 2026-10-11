@@ -21,6 +21,10 @@ function report_is_blocked(PDO $db, ?array $user): bool {
 function report_require_submission(PDO $db, ?array $user): void {
     if (report_is_blocked($db, $user)) throw new CatalogException('Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.', 403);
 }
+function report_can_manage_sender(string $actorRole, int $actorId, array $target): bool {
+    $ranks = ['usuario' => 1, 'moderador' => 2, 'administrador' => 3, 'manager' => 4];
+    return !empty($target['id']) && (int) $target['id'] !== $actorId && ($ranks[$actorRole] ?? 0) > ($ranks[$target['role']] ?? 4);
+}
 function report_set_block(PDO $db, array $actor, int $id, bool $blocked): array {
     if (!can_edit_catalog($db, $actor)) throw new CatalogException('No tienes permiso para gestionar reportes.', 403);
     $db->beginTransaction();
@@ -29,7 +33,7 @@ function report_set_block(PDO $db, array $actor, int $id, bool $blocked): array 
         $report = report_detail($db, $id, 'user:' . $actor['id'], true);
         $target = $report['submitter'];
         $stmt = $db->prepare('SELECT role FROM users WHERE id = ?'); $stmt->execute([$actor['id']]); $role = $stmt->fetchColumn();
-        if (!$target['id'] || (int) $target['id'] === (int) $actor['id'] || $target['role'] === 'administrador' || ($target['role'] !== 'usuario' && $role !== 'administrador')) throw new CatalogException('No puedes cambiar el permiso de reportes de esta cuenta.', 403);
+        if (!report_can_manage_sender((string) $role, (int) $actor['id'], $target)) throw new CatalogException('No puedes cambiar el permiso de reportes de esta cuenta.', 403);
         if (report_is_blocked($db, $target) !== $blocked) {
             if ($blocked) $db->prepare('INSERT INTO report_blocks(user_id, blocked_by) VALUES (?, ?)')->execute([$target['id'], $actor['id']]);
             else $db->prepare('DELETE FROM report_blocks WHERE user_id = ?')->execute([$target['id']]);
@@ -69,15 +73,17 @@ function report_detail(PDO $db, int $id, string $owner, bool $moderator): array 
     $stmt = $db->prepare('SELECT kind FROM report_photos WHERE report_id = ?'); $stmt->execute([$id]);
     $report['photos'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
     if ($moderator) {
-        $stmt = $db->prepare('SELECT submitter_ip FROM product_reports WHERE id = ?'); $stmt->execute([$id]);
-        $report['submitter_ip'] = $stmt->fetchColumn();
         $stmt = $db->prepare('SELECT id, name, email, company, role FROM users WHERE id = ?'); $stmt->execute([$report['user_id']]);
         $report['submitter'] = $stmt->fetch() ?: ['id' => null, 'name' => 'Invitado', 'email' => '', 'company' => '', 'role' => ''];
         $report['submitter']['blocked'] = report_is_blocked($db, $report['submitter']['id'] ? $report['submitter'] : null);
         $actorId = str_starts_with($owner, 'user:') ? (int) substr($owner, 5) : 0;
         $stmt = $db->prepare('SELECT role FROM users WHERE id = ?'); $stmt->execute([$actorId]); $actorRole = $stmt->fetchColumn();
         $target = $report['submitter'];
-        $report['submitter']['can_manage'] = $target['id'] && (int) $target['id'] !== $actorId && $target['role'] !== 'administrador' && ($target['role'] === 'usuario' || $actorRole === 'administrador');
+        $report['submitter']['can_manage'] = report_can_manage_sender((string) $actorRole, $actorId, $target);
+        if ($actorRole === 'manager') {
+            $stmt = $db->prepare('SELECT submitter_ip FROM product_reports WHERE id = ?'); $stmt->execute([$id]);
+            $report['submitter_ip'] = $stmt->fetchColumn();
+        }
     }
     return $report;
 }

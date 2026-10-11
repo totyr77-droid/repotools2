@@ -22,6 +22,13 @@ $report = submit_product_report($db, $user, $owner, $input, ['ean' => 'photo-ean
 check_report(count($report['photos']) === 2 && count($objects) === 2, 'Guarda las dos evidencias.');
 check_report(!isset($report['submitter_ip'], $report['submitter']), 'Datos privados fuera de la respuesta del usuario.');
 $private = report_detail($db, (int) $report['id'], 'user:' . $mod['id'], true);
+check_report(!array_key_exists('submitter_ip', $private), 'El moderador no recibe la IP.');
+$admin = $users['administrador'];
+check_report(!array_key_exists('submitter_ip', report_detail($db, (int) $report['id'], 'user:' . $admin['id'], true)), 'El administrador no recibe la IP.');
+$db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute(['manager', $admin['id']]);
+check_report(can_edit_catalog($db, $admin) && array_key_exists('submitter_ip', report_detail($db, (int) $report['id'], 'user:' . $admin['id'], true)), 'El manager puede revisar y recibir la IP.');
+$db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute(['administrador', $admin['id']]);
+check_report(!array_key_exists('submitter_ip', report_detail($db, (int) $report['id'], 'user:' . $admin['id'], true)), 'La IP se oculta inmediatamente al bajar el rango.');
 check_report($private['submitter']['email'] === $suffix . 'usuario@example.invalid', 'Moderación identifica al remitente.');
 denied_report(fn() => report_set_block($db, $user, (int) $report['id'], true), 403);
 report_set_block($db, $mod, (int) $report['id'], true);

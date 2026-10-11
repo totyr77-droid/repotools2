@@ -97,7 +97,7 @@ function can_edit_catalog(PDO $db, ?array $user): bool {
     if (!$user) return false;
     $stmt = $db->prepare('SELECT role FROM users WHERE id = ?');
     $stmt->execute([$user['id']]);
-    return in_array($stmt->fetchColumn(), ['administrador', 'moderador'], true);
+    return in_array($stmt->fetchColumn(), ['manager', 'administrador', 'moderador'], true);
 }
 
 function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision, int $userId): array {
