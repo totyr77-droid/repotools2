@@ -18,6 +18,11 @@ function report_is_blocked(PDO $db, ?array $user): bool {
     $stmt = $db->prepare('SELECT user_id FROM report_blocks WHERE user_id = ?'); $stmt->execute([$user['id']]);
     return $stmt->fetchColumn() !== false;
 }
+function report_can_audit(PDO $db, ?array $user): bool {
+    if (!$user) return false;
+    $stmt = $db->prepare('SELECT role FROM users WHERE id = ?'); $stmt->execute([$user['id']]);
+    return in_array($stmt->fetchColumn(), ['administrador', 'manager'], true);
+}
 function report_require_submission(PDO $db, ?array $user): void {
     if (report_is_blocked($db, $user)) throw new CatalogException('Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.', 403);
 }

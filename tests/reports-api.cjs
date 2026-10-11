@@ -124,4 +124,17 @@ async function create(request, more = {}) {
   assert.equal(notices.unread,1);assert.equal(notices.notifications.length,2);assert.match(notices.notifications[0].title,/rechazado/);
   assert.equal((await user('api/notificaciones.php',{action:'read_all',id:notices.notifications[0].id,csrf:userCsrf})).json().unread,0);
   console.log('OK: avisos privados, aprobación y rechazo idempotentes, CSRF y lectura persistente.');
+  for(const request of [guest,user,mod]) for(const view of ['history','logs']) assert.equal((await request('api/reportes.php?view='+view)).status,403);
+  const history=(await admin('api/reportes.php?view=history')).json();
+  assert.ok(history.items.some(item=>Number(item.id)===Number(registered.report.id)&&item.status==='approved'&&item.reviewer_name==='moderador'));
+  assert.ok(history.items.some(item=>item.status==='rejected'));
+  const logs=(await admin('api/reportes.php?view=logs')).json();
+  assert.ok(logs.items.some(item=>item.event_type==='report_review'));assert.ok(logs.items.some(item=>item.event_type==='report_block'));
+  assert.equal((await admin('api/reportes.php?view=logs&page=-1')).status,422);
+  assert.equal((await admin('api/reportes.php?view=history&page=1')).json().items.length,0);
+  assert.match((await admin('reportes.php?queue=1')).text,/data-moderation-view="history"/);
+  assert.doesNotMatch((await mod('reportes.php?queue=1')).text,/data-moderation-view="history"/);
+  const managerSeed=spawnSync(php,['-r',`require 'includes/database.php'; database()->prepare('UPDATE users SET role = ? WHERE email = ?')->execute(['manager','administrador@example.invalid']);`],{env,encoding:'utf8'});assert.equal(managerSeed.status,0,managerSeed.stderr);
+  assert.equal((await admin('api/reportes.php?view=logs')).status,200);assert.match((await admin('index.php')).text,/account-role-manager/);
+  console.log('OK: historial y registros privados para administrador y manager; rango vigente junto al nombre.');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => server.kill());

@@ -9,6 +9,17 @@
   let queue = document.querySelector('[data-report-view]').dataset.reportView === 'queue', version = 0, listVersion = 0, active, csrf, busy = false, photos = [];
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
+  let moderationView = 'pending', auditPage = 0;
+  const stamp = value => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)?value:value.replace(' ','T')+'Z').toLocaleString('es-AR', { timeZone: 'America/Buenos_Aires', dateStyle: 'short', timeStyle: 'short', hourCycle: 'h23' });
+  const logLabels = {product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet'};
+  const actionLabels = {approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
+  document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
+    moderationView = button.dataset.moderationView; auditPage = 0;
+    document.querySelectorAll('[data-moderation-view]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
+    document.querySelector('.reports-panel h1').textContent = {pending:'Reportes pendientes',history:'Historial de reportes',logs:'Registros de actividad'}[moderationView]; load();
+  }));
+  document.getElementById('moderationPrevious').addEventListener('click', () => { if(auditPage>0){auditPage--;load();} });
+  document.getElementById('moderationNext').addEventListener('click', () => { auditPage++;load(); });
   function text(tag, value, container = details) { const node = document.createElement(tag); node.textContent = value; container.append(node); return node; }
   function icon(container, type) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '1.8');
@@ -19,7 +30,23 @@
   page?.onLeave(() => { ++version; ++listVersion; clearPhotos(); });
   async function load() {
     const attempt = ++listVersion; status.textContent = 'Cargando…'; list.replaceChildren();
+    document.getElementById('moderationPagination').hidden = true;
     try {
+      if (queue && moderationView !== 'pending') {
+        const result = await RepoReports.request(`?view=${moderationView}&page=${auditPage}`); if(attempt !== listVersion)return; csrf=result.csrf;
+        status.textContent=result.items.length?'':moderationView==='history'?'Todavía no hay reportes revisados.':'Todavía no hay actividad registrada.';
+        for(const item of result.items){
+          const card=document.createElement('article');card.className='report-card';list.append(card);const info=document.createElement('div');info.className='report-card-info';card.append(info);
+          if(moderationView==='history'){
+            const heading=document.createElement('div');heading.className='report-card-heading';info.append(heading);text('h2',`#${item.id}`,heading);badge(heading,item.status);
+            const ean=text('p',item.ean,info);ean.className='report-inline';icon(ean,'ean');text('p',`${item.submitter_name} · Revisado por ${item.reviewer_name||'Staff'}`,info);text('p',stamp(item.reviewed_at),info);
+            const button=text('button','Ver reporte',card);button.type='button';button.className='library-secondary';button.addEventListener('click',()=>open(item.id));
+          }else{
+            text('h2',logLabels[item.event_type]||'Actividad',info);text('p',`${item.actor} · ${actionLabels[item.action]||'Cambio registrado'}`,info);text('p',item.target,info);text('p',stamp(item.created_at),info);
+          }
+        }
+        const pagination=document.getElementById('moderationPagination');pagination.hidden=!auditPage&&!result.has_more;document.getElementById('moderationPrevious').disabled=auditPage===0;document.getElementById('moderationNext').disabled=!result.has_more;document.getElementById('moderationPageNumber').textContent=String(auditPage+1);return;
+      }
       const result = await RepoReports.request(queue ? '?queue=1' : ''); if (attempt !== listVersion) return;
       if (!result.can_review) queue = false;
       csrf = result.csrf;

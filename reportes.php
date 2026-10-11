@@ -3,10 +3,12 @@ require_once __DIR__ . '/includes/auth.php';
 $paginaCuenta = true; $paginaReportes = true;
 include __DIR__ . '/vistas/header.vista.php';
 $moderationView = $navModerator && ($_GET['queue'] ?? '') === '1';
+$auditView = in_array($navRole, ['administrador', 'manager'], true);
 ?>
 <main class="reports-main" data-report-view="<?= $moderationView ? 'queue' : 'own' ?>"><section class="reports-panel">
   <div class="library-heading"><div><p class="app-resumen__eyebrow"><?= $moderationView ? 'Moderación' : 'Mi cuenta' ?></p><h1><?= $moderationView ? 'Reportes pendientes' : 'Mis reportes' ?></h1></div><?php if (!$moderationView): ?><a href="cuenta.php" class="library-secondary">Mi cuenta</a><?php endif; ?></div>
-  <p id="reportActionStatus" class="library-status" role="status"></p><p id="reportsStatus" class="library-status" role="status"></p><div id="reportsList" class="reports-list"></div>
+  <?php if ($moderationView && $auditView): ?><nav class="reports-tabs" aria-label="Secciones de Moderación"><button type="button" class="library-secondary" data-moderation-view="pending" aria-pressed="true">Pendientes</button><button type="button" class="library-secondary" data-moderation-view="history" aria-pressed="false">Historial</button><button type="button" class="library-secondary" data-moderation-view="logs" aria-pressed="false">Registros</button></nav><?php endif; ?>
+  <p id="reportActionStatus" class="library-status" role="status"></p><p id="reportsStatus" class="library-status" role="status"></p><div id="reportsList" class="reports-list"></div><div id="moderationPagination" class="library-dialog-actions" hidden><button type="button" id="moderationPrevious" class="library-secondary" aria-label="Página anterior">‹</button><span id="moderationPageNumber"></span><button type="button" id="moderationNext" class="library-secondary" aria-label="Página siguiente">›</button></div>
 </section></main>
 <dialog id="reviewReportDialog" class="library-dialog product-edit-dialog" aria-labelledby="reviewReportTitle">
   <div class="library-heading"><h2 id="reviewReportTitle">Reporte</h2><button id="closeReviewReport" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>

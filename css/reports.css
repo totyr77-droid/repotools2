@@ -73,6 +73,9 @@
 .report-inline { display: flex; align-items: center; gap: 6px; }
 .report-inline svg, .report-block-button svg { width: 16px; height: 16px; flex-shrink: 0; }
 .report-card-sender { color: #626b7a; }
+.reports-tabs button { min-height: 44px; padding: 8px 14px; }
+#moderationPagination { align-items: center; justify-content: center; margin-top: 12px; }
+#moderationPagination button { min-width: 44px; font-size: 1.25rem; }
 #reviewReportDialog { padding: 16px; }
 #reviewReportDialog .library-heading { gap: 8px; margin-bottom: 8px; }
 #reviewReportDialog .library-heading h2 { font-size: 1.1rem; }

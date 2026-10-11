@@ -1,6 +1,12 @@
 .notification-control { position: relative; margin-left: auto; margin-right: 16px; flex-shrink: 0; }
 .stock-nav-expiry { display: inline-block; width: 8px; height: 8px; background: #c92a38; border-radius: 50%; margin-left: 4px; flex-shrink: 0; }
 .stock-nav-expiry[hidden] { display: none; }
+.account-role { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; padding: 3px 6px; border-radius: 6px; font-size: .7rem; font-weight: 600; vertical-align: middle; background: #e9e5f7; color: #62577e; white-space: nowrap; }
+.account-role-manager { background: #fff1c9; color: #795b08; }
+.account-role-administrador { background: #e8e4fa; color: #27187e; }
+.account-role-moderador { background: #e1f2ed; color: #216b43; }
+.account-role-supervisor { background: #e4eefb; color: #315787; }
+.account-role-empresa { background: #edf0f5; color: #526075; }
 #openNotifications { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; color: white; background: #ffffff14; cursor: pointer; }
 #openNotifications svg { width: 22px; height: 22px; }
 #notificationBadge { position: absolute; top: -3px; right: -3px; min-width: 18px; padding: 2px 4px; border-radius: 12px; background: #c92a38; color: white; font-size: .7rem; }
