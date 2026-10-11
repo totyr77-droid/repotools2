@@ -26,6 +26,7 @@ try {
                 UNION ALL SELECT 'report_review', u.name, r.ean, r.reviewed_at, r.id, r.status, r.id FROM product_reports r JOIN users u ON u.id = r.reviewed_by WHERE r.reviewed_at IS NOT NULL
                 UNION ALL SELECT 'report_block', a.name, u.name, e.created_at, NULL, e.action, e.id FROM report_block_events e JOIN users a ON a.id = e.actor_id JOIN users u ON u.id = e.user_id
                 UNION ALL SELECT 'pallet_admin', u.name, e.code, e.created_at, NULL, e.action, e.id FROM pallet_admin_events e JOIN users u ON u.id = e.user_id
+            UNION ALL SELECT 'user_role', a.name, u.name, e.created_at, NULL, e.old_role || ' → ' || e.new_role, e.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
             ) events ORDER BY created_at DESC, event_type, event_id DESC LIMIT 51 OFFSET {$offset}")->fetchAll();
         }
         report_response(200, ['items' => array_slice($items, 0, 50), 'has_more' => count($items) > 50, 'can_audit' => true, 'csrf' => $csrf]);

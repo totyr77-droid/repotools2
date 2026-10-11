@@ -81,6 +81,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <h1>Mi cuenta</h1>
     <p>Hola, <?= escape(current_user()['name']) ?>.</p>
     <p class="account-email"><?= escape(current_user()['email']) ?></p>
+    <details id="myProfileQR" class="profile-qr"><summary><i class="fa-solid fa-qrcode" aria-hidden="true"></i>Mi QR de perfil<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary><div class="profile-qr-image"></div><p role="status"></p></details>
     <?php if (!empty(current_user()['company'])): ?><p class="account-company"><?= account_icon('company') ?><?= escape(current_user()['company']) ?></p><?php endif; ?>
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php">Ver mis estadísticas y TOPs</a>
     <a href="biblioteca.php">Abrir mi biblioteca</a>

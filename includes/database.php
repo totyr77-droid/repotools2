@@ -124,6 +124,11 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE report_block_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), actor_id {$ref} NOT NULL REFERENCES users(id), action TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(10)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 11')->fetchColumn()) {
+            $db->exec("CREATE TABLE user_profile_tokens (user_id {$ref} PRIMARY KEY REFERENCES users(id), token TEXT NOT NULL UNIQUE)");
+            $db->exec("CREATE TABLE user_role_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), actor_id {$ref} NOT NULL REFERENCES users(id), old_role TEXT NOT NULL, new_role TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(11)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

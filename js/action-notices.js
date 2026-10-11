@@ -3,7 +3,7 @@
   const selector='[role="status"],.library-status,.library-form-status,.account-error';
   function decorate(el){
     const text=el.textContent.trim();
-    const success=/^(?:Producto (?:guardado|eliminado|actualizado)|Colección (?:guardada|creada|eliminada|renombrada)|Preferencia guardada|Invitación enviada|Descripción guardada|Acceso eliminado|Palet (?:eliminado|guardado)|Etiquetas listas|Reporte (?:#\d+ )?enviado|Imagen (?:descargada|compartida)|Dejaste de participar|Solicitud enviada|Aprobado\.|Reporte rechazado\.|Guardado en|Se guardó|Se agregó)/i.test(text);
+    const success=/^(?:Producto (?:guardado|eliminado|actualizado)|Colección (?:guardada|creada|eliminada|renombrada)|Preferencia guardada|Rango actualizado|Invitación enviada|Descripción guardada|Acceso eliminado|Palet (?:eliminado|guardado)|Etiquetas listas|Reporte (?:#\d+ )?enviado|Imagen (?:descargada|compartida)|Dejaste de participar|Solicitud enviada|Aprobado\.|Reporte rechazado\.|Guardado en|Se guardó|Se agregó)/i.test(text);
     const error=el.classList.contains('account-error')||/^(?:No pudimos|No puedes|Error|La sesión venció|Revisa |Ingresa .*válido)/i.test(text);
     if(success||error)el.dataset.notice=error?'error':'success';else delete el.dataset.notice;
   }
