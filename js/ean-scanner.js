@@ -13,7 +13,11 @@
     try {
       const video = element.querySelector('video');
       if (!video?.videoWidth || !video.videoHeight) return;
-      const frame = visibleFrame(video), scale = Math.min(1, 1280 / Math.max(frame.width, frame.height));
+      const visible = visibleFrame(video);
+      // Mismo recuadro horizontal que la foto manual del EAN: barras y números.
+      const width = Math.min(visible.width * .88, visible.height * 2.4), height = width / 2.4;
+      const frame = { x: visible.x + (visible.width - width) / 2, y: visible.y + (visible.height - height) / 2, width, height };
+      const scale = Math.min(1, 1280 / Math.max(frame.width, frame.height));
       const canvas = document.createElement('canvas');
       canvas.width = Math.max(1, Math.round(frame.width * scale)); canvas.height = Math.max(1, Math.round(frame.height * scale));
       canvas.getContext('2d').drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
