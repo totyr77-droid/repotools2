@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . "/../includes/auth.php";
 require_once __DIR__ . "/../includes/catalog.php";
+require_once __DIR__ . "/../includes/reports.php";
 $userHand = '';
 $navModerator = false; $navPending = 0; $navRole = '';
 if (current_user()) {
-    try { $navDb = database(); $navModerator = can_edit_catalog($navDb, current_user()); if ($navModerator) { $navCount = $navDb->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $navCount->execute([current_user()['id']]); $navPending = (int) $navCount->fetchColumn(); } }
+    try { $navDb = database(); $navModerator = can_edit_catalog($navDb, current_user()); if ($navModerator) { $navCount = $navDb->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $navCount->execute([report_is_manager($navDb,current_user())?0:current_user()['id']]); $navPending = (int) $navCount->fetchColumn(); } }
     catch (Throwable $error) { error_log('Repotools: no se pudo consultar el menú de moderación.'); }
 }
 if (isset($navDb) && current_user()) {

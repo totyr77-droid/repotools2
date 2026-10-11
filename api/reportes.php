@@ -13,6 +13,7 @@ $csrf = csrf_token(); session_write_close();
 try {
     $db = database(); $moderator = can_edit_catalog($db, $user);
     $audit = report_can_audit($db, $user);
+    $excludedUser=report_is_manager($db,$user)?0:(int)($user['id']??0);
     if ($method === 'GET' && in_array($_GET['view'] ?? '', ['history', 'logs'], true)) {
         if (!$audit) throw new CatalogException('Solo administradores y managers pueden consultar esta sección.', 403);
         $page = filter_var($_GET['page'] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 10000]]);
@@ -34,7 +35,7 @@ try {
     }
     if ($method === 'GET' && isset($_GET['pending_count'])) {
         if (!$moderator) throw new CatalogException('No tienes permiso para revisar reportes.', 403);
-        $count = $db->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $count->execute([$user['id']]);
+        $count = $db->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $count->execute([$excludedUser]);
         report_response(200, ['pending_count' => (int) $count->fetchColumn()]);
     }
     $owner = report_owner($user, $_POST['owner_token'] ?? $_SERVER['HTTP_X_REPORT_OWNER'] ?? '');
@@ -66,9 +67,9 @@ try {
         report_response(200, ['report' => $report, 'csrf' => $csrf, 'can_review' => $moderator]);
     }
     $queue = $moderator && ($_GET['queue'] ?? '') === '1';
-    $stmt = $db->prepare('SELECT r.id, r.ean, r.description, r.status, r.created_at, r.review_note' . ($queue ? ", COALESCE(u.name, 'Invitado') AS submitter_name" : '') . ' FROM product_reports r' . ($queue ? ' LEFT JOIN users u ON u.id = r.user_id' : '') . ' WHERE ' . ($queue ? "r.status = 'pending' AND (r.user_id IS NULL OR r.user_id <> ?)" : 'r.owner_key = ?') . ' ORDER BY r.id DESC LIMIT 50'); $stmt->execute($queue ? [$user['id']] : [$owner]);
+    $stmt = $db->prepare('SELECT r.id, r.ean, r.description, r.status, r.created_at, r.review_note' . ($queue ? ", COALESCE(u.name, 'Invitado') AS submitter_name" : '') . ' FROM product_reports r' . ($queue ? ' LEFT JOIN users u ON u.id = r.user_id' : '') . ' WHERE ' . ($queue ? "r.status = 'pending' AND (r.user_id IS NULL OR r.user_id <> ?)" : 'r.owner_key = ?') . ' ORDER BY r.id DESC LIMIT 50'); $stmt->execute($queue ? [$excludedUser] : [$owner]);
     $reports = $stmt->fetchAll(); $blocked = [];
-    if ($queue) $blocked = $db->query('SELECT u.name, u.email, (SELECT MAX(r.id) FROM product_reports r WHERE r.user_id = u.id) AS report_id FROM report_blocks b JOIN users u ON u.id = b.user_id ORDER BY b.created_at DESC')->fetchAll();
+    if ($queue) $blocked = $db->query('SELECT u.name, u.email, (SELECT MAX(r.id) FROM product_reports r WHERE r.user_id = u.id) AS report_id FROM report_blocks b JOIN users u ON u.id = b.user_id WHERE u.id <> ' . $excludedUser . ' ORDER BY b.created_at DESC')->fetchAll();
     report_response(200, ['reports' => $reports, 'blocked_reports' => $blocked, 'csrf' => $csrf, 'can_review' => $moderator, 'can_submit' => !report_is_blocked($db, $user), 'photos_enabled' => report_storage_ready(), 'registered' => $user !== null]);
 } catch (CatalogException $error) { report_response($error->status, ['error' => $error->getMessage()]); }
 catch (Throwable $error) { error_log('Repotools reports error: ' . get_class($error) . ' code=' . $error->getCode()); report_response(503, ['error' => 'No pudimos acceder a los reportes. Intenta nuevamente.']); }

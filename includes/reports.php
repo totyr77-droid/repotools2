@@ -35,9 +35,14 @@ function report_require_submission(PDO $db, ?array $user): void {
     if (report_is_blocked($db, $user)) throw new CatalogException('Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.', 403);
 }
 function report_can_manage_sender(string $actorRole, int $actorId, array $target, bool $blocking = true): bool {
+    if ($actorRole === 'manager') return !empty($target['id']);
     $ranks = ['usuario' => 1, 'moderador' => 2, 'administrador' => 3, 'manager' => 4];
     if (!$blocking && !in_array($actorRole, ['administrador', 'manager'], true)) return false;
     return !empty($target['id']) && (int) $target['id'] !== $actorId && ($ranks[$actorRole] ?? 0) > ($ranks[$target['role']] ?? 4);
+}
+function report_is_manager(PDO $db, ?array $user): bool {
+    if (!$user) return false;
+    $stmt=$db->prepare('SELECT role FROM users WHERE id=?');$stmt->execute([$user['id']]);return $stmt->fetchColumn()==='manager';
 }
 function report_set_block(PDO $db, array $actor, int $id, bool $blocked): array {
     if (!can_edit_catalog($db, $actor)) throw new CatalogException('No tienes permiso para gestionar reportes.', 403);
@@ -164,7 +169,7 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
     try {
         report_lock($db);
         $report = report_detail($db, $id, 'user:' . $user['id'], true);
-        if ((int) $report['user_id'] === (int) $user['id']) throw new CatalogException('Otro moderador debe revisar tu reporte.', 403);
+        if ((int) $report['user_id'] === (int) $user['id'] && !report_is_manager($db,$user)) throw new CatalogException('Otro moderador debe revisar tu reporte.', 403);
         if ($report['status'] !== 'pending') {
             if ($report['status'] !== $decision) throw new CatalogException('Este reporte ya fue revisado.', 409);
             $db->commit(); return $report;

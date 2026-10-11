@@ -34,7 +34,8 @@ denied_report(fn() => report_set_block($db, $user, (int) $report['id'], true), 4
 report_set_block($db, $mod, (int) $report['id'], true);
 denied_report(fn() => submit_product_report($db, $user, $owner, $input, ['ean' => 'blocked-photo'], $storage), 403);
 check_report(count($objects) === 2 && !report_is_blocked($db, $users['administrador']), 'Bloqueo previo a subir fotos y exclusivo de la cuenta.');
-report_set_block($db, $mod, (int) $report['id'], false);
+denied_report(fn() => report_set_block($db, $mod, (int) $report['id'], false),403);
+report_set_block($db, $admin, (int) $report['id'], false);
 check_report(!report_is_blocked($db, $user), 'Permite habilitar los reportes nuevamente.');
 check_report(report_client_ip(['REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => 'malformed']) === '127.0.0.1', 'Rechaza IP inválida.');
 check_report(catalog_product($db, $ean) === $original, 'El reporte no debe modificar la ficha.');
