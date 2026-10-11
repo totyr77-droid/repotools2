@@ -15,15 +15,21 @@ if ($method === 'POST' && !valid_csrf()) notification_response(403, ['error' => 
 session_write_close();
 try {
     $db = database();
-    stock_notify($db, $userId);
+    $stockAlerts = stock_notify($db, $userId);
     if ($method === 'POST') {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         if (!$id || !in_array($_POST['action'] ?? '', ['read', 'read_all'], true)) notification_response(422, ['error' => 'Notificación no válida.']);
         $comparison = $_POST['action'] === 'read_all' ? '<=' : '=';
         $db->prepare("UPDATE notifications SET read_at = CURRENT_TIMESTAMP WHERE user_id = ? AND id {$comparison} ? AND read_at IS NULL")->execute([$userId, $id]);
     }
-    $stmt = $db->prepare('SELECT n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? ORDER BY n.id DESC LIMIT 40');
+    $stmt = $db->prepare('SELECT n.event_key, n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? ORDER BY n.id DESC LIMIT 40');
     $stmt->execute([$userId]); $items = $stmt->fetchAll();
+    foreach ($items as &$item) {
+        if (isset($stockAlerts[$item['event_key']])) $item=array_merge($item,$stockAlerts[$item['event_key']]);
+        unset($item['event_key']);
+        $item['created_at']=(new DateTimeImmutable($item['created_at'],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
+    }
+    unset($item);
     $stmt = $db->prepare('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read_at IS NULL');
     $stmt->execute([$userId]);
     $unread = (int) $stmt->fetchColumn();

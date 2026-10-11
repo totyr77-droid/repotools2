@@ -49,10 +49,10 @@
 <script src="js/ean-scanner.js?v=20261011-orientation4"></script>
 <script src="js/product-info.js?v=20261011-fresh2"></script>
 <script src="js/vendor/qrcode.min.js"></script>
-<script src="js/stock-utils.js?v=20261011-reference14"></script>
+<script src="js/stock-utils.js?v=20261011-expiryalerts15"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 <script src="js/stock-offline.js?v=20261011-offline1"></script>
-<script src="js/stock.js?v=20261011-stockreference7"></script>
+<script src="js/stock.js?v=20261011-expiryalerts15"></script>
 <script src="js/public-pallet.js?v=20261010-stock13"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -71,7 +71,7 @@
 <script src="js/title-icons.js?v=20261011-icons1"></script>
 <script src="js/botones.js?v=20261011-password1"></script>
 <script src="js/report-notifications.js?v=20261011-pendingcounts1"></script>
-<script src="js/notifications.js?v=20261011-stockcount2"></script>
+<script src="js/notifications.js?v=20261011-expiryalerts15"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261010-stock13"></script><script src="js/account-edit.js?v=20261011-dialog2"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-qr2"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-alert2"></script><?php endif; ?>

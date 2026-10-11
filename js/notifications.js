@@ -20,17 +20,17 @@
     get('notificationList').replaceChildren();
     items.forEach(item => {
       const link = document.createElement('a'); link.className = 'notification-item';
-      const state = item.type === 'report_review' ? (item.report_status || (item.title.includes('aprobado') ? 'approved' : item.title.includes('rechazado') ? 'rejected' : 'info')) : item.type === 'stock_expiry' ? 'warning' : 'info';
+      const state = item.type === 'report_review' ? (item.report_status || (item.title.includes('aprobado') ? 'approved' : item.title.includes('rechazado') ? 'rejected' : 'info')) : item.type === 'stock_expiry' ? (item.expiry_state || 'warning') : 'info';
       link.dataset.state = state;
       const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); icon.classList.add('notification-icon'); icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('fill', 'none'); icon.setAttribute('stroke', 'currentColor'); icon.setAttribute('stroke-width', '1.8'); icon.setAttribute('aria-hidden', 'true');
-      const path = document.createElementNS(icon.namespaceURI, 'path'); path.setAttribute('d', state === 'approved' ? 'M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' : state === 'rejected' ? 'm9 9 6 6m0-6-6 6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' : state === 'warning' ? 'M12 8v5m0 3v1M3 20h18L12 3Z' : 'M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'); icon.append(path);
-      link.href = item.report_id ? `reportes.php?report=${encodeURIComponent(item.report_id)}` : item.type?.startsWith('stock_') ? 'stock.php' : 'cuenta.php';
+      const path = document.createElementNS(icon.namespaceURI, 'path'); path.setAttribute('d', state === 'approved' ? 'M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' : state === 'rejected' ? 'm9 9 6 6m0-6-6 6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' : ['warning','today','expired'].includes(state) ? 'M12 8v5m0 3v1M3 20h18L12 3Z' : 'M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'); icon.append(path);
+      link.href = item.report_id ? `reportes.php?report=${encodeURIComponent(item.report_id)}` : item.pallet_code ? 'stock.php?codigo='+encodeURIComponent(item.pallet_code)+'&producto='+encodeURIComponent(item.product_id) : item.type?.startsWith('stock_') ? 'stock.php' : 'cuenta.php';
       if (!item.read_at) link.dataset.unread = '';
       const title = document.createElement('strong'); title.textContent = item.title;
       const body = document.createElement('span'); body.textContent = item.body;
       const date = document.createElement('time'); date.dateTime = item.created_at;
-      const instant = new Date(item.created_at); date.textContent = Number.isNaN(instant.getTime()) ? '' : instant.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
-      const content = document.createElement('div'); content.className = 'notification-content'; content.append(title, body, date); link.append(icon, content);
+      const instant = new Date(item.created_at); date.textContent = Number.isNaN(instant.getTime()) ? '' : instant.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short', timeZone:'America/Buenos_Aires', hourCycle:'h23' });
+      const content = document.createElement('div'); content.className = 'notification-content'; content.append(title, body);if(item.expiry_label){const tag=document.createElement('span');tag.className='notification-expiry-label';tag.textContent=item.expiry_label;content.append(tag);}content.append(date); link.append(icon, content);
       link.addEventListener('click', async event => {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         event.preventDefault();

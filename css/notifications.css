@@ -36,3 +36,5 @@
 @media (max-width: 768px) { .notification-panel { position: fixed; top: calc(72px + env(safe-area-inset-top, 0px)); right: 12px; } }
 
 @media(max-width:768px){.nav-celular .stock-nav-link{position:relative}.nav-celular .stock-expiry-badge{position:absolute;top:3px;right:2px;min-width:19px;height:19px;font-size:10px}}
+
+.notification-item[data-state="expired"] .notification-icon{color:#b42332;background:#fbe3e8}.notification-item[data-state="today"] .notification-icon{color:#a8440a;background:#ffead2}.notification-item[data-state="expired"][data-unread]{background:#fff5f6;border-left-color:#c92a38}.notification-item[data-state="today"][data-unread]{background:#fff7ee;border-left-color:#dd761d}.notification-item .notification-expiry-label{display:table;font-size:.75rem;font-weight:600;padding:3px 7px;border-radius:6px;background:#fff1b8;color:#795b08}.notification-item[data-state="expired"] .notification-expiry-label{background:#fbe3e8;color:#b42332}.notification-item[data-state="today"] .notification-expiry-label{background:#ffead2;color:#a8440a}

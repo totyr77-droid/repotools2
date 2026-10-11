@@ -143,9 +143,24 @@ function stock_list(PDO $db,int $user,bool $all=false): array {
     $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
     return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,u.company AS owner_company,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,(int)$all,$user,$user])->fetchAll();
 }
-function stock_notify(PDO $db,int $user): void {
+function stock_notify(PDO $db,int $user): array {
     $days=stock_warning_days($db,$user);
-    $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify("+{$days} days")->format('Y-m-d');
+    $today=new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
+    $limit=$today->modify("+{$days} days")->format('Y-m-d');
     $items=stock_query($db,"SELECT b.id,b.name,b.ean,b.expires,p.code FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND b.expires<>'' AND b.expires<=? AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$limit,$user,$user])->fetchAll();
-    foreach($items as $item) stock_query($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO NOTHING",[$user,'expiry:'.$user.':'.$item['id'].':'.$item['expires'],'stock_expiry','Mercadería próxima a vencer','Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']).' · Vence '.implode('/',array_reverse(explode('-',$item['expires'])))]);
+    $current=[];
+    foreach($items as $item) {
+        $remaining=(int)$today->diff(new DateTimeImmutable($item['expires'],new DateTimeZone('America/Buenos_Aires')))->format('%r%a');
+        $state=$remaining<0?'expired':($remaining===0?'today':'warning');
+        $title=$remaining<0?'Mercadería vencida':($remaining===0?'Mercadería que vence hoy':'Mercadería próxima a vencer');
+        $label=$remaining<0?'Vencido hace '.(-$remaining).' día'.($remaining===-1?'':'s'):($remaining===0?'Vence hoy':'Vence en '.$remaining.' día'.($remaining===1?'':'s'));
+        $key='expiry:'.$user.':'.$item['id'].':'.$item['expires'];
+        $body='Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']);
+        stock_query($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO UPDATE SET title=excluded.title,body=excluded.body,read_at=CASE WHEN notifications.title<>excluded.title THEN NULL ELSE notifications.read_at END",[$user,$key,'stock_expiry',$title,$body]);
+        $current[$key]=['pallet_code'=>$item['code'],'product_id'=>(int)$item['id'],'expiry_state'=>$state,'expiry_label'=>$label];
+    }
+    foreach(stock_query($db,"SELECT id,event_key FROM notifications WHERE user_id=? AND type='stock_expiry'",[$user])->fetchAll() as $old) {
+        if(!isset($current[$old['event_key']]))stock_query($db,'DELETE FROM notifications WHERE user_id=? AND id=?',[$user,$old['id']]);
+    }
+    return $current;
 }

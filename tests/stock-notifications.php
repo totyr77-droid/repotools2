@@ -1,0 +1,29 @@
+<?php
+require_once __DIR__.'/../includes/database.php';
+require_once __DIR__.'/../includes/stock.php';
+function verify_alert(bool $ok,string $message): void {if(!$ok)throw new RuntimeException($message);}
+$db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+initialize_database($db);
+$db->exec("INSERT INTO users(name,email,password_hash) VALUES('Prueba','alerts@example.invalid','test'),('Otro','other@example.invalid','test')");
+$label=stock_generate($db,1);$p=stock_claim($db,$label['code'],1);
+$today=new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
+foreach([-3,0,1,60] as $offset)stock_save_product($db,1,['pallet_id'=>$p['id'],'ean'=>'96385074','name'=>'Prueba '.$offset,'amount'=>2,'kind'=>'units','pack_size'=>1,'expires'=>$today->modify(($offset>=0?'+':'').$offset.' days')->format('Y-m-d')]);
+$alerts=stock_notify($db,1);
+verify_alert(count($alerts)===3,'Solo vencido, hoy y próximo dentro del plazo.');
+verify_alert(array_column(array_values($alerts),'expiry_state')===['expired','today','warning'],'Tres estados diferenciados.');
+foreach($alerts as $alert)verify_alert($alert['pallet_code']===$p['code'] && $alert['product_id']>0,'Destino identifica palet y lote.');
+$db->exec('UPDATE notifications SET read_at=CURRENT_TIMESTAMP');stock_notify($db,1);stock_notify($db,1);
+verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications')->fetchColumn()===3,'No duplica avisos.');
+verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications WHERE read_at IS NULL')->fetchColumn()===0,'La consulta conserva avisos leídos.');
+$expiredKey=array_key_first($alerts);
+stock_query($db,'UPDATE notifications SET title=? WHERE event_key=?',['Mercadería próxima a vencer',$expiredKey]);stock_notify($db,1);
+verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications WHERE read_at IS NULL')->fetchColumn()===1,'Escalar a vencido vuelve a avisar una sola vez.');
+$db->exec("INSERT INTO pallet_access(pallet_id,user_id,status) VALUES(".$p['id'].",2,'accepted')");
+verify_alert(count(stock_notify($db,2))===3,'Invitado autorizado recibe alertas.');
+$db->exec("UPDATE pallet_access SET status='pending'");verify_alert(stock_notify($db,2)===[],'Acceso revocado retira avisos.');
+verify_alert((int)stock_query($db,'SELECT COUNT(*) FROM notifications WHERE user_id=?',[2])->fetchColumn()===0,'No conserva enlaces a datos sin acceso.');
+stock_query($db,'UPDATE pallet_products SET expires=? WHERE id=?',[$today->modify('+90 days')->format('Y-m-d'),$alerts[$expiredKey]['product_id']]);
+verify_alert(count(stock_notify($db,1))===2,'Cambiar fecha retira aviso vencido.');
+stock_query($db,'DELETE FROM pallet_products WHERE pallet_id=?',[$p['id']]);
+verify_alert(stock_notify($db,1)===[] && (int)$db->query('SELECT COUNT(*) FROM notifications')->fetchColumn()===0,'Eliminar productos limpia avisos.');
+echo "OK: estados, destino por lote, lectura, escalamiento, sin duplicados, permisos y limpieza de alertas.\n";
