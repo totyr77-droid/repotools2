@@ -106,3 +106,7 @@
 @media(max-width:360px) { .account-panel-profile { padding: 18px; } #stockPreferences { grid-template-columns: 1fr; } .account-panel #stockPreferences button { width: 100%; } }
 @media(min-width:769px) { .stock-main { padding: 40px 32px; } }
 @media(max-width:400px) { .stock-form-row { grid-template-columns: 1fr; gap: 0; } .stock-icon { width: 44px; min-height: 44px; padding: 10px; } }
+.account-panel-auth > a.account-create-button { display:flex;gap:8px;width:100%;box-sizing:border-box;min-height:48px;margin-top:10px;padding:12px 16px;border:1px solid #a8d9c8;border-radius:10px;background:#e4f5ed;color:#17634b;font-weight:600;font-size:.9rem;text-decoration:none;transition:background .2s,border-color .2s; }
+.account-create-button svg {width:20px;height:20px;flex-shrink:0}
+.account-panel-auth > a.account-create-button:hover {background:#d3eddf;border-color:#78bca4}
+.account-panel-auth > a.account-create-button:focus-visible {outline:2px solid #17634b;outline-offset:3px}

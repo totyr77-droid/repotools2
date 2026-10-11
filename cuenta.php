@@ -103,7 +103,8 @@ include __DIR__ . '/vistas/header.vista.php';
       <button class="password-toggle" type="button" aria-pressed="false">Mostrar contraseña</button>
       <button type="submit"><?= $register ? 'CREAR CUENTA' : 'ENTRAR' ?></button>
     </form>
-    <nav class="account-auth-links" aria-label="Opciones de acceso"><a href="cuenta.php?mode=<?= $register ? 'login' : 'registro' ?>&amp;next=<?= escape($next) ?>"><?= $register ? 'Ya tengo cuenta' : 'Crear una cuenta' ?></a>
+    <?php if (!$register): ?><a class="account-create-button" href="cuenta.php?mode=registro&amp;next=<?= escape($next) ?>"><?= account_icon('user') ?><span>Crear cuenta</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a><?php endif; ?>
+    <nav class="account-auth-links" aria-label="Opciones de acceso"><?php if ($register): ?><a href="cuenta.php?mode=login&amp;next=<?= escape($next) ?>">Ya tengo cuenta</a><?php endif; ?>
     <a href="index.php">Continuar sin cuenta</a>
     <a href="tops.php">Ver TOPs</a>
     <a href="reportes.php">Mis reportes</a>
