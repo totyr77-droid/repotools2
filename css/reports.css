@@ -105,3 +105,4 @@
 #reviewReportDetails .report-field p { font-size: .95rem; }
 #reviewReportForm label { font-size: .95rem; }
 .report-card p { font-size: .9rem; }
+.reports-state-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid #eceaf2}.reports-state-tabs[hidden]{display:none}.reports-state-tabs button{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 12px;font-size:.85rem}.reports-state-tabs button[aria-pressed=true]{background:#e9e6f5;color:#27187e;box-shadow:inset 0 0 0 1px #bcb2de}.reports-state-tabs svg,.reports-tabs svg{width:18px;height:18px;flex-shrink:0}

@@ -9,14 +9,18 @@
   let queue = document.querySelector('[data-report-view]').dataset.reportView === 'queue', version = 0, listVersion = 0, active, csrf, busy = false, photos = [];
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
-  let moderationView = 'pending', auditPage = 0;
+  let moderationView = 'pending', auditPage = 0, reportState = 'pending';
+  document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
   const stamp = value => new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)?value:value.replace(' ','T')+'Z').toLocaleString('es-AR', { timeZone: 'America/Buenos_Aires', dateStyle: 'short', timeStyle: 'short', hourCycle: 'h23' });
   const logLabels = {product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet',user_role:'Cambio de rango'};
   const actionLabels = {approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
   document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
     moderationView = button.dataset.moderationView; auditPage = 0;
+    const reports = ['pending','history'].includes(moderationView); if(reports)reportState=moderationView;
+    const filters=document.getElementById('reportStateTabs'); if(filters)filters.hidden=!reports;
+    document.getElementById('moderationReports')?.setAttribute('aria-pressed',String(reports));
     document.querySelectorAll('[data-moderation-view]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
-    document.querySelector('.reports-panel h1').textContent = {pending:'Reportes pendientes',history:'Historial de reportes',logs:'Registros de actividad',users:'Usuarios'}[moderationView]; load();
+    document.querySelector('.reports-panel h1').textContent = {pending:'Reportes pendientes',history:'Reportes resueltos',logs:'Registros de actividad',users:'Usuarios'}[moderationView]; load();
   }));
   document.getElementById('moderationPrevious').addEventListener('click', () => { if(auditPage>0){auditPage--;load();} });
   document.getElementById('moderationNext').addEventListener('click', () => { auditPage++;load(); });

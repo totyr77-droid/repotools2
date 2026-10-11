@@ -40,7 +40,7 @@
 <script src="js/product-reports.js?v=20261011-audit1"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/ean-scanner.js?v=20261010-palletzoom1"></script>
-<script src="js/reports-page.js?v=20261011-profile1"></script>
+<script src="js/reports-page.js?v=20261011-reportgroup1"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
@@ -68,6 +68,6 @@
 <script src="js/notifications.js?v=20261011-stock1"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261010-stock13"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-profile1"></script><?php endif; ?>
-<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-hand1"></script><?php endif; ?>
+<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-autohand1"></script><?php endif; ?>
 </body>
 </html>
