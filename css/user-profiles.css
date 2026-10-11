@@ -9,3 +9,33 @@
 .user-report-permission .report-block-button{background:#c92a38;color:#fff;border-color:#c92a38}.user-report-permission .report-block-button.user-unblock-button{background:#eaf7ef;color:#17633d;border-color:#c6e8d3}
 
 .user-role-badge{margin-left:0;padding:5px 7px;gap:5px;font-size:.72rem;line-height:1.3;flex-shrink:0}.user-role-badge .profile-icon{width:15px;height:15px}.user-report-permission{justify-content:space-between;gap:10px;padding:10px 12px;background:#f5f6fa;border:1px solid #e8eaf0;border-radius:12px}.user-report-state{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;line-height:1.4;color:#23704a}.user-report-state .profile-icon{width:17px;height:17px}.user-report-permission.is-blocked .user-report-state{color:#a22432}.user-report-permission .report-block-button{min-height:40px;margin:0;border:1px solid #c92a38;border-radius:9px;padding:8px 10px;line-height:1.3;font-weight:600;text-transform:none;box-shadow:none}.user-report-permission .report-block-button .profile-icon{width:16px;height:16px}.user-report-permission .report-block-button:hover{filter:brightness(.96);transform:none}
+
+/* Keep directory controls and profile sections aligned despite shared form styles. */
+.user-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:end;gap:16px;margin-bottom:16px}
+.user-workspace .user-search{display:grid;grid-template-columns:minmax(0,1fr) 44px 44px;gap:8px;margin:0;padding:0;width:100%}
+.user-workspace .user-search-field{margin:0;gap:6px}
+.user-workspace .user-search button{width:44px;height:44px;min-height:44px;margin:0;padding:10px;justify-content:center}
+.user-workspace .user-search input{height:44px;margin:0}
+.user-workspace .user-directory-filter{display:grid;grid-template-columns:18px 1fr;gap:6px;margin:0}
+.user-directory-filter select{grid-column:1/-1;height:44px;width:100%;box-sizing:border-box}
+.user-workspace #userStatus:empty,.user-workspace #userDirectoryStatus:empty{display:none}
+.user-workspace .user-directory-row{box-sizing:border-box;margin:0;border-radius:0;min-height:64px;box-shadow:none;text-transform:none;line-height:1.4}
+.user-directory-details strong{font-size:.9rem;font-weight:600;color:#27187e}
+.user-profile-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.user-profile-summary,.user-profile-activity{min-width:0}
+.user-profile-heading{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:8px;align-items:center}
+.user-profile-heading h2{font-size:1.05rem;line-height:1.4}
+.user-profile-data{grid-template-columns:125px minmax(0,1fr);gap:8px 12px;padding:14px 0;margin:0;border-bottom:1px solid #eceaf2;line-height:1.45}
+.user-profile-stats{margin:14px 0;gap:6px}
+.user-profile-stats>div{padding:9px 10px;min-width:0}
+.user-role-form{margin:0;padding:0;gap:8px;width:100%}
+.user-role-form label{margin:0;min-width:0}
+.user-workspace .user-role-form button{min-height:44px;margin:0;padding:10px 12px;font-size:.85rem;text-transform:none}
+.user-role-form select{height:44px;margin:0}
+.user-profile-activity{border-left:1px solid #eceaf2;padding-left:24px}
+.user-profile-activity h3{align-items:center;font-size:.95rem;line-height:1.4;margin:0 0 8px}
+.user-profile-activity>p{font-size:.85rem;color:#68677b;margin:10px 0}
+.user-event{line-height:1.4;gap:4px 10px}
+@media(max-width:760px){.user-toolbar{grid-template-columns:minmax(0,1fr);gap:12px}.user-workspace .user-directory-filter{display:flex;gap:8px}.user-directory-filter select{flex:1;max-width:260px}.user-profile-grid{grid-template-columns:minmax(0,1fr);gap:20px}.user-profile-activity{border-left:0;border-top:1px solid #eceaf2;padding:16px 0 0}.user-profile-data{grid-template-columns:90px minmax(0,1fr)}.user-profile-heading{grid-template-columns:20px minmax(0,1fr)}.user-profile-heading .user-role-badge{grid-column:2;justify-self:start}.user-report-permission{padding:10px;gap:8px}.user-directory-row{gap:8px}.user-directory-row>.profile-icon{width:17px;height:17px}.user-directory-row .user-role-badge{font-size:.68rem;padding:4px 5px;gap:4px}.user-directory-row .user-role-badge .profile-icon{width:13px;height:13px}}
+
+.user-workspace:has(.user-profile-grid) .user-directory-filter{display:none}.user-workspace:has(.user-profile-grid) .user-toolbar{grid-template-columns:minmax(0,1fr)}
