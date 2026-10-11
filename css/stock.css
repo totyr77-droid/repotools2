@@ -122,3 +122,7 @@
 .account-password-field .password-toggle:focus-visible {outline:2px solid #8372d8;outline-offset:-2px}
 body[data-hand="left"] .account-panel-auth .account-password-field .password-toggle {right:auto;left:2px}
 body[data-hand="left"] .account-panel-auth .account-password-field input {padding-right:12px;padding-left:50px}
+
+.account-main:has(.account-panel-profile){max-width:1200px;margin:0 auto;box-sizing:border-box;padding:28px 24px 40px;min-height:0}.account-panel.account-panel-profile{width:100%;max-width:none;box-sizing:border-box;margin:0;padding:0;background:transparent;border:0;border-radius:0}.account-title,.account-panel-profile .stock-preferences h2{display:flex;align-items:center;gap:8px}.account-title svg{width:26px;height:26px}.account-panel-profile .stock-preferences h2 svg,.account-shortcuts svg,.profile-qr summary svg{width:20px;height:20px;flex-shrink:0}.account-shortcuts a{gap:8px}.account-panel-profile .stock-preferences,.account-panel-profile .hand-preferences{max-width:640px}.account-panel-profile .account-shortcuts{max-width:800px}.account-panel-profile .profile-qr{max-width:640px}.account-panel-profile .profile-chevron{display:flex;margin-left:auto}.account-panel-profile .account-shortcuts a{background:#efedf8}.stock-palets-block>.library-empty-notice{margin-top:14px}@media(max-width:768px){.account-main:has(.account-panel-profile){padding:24px 16px 32px}}
+
+.stock-workspace .library-empty-notice h2{color:#236342}

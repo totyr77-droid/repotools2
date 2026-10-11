@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 $paginaCuenta = true;
+require_once __DIR__.'/includes/stock-icons.php';
 $mostrarCreditos = true;
 $register = ($_GET['mode'] ?? '') === 'registro';
 $next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca'], true) ? $_GET['next'] : '';
@@ -78,17 +79,17 @@ include __DIR__ . '/vistas/header.vista.php';
   <section class="account-panel<?= current_user() ? ' account-panel-profile' : ' account-panel-auth' ?>">
     <?php if (current_user() && $error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
     <?php if (current_user()): ?>
-    <h1>Mi cuenta</h1>
+    <h1 class="account-title"><?= stock_icon('settings') ?>Configuración</h1>
     <p>Hola, <?= escape(current_user()['name']) ?>.</p>
     <p class="account-email"><?= escape(current_user()['email']) ?></p>
-    <details id="myProfileQR" class="profile-qr"><summary><i class="fa-solid fa-qrcode" aria-hidden="true"></i>Mi QR de perfil<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary><div class="profile-qr-image"></div><p role="status"></p></details>
+    <details id="myProfileQR" class="profile-qr"><summary><?= stock_icon('qr') ?>Mi QR de perfil<span class="profile-chevron"><?= stock_icon('chevron') ?></span></summary><div class="profile-qr-image"></div><p role="status"></p></details>
     <?php if (!empty(current_user()['company'])): ?><p class="account-company"><?= account_icon('company') ?><?= escape(current_user()['company']) ?></p><?php endif; ?>
-    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php">Ver mis estadísticas y TOPs</a>
-    <a href="biblioteca.php">Abrir mi biblioteca</a>
-    <a href="reportes.php">Mis reportes</a>
-    <a href="stock.php">Gestionar palets</a>
-    <a href="index.php">Volver al escáner</a></nav>
-    <section class="stock-preferences"><h2>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="30" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
+    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
+    <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
+    <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
+    <a href="stock.php"><?= stock_icon('qr') ?>Palets</a>
+    <a href="index.php"><?= stock_icon('barcode') ?>Escáner</a></nav>
+    <section class="stock-preferences"><h2><?= stock_icon('clock') ?>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="30" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
     <?php include __DIR__ . '/includes/hand-preference-view.php'; ?>
     <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
@@ -100,7 +101,7 @@ include __DIR__ . '/vistas/header.vista.php';
       <label><span class="account-field-title"><?= account_icon('company') ?>Empresa o agencia <small>(opcional)</small></span><input name="company" autocomplete="organization" maxlength="100" placeholder="Marca, empresa o agencia" value="<?= escape($company) ?>"></label><p class="account-field-hint">Se mostrará junto a tu nombre en los palets.</p><?php endif; ?>
       <label><span class="account-field-title"><?= account_icon('mail') ?>Correo electrónico</span><input type="email" name="email" autocomplete="email" maxlength="254" placeholder="nombre@correo.com" required value="<?= escape($email) ?>"></label>
       <label><span class="account-field-title"><?= account_icon('lock') ?>Contraseña</span><span class="account-password-field"><input id="accountPassword" type="password" name="password" autocomplete="<?= $register ? 'new-password' : 'current-password' ?>" placeholder="<?= $register ? 'Al menos 10 caracteres' : 'Tu contraseña' ?>" <?= $register ? 'minlength="10" maxlength="72"' : '' ?> required><button class="password-toggle" type="button" aria-label="Mostrar contraseña" title="Mostrar contraseña" aria-controls="accountPassword" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></span></label>
-      <button type="submit"><?= $register ? 'CREAR CUENTA' : 'ENTRAR' ?></button>
+      <button type="submit"><?= $register ? 'CREAR CUENTA' : 'INGRESAR' ?></button>
     </form>
     <?php if (!$register): ?><a class="account-create-button" href="cuenta.php?mode=registro&amp;next=<?= escape($next) ?>"><?= account_icon('user') ?><span>Crear cuenta</span></a><?php endif; ?>
     <nav class="account-auth-links" aria-label="Opciones de acceso"><?php if ($register): ?><a href="cuenta.php?mode=login&amp;next=<?= escape($next) ?>">Ya tengo cuenta</a><?php endif; ?>

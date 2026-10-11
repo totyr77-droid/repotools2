@@ -129,3 +129,5 @@ body:has(.library-dialog[open]) { overflow: hidden; }
     .library-heading h1 { font-size: 1.6rem; }
     .library-heading h2 { font-size: 1.2rem; }
 }
+
+#newCollection,#generateLabels{background:#dce9ff;color:#234b8b;border:1px solid #b4cef4;box-shadow:0 2px 5px #234b8b12}#newCollection:hover,#generateLabels:hover{background:#cbdfff}#newCollection:focus-visible,#generateLabels:focus-visible{outline:2px solid #234b8b;outline-offset:3px}

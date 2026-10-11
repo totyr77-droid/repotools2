@@ -2,6 +2,9 @@
 function stock_icon(string $name): string {
     $paths = [
         'qr'=>'<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h3v3h3v3h-6zM21 12v3M12 3v3M12 12h3M12 18v3"/>',
+        'chart'=>'<path d="M4 3v18h17M8 16v-4M13 16V8M18 16V5"/>',
+        'book'=>'<path d="M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 6v15"/>',
+        'report'=>'<path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h4"/>',
         'barcode'=>'<path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/>',
         'keyboard'=>'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M7 16h10"/>',
         'print'=>'<path d="M6 9V3h12v6M6 17H3V9h18v8h-3M6 14h12v7H6zM17 12h.01"/>',
