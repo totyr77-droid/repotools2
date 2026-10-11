@@ -135,10 +135,15 @@ async function create(request, more = {}) {
   const resolved=history.items.find(item=>Number(item.id)===Number(registered.report.id));
   assert.ok(resolved.changes.some(change=>change.field==='quantity'&&change.before==='1 L'&&change.after==='500 ml'));
   assert.ok(!Object.hasOwn(resolved,'original_data')&&!Object.hasOwn(resolved,'proposed_data'));
+  const legacy=spawnSync('C:/xampp/php/php.exe',['-r',"require 'includes/database.php';$db=database();foreach($db->query('SELECT id,after_data FROM product_edits')->fetchAll() as $row){$data=json_decode($row['after_data'],true);unset($data['reviewed_report_id']);$db->prepare('UPDATE product_edits SET after_data=? WHERE id=?')->execute([json_encode($data,JSON_UNESCAPED_UNICODE),$row['id']]);}"],{env,encoding:'utf8'});assert.equal(legacy.status,0,legacy.stderr);
   const logs=(await admin('api/reportes.php?view=logs')).json();
   assert.ok(logs.items.some(item=>item.event_type==='report_review'));assert.ok(!logs.items.some(item=>item.event_type==='product_edit'),'Aprobar reportes no debe generar otra etiqueta Editado');assert.ok(logs.items.some(item=>item.event_type==='report_block'));
   const directRevision=(await admin('api/productos.php?ean=96385074')).json().product.revision;const direct=await admin('api/productos.php',{...fields,ean:'96385074',revision:directRevision,csrf:adminCsrf});assert.equal(direct.status,200,direct.text);
   assert.ok((await admin('api/reportes.php?view=logs')).json().items.some(item=>item.event_type==='product_edit'&&item.target==='96385074'),'Edición directa mantiene Editado');
+  for(const filter of ['approved','rejected','edited','blocked','unblocked']){const filtered=(await admin('api/reportes.php?view=logs&filter='+filter)).json();assert.ok(filtered.items.every(item=>item.action===filter));}
+  assert.equal((await admin('api/reportes.php?view=logs&filter=invalid')).status,422);
+  assert.equal((await admin('api/reportes.php?view=logs&filter[]=edited')).status,422);
+  assert.equal((await mod('api/reportes.php?view=logs&filter=edited')).status,403);
   assert.equal((await admin('api/reportes.php?view=logs&page=-1')).status,422);
   assert.equal((await admin('api/reportes.php?view=history&page=1')).json().items.length,0);
   assert.match((await admin('reportes.php?queue=1')).text,/data-moderation-view="history"/);

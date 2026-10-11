@@ -37,7 +37,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/contador.css" rel="stylesheet" type="text/css">
     <link href="css/mobile.css" rel="stylesheet" type="text/css">
     <link href="css/footer.css" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-moderationflat7" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-logfilters8" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261010-result2" rel="stylesheet" type="text/css"><?php endif; ?>

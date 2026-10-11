@@ -171,5 +171,8 @@ function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision
 }
 
 function catalog_direct_edit_condition(PDO $db, string $column='after_data'): string {
-    return $db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql' ? "({$column}::jsonb ->> 'reviewed_report_id') IS NULL" : "json_extract({$column}, '$.reviewed_report_id') IS NULL";
+    $alias=str_contains($column,'.')?substr($column,0,strrpos($column,'.')):'product_edits';
+    $origin=$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql' ? "({$column}::jsonb ->> 'reviewed_report_id') IS NULL" : "json_extract({$column}, '$.reviewed_report_id') IS NULL";
+    // Legacy reviews have no explicit origin: unify only an exact, unique audit match.
+    return $origin." AND NOT EXISTS(SELECT 1 FROM product_reports legacy WHERE legacy.status='approved' AND legacy.ean={$alias}.ean AND legacy.reviewed_by={$alias}.user_id AND legacy.reviewed_at={$alias}.created_at AND ((legacy.original_data={$alias}.before_data AND (SELECT COUNT(*) FROM product_edits sibling WHERE sibling.ean={$alias}.ean AND sibling.user_id={$alias}.user_id AND sibling.created_at={$alias}.created_at AND sibling.before_data={$alias}.before_data)=1) OR (SELECT COUNT(*) FROM product_edits sibling WHERE sibling.ean={$alias}.ean AND sibling.user_id={$alias}.user_id AND sibling.created_at={$alias}.created_at)=(SELECT COUNT(*) FROM product_reports reviewed WHERE reviewed.status='approved' AND reviewed.ean={$alias}.ean AND reviewed.reviewed_by={$alias}.user_id AND reviewed.reviewed_at={$alias}.created_at)))";
 }

@@ -11,6 +11,7 @@
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   let moderationView = 'pending', auditPage = 0, reportState = 'pending';
   document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
+  const logFilter=document.getElementById('reportLogFilter');logFilter?.addEventListener('change',()=>{auditPage=0;load();});
   const stamp = value => window.RepoDateTime.stamp(value);
   const logLabels = {product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet',user_role:'Cambio de rango'};
   const actionLabels = {approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
@@ -34,11 +35,12 @@
   function clearPhotos() { photos.forEach(url => URL.revokeObjectURL(url)); photos = []; }
   page?.onLeave(() => { ++version; ++listVersion; clearPhotos(); });
   async function load() {
+    const filterBox=document.getElementById('reportLogFilters');if(filterBox)filterBox.hidden=moderationView!=='logs';
     const attempt = ++listVersion; const users=moderationView==='users'; const workspace=document.getElementById('userWorkspace'); if(workspace)workspace.hidden=!users; list.hidden=users; document.getElementById('moderationPagination').hidden=true; if(users){status.textContent='';return;} status.textContent = 'Cargando…'; list.replaceChildren();
     document.getElementById('moderationPagination').hidden = true;
     try {
       if (queue && moderationView !== 'pending') {
-        const result = await RepoReports.request(`?view=${moderationView}&page=${auditPage}`); if(attempt !== listVersion)return; csrf=result.csrf;
+        const result = await RepoReports.request(`?view=${moderationView}&page=${auditPage}${moderationView==='logs'?'&filter='+encodeURIComponent(logFilter?.value||''):''}`); if(attempt !== listVersion)return; csrf=result.csrf;
         status.textContent=result.items.length?'':moderationView==='history'?'Todavía no hay reportes revisados.':'Todavía no hay actividad registrada.';
         for(const item of result.items){
           const card=document.createElement('article');card.className='report-card';list.append(card);const info=document.createElement('div');info.className='report-card-info';card.append(info);
