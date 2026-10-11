@@ -10,6 +10,12 @@ try {
     $csrf=csrf_token();session_write_close();$db=database();$actor=profile_user($db,(int)$session['id']);
     if ($method==='GET' && isset($_GET['mine'])) user_response(200,['token'=>profile_token($db,(int)$actor['id'])]);
     if (!in_array($actor['role'],['administrador','manager'],true)) throw new CatalogException('Solo administradores y managers pueden consultar perfiles.',403);
+    if ($method==='GET' && isset($_GET['list'])) {
+        $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);
+        if ($page===false) throw new CatalogException('Página no válida.',422);
+        $s=$db->prepare('SELECT id,name,email,company,role FROM users ORDER BY LOWER(name),id LIMIT 21 OFFSET '.($page*20));$s->execute();$users=$s->fetchAll(PDO::FETCH_ASSOC);
+        user_response(200,['users'=>array_slice($users,0,20),'page'=>$page,'page_size'=>20,'has_more'=>count($users)>20]);
+    }
     if ($method==='POST') {
         if (($_POST['action']??'')!=='role') throw new CatalogException('Solicitud no válida.',422);
         profile_change_role($db,(int)$actor['id'],(int)($_POST['id']??0),(string)($_POST['role']??''));
@@ -18,7 +24,8 @@ try {
         $target=profile_user($db,(int)$_POST['id']);
     } else {
         $email=trim((string)($_GET['email']??''));$token=(string)($_GET['token']??'');
-        if ($email!=='' && filter_var($email,FILTER_VALIDATE_EMAIL)) {$s=$db->prepare('SELECT id FROM users WHERE LOWER(email)=LOWER(?)');$s->execute([$email]);}
+        if (isset($_GET['id'])) {$id=filter_var($_GET['id'],FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);if ($id===false) throw new CatalogException('Cuenta no válida.',422);$s=$db->prepare('SELECT id FROM users WHERE id=?');$s->execute([$id]);}
+        elseif ($email!=='' && filter_var($email,FILTER_VALIDATE_EMAIL)) {$s=$db->prepare('SELECT id FROM users WHERE LOWER(email)=LOWER(?)');$s->execute([$email]);}
         elseif (preg_match('/^[a-f0-9]{64}$/D',$token)) {$s=$db->prepare('SELECT user_id FROM user_profile_tokens WHERE token=?');$s->execute([$token]);}
         else throw new CatalogException('Ingresa un correo válido o escanea el QR del perfil.',422);
         $id=$s->fetchColumn();if (!$id) throw new CatalogException('No encontramos esa cuenta.',404);$target=profile_user($db,(int)$id);
