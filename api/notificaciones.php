@@ -28,8 +28,8 @@ try {
     $stmt->execute([$userId]);
     $unread = (int) $stmt->fetchColumn();
     $limit = (new DateTimeImmutable('today', new DateTimeZone('America/Buenos_Aires')))->modify('+' . stock_warning_days($db, $userId) . ' days')->format('Y-m-d');
-    $hasExpiry = stock_query($db, "SELECT 1 FROM pallet_products b JOIN pallets p ON p.id = b.pallet_id WHERE p.released = 0 AND b.expires <> '' AND b.expires <= ? AND (p.owner_id = ? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id = p.id AND a.user_id = ? AND a.status = 'accepted')) LIMIT 1", [$limit, $userId, $userId])->fetchColumn() !== false;
-    notification_response(200, ['notifications' => $items, 'unread' => $unread, 'has_expiring_stock' => $hasExpiry]);
+    $expiryCount = (int) stock_query($db, "SELECT COUNT(*) FROM pallet_products b JOIN pallets p ON p.id = b.pallet_id WHERE p.released = 0 AND b.expires <> '' AND b.expires <= ? AND (p.owner_id = ? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id = p.id AND a.user_id = ? AND a.status = 'accepted'))", [$limit, $userId, $userId])->fetchColumn();
+    notification_response(200, ['notifications' => $items, 'unread' => $unread, 'has_expiring_stock' => $expiryCount > 0, 'expiring_stock_count' => $expiryCount]);
 } catch (Throwable $error) {
     error_log('Repotools notifications error: ' . get_class($error));
     notification_response(503, ['error' => 'No pudimos cargar tus notificaciones.']);

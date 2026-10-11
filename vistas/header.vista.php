@@ -43,7 +43,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
-    <link href="css/notifications.css?v=20261011-roles1" rel="stylesheet" type="text/css">
+    <link href="css/notifications.css?v=20261011-stockcount2" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261011-clear7" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
@@ -64,7 +64,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 
         <nav class="nav" aria-label="Navegacion principal">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
-          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK<span class="stock-nav-expiry" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
+          <a href="stock.php" class="stock-nav-link"><i class="fa-solid fa-qrcode"></i>STOCK<span class="report-pending-badge stock-expiry-badge" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-shield-halved"></i>MODERACIÓN <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
           <a href="cuenta.php"><i class="fa-solid <?= current_user() ? 'fa-gear' : 'fa-user' ?>"></i><?= current_user() ? 'AJUSTES' : 'INGRESAR' ?><?php if (current_user()): ?><span class="profile-pending-dot" data-profile-pending aria-label="Perfil por completar"<?= $userHand !== '' ? ' hidden' : '' ?>></span><?php endif; ?></a>
@@ -72,7 +72,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 
         <nav class="nav-celular" id="nav-celular" aria-label="Navegación móvil">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
-          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK<span class="stock-nav-expiry" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
+          <a href="stock.php" class="stock-nav-link"><i class="fa-solid fa-qrcode"></i>STOCK<span class="report-pending-badge stock-expiry-badge" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-shield-halved"></i>MODERACIÓN <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
           <a href="cuenta.php"><i class="fa-solid <?= current_user() ? 'fa-gear' : 'fa-user' ?>"></i><?= current_user() ? 'AJUSTES' : 'INGRESAR' ?><?php if (current_user()): ?><span class="profile-pending-dot" data-profile-pending aria-label="Perfil por completar"<?= $userHand !== '' ? ' hidden' : '' ?>></span><?php endif; ?></a>

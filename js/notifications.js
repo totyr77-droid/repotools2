@@ -12,7 +12,7 @@
   function toggle(open) { panel.hidden = !open; button.setAttribute('aria-expanded', String(open)); }
   function render(result) {
     items = result.notifications;
-    document.querySelectorAll('[data-stock-expiry]').forEach(dot => { dot.hidden = result.has_expiring_stock !== true; });
+    document.querySelectorAll('[data-stock-expiry]').forEach(badge => { const count=Number(result.expiring_stock_count)||0;badge.hidden=count===0;badge.textContent=count>99?'99+':String(count);badge.setAttribute('aria-label',count+' productos por vencer o vencidos'); });
     const badge = get('notificationBadge'); badge.hidden = result.unread === 0; badge.textContent = result.unread > 99 ? '99+' : result.unread;
     button.setAttribute('aria-label', result.unread ? `Notificaciones: ${result.unread} sin leer` : 'Notificaciones');
     get('readAllNotifications').hidden = result.unread === 0;
