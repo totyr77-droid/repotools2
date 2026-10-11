@@ -92,8 +92,9 @@
       if (active.review_note) text('p', active.review_note);
       if (result.can_review && active.submitter) {
         const sender = active.submitter, section = document.createElement('section'); section.className = 'report-sender'; details.append(section);
-        const identity = text('p', sender.name, section); identity.className = 'report-inline'; identity.setAttribute('aria-label', 'Enviado por ' + sender.name); icon(identity, 'user');
-        const more = document.createElement('details'); more.className = 'report-sender-more'; section.append(more); text('summary', 'Datos', more);
+        const senderIdentity = document.createElement('div'); senderIdentity.className = 'report-sender-identity'; section.append(senderIdentity);
+        const identity = text('p', sender.name, senderIdentity); identity.className = 'report-inline'; identity.setAttribute('aria-label', 'Enviado por ' + sender.name); icon(identity, 'user');
+        const more = document.createElement('details'); more.className = 'report-sender-more'; senderIdentity.append(more); text('summary', 'Datos', more);
         const senderData = document.createElement('div'); senderData.className = 'report-sender-data'; more.append(senderData);
         text('p', `Correo: ${sender.email || 'No disponible'}`, senderData);
         text('p', `Empresa: ${sender.company || 'No indicada'}`, senderData);
@@ -110,13 +111,13 @@
             busy = true; button.disabled = approve.disabled = reject.disabled = close.disabled = true;
             try {
               const body = new FormData(); body.set('csrf', csrf); body.set('id', id); body.set('action', sender.blocked ? 'unblock_reports' : 'block_reports');
-              const response = await RepoReports.request('', body); sender.blocked = response.report.submitter.blocked;
+              const response = await RepoReports.request('', body); sender.blocked = response.report.submitter.blocked; sender.can_manage = response.report.submitter.can_manage;
               hint.textContent = sender.blocked ? 'Bloqueado. Esta cuenta no puede enviar nuevos reportes.' : 'Habilitado. Esta cuenta puede volver a enviar reportes.';
               await load();
             } catch (error) { hint.textContent = error.message; }
-            finally { busy = false; button.disabled = approve.disabled = reject.disabled = close.disabled = false; button.textContent = sender.blocked ? 'Habilitar' : 'Bloquear'; icon(button, 'block'); }
+            finally { busy = false; button.disabled = approve.disabled = reject.disabled = close.disabled = false; button.hidden = !sender.can_manage; button.textContent = sender.blocked ? 'Habilitar' : 'Bloquear'; icon(button, 'block'); }
           });
-        }
+        } else if (sender.blocked) { const state = text('span', 'Reportes bloqueados', section); state.className = 'report-blocked-state'; }
       }
       const comparison = document.createElement('div'); comparison.className = 'report-comparison'; details.append(comparison);
       const resolved=active.status!=='pending', baseline=resolved?active.original:active.current;

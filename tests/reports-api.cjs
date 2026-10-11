@@ -21,7 +21,7 @@ function client(owner = 'a'.repeat(64)) {
     return { status: response.status, text, bytes, json: () => JSON.parse(text) };
   };
 }
-const guest = client(), user = client(), mod = client();
+const guest = client(), user = client(), mod = client(), unblockAdmin = client();
 const fields = { ean: '7791234567898', name: 'Agua corregida', quantity: '500 ml', brand: 'Marca', category: 'Bebidas', packaging: 'Botella', description: 'La presentación correcta es 500 ml.' };
 async function login(request, role) {
   const form = await request('cuenta.php'); const csrf = form.text.match(/name="csrf" value="([^"]+)"/)[1];
@@ -62,7 +62,11 @@ async function create(request, more = {}) {
   assert.equal((await user('biblioteca.php')).status, 200);
   assert.equal((await guest('api/reportes.php')).json().can_submit, true);
   assert.equal((await mod('api/reportes.php?queue=1')).json().blocked_reports.length, 1);
-  assert.equal((await mod('api/reportes.php', { ...block, action: 'unblock_reports' })).json().report.submitter.blocked, false);
+  assert.equal((await mod('api/reportes.php', { ...block, action: 'unblock_reports' })).status, 403);
+  assert.equal((await mod('api/reportes.php?id=' + registered.report.id)).json().report.submitter.can_manage, false);
+  assert.equal((await user('api/reportes.php')).json().can_submit, false);
+  await login(unblockAdmin, 'administrador'); const unblockCsrf = (await unblockAdmin('api/reportes.php?queue=1')).json().csrf;
+  assert.equal((await unblockAdmin('api/reportes.php', { ...block, csrf: unblockCsrf, action: 'unblock_reports' })).json().report.submitter.blocked, false);
   assert.equal((await user('api/reportes.php')).json().can_submit, true);
   assert.equal((await mod('api/reportes.php?pending_count=1')).json().pending_count, 2);
   assert.match((await mod('index.php')).text, /href="reportes\.php\?queue=1" class="report-nav-link"/);
