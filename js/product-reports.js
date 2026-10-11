@@ -128,9 +128,10 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) { stopCamera(); if (camera.open) camera.close(); } });
   (page ? page.listen : window.addEventListener.bind(window))('pagehide', stopCamera);
   page?.onLeave(stopCamera);
-  page?.onLeave(() => { revision++; previews.forEach(url => URL.revokeObjectURL(url)); previews.clear(); });
+  page?.onLeave(() => { revision++; previews.forEach(url => URL.revokeObjectURL(url)); previews.clear(); capturedPhotos.clear(); });
   async function open(ean) {
     if (busy) return;
+    const scanPhoto = window.RepoEANScanner?.takeScanPhoto?.(ean);
     stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto);
     const version = ++revision; active = null; form.reset(); form.hidden = true; status.textContent = 'Cargando…';
     if (!dialog.open) dialog.showModal();
@@ -148,6 +149,12 @@
       document.getElementById('reportInstructions').textContent = missing ? 'Completa los datos del producto. Un moderador los revisará.' : 'Propón los datos correctos. Un moderador los revisará.';
       for (const field of ['name', 'quantity', 'brand', 'category', 'packaging']) form.elements[field].value = product?.[field] || '';
       document.getElementById('reportPhotos').disabled = !config.photos_enabled;
+      if (config.photos_enabled && scanPhoto) {
+        capturedPhotos.set('ean', scanPhoto); const url = URL.createObjectURL(scanPhoto); previews.set('ean', url);
+        const preview = document.getElementById('reportPreviewEan'); preview.src = url; preview.hidden = false;
+        form.querySelector('[data-report-remove="ean"]').hidden = false;
+        form.querySelector('[data-report-camera="ean"]').textContent = 'Volver a tomar foto del EAN';
+      }
       document.getElementById('reportPhotosNote').textContent = config.photos_enabled ? '' : 'Las fotos no están disponibles porque falta configurar su almacenamiento. Puedes enviar el reporte sin fotos.';
       status.textContent = ''; form.hidden = false;
     } catch (error) { if (version === revision) status.textContent = error.message; }
@@ -164,7 +171,7 @@
         const file = capturedPhotos.get(kind); body.delete('photo_' + kind);
         if (file && !document.getElementById('reportPhotos').disabled) body.set('photo_' + kind, await compress(file), kind + '.jpg');
       }
-      const result = await request('', body); form.hidden = true;
+      const result = await request('', body); form.hidden = true; ['ean', 'product'].forEach(removePhoto);
       status.replaceChildren(document.createTextNode(`Reporte #${result.report.id} enviado. `));
       const link = document.createElement('a'); link.href = 'reportes.php'; link.textContent = 'Ver mis reportes'; status.append(link);
     } catch (error) { status.textContent = error.message; }

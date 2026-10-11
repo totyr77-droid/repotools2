@@ -30,22 +30,22 @@
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
-<script src="js/ean-scanner.js?v=20261010-palletzoom1"></script>
+<script src="js/ean-scanner.js?v=20261011-scanphoto2"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=20261011-summary1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
-<script src="js/product-reports.js?v=20261011-audit1"></script>
+<script src="js/product-reports.js?v=20261011-scanphoto2"></script>
 <script src="js/biblioteca.js?v=20261010-manual1"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
-<script src="js/product-reports.js?v=20261011-audit1"></script>
+<script src="js/product-reports.js?v=20261011-scanphoto2"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/ean-scanner.js?v=20261010-palletzoom1"></script>
+<script src="js/ean-scanner.js?v=20261011-scanphoto2"></script>
 <script src="js/reports-page.js?v=20261011-tabs1"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/ean-scanner.js?v=20261010-palletzoom1"></script>
+<script src="js/ean-scanner.js?v=20261011-scanphoto2"></script>
 <script src="js/product-info.js?v=20261011-summary1"></script>
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=20261010-stock13"></script>
@@ -59,8 +59,8 @@
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 <script src="js/product-info.js?v=20261011-summary1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
-<script src="js/product-reports.js?v=20261011-audit1"></script>
-<script src="js/ean-scanner.js?v=20261010-palletzoom1"></script>
+<script src="js/product-reports.js?v=20261011-scanphoto2"></script>
+<script src="js/ean-scanner.js?v=20261011-scanphoto2"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/script.js?v=20261011-summary1"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>

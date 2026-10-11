@@ -2,6 +2,32 @@
   'use strict';
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
+  let scanPhoto = null, photoTimer, photoVersion = 0;
+  function clearScanPhoto() { ++photoVersion; scanPhoto = null; clearTimeout(photoTimer); }
+  function takeScanPhoto(ean) {
+    const photo = scanPhoto?.ean === String(ean) && scanPhoto.expires > Date.now() ? scanPhoto.blob : null;
+    clearScanPhoto(); return photo;
+  }
+  function rememberScanPhoto(ean, element) {
+    const version = photoVersion;
+    try {
+      const video = element.querySelector('video');
+      if (!video?.videoWidth || !video.videoHeight) return;
+      const frame = visibleFrame(video), scale = Math.min(1, 1280 / Math.max(frame.width, frame.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(frame.width * scale)); canvas.height = Math.max(1, Math.round(frame.height * scale));
+      canvas.getContext('2d').drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => {
+        canvas.width = canvas.height = 0;
+        if (version !== photoVersion || !blob || blob.size > 1024 * 1024) return;
+        scanPhoto = { ean: String(ean), blob, expires: Date.now() + 300000 };
+        photoTimer = setTimeout(clearScanPhoto, 300000);
+      }, 'image/jpeg', .8);
+    } catch { /* Una foto opcional nunca bloquea el escaneo. */ }
+  }
+  page?.onLeave(clearScanPhoto);
+  if (page) page.listen('pagehide', clearScanPhoto);
+  else window.addEventListener?.('pagehide', clearScanPhoto);
 
   let audioContext = null, audioPrimed = false;
   function prepareSound() {
@@ -244,6 +270,7 @@
       return enqueue(() => release(session));
     }
     function start(format = 'ean') {
+      clearScanPhoto();
       // Se habilita el audio en el toque que abre la cámara, antes de esperar
       // permisos o fotogramas, para que el primer escaneo también tenga sonido.
       prepareSound();
@@ -278,6 +305,7 @@
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
+          if (!isQR) rememberScanPhoto(code, element);
           current.accepting = false; clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
           enqueue(async () => {
@@ -318,5 +346,5 @@
     page?.onLeave(stop);
     return { start, stop };
   }
-  window.RepoEANScanner = { create, validEAN, confirmation };
+  window.RepoEANScanner = { create, validEAN, confirmation, takeScanPhoto, clearScanPhoto };
 })();
