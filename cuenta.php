@@ -90,7 +90,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <a href="stock.php"><?= stock_icon('qr') ?>Palets</a>
     <a href="index.php"><?= stock_icon('barcode') ?>Escáner</a></nav>
     <section class="stock-preferences"><h2><?= stock_icon('clock') ?>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="30" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
-    <?php include __DIR__ . '/includes/hand-preference-view.php'; ?>
+    <?php include __DIR__ . '/includes/hand-preference-view.php'; include __DIR__.'/includes/account-security-view.php'; ?>
     <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
     <p class="account-intro"><?= $register ? 'Guarda tus productos y organiza tus palets.' : 'Continúa con tus productos y palets.' ?></p>

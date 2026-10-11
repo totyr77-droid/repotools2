@@ -56,7 +56,7 @@ cerrarAlertaBtn?.addEventListener("click", () => {
 
 document.querySelectorAll('.password-toggle').forEach((button) => {
   button.addEventListener('click', () => {
-    const input = button.closest('form').querySelector('input[name="password"]');
+    const input = button.closest('.account-password-field')?.querySelector('input') || button.closest('form').querySelector('input[name="password"]');
     const visible = input.type === 'password';
     input.type = visible ? 'text' : 'password';
     const label = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';

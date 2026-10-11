@@ -1,0 +1,11 @@
+<section class="account-security">
+  <h2><?= account_icon('lock') ?>Seguridad</h2>
+  <div class="account-security-actions"><button id="changePassword" class="library-secondary" type="button"><?= account_icon('lock') ?>Cambiar contraseña</button><button id="closeOtherSessions" class="library-secondary" type="button"><?= stock_icon('close') ?>Cerrar otras sesiones</button></div>
+  <p id="accountSecurityStatus" role="status"></p>
+</section>
+<dialog id="accountSecurityDialog" class="account-edit-dialog" aria-labelledby="accountSecurityTitle"><div class="account-edit-heading"><h2 id="accountSecurityTitle">Cambiar contraseña</h2><button type="button" class="app-close" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>
+<form id="accountSecurityForm"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><input type="hidden" name="action" value="password">
+<?php foreach (['current_password'=>['Contraseña actual','Tu contraseña actual','current-password'],'password'=>['Nueva contraseña','Al menos 10 caracteres','new-password'],'confirmation'=>['Repetir nueva contraseña','Repite la nueva contraseña','new-password']] as $field=>$values): ?>
+<label data-security-field="<?= $field ?>"><?= $values[0] ?><span class="account-password-field"><input id="security-<?= $field ?>" name="<?= $field ?>" type="password" autocomplete="<?= $values[2] ?>" placeholder="<?= $values[1] ?>" required maxlength="72"<?= $field!=='current_password'?' minlength="10"':'' ?>><button class="password-toggle" type="button" aria-label="Mostrar contraseña" aria-controls="security-<?= $field ?>" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></span></label>
+<?php endforeach; ?>
+<p id="securityFormStatus" role="status"></p><button id="saveAccountSecurity" type="submit">Guardar contraseña</button></form></dialog>

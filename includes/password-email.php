@@ -29,3 +29,11 @@ function reset_email_html(string $url): string {
 </td></tr></table></body></html>
 HTML;
 }
+
+function account_security_email(string $email): bool {
+    $key=getenv('RESEND_API_KEY')?:'';$from=getenv('MAIL_FROM')?:'';$origin=rtrim(getenv('APP_URL')?:'','/');
+    if (!$key || !$from || !preg_match('~^https://[^\s]+$~D',$origin)) return false;
+    $url=htmlspecialchars($origin.'/recuperar.php',ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');
+    $html='<html lang="es"><body style="margin:0;background:#f5f6fb;font-family:Arial,sans-serif;color:#172033"><table role="presentation" width="100%"><tr><td align="center" style="padding:32px 16px"><table role="presentation" width="100%" style="max-width:520px"><tr><td style="color:#27187e;font-size:21px;font-weight:bold;padding-bottom:20px">REPOTOOLS</td></tr><tr><td style="background:white;border:1px solid #e1e5ed;border-radius:16px;padding:28px 24px"><h1 style="font-size:24px;color:#27187e;margin-top:0">Contraseña actualizada</h1><p style="line-height:1.6">Se cambió la contraseña de tu cuenta. Las sesiones anteriores en otros dispositivos ya no tienen acceso.</p><p style="line-height:1.6">Si no hiciste este cambio, recupera tu cuenta cuanto antes.</p><a href="'.$url.'" style="display:block;background:#27187e;color:white;text-align:center;padding:15px;border-radius:10px;text-decoration:none;font-weight:bold">Recuperar mi cuenta</a></td></tr></table></td></tr></table></body></html>';
+    $curl=curl_init('https://api.resend.com/emails');curl_setopt_array($curl,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>12,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>json_encode(['from'=>$from,'to'=>[$email],'subject'=>'Se cambió tu contraseña de Repotools','html'=>$html,'text'=>'Se cambió tu contraseña de Repotools. Las sesiones anteriores en otros dispositivos ya no tienen acceso. Si no hiciste este cambio, recupera tu cuenta: '.$origin.'/recuperar.php'])]);curl_exec($curl);$status=curl_getinfo($curl,CURLINFO_HTTP_CODE);curl_close($curl);return $status>=200&&$status<300;
+}
