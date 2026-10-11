@@ -144,7 +144,7 @@
       if(!active.photos.includes('product')){
         const wrapper=text('figure','',details);wrapper.className='report-photo-evidence report-reference-photo';
         text('figcaption','Foto de referencia',wrapper);
-        const note=text('p',active.reference_image?'El usuario no adjuntó una foto del producto. Mostramos la imagen que ya tenemos.':'El usuario no adjuntó una foto del producto y no tenemos una imagen guardada.',wrapper);note.className='product-edit-note';icon(note,'file');
+        const note=text('p',active.reference_image?'El usuario no adjuntó una foto del producto. Mostramos la imagen que ya tenemos.':'El usuario no adjuntó una foto del producto. No encontramos una imagen de referencia disponible en nuestra base ni en la consulta externa.',wrapper);note.className='product-edit-note';icon(note,'file');
         if(active.reference_image){const image=document.createElement('img');image.src=active.reference_image;image.alt='Foto existente del producto; no enviada en este reporte';image.className='report-evidence';image.addEventListener('error',()=>{image.remove();note.textContent='El usuario no adjuntó una foto del producto. No pudimos cargar la imagen de referencia.';},{once:true});wrapper.append(image);}
       }
       for (const kind of active.photos) {

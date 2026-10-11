@@ -71,6 +71,7 @@ try {
             $key = $stmt->fetchColumn(); if (!$key) throw new CatalogException('Foto no disponible.', 404);
             $bytes = report_object('GET', $key); header('Content-Type: image/jpeg'); echo $bytes; exit;
         }
+        $report=report_resolve_reference_photo($db,$report);
         report_response(200, ['report' => $report, 'csrf' => $csrf, 'can_review' => $moderator]);
     }
     $queue = $moderator && ($_GET['queue'] ?? '') === '1';

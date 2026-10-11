@@ -192,3 +192,17 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
         $db->commit(); return report_detail($db, $id, 'user:' . $user['id'], true);
     } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
 }
+
+function report_resolve_reference_photo(PDO $db,array $report,?callable $fetcher=null): array {
+    if(in_array('product',$report['photos'],true)||!empty($report['reference_image']))return $report;
+    try {
+        $existing=$report['current'];$product=$existing??lookup_product($db,$report['ean'],$fetcher);
+        if($product){
+            if($existing!==null||!empty($product['image']))$product=catalog_product_image($db,$product,$fetcher);
+            $report['current']=$product;
+            $report['reference_image']=$product['image']??'';
+            $report['reference_image_source']=$product['image_source']??($report['reference_image']?'openfoodfacts':'');
+        }
+    }catch(Throwable $error){/* Missing/rate-limited external imagery must never prevent reviewing a ticket. */}
+    return $report;
+}
