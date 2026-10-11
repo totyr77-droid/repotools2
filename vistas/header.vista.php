@@ -54,7 +54,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261010-compact1" rel="stylesheet" type="text/css"><?php endif; ?>
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-profile2" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet"><?php endif; ?>
-<link href="css/hand-preferences.css?v=20261011-hand-header6" rel="stylesheet">
+<link href="css/hand-preferences.css?v=20261011-hand-priority7" rel="stylesheet">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
