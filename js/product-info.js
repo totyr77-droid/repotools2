@@ -119,11 +119,6 @@
       }
       container.append(list);
       if (!list.children.length && !product.name) { status.textContent = 'Este producto todavía no tiene características cargadas.'; container.append(status); }
-      if (product.source === 'openfoodfacts' || product.image_source === 'openfoodfacts') {
-        const source = document.createElement('a'); source.href = `https://world.openfoodfacts.org/product/${ean}`;
-        source.target = '_blank'; source.rel = 'noopener noreferrer'; source.className = 'product-details__source';
-        source.textContent = 'Open Food Facts · ODbL ↗'; container.append(source);
-      }
     } catch {
       if (activeRequests.get(container) !== token) return;
       status.textContent = 'No pudimos cargar el producto. El EAN sigue disponible.';
