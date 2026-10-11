@@ -1,4 +1,6 @@
 .notification-control { position: relative; margin-left: auto; margin-right: 16px; flex-shrink: 0; }
+.stock-nav-expiry { display: inline-block; width: 8px; height: 8px; background: #c92a38; border-radius: 50%; margin-left: 4px; flex-shrink: 0; }
+.stock-nav-expiry[hidden] { display: none; }
 #openNotifications { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; color: white; background: #ffffff14; cursor: pointer; }
 #openNotifications svg { width: 22px; height: 22px; }
 #notificationBadge { position: absolute; top: -3px; right: -3px; min-width: 18px; padding: 2px 4px; border-radius: 12px; background: #c92a38; color: white; font-size: .7rem; }

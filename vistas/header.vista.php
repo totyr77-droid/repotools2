@@ -38,9 +38,9 @@ if (current_user()) {
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261010-compact1" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261010-manual1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
-    <link href="css/notifications.css?v=20261011-status1" rel="stylesheet" type="text/css">
+    <link href="css/notifications.css?v=20261011-stock1" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261010-stock13" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock.css?v=20261011-tools1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261010-motion1" rel="stylesheet" type="text/css">
@@ -55,7 +55,7 @@ if (current_user()) {
 
         <nav class="nav" aria-label="Navegacion principal">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
-          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
+          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK<span class="stock-nav-expiry" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-shield-halved"></i>MODERACIÓN <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>
@@ -63,7 +63,7 @@ if (current_user()) {
 
         <nav class="nav-celular" id="nav-celular" aria-label="Navegación móvil">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
-          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK</a>
+          <a href="stock.php"><i class="fa-solid fa-qrcode"></i>STOCK<span class="stock-nav-expiry" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
           <a href="biblioteca.php"><i class="fa-solid fa-book"></i>BIBLIOTECA</a>
           <?php if ($navModerator): ?><a href="reportes.php?queue=1" class="report-nav-link"><i class="fa-solid fa-shield-halved"></i>MODERACIÓN <span class="report-pending-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span></a><?php endif; ?>
           <a href="cuenta.php"><i class="fa-solid fa-user"></i><?= current_user() ? 'MI CUENTA' : 'ENTRAR' ?></a>

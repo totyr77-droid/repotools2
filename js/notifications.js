@@ -12,6 +12,7 @@
   function toggle(open) { panel.hidden = !open; button.setAttribute('aria-expanded', String(open)); }
   function render(result) {
     items = result.notifications;
+    document.querySelectorAll('[data-stock-expiry]').forEach(dot => { dot.hidden = result.has_expiring_stock !== true; });
     const badge = get('notificationBadge'); badge.hidden = result.unread === 0; badge.textContent = result.unread > 99 ? '99+' : result.unread;
     button.setAttribute('aria-label', result.unread ? `Notificaciones: ${result.unread} sin leer` : 'Notificaciones');
     get('readAllNotifications').hidden = result.unread === 0;
@@ -62,4 +63,5 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
   (page ? page.listen : window.addEventListener.bind(window))('focus', () => refresh()); (page ? page.listen : window.addEventListener.bind(window))('repotools:reports-changed', () => refresh());
   setInterval(() => refresh(), 60000); refresh();
+  (page ? page.listen : window.addEventListener.bind(window))('repotools:stock-changed', () => refresh());
 })();

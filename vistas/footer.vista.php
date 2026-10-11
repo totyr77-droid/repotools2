@@ -47,7 +47,7 @@
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=20261010-stock13"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
-<script src="js/stock.js?v=20261010-stock13"></script>
+<script src="js/stock.js?v=20261011-tools1"></script>
 <script src="js/public-pallet.js?v=20261010-stock13"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -62,8 +62,8 @@
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/botones.js?v=20261010-notices1"></script>
-<script src="js/report-notifications.js?v=20261011-status1"></script>
-<script src="js/notifications.js?v=20261011-status1"></script>
+<script src="js/report-notifications.js?v=20261011-stock1"></script>
+<script src="js/notifications.js?v=20261011-stock1"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261010-stock13"></script><?php endif; ?>
 </body>
 </html>
