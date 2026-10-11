@@ -39,7 +39,7 @@ El campo opcional «Empresa o agencia» del perfil es información descriptiva; 
 
 ## Stock para administradores y managers
 
-Mantener acceso global, pero evitar mostrar todos los palets de entrada. Mostrar sus palets y los compartidos; ofrecer una búsqueda aparte por código o QR para consultar otros cuando lo necesiten. Pendiente de aplicar.
+Aplicado el 11 de octubre: mantener acceso global, pero mostrar solo sus palets y los compartidos al entrar. La pestaña «Buscar palet» permite abrir otros por código o QR. La API ya no descarga el listado global en cada carga de Stock. Pruebas: `node tests/stock-api.cjs`.
 
 ## Acceso desde dispositivos
 
@@ -52,3 +52,26 @@ Recomendación pendiente de decisión: permitir varios dispositivos personales y
 - Registrar cambios de cantidades con responsable y fecha, sin exigir motivo.
 - Transferencia de palets: propuesta de requerir aceptación del nuevo propietario; aún no confirmada.
 - Búsqueda de productos o EAN dentro de Stock, vista reunida de vencimientos y recuperación de contraseña.
+
+## Última entrega y continuidad para mañana
+
+El usuario pidió mejorar estabilidad y UX con trabajo acotado por su cuota restante. No se completaron todas las mejoras ni se atribuye un 9/10 a la app.
+
+Problema corregido: el resumen de Stock descargaba todos los palets para administradores y managers, incluso al consultar preferencias. Solución: retirar esa consulta global del resumen y reemplazar «Todos los palets» por búsqueda mediante los lectores y formularios existentes. Se conservan permisos de administración y gestión del palet abierto.
+
+Validación: sintaxis PHP/JS y suite de API de Stock, incluyendo permisos, CSRF, reintentos idempotentes, conflictos de reclamación, invitaciones y acceso global por código. El resumen administrativo se verifica sin palets ajenos.
+
+Reversión: esta entrega se publica en un commit separado titulado «Keep administrative Stock focused on own pallets and lookup». Usar `git revert <hash de ese commit>` en un checkout limpio; no resetear ni borrar las mejoras anteriores. Punto anterior: commit `b499245`, que contiene el registro de pendientes.
+
+Prioridades al retomar:
+
+1. Validar visualmente la nueva búsqueda administrativa en móvil y PC, y confirmar carga y edición de un palet ajeno con permisos.
+2. Auditar sesiones en Render: actualmente PHP conserva sesiones en archivos locales, que pueden perderse al reiniciar/desplegar. Diseñar almacenamiento persistente y seguro; no confundir cuenta borrada con sesión perdida. Probar cierre, revocación y caducidad antes de publicar.
+3. Implementar recuperación de contraseña con tokens de un solo uso, caducidad, límites y proveedor de correo definido. Falta elegir/configurar el servicio de correo; no inventar entregas.
+4. Implementar el alcance inicial sin conexión descrito arriba, con cola local por cuenta, identificadores idempotentes y resolución explícita de conflictos. No simular éxito cuando algo no se sincronizó.
+5. Agregar búsqueda de productos/EAN en Stock y vista reunida de vencimientos.
+6. Retomar supervisores; empresas sigue pendiente de definición. La restricción de dispositivos para suscripciones está discutida, no aprobada ni implementada.
+
+Pruebas ya disponibles: `tests/stock-api.cjs`, `tests/reports-api.cjs`, `tests/user-profiles-api.cjs`, `tests/navigation.cjs`, `tests/navigation-timeouts.cjs` y `tests/date-time.cjs`. Los archivos `tmp/*` son apoyos locales de pruebas y no deben publicarse.
+
+Publicación utilizada: checkout Git en `tmp/upstream`, repositorio `totyr77-droid/repotools2`, rama `main`, despliegue automático en Render. Copiar y versionar solo los archivos de la entrega. La raíz del workspace no es un repositorio Git.

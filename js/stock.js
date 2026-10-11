@@ -52,6 +52,8 @@
   $('stockScanner').addEventListener('cancel',()=>scanner.stop().catch(()=>{}));
   async function scan(mode){scannerMode=mode;const version=++scannerVersion;$('stockScanner').querySelector('h2').textContent=mode==='pallet'?'Escanea el QR del palet':'Escanea el EAN';show('stockScanner');try{await scanner.start(mode==='pallet'?'qr':'ean');}catch{if(version===scannerVersion)$('stockScannerStatus').textContent='No pudimos abrir la cámara. Revisa el permiso o usa el teclado.';}}
   $('scanPallet').addEventListener('click',()=>scan('pallet'));
+  $('adminScanPallet').addEventListener('click',()=>scan('pallet'));
+  $('adminManualPallet').addEventListener('click',()=>$('manualPallet').click());
   $('manualPallet').addEventListener('click',()=>{ $('manualPalletStatus').textContent='';show('manualPalletDialog');});
   $('manualPalletForm').addEventListener('submit',async e=>{e.preventDefault();const code=U.palletCode($('palletCodeInput').value);if(!code){$('manualPalletStatus').textContent='Ingresa los 8 números del palet.';return;}await run('manualPalletForm',async()=>{try{await openPallet(code,true);$('manualPalletDialog').close();}catch(error){$('manualPalletStatus').textContent=error.message;}});});
   function card(p,container,subtitle){const b=button('',container,()=>openPallet(p.code),'stock-card');const span=document.createElement('span');b.append(span);const name=text('strong',p.code,span);if(Number(p.expiry_count)>0){const dot=text('span','',name,'stock-alert-dot');dot.setAttribute('aria-label','Productos por vencer o vencidos');text('small',p.expiry_count+' productos requieren revisar su vencimiento',span,'stock-expiry-past');}text('small',subtitle,span);if(p.description)text('small',p.description,span);}
