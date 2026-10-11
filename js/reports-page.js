@@ -94,9 +94,11 @@
         const sender = active.submitter, section = document.createElement('section'); section.className = 'report-sender'; details.append(section);
         const identity = text('p', sender.name, section); identity.className = 'report-inline'; identity.setAttribute('aria-label', 'Enviado por ' + sender.name); icon(identity, 'user');
         const more = document.createElement('details'); more.className = 'report-sender-more'; section.append(more); text('summary', 'Datos', more);
-        text('p', `Correo: ${sender.email || 'No disponible'}`, more);
-        text('p', `Empresa: ${sender.company || 'No indicada'}`, more);
-        if (Object.hasOwn(active, 'submitter_ip')) text('p', `IP registrada: ${active.submitter_ip || 'No disponible'}`, more);
+        const senderData = document.createElement('div'); senderData.className = 'report-sender-data'; more.append(senderData);
+        text('p', `Correo: ${sender.email || 'No disponible'}`, senderData);
+        text('p', `Empresa: ${sender.company || 'No indicada'}`, senderData);
+        if (Object.hasOwn(active, 'submitter_ip')) text('p', `IP registrada: ${active.submitter_ip || 'No disponible'}`, senderData);
+        more.addEventListener('toggle', () => { if (more.open) { const outside = event => { if (!more.contains(event.target)) { more.open = false; document.removeEventListener('pointerdown', outside); } }; document.addEventListener('pointerdown', outside); more.addEventListener('toggle', () => { if (!more.open) document.removeEventListener('pointerdown', outside); }, { once: true }); } });
         if (sender.can_manage) {
           const button = text('button', sender.blocked ? 'Habilitar' : 'Bloquear', section); button.type = 'button'; button.className = 'library-secondary report-block-button'; icon(button, 'block');
           const hint = text('p', '', section); hint.className = 'report-block-status'; hint.setAttribute('role', 'status');
@@ -121,12 +123,12 @@
       const changed = Object.keys(fields).filter(key => (baseline?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
       const shownFields = Object.keys(fields).filter(key => baseline?.[key] || active.proposed?.[key]);
       comparison.style.setProperty('--report-rows', String(shownFields.length ? shownFields.length + 2 : 3));
-      for (const [heading, product, proposed] of [[resolved?'Antes de la propuesta':'Ficha actual', baseline, false], ['Propuesta del usuario', active.proposed, true]]) {
+      for (const [heading, product, proposed] of [[resolved?'Ficha anterior':'Ficha actual', baseline, false], ['Propuesta', active.proposed, true]]) {
         const section = document.createElement('section'); section.className = proposed ? 'report-proposed' : 'report-current'; const title=text('h3', heading, section);icon(title,proposed?'edit':'file');
         text('small', proposed ? (changed.length ? `${changed.length} ${changed.length === 1 ? 'dato modificado' : 'datos modificados'}` : 'Sin cambios en los datos') : 'Datos guardados', section);
         for (const [key, label] of Object.entries(fields)) if (product?.[key] || changed.includes(key)) {
           const row = document.createElement('div'); row.className = 'report-field' + (changed.includes(key) ? ' report-field-changed' : ''); section.append(row);
-          const labelNode=text('small', label + (proposed && changed.includes(key) ? ' · Modificado' : ''), row);icon(labelNode,key); text('p', product?.[key] || 'Sin datos', row);
+          const labelNode=text('small', label, row);icon(labelNode,key); text('p', product?.[key] || 'Sin datos', row);
         }
         if (!shownFields.length) text('p', 'Sin datos.', section);
         comparison.append(section);
