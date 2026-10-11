@@ -16,10 +16,10 @@ const service = context.window.RepoProductInfo;
 (async () => {
   const [first, second] = await Promise.all([service.get('7791234567898'), service.get('7791234567898')]);
   assert.equal(calls, 1); assert.equal(first, second); assert.equal(first.name, 'Agua');
-  assert.equal(service.summary(first), 'Marca Agua | 1 L');
-  assert.equal(service.summary({ name: 'Agua', brand: 'Marca' }), 'Marca Agua | Contenido no disponible');
-  assert.equal(service.summary({ name: 'Energizante Lata', brand: 'Red Bull', quantity: '250 ml' }), 'Red Bull Energizante Lata | 250 ml');
-  assert.equal(service.summary({ name: 'Red Bull Energizante', brand: 'Red Bull', quantity: '250 ml' }), 'Red Bull Energizante | 250 ml');
+  assert.equal(service.summary(first), 'Marca Agua · 1 L');
+  assert.equal(service.summary({ name: 'Agua', brand: 'Marca' }), 'Marca Agua · Contenido no disponible');
+  assert.equal(service.summary({ name: 'Energizante Lata', brand: 'Red Bull', quantity: '250 ml' }), 'Red Bull Energizante Lata · 250 ml');
+  assert.equal(service.summary({ name: 'Red Bull Energizante', brand: 'Red Bull', quantity: '250 ml' }), 'Red Bull Energizante · 250 ml');
   assert.equal(service.displayName({ name: 'Energizante Lata', brand: 'Red Bull' }), 'Red Bull Energizante Lata');
   assert.equal(service.displayName({ name: 'Red Bull Energizante', brand: 'Red Bull' }), 'Red Bull Energizante');
   assert.equal(service.summary(null), 'No tenemos información de este producto');

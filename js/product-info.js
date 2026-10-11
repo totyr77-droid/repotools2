@@ -61,7 +61,8 @@
     try {
       const product = await get(ean);
       if (activeRequests.get(container) !== token) return null;
-      container.textContent = compact ? (product ? 'Nombre sugerido. Puedes editarlo.' : 'No tenemos información de este producto. Escribe un nombre para recordarlo.') : summary(product);
+      if (compact) container.textContent = product ? 'Nombre sugerido. Puedes editarlo.' : 'No tenemos información de este producto. Escribe un nombre para recordarlo.';
+      else renderSummary(container, product);
       editButton(container, ean);
       return product;
     } catch (error) {
@@ -136,10 +137,17 @@
   }
   function summary(product) {
     if (!product) return 'No tenemos información de este producto';
-    return `${displayName(product) || 'Producto sin nombre'} | ${product.quantity || 'Contenido no disponible'}`;
+    return `${displayName(product) || 'Producto sin nombre'} · ${product.quantity || 'Contenido no disponible'}`;
+  }
+  function renderSummary(container, product) {
+    container.replaceChildren();
+    if (typeof product === 'string' || !product) { container.textContent = typeof product === 'string' ? product : summary(null); return; }
+    const name = document.createElement('span'); name.className = 'product-summary-name'; name.textContent = displayName(product) || 'Producto sin nombre';
+    const quantity = document.createElement('span'); quantity.className = 'product-summary-quantity'; quantity.textContent = product.quantity || 'Contenido no disponible';
+    container.append(name, quantity);
   }
   function referenceName(product) {
     return [displayName(product), (product?.quantity || '').trim()].filter(Boolean).join(' ');
   }
-  window.RepoProductInfo = { get, show, summary, displayName, referenceName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
+  window.RepoProductInfo = { get, show, summary, renderSummary, displayName, referenceName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
 })();

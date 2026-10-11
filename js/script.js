@@ -228,7 +228,7 @@ function verCodigo(indice) {
   els.compartirD.textContent = `Compartir lista completa (${lista.length})`;
   const ean = lista[indiceActual - 1], version = ++viewerRevision, summary = document.getElementById('resultProductSummary'); summary.textContent = 'Buscando producto…';
   window.RepoProductInfo.get(ean).then(product => {
-    if (version === viewerRevision && els.verb.open) summary.textContent = window.RepoProductInfo.summary(product);
+    if (version === viewerRevision && els.verb.open) window.RepoProductInfo.renderSummary(summary, product);
   }).catch(() => { if (version === viewerRevision && els.verb.open) summary.textContent = 'Nombre y contenido no disponibles'; });
 }
 
@@ -321,7 +321,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   els.resultadoApi.textContent = "Buscando producto…";
   const resultadoAPI = await buscarProductoPorEAN(codigo);
   if (revision !== scanResultRevision) return;
-  els.resultadoApi.textContent = resultadoAPI;
+  window.RepoProductInfo.renderSummary(els.resultadoApi, resultadoAPI);
   window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), codigo);
 }
 
@@ -444,7 +444,7 @@ async function fallbackCompartir(link) {
 async function buscarProductoPorEAN(ean) {
   try {
     const product = await window.RepoProductInfo.get(ean);
-    return window.RepoProductInfo.summary(product);
+    return product;
   } catch (error) {
     return "No pudimos cargar la información del producto.";
   }
@@ -491,12 +491,12 @@ window.quitarOverlay = quitarOverlay;
 (page ? page.listen : window.addEventListener.bind(window))('repotools:product-updated', event => {
   const { ean, product } = event.detail;
   if (els.contenedormax.open && resultadoActual === ean) {
-    els.resultadoApi.textContent = window.RepoProductInfo.summary(product);
+    window.RepoProductInfo.renderSummary(els.resultadoApi, product);
     document.getElementById('scanProductActions')?.replaceChildren();
     window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), ean);
   }
   if (els.verb.style.display === 'flex' && lista[indiceActual - 1] === ean) {
-    document.getElementById('resultProductSummary').textContent = window.RepoProductInfo.summary(product);
+    window.RepoProductInfo.renderSummary(document.getElementById('resultProductSummary'), product);
     if (document.getElementById('resultInfoDialog').open) window.RepoProductInfo.show(document.getElementById('resultProductDetails'), ean);
   }
 });
