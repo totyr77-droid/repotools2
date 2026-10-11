@@ -13,7 +13,9 @@ try {
     if ($method==='GET' && isset($_GET['list'])) {
         $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);
         if ($page===false) throw new CatalogException('Página no válida.',422);
-        $s=$db->prepare('SELECT id,name,email,company,role FROM users ORDER BY LOWER(name),id LIMIT 21 OFFSET '.($page*20));$s->execute();$users=$s->fetchAll(PDO::FETCH_ASSOC);
+        $role=$_GET['role']??'';
+        if (!is_string($role) || !in_array($role,['','usuario','moderador','administrador','manager'],true)) throw new CatalogException('Rango no válido.',422);
+        $s=$db->prepare('SELECT id,name,email,company,role FROM users'.($role!==''?' WHERE role=?':'').' ORDER BY LOWER(name),id LIMIT 21 OFFSET '.($page*20));$s->execute($role!==''?[$role]:[]);$users=$s->fetchAll(PDO::FETCH_ASSOC);
         user_response(200,['users'=>array_slice($users,0,20),'page'=>$page,'page_size'=>20,'has_more'=>count($users)>20]);
     }
     if ($method==='POST') {
