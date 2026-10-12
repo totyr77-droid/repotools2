@@ -391,3 +391,12 @@ Cabecera con marca sobre fondo claro, sin bloque violeta sólido; se mantienen b
 Solicitud PC en celular presentada en diálogo modal con fondo oscurecido, cierre por cruz y bloqueo de desplazamiento de fondo. Aceptación explícita conserva validación existente de misma cuenta/CSRF; aceptar cierra aviso. Botón circular flotante inferior, verde al conectar y amarillo mientras espera, abre controles de escaneo/desconexión; izquierda para zurdos en móvil y derecha por defecto. Cerrar solicitud permite volver desde botón sin repetir modal en cada consulta. Limpieza al navegar para evitar controles duplicados. PC conserva su aviso existente. Recursos versionados.
 
 Validado node --check y tests/device-connection-ui.cjs: modal automático, cierre tras aceptar, posición por mano y relay Inicio/Stock/Biblioteca, aislamiento/permisos y desconexión. Prueba física móvil pendiente. Sin migraciones ni cambios de seguridad. Revertir commit de JS/CSS/vistas/tests restaura aviso en bloque sin alterar conexiones ni datos.
+
+
+## Lector móvil en espera y campos PC — 12/10/2026
+
+Conexión móvil conserva botón Escanear aun si PC no está lista; lector abre con marco rojo y texto de espera, vuelve a marco compartido normal cuando hay petición. Guard canAccept en detector impide confirmar, capturar foto, pitar o enviar mientras espera. Entrada manual deshabilita Enviar en espera. Desconectar disponible también dentro del lector. Cambio remoto EAN/QR reinicia lector en modo correspondiente; perder conexión cierra cámara.
+
+Campos explícitos Stock búsqueda/EAN, Biblioteca EAN, código manual del palet y entrada teclado de lectores PC solicitan recepción al recibir foco. La lectura actualiza solo ese input y dispara input/change; no guarda ni envía formularios automáticamente. Blur, campo oculto/retirado o navegación pausa recepción; flow conserva aislamiento entre aperturas/pestañas. Nuevos campos compatibles pueden declarar data-scan-mode=ean/qr; QR actual corresponde a códigos de palet, no QR arbitrarios de perfil. Campos de nombre/contraseña/cantidad no solicitan lecturas.
+
+Validado tests/device-connection-ui.cjs: espera roja sin confirmar, vuelta normal, filtro EAN, campo QR, pausa al perder foco y regresiones completas; tests/ean-scanner.cjs pasa. Simulación Chrome/SQLite; falta móvil físico. Sin migraciones. Revertir commit completo restaura lector solo listo y peticiones desde botones; conserva backend/permisos y datos.
