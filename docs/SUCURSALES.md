@@ -45,3 +45,10 @@ Aclaración del 11/10: la columna stock_branches.owner_id conserva al creador co
 ## Stock: retirar bloques del inicio — 11/10/2026
 
 El usuario confirmó quitar solo los bloques Sucursales y Enlaces compartidos del inicio de Stock. Permanecen elegir/crear sucursal dentro del palet, filtro y Compartir selección. No se eliminan datos ni se revocan enlaces existentes. Los avisos de sucursales quedan fuera del panel oculto para seguir visibles. Se actualiza la prueba UI para comprobar que ambos paneles permanecen ocultos después de compartir y navegar por AJAX; mantiene alta inline y asignación desde el palet. Para revertir, restaurar interfaz/JS y versión del recurso del commit de este ajuste, sin cambios de esquema.
+
+
+## Favoritos y sucursales recientes — 12/10/2026
+
+Selector con Todas/Favoritos/Recientes y estrella independiente de la selección. Sin sucursal usa ubicación tachada. Favoritos por cuenta, guardados en DB, disponibles entre dispositivos. Recientes muestra hasta8 sucursales ordenadas por último uso, con frecuencia como desempate; se registra solo al guardar asignación o preparar palet con sucursal, no al tocar resultados. Todas prioriza favoritos y último uso. Quitar favorito conserva recientes. No otorga permisos ni cambia directorio común. Migración18 aditiva user_branch_preferences con clave user_id/branch_id y borrado en cascada; endpoint autenticado/CSRF/idempotencia, usuario tomado de sesión. Sin cambios manuales a producción.
+
+Validado PHP sintaxis y tests/stock-branches.php en SQLite (migración repetible, aislamiento, favorito explícito repetido, validación, reciente al asignar y conservación al quitar estrella); Chrome tests/stock-branches-ui.cjs (estrella persistente al reabrir, filtros, vacío, asignación, AJAX y tamaños320/390/1366). PostgreSQL aislado pendiente por credenciales de prueba previas rechazadas; no afirmar validación Neon. Probar físicamente en móvil, confirmar Render y favoritos en otro dispositivo. Revertir el commit de favoritos conservando tabla18 y datos.

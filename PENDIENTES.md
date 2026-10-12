@@ -300,3 +300,10 @@ Mapa UX: diálogo más ancho solo en Por ubicación y mapa más alto; ubicación
 
 
 Mapa vectorial � 12/10/2026: OpenFreeMap Liberty con MapLibre GL JS5.6.2 y adaptador Leaflet0.1.3 locales, carga diferida. Mantiene marcadores, selecci�n, cercan�a200m, formulario y preferencia de mano. Sin cuenta/clave/facturaci�n. Atribuci�n del proveedor conservada por adaptador. Sin WebGL, error inicial o espera12s: mapa OSM anterior; b�squeda escrita disponible. Limpieza de mapas/temporizadores al cerrar o navegar AJAX. No cambia DB ni permisos. Pruebas Chrome con estilo vectorial vac�o simulado (sin tr�fico automatizado al proveedor); nitidez cartogr�fica real y rendimiento en iPhone/Android requieren prueba f�sica. Revertir archivos del commit de esta entrega, conservando coordenadas y datos.
+
+
+## Favoritos y sucursales recientes — 12/10/2026
+
+Selector con Todas/Favoritos/Recientes y estrella independiente de la selección. Sin sucursal usa ubicación tachada. Favoritos por cuenta, guardados en DB, disponibles entre dispositivos. Recientes muestra hasta8 sucursales ordenadas por último uso, con frecuencia como desempate; se registra solo al guardar asignación o preparar palet con sucursal, no al tocar resultados. Todas prioriza favoritos y último uso. Quitar favorito conserva recientes. No otorga permisos ni cambia directorio común. Migración18 aditiva user_branch_preferences con clave user_id/branch_id y borrado en cascada; endpoint autenticado/CSRF/idempotencia, usuario tomado de sesión. Sin cambios manuales a producción.
+
+Validado PHP sintaxis y tests/stock-branches.php en SQLite (migración repetible, aislamiento, favorito explícito repetido, validación, reciente al asignar y conservación al quitar estrella); Chrome tests/stock-branches-ui.cjs (estrella persistente al reabrir, filtros, vacío, asignación, AJAX y tamaños320/390/1366). PostgreSQL aislado pendiente por credenciales de prueba previas rechazadas; no afirmar validación Neon. Probar físicamente en móvil, confirmar Render y favoritos en otro dispositivo. Revertir el commit de favoritos conservando tabla18 y datos.

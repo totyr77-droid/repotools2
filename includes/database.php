@@ -164,6 +164,10 @@ function initialize_database(PDO $db): void {
             $db->exec('ALTER TABLE stock_branches ADD COLUMN longitude DOUBLE PRECISION');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(17)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 18')->fetchColumn()) {
+            $db->exec("CREATE TABLE user_branch_preferences (user_id {$ref} NOT NULL REFERENCES users(id) ON DELETE CASCADE, branch_id {$ref} NOT NULL REFERENCES stock_branches(id) ON DELETE CASCADE, favorite INTEGER NOT NULL DEFAULT 0, last_used BIGINT NOT NULL DEFAULT 0, use_count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(user_id,branch_id))");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(18)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

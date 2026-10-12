@@ -8,6 +8,14 @@ function branch_owned(PDO $db, int $id, int $user): array {
     if (!$branch) throw new CatalogException('Esta sucursal no está disponible.',404);
     return $branch;
 }
+function branch_favorite(PDO $db,int $user,array $input): void {
+    $id=(int)($input['branch_id']??0); branch_owned($db,$id,$user);
+    if (!in_array($input['favorite']??null,['0','1'],true)) throw new CatalogException('El favorito no es valido.',422);
+    stock_query($db,'INSERT INTO user_branch_preferences(user_id,branch_id,favorite) VALUES(?,?,?) ON CONFLICT(user_id,branch_id) DO UPDATE SET favorite=excluded.favorite',[$user,$id,(int)$input['favorite']]);
+}
+function branch_recent(PDO $db,int $user,int $id): void {
+    stock_query($db,'INSERT INTO user_branch_preferences(user_id,branch_id,last_used,use_count) VALUES(?,?,?,1) ON CONFLICT(user_id,branch_id) DO UPDATE SET last_used=excluded.last_used,use_count=user_branch_preferences.use_count+1',[$user,$id,time()]);
+}
 function branch_input(array $input): array {
     $result=[];
     foreach (['name'=>100,'address'=>160,'locality'=>100,'province'=>80,'description'=>300] as $field=>$max) {
@@ -56,6 +64,7 @@ function branch_assign(PDO $db,int $user,array $input): void {
     $changed=stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=? AND revision=?',[$branchId?:null,$id,(int)($input['revision']??0)])->rowCount();
     if (!$changed) throw new CatalogException('El palet cambió. Vuelve a abrirlo antes de guardar.',409);
     stock_touch($db,$id,$user);
+    if ($branchId) branch_recent($db,$user,$branchId);
 }
 function branch_delete(PDO $db,int $user,array $input): void {
     if (!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden eliminar sucursales.',403);
