@@ -297,3 +297,6 @@ Carga de dirección: aviso arriba del nombre con SVG animado (respeta movimiento
 
 
 Mapa UX: diálogo más ancho solo en Por ubicación y mapa más alto; ubicación como botón de icono flotante, zoom con superficie translúcida y objetivos táctiles44px. Marcadores con icono de local y ficha compacta; cercanos usan nombre/dirección en dos líneas, sin botones pesados. Conserva OSM/retina y atribución: este ajuste mejora presentación, no sustituye el proveedor raster ni promete nitidez vectorial. Pruebas de mapa y formulario siguen; revertir commit de estilo sin tocar datos.
+
+
+Mapa vectorial � 12/10/2026: OpenFreeMap Liberty con MapLibre GL JS5.6.2 y adaptador Leaflet0.1.3 locales, carga diferida. Mantiene marcadores, selecci�n, cercan�a200m, formulario y preferencia de mano. Sin cuenta/clave/facturaci�n. Atribuci�n del proveedor conservada por adaptador. Sin WebGL, error inicial o espera12s: mapa OSM anterior; b�squeda escrita disponible. Limpieza de mapas/temporizadores al cerrar o navegar AJAX. No cambia DB ni permisos. Pruebas Chrome con estilo vectorial vac�o simulado (sin tr�fico automatizado al proveedor); nitidez cartogr�fica real y rendimiento en iPhone/Android requieren prueba f�sica. Revertir archivos del commit de esta entrega, conservando coordenadas y datos.
