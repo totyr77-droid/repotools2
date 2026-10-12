@@ -28,6 +28,10 @@ try {
             if(!is_string($filter)||($filter!==''&&!isset($filters[$filter])))throw new CatalogException('Filtro no válido.',422);
             $params=[];$where='';
             if($filter!==''){$definition=$filters[$filter];$where=' WHERE event_type=?';$params[]=$definition['type'];if(isset($definition['action'])){$where.=' AND action=?';$params[]=$definition['action'];}}
+            $actor=$_GET['actor']??'';
+            if(!is_string($actor)||strlen($actor)>480)throw new CatalogException('Usuario no válido.',422);
+            $actor=trim($actor);
+            if($actor!==''){$where.=($where===''?' WHERE ':' AND ')."LOWER(actor) LIKE LOWER(?) ESCAPE '!'";$params[]='%'.str_replace(['!','%','_'],['!!','!%','!_'],$actor).'%';}
             $directEdit=catalog_direct_edit_condition($db,'e.after_data');
             $query = $db->prepare("SELECT * FROM (
                 SELECT 'product_edit' AS event_type, u.name AS actor, e.ean AS target, e.created_at, NULL AS report_id, 'edited' AS action, e.id AS event_id FROM product_edits e JOIN users u ON u.id = e.user_id WHERE {$directEdit}

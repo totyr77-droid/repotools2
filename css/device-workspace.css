@@ -99,3 +99,5 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 @media(min-width:1024px) and (max-width:1199px){.report-card[data-layout=history] .report-card-info{grid-template-columns:120px 170px minmax(0,1fr)}.report-card[data-layout=history] .report-card-info>p:nth-of-type(3){grid-column:2}.report-card[data-layout=history] .report-change-tags{grid-column:3}}
 
 @media(min-width:1024px){.report-card[data-layout=pending]>button,.report-card[data-layout=history]>button{min-width:120px;white-space:nowrap;flex:none}}
+
+.report-log-filters input[type=search]{min-width:0;flex:1;max-width:360px;min-height:44px;padding:10px 12px;border:1px solid #dddce8;border-radius:10px;background:white;color:#27187e;font:inherit;font-size:.85rem}@media(max-width:600px){.report-log-filters{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}.report-log-filters select,.report-log-filters input[type=search]{width:100%;max-width:none}}

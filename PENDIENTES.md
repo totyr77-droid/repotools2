@@ -512,3 +512,12 @@ Validación tests/device-connection-ui.cjs Chrome/SQLite: cierre permanece cerra
 Biblioteca PC estira tarjetas a misma altura por fila, mínimo 104 px, botones centrados en eje común. Moderación PC Pendientes/Resueltos selector compacto 420 px; filas blancas a ancho completo, estado/EAN/remitente alineados, botón al extremo. Historial muestra revisores/fecha y cambios en segunda línea de chips, adapta columnas a escritorio pequeño. data-layout identifica solo pendientes/historial, no altera Registros u otras vistas. Móvil conserva diseño anterior.
 
 Validación: JS sintaxis y pruebas visuales temporales Chrome/SQLite con reportes pendiente/aprobado y biblioteca de tres productos. Comprobadas pestañas a 320–1366 px, fila pending alineada y sin overflow; capturas PC revisadas. Sin modificación de datos reales/permisos. Revertir commit restaura estilos y marcadores anteriores.
+
+
+## Filtro de registros por autor — 12/10/2026
+
+Registros: búsqueda por nombre del usuario que ejecutó acción, combinada con filtro de acción y paginación 50. Servidor valida texto y usa parámetro SQL con LIKE escapando comodines %, _ y !; filtro antes de LIMIT/OFFSET. Input search SVG, debounce 300 ms, reinicia página y evita respuestas obsoletas, limpia timer al navegar. Móvil filtros en dos filas label/control. Mantiene permisos audit admin/manager y driver PDO, sin migraciones. Skill neon-postgres/neon consultadas para preservar consultas parametrizadas y arquitectura.
+
+Aclaración: registros incluyen edición directa producto, revisión reporte, bloqueos, rangos, perfiles, sucursales y acciones palet registradas para admin/manager. No representan todos los escaneos o movimientos de cualquier usuario.
+
+Validación PHP/JS sintaxis; Chrome/SQLite temporal verifica filtro por nombre parcial + aprobado, cero coincidencias, comodín literal, input array422 y usuario normal403, UI combinada y 390 px sin overflow. Regresiones visuales reportes/Biblioteca pasan. Sin consultar/modificar datos reales; PostgreSQL no ejecutado. Revertir commit restaura API/vista/JS/CSS anteriores.
