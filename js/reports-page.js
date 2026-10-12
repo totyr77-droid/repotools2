@@ -44,7 +44,7 @@
         const result = await RepoReports.request(`?view=${moderationView}&page=${auditPage}${moderationView==='logs'?'&filter='+encodeURIComponent(logFilter?.value||''):''}`); if(attempt !== listVersion)return; csrf=result.csrf;
         status.textContent=result.items.length?'':moderationView==='history'?'Todavía no hay reportes revisados.':'Todavía no hay actividad registrada.';
         for(const item of result.items){
-          const card=document.createElement('article');card.className='report-card';list.append(card);const info=document.createElement('div');info.className='report-card-info';card.append(info);
+          const card=document.createElement('article');card.className='report-card';card.dataset.layout=moderationView;list.append(card);const info=document.createElement('div');info.className='report-card-info';card.append(info);
           if(moderationView==='history'){
             const heading=document.createElement('div');heading.className='report-card-heading';info.append(heading);text('h2',`#${item.id}`,heading);badge(heading,item.status);
             const ean=text('p',item.ean,info);ean.className='report-inline';icon(ean,'ean');text('p',`${item.submitter_name} · Revisado por ${item.reviewer_name||'Staff'}`,info);text('p',stamp(item.reviewed_at),info);
@@ -69,7 +69,7 @@
       csrf = result.csrf;
       status.textContent = result.reports.length ? '' : (queue ? 'No hay reportes pendientes.' : 'Todavía no enviaste reportes.');
       for (const report of result.reports) {
-        const card = document.createElement('article'); card.className = 'report-card';
+        const card = document.createElement('article'); card.className = 'report-card';if(queue)card.dataset.layout='pending';
         const info = document.createElement('div'); info.className = 'report-card-info'; card.append(info);
         const heading = document.createElement('div'); heading.className = 'report-card-heading'; info.append(heading); text('h2', `#${report.id}`, heading); badge(heading, report.status);
         const ean = text('p', report.ean, info); ean.className = 'report-inline'; ean.setAttribute('aria-label', 'EAN ' + report.ean); icon(ean, 'ean');

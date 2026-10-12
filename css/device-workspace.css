@@ -81,3 +81,21 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 .relay-connection-dialog>[data-relay-accept]{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;margin:14px 0 0;padding:12px 16px;border:1px solid #c6e8d3;border-radius:10px;background:#eaf7ef;color:#17633d;font:inherit;cursor:pointer}
 .relay-connection-dialog>[data-relay-accept] svg{width:20px;height:20px;flex:none}
 .relay-connection-dialog>[data-relay-accept][hidden]{display:none}
+
+@media(min-width:1024px){
+ .library-page .library-products{align-items:stretch}
+ .library-page .library-product{height:100%;min-height:104px}
+ .library-page .library-product-actions{align-self:center}
+ .reports-state-tabs{width:420px;max-width:100%;margin:12px 0 20px;gap:4px}
+ .reports-state-tabs button{min-height:42px;padding:9px 16px}
+ .reports-list:has([data-layout=pending]),.reports-list:has([data-layout=history]){grid-template-columns:1fr;gap:10px}
+ .reports-list .report-card[data-layout=pending],.reports-list .report-card[data-layout=history]{display:flex;align-items:center;gap:20px;background:white;padding:16px 20px;min-height:76px}
+ .report-card[data-layout=pending] .report-card-info{display:grid;grid-template-columns:140px 190px minmax(0,1fr);align-items:center;gap:16px;flex:1}
+ .report-card[data-layout=history] .report-card-info{display:grid;grid-template-columns:140px 190px minmax(180px,1fr) minmax(120px,auto);align-items:center;gap:10px 16px;flex:1}
+ .report-card[data-layout=pending] p,.report-card[data-layout=history] p{margin:0;line-height:1.4}
+ .report-card[data-layout=history] .report-change-tags{grid-column:2/-1;margin:0}
+ .report-card[data-layout=pending]>button,.report-card[data-layout=history]>button{display:inline-flex;align-items:center;gap:6px;min-width:100px;justify-content:center}
+}
+@media(min-width:1024px) and (max-width:1199px){.report-card[data-layout=history] .report-card-info{grid-template-columns:120px 170px minmax(0,1fr)}.report-card[data-layout=history] .report-card-info>p:nth-of-type(3){grid-column:2}.report-card[data-layout=history] .report-change-tags{grid-column:3}}
+
+@media(min-width:1024px){.report-card[data-layout=pending]>button,.report-card[data-layout=history]>button{min-width:120px;white-space:nowrap;flex:none}}

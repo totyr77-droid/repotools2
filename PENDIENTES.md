@@ -505,3 +505,10 @@ Validación: captura espera PC revisada sin barra; tests/device-connection-ui.cj
 Cerrar con cruz o Escape guarda standby en sessionStorage por cuenta para esta pestaña: no reabre automáticamente la misma espera al navegar/recargar. Fab amarillo sigue disponible para abrir voluntariamente. Se limpia standby cuando deja de estar pendiente (conectado o solicitud terminada). No acepta ni rechaza conexión al cerrar. Aviso espera amarillo; botón Conectar verde movido fuera del bloque de aviso, debajo. Referencia del botón conservada para listeners/render.
 
 Validación tests/device-connection-ui.cjs Chrome/SQLite: cierre permanece cerrado tras polling y reload, fab amarillo reabre y permite aceptar, botón fuera del aviso y color amarillo, regresiones conexión/lecturas. Captura móvil revisada. Sin DB/permisos nuevos. Revertir commit restaura presentación y memoria local previa.
+
+
+## Filas de reportes y tarjetas uniformes PC — 12/10/2026
+
+Biblioteca PC estira tarjetas a misma altura por fila, mínimo 104 px, botones centrados en eje común. Moderación PC Pendientes/Resueltos selector compacto 420 px; filas blancas a ancho completo, estado/EAN/remitente alineados, botón al extremo. Historial muestra revisores/fecha y cambios en segunda línea de chips, adapta columnas a escritorio pequeño. data-layout identifica solo pendientes/historial, no altera Registros u otras vistas. Móvil conserva diseño anterior.
+
+Validación: JS sintaxis y pruebas visuales temporales Chrome/SQLite con reportes pendiente/aprobado y biblioteca de tres productos. Comprobadas pestañas a 320–1366 px, fila pending alineada y sin overflow; capturas PC revisadas. Sin modificación de datos reales/permisos. Revertir commit restaura estilos y marcadores anteriores.
