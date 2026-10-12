@@ -421,3 +421,10 @@ Validación Chrome/SQLite:17309735 usado como código inexistente únicamente en
 Consulta pública autorizada confirmó17309735 como etiqueta existente disponible, con reserva vigente, sin palet asignado; no es código inexistente. Ficha en Stock muestra pendiente de utilizar, aviso amarillo si reserva pertenece a otra cuenta, fecha de reserva en hora argentina24h e información sin propietario/productos. Manager conserva impresión/eliminación según servidor; no se permite apropiarse de reserva ajena. Enlace histórico repotools2.onrender.com reconocido exclusivamente como alias del proyecto cuando APP_URL es repotools.online; parser local Stock acepta dominios conocidos del mismo proyecto. Otros hosts siguen rechazados. No se confirmó que alias fuera causa exacta del intento del usuario; se pidió enlace leído.
 
 Prueba ampliada con manager y etiqueta reservada por otra cuenta en SQLite temporal: QR de Render llega desde celular y abre ficha en PC con reserva/metadatos, Utilizar oculto. Regresiones relay y errores pasan, sintaxisPHP/JS correcta. Sin tocar cuentas/palets reales, sin migraciones. Revertir commit restaura textos/parser anteriores sin modificar datos ni permisos.
+
+
+## Estado correcto al abrir QR público — 12/10/2026
+
+Vista palet.php dejaba mensaje fijo disponible/iniciar sesión incluso cuando etiqueta tenía reserva o visitante ya estaba conectado. Ahora distingue etiqueta reservada ajena/anon (aviso amarillo, pendiente de utilizar), reservante conectado (puede utilizar desde Stock), etiqueta libre y palet con propietario/contenido. Muestra reserva horaArgentina y ausencia de propietario/productos también fuera de Stock. No expone identidad del reservante. Consultar/leer QR no exige permiso de edición ni rango; acciones siguen permisos servidor sin cambios.
+
+Validación añadida a tests/device-connection-ui.cjs: mismo QR reservado consultado anónimo, manager y usuario reservante; estado y metadata correctos, sin petición engañosa de sesión. Regresiones scanner/relay pasan en Chrome/SQLite; sintaxis JS correcta. Sin cambios DB. Revertir commit restaura mensajes/estilo públicos anteriores sin cambiar datos o permisos.
