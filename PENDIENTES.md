@@ -262,3 +262,6 @@ El usuario confirmó quitar solo los bloques Sucursales y Enlaces compartidos de
 
 
 Stock: también se retira del inicio el selector de sucursales y Compartir selección para dejar el buscador de productos seguido de Palets, según aclaración del usuario. Se oculta el contenedor completo sin ocupar espacio; elegir/crear sucursal dentro del palet y los datos/enlaces existentes permanecen. Prueba UI adaptada al inicio simplificado; compartir se verifica mediante API. Revertir este ajuste de vista para recuperar los controles.
+
+
+Palets: bloque principal sin tarjeta blanca, borde ni padding exterior. Sucursal pasa de la tuerca a botón directo a la derecha de la barra del palet; conserva permisos de propietario y el diálogo existente. Validación UI de asignación sin abrir configuración y tamaños móviles/PC. Revertir commit de diseño para volver a la disposición anterior, sin cambios de datos.

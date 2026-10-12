@@ -11,12 +11,11 @@ function stock_dialog_heading(string $title,string $id,string $descriptionId='')
  <div id="palletTools" class="stock-toolbar"><button id="scanStockProduct" class="library-primary stock-icon" type="button" aria-label="Escanear producto" title="Escanear producto"><?= stock_icon('barcode') ?></button>
  <details id="palletSettings" class="library-settings"><summary aria-label="Opciones del palet" title="Opciones del palet"><?= stock_icon('settings') ?></summary><div class="library-settings-menu">
  <button id="editPalletDescription" class="library-secondary" type="button"><?= stock_icon('plus') ?> Descripción del palet</button>
- <button id="assignPalletBranch" class="library-secondary" type="button" hidden><?= stock_icon('branch') ?> Sucursal del palet</button>
  <button id="sharePalletLabel" class="library-secondary" type="button"><?= stock_icon('share') ?> Compartir palet</button>
  <a id="printPallet" class="library-secondary" target="_blank"><?= stock_icon('print') ?> Reimprimir imagen</a>
  <button id="managePalletAccess" class="library-secondary" type="button"><?= stock_icon('user') ?> Gestionar accesos</button>
  <button id="deletePallet" class="library-secondary stock-delete" type="button"><?= stock_icon('trash') ?> Eliminar palet</button>
- <button id="leavePallet" class="library-secondary" type="button"><?= stock_icon('exit') ?> Dejar de participar</button></div></details></div>
+ <button id="leavePallet" class="library-secondary" type="button"><?= stock_icon('exit') ?> Dejar de participar</button></div></details><button id="assignPalletBranch" class="library-secondary pallet-branch-action" type="button" hidden><?= stock_icon('branch') ?> Sucursal</button></div>
  <button id="claimPallet" class="library-primary" type="button">Usar este palet</button><div id="palletProducts"></div><footer id="palletMetadata" class="stock-metadata"></footer>
 </dialog>
 <dialog id="stockProductDialog" class="library-dialog"><?php stock_dialog_heading('Producto','stockProductDialog'); ?><form id="stockProductForm">
