@@ -271,3 +271,6 @@ Sucursal del palet: búsqueda instantánea sin distinguir acentos/mayúsculas po
 
 
 12/10: al abrir Sucursal de un palet ya asignado, muestra primero nombre del supermercado, dirección completa y descripción si tiene, junto a botón de lápiz para cambiar la asignación. Sin sucursal abre búsqueda directamente. Conserva permisos del propietario; cambiar sucursal no edita el directorio común. UI prueba vista previa y paso a edición; reversión solo de vista/JS/CSS sin datos.
+
+
+Selector de sucursal al usar/cambiar palet: dos pestañas iguales Buscar y Por ubicación, con SVG, roles accesibles y flechas de teclado. Buscar mantiene selección/alta inline; ubicación muestra aviso de mapa pendiente, sin geolocalización ni proveedor nuevo. Al abrir vuelve a Buscar; conserva borrador al alternar. Validar UI alternar y continuar alta/asignación; revertir vista/JS/CSS para selector anterior.
