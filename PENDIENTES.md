@@ -274,3 +274,6 @@ Sucursal del palet: búsqueda instantánea sin distinguir acentos/mayúsculas po
 
 
 Selector de sucursal al usar/cambiar palet: dos pestañas iguales Buscar y Por ubicación, con SVG, roles accesibles y flechas de teclado. Buscar mantiene selección/alta inline; ubicación muestra aviso de mapa pendiente, sin geolocalización ni proveedor nuevo. Al abrir vuelve a Buscar; conserva borrador al alternar. Validar UI alternar y continuar alta/asignación; revertir vista/JS/CSS para selector anterior.
+
+
+Aclaración: botón Sucursal de barra del palet ahora muestra el nombre del local asignado, con lápiz separado al lado para cambiarlo directamente. Sin asignación mantiene Sucursal. Nombre largo se trunca, controles siguen juntos y permisos del propietario se conservan. Revertir ajuste de vista/JS/CSS sin cambios de DB.

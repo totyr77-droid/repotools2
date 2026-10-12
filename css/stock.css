@@ -168,3 +168,5 @@ body[data-hand="left"] .account-panel-auth .account-password-field input {paddin
 
 #palletTools .pallet-branch-action{margin-left:auto;min-height:48px}
 @media(max-width:768px) and (pointer:coarse){body[data-hand=right] #palletTools .pallet-branch-action{order:-1}}
+
+#palletTools .pallet-branch-action{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}#assignPalletBranch{min-width:0;max-width:100%;min-height:48px}#palletBranchButtonName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#changePalletBranch{flex-shrink:0;min-height:48px}

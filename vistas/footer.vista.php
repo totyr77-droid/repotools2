@@ -54,7 +54,7 @@
 <script src="js/stock-offline.js?v=20261011-offline1"></script>
 <script src="js/stock.js?v=20261011-branches2"></script>
 <script src="js/public-pallet.js?v=20261010-stock13"></script>
-<script src="js/stock-branches.js?v=20261012-tabs"></script>
+<script src="js/stock-branches.js?v=20261012-name"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>

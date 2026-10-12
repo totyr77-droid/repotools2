@@ -15,7 +15,7 @@ function stock_dialog_heading(string $title,string $id,string $descriptionId='')
  <a id="printPallet" class="library-secondary" target="_blank"><?= stock_icon('print') ?> Reimprimir imagen</a>
  <button id="managePalletAccess" class="library-secondary" type="button"><?= stock_icon('user') ?> Gestionar accesos</button>
  <button id="deletePallet" class="library-secondary stock-delete" type="button"><?= stock_icon('trash') ?> Eliminar palet</button>
- <button id="leavePallet" class="library-secondary" type="button"><?= stock_icon('exit') ?> Dejar de participar</button></div></details><button id="assignPalletBranch" class="library-secondary pallet-branch-action" type="button" hidden><?= stock_icon('branch') ?> Sucursal</button></div>
+ <button id="leavePallet" class="library-secondary" type="button"><?= stock_icon('exit') ?> Dejar de participar</button></div></details><div id="palletBranchActions" class="pallet-branch-action" hidden><button id="assignPalletBranch" class="library-secondary" type="button"><?= stock_icon('branch') ?><span id="palletBranchButtonName">Sucursal</span></button><button id="changePalletBranch" class="library-secondary stock-icon" type="button" aria-label="Cambiar sucursal" title="Cambiar sucursal" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14z"/></svg></button></div></div>
  <button id="claimPallet" class="library-primary" type="button">Usar este palet</button><div id="palletProducts"></div><footer id="palletMetadata" class="stock-metadata"></footer>
 </dialog>
 <dialog id="stockProductDialog" class="library-dialog"><?php stock_dialog_heading('Producto','stockProductDialog'); ?><form id="stockProductForm">
