@@ -5,9 +5,11 @@
 1. Iniciar sesión con la misma cuenta en computadora y celular.
 2. En la computadora, abrir escaneo: aparece un campo para teclado o lector de códigos (Enter).
 3. En PC no se ofrece cámara. Elegir Usar celular; Recordar este método es opcional y se guarda en este navegador por cuenta.
-4. En el celular, aceptar Conectar. Desde el aviso verde, Escanear para PC abre la cámara compartida, con zoom, flash y entrada manual cuando corresponde.
+4. En el celular, aceptar Conectar. El botón flotante Escanear para PC abre directamente la cámara compartida, con zoom, flash y entrada manual. Sin petición activa, el marco rojo indica espera y no confirma códigos.
 5. Inicio incorpora los EAN a la lista. Biblioteca abre su formulario. Stock abre cantidad/vencimiento o el palet si se pidió QR. En una carga individual, el teléfono espera hasta abrir el siguiente escaneo.
 6. Desconectar está disponible en ambos equipos. Recordar el método no acepta una conexión nueva por el usuario.
+
+Los botones normales de Inicio, Biblioteca y Stock en el celular guardan/procesan en el propio celular, aunque siga vinculado. Solo el lector del botón flotante envía a PC. Cada lector usa el modo EAN/QR que pide su pantalla; al abrir escaneo local se cierra y detiene el lector para PC antes de usar la cámara. La vinculación permanece activa.
 
 ## Sesiones y seguridad
 

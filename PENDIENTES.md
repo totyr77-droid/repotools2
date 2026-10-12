@@ -435,3 +435,10 @@ Validación añadida a tests/device-connection-ui.cjs: mismo QR reservado consul
 Por solicitud explícita se muestra Reservado por con nombre e icono de usuario en Stock y página pública de QR; servidor retorna únicamente reserved_name para reserva vigente sin palet asignado. No email/DNI/IP ni ID del reservante. Confirmado que eliminar palet y eliminar etiqueta pendiente ya limpian pallet_id/reserved_by/reserved_until de forma transaccional; no fue necesario cambiar eliminación. Reserva anterior no se conserva tras eliminación, código utilizable inmediatamente por otra cuenta.
 
 Validado tests/stock-api.cjs con reserva/ocupación/productos/eliminación, reserved_until0 y reserved_name null, uso inmediato por otra cuenta; también eliminar etiqueta pendiente. tests/device-connection-ui.cjs verifica nombre en Stock y QR público (anónimo, manager y reservante) y resto del relay. PHP/JS válidos. SQLite/Chrome; sin modificación producción, sin migraciones. Revertir commit restaura ficha sin nombre; liberación permanece comportamiento existente.
+
+
+## Uso local del celular mientras está vinculado — 12/10/2026
+
+Antes todo lector normal móvil heredaba modo solicitado por PC y enviaba resultados a ella, impidiendo guardar normalmente en teléfono. Corregido: botones normales procesan localmente y conservan su propio modo EAN/QR; solo lector flotante raw para PC envía vía relay. Al iniciar lector normal, se cierra diálogo remoto y se espera su stop para liberar cámara. Conexión sigue activa sin cerrar sesión ni desconectar la PC. Documentado en docs/ESCANEO-PC-CELULAR.md.
+
+Validado tests/device-connection-ui.cjs: celular vinculado con petición QR en PC lee EAN local y QR local sin enviar código; se verifica único lector activo mediante mock que rechaza cámara ocupada; conexión conservada y resto del relay completo. tests/ean-scanner.cjs y node sintaxis pasan. Simulación Chrome; falta teléfono físico para verificar hardware/permisos. Sin migraciones o modificación de cuentas reales. Revertir commit restaura envío automático desde lectores normales, conservar tablas/datos.
