@@ -28,7 +28,7 @@
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-branches1"></script>
 <script src="js/device-connection.js?v=20261012-devices"></script>
-<script src="js/action-notices.js?v=20261011-branches2"></script>
+<script src="js/action-notices.js?v=20261012-security"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>

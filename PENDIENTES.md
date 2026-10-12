@@ -362,3 +362,8 @@ Escaneo de escritorio con input/Enter para teclado o pistola, cámara opcional y
 Una sesión de navegador PC + una celular: ingreso nuevo del mismo tipo pide Cancelar/Entrar aquí; reemplaza ese cupo, conserva el otro y las cargas locales. Dispositivos clasificados por User-Agent: no identificación física ni anticopia. Sesiones antiguas adoptan cupo al usarse. Token en sesión, digest en DB. Cierre/cambio de contraseña conserva cupo actual y revoca otros; logout libera solo token coincidente. Corregido formulario que deshabilitaba el botón antes de enviar su decisión y carga duplicada del módulo de conexión.
 
 Diseño PC ampliado: Stock/palets, Biblioteca, Moderación, Ajustes e Inicio con distribución de escritorio; móvil conserva mano e iconos, herramientas no se invierten. Ver docs/ESCANEO-PC-CELULAR.md para uso, pruebas, límites y reversión. Validación SQLite/Chrome simulada; falta teléfono real, lector físico, PostgreSQL aislado y verificar despliegue Render. No transferimos fotos ni ejecutamos relay sin Internet. Revertir commit completo preservando tablas21/22; mantener actualización de cupo en Seguridad si se conserva el control de sesiones.
+
+
+## Aviso de contraseña actualizada — 12/10/2026
+
+Contraseña actualizada y cierre de otras sesiones ahora usan la notificación compartida verde, borde suave, esquinas redondeadas e icono SVG de confirmación. No cambia seguridad ni mensajes del servidor. Clasificación JS verificada para éxito, error y vacío; sintaxis correcta. Revertir este commit restaura presentación anterior sin cambios de datos.
