@@ -456,3 +456,10 @@ Validado tests/device-connection-ui.cjs: código17309735 enviado desde celular a
 PC al abrir Código del palet o formulario producto Stock con EAN editable prepara automáticamente el campo para teclado/lector y activa petición móvil existente, sin clic/foco manual del usuario. EAN fijo por escaneo/edición no pide nueva lectura. Biblioteca y entradas del lector ya preparaban campo al abrir: verificado retirando focus explícito de pruebas. Móvil conserva comportamiento previo sin activar teclado por esta corrección. Blur/cierre sigue pausando recepción; no pide lectura por abrir secciones sin entrada de código ni guarda formularios automáticamente.
 
 Validado tests/device-connection-ui.cjs sin focus manual en entrada palet y Biblioteca: abrir/código remoto/avance completo y regresiones. JS sintaxis correcta. Sin DB ni permisos nuevos. Revertir commit restaura preparación manual en Stock, conserva datos y vinculación.
+
+
+## Indicadores de escritorio — 12/10/2026
+
+Campana centrada verticalmente en header, sin padding/margen heredado. Conexión PC compacta alineada a la derecha, icono de celular y texto Celular conectado; desconectar con icono, nombre accesible y tooltip. Estado de espera neutro; móvil conserva aviso y controles. Versiones de assets actualizadas. Sin cambios en DB o permisos.
+
+Validación: sintaxis JS/PHP y regresión device-connection-ui.cjs en Chrome/SQLite, incluida lectura remota EAN/QR, desconexión y anchos móviles/PC. Captura de Stock revisada. Falta prueba de campo en teléfono físico. Revertir este commit restaura presentación anterior, sin afectar datos o conexiones.
