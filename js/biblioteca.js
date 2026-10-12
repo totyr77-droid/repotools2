@@ -62,6 +62,7 @@
     return result.libraries;
   }
   async function mutate(data) {
+    if(!navigator.onLine){if(data.action!=='add_product')throw Error('Esta acción necesita conexión.');await RepoLibraryQueue.add(data,libraries.find(l=>Number(l.id)===Number(data.library_id))?.name||'Biblioteca');const local=libraries.find(l=>Number(l.id)===Number(data.library_id));if(local&&!local.products.some(p=>p.ean===data.ean))local.products.push({ean:data.ean,name:data.name,pending:true});render();return;}
     if (busy) throw new Error('Espera a que termine el cambio anterior.');
     busy = true;
     document.querySelectorAll('.library-app button, .library-dialog button[type="submit"]').forEach(b => b.disabled = true);
@@ -105,6 +106,7 @@
       const code = document.createElement('p'); code.className = 'library-product-code';
       code.append(barcodeIcon(), document.createTextNode(product.ean));
       const description = document.createElement('div'); description.className = 'library-product-description'; description.append(title, code);
+      if(product.pending){const pending=document.createElement('small');pending.className='offline-pending-tag';pending.textContent='Pendiente de sincronizar';description.append(pending);}
       if (product.reference_name && product.catalog_name && product.catalog_name !== product.name) { const catalog=document.createElement('p');catalog.className='library-catalog-name';catalog.textContent=product.catalog_name;description.insertBefore(catalog,code); }
       const actions = document.createElement('div'); actions.className = 'library-product-actions';
       const view = button('', 'library-primary library-view-code', () => {
@@ -169,6 +171,7 @@
     if (ean) loadScannedProduct(ean);
   }
   async function loadScannedProduct(ean) {
+    if(!navigator.onLine){const local=await RepoOfflineCatalog.get(Number(config.user_id||window.repotoolsOfflineUser),ean);get('libraryScanProductInfo').textContent=local?[local.brand,local.name,local.quantity].filter(Boolean).join(' '):'No tenemos información guardada de este producto.';if(local&&!get('libraryProductName').value)get('libraryProductName').value=[local.brand,local.name,local.quantity].filter(Boolean).join(' ').slice(0,120);return;}
     const product = await window.RepoProductInfo.showSummary(get('libraryScanProductInfo'), ean, { compact: true });
     if (product && get('libraryProductDialog').open && get('libraryProductEan').value === ean && !get('libraryProductName').value) get('libraryProductName').value = Array.from(window.RepoProductInfo.referenceName(product)).slice(0, 120).join('');
   }
@@ -224,7 +227,7 @@
     }
     try {
       await mutate({ action: 'add_product', library_id: productLibraryId, ean: get('libraryProductEan').value.trim(), name: get('libraryProductName').value.trim() });
-      get('libraryProductDialog').close(); message('Producto guardado.');
+      get('libraryProductDialog').close(); message(navigator.onLine?'Producto guardado.':'Guardado en este dispositivo · pendiente de sincronizar.');
     } catch (error) { message(error.message); }
   });
   get('eanCollection').addEventListener('change', () => {
@@ -360,6 +363,7 @@
   });
   get('newCollection').disabled = true;
   message('Cargando colecciones…');
+  document.addEventListener('repotools:library-synced',()=>request().then(result=>{libraries=result;render();}).catch(()=>{}));
   request().then(result => {
     libraries = result; activeId = libraries.length ? Number(libraries[0].id) : null;
     render(); message(''); previewImport();

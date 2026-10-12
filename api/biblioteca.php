@@ -26,6 +26,7 @@ try {
         $action = $_POST['action'] ?? '';
         $name = trim(is_string($_POST['name'] ?? null) ? $_POST['name'] : '');
         if (in_array($action, ['create', 'rename'], true) && (mb_strlen($name) < 1 || mb_strlen($name) > 80)) library_response(422, ['error' => 'Escribe un nombre de hasta 80 caracteres.']);
+        if ($action === 'offline_add' && (int)($_POST['offline_owner']??0)!==$userId) library_response(403,['error'=>'Ingresa con la cuenta que guardó esta carga.']);
         if ($action === 'share') {
             $id = filter_var($_POST['library_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
             if (!$id) library_response(422, ['error' => 'Colección no válida.']);
@@ -35,7 +36,7 @@ try {
         } elseif ($action === 'create') {
             $stmt = $db->prepare('INSERT INTO libraries (user_id, name) VALUES (?, ?)');
             $stmt->execute([$userId, $name]);
-        } elseif (in_array($action, ['rename', 'delete', 'add_product', 'delete_product'], true)) {
+        } elseif (in_array($action, ['rename', 'delete', 'add_product', 'offline_add', 'delete_product'], true)) {
             $id = filter_var($_POST['library_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
             if (!$id) library_response(422, ['error' => 'Colección no válida.']);
             $db->beginTransaction();
@@ -57,7 +58,7 @@ try {
                     $db->rollBack();
                     library_response(422, ['error' => 'Usa un EAN de 8 o 13 números y un nombre de hasta 120 caracteres.']);
                 }
-                if ($action === 'add_product') {
+                if (in_array($action,['add_product','offline_add'],true)) {
                     $sum = 0;
                     $weight = 3;
                     for ($i = strlen($ean) - 2; $i >= 0; $i--) {
@@ -69,8 +70,8 @@ try {
                         library_response(422, ['error' => 'El EAN no es válido. Revisa el código.']);
                     }
                 }
-                if ($action === 'add_product') {
-                    $db->prepare("INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO UPDATE SET name = CASE WHEN excluded.name != '' THEN excluded.name ELSE library_products.name END")->execute([$id, $ean, $name]);
+                if (in_array($action,['add_product','offline_add'],true)) {
+                    $db->prepare($action==='offline_add'?"INSERT INTO library_products (library_id,ean,name) VALUES(?,?,?) ON CONFLICT(library_id,ean) DO NOTHING":"INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO UPDATE SET name = CASE WHEN excluded.name != '' THEN excluded.name ELSE library_products.name END")->execute([$id, $ean, $name]);
                 } else {
                     $db->prepare('DELETE FROM library_products WHERE library_id = ? AND ean = ?')->execute([$id, $ean]);
                 }
@@ -97,7 +98,7 @@ try {
         $library['products'] = $products[$library['id']] ?? [];
     }
     unset($library);
-    library_response(200, ['libraries' => $libraries]);
+    library_response(200, ['libraries' => $libraries,'user_id'=>$userId,'csrf'=>csrf_token()]);
 } catch (DomainException $exception) {
     library_response(422, ['error' => $exception->getMessage()]);
 } catch (PDOException $exception) {

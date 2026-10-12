@@ -20,7 +20,7 @@
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || 'No pudimos cargar el producto.');
           access.set(ean, { canEdit: result.can_edit === true, csrf: result.csrf });
-          return result.product || null;
+          if(result.product)window.RepoOfflineCatalog?.put(Number(window.repotoolsOfflineUser||0),ean,result.product).catch(()=>{});return result.product || null;
         } finally { clearTimeout(timeout); }
       })();
       cache.set(key, pending);

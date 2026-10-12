@@ -25,6 +25,8 @@
 <?php endif; ?>
 <!-- SCRIPTS -->
 <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261011-camera3"></script>
+<script src="js/stock-offline.js?v=20261012-library-offline"></script>
+<?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-library-offline"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-branches1"></script>
 <script src="js/device-connection.js?v=20261012-standby"></script>
@@ -34,10 +36,10 @@
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/ean-scanner.js?v=20261012-continuous"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/product-info.js?v=20261011-fresh2"></script>
+<script src="js/product-info.js?v=20261012-local-catalog"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261011-reportphotofallback10"></script>
-<script src="js/biblioteca.js?v=20261012-auto-code"></script>
+<script src="js/biblioteca.js?v=20261012-offline-add"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261011-orientation4"></script>
@@ -54,8 +56,8 @@
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
-<script src="js/stock-offline.js?v=20261011-offline1"></script>
-<script src="js/stock.js?v=20261012-open-code"></script>
+
+<script src="js/stock.js?v=20261012-offline-sync"></script>
 <script src="js/public-pallet.js?v=20261012-reserver"></script>
 <script src="js/branch-maps.js?v=20261012-vector"></script>
 <script src="js/stock-branches.js?v=20261012-public-layout"></script>

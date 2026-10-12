@@ -535,3 +535,14 @@ Validación JS/PHP sintaxis y prueba visual Chrome con datos simulados: 320/390/
 Sustituye búsqueda textual por select Todos los usuarios + personas con eventos para filtro de acción actual, consultadas en servidor sobre unión de eventos antes de paginar. Selección por ID exacto; homónimos se distinguen con ID visible si duplicados. Cambiar acción reinicia persona/página. Autor no limita opciones para permitir cambiar de cuenta; listado no depende solo de página visible. Valida ID y mantiene permisos audit y parámetros PDO. No emails ni datos privados extra en opciones. Sin migraciones.
 
 Validación PHP/JS sintaxis y Chrome/SQLite temporal: actor1/aprobados, actor2 o inexistente sin resultados, opciones solo autor con eventos, selector/cambio acción/reseteo, arrays y texto inválido422, usuario normal403, móvil sin overflow. PostgreSQL no ejecutado. Revertir commit restaura filtro textual previo.
+
+
+## Cargas sin conexión y Biblioteca — 12/10/2026
+
+Stock offline: iconos centrados, entrada manual dentro de cámara (externa solo si cámara falla), calculadora opcional con preferencia compartida online/offline, cantidad inicial 0 y espacio estable para resultado. Bloqueo de gestos zoom en página offline; pendientes amarillos. Reconexión comprueba respuesta autenticada del servidor, sin anunciar Internet solo por navigator.onLine. Envíos confirmados generan notificación verde con desplegable de cargas enviadas, EAN y destino. Historial local limitado a 100 y siete días.
+
+Biblioteca permite agregar productos sin conexión a colecciones previamente consultadas. Conserva referencia personal, cola separada por cuenta, catálogo local común Stock/Biblioteca de nombre/marca/presentación (máximo500, 30 días), sincronización automática con CSRF actual y bloqueo entre pestañas. API offline_add valida propietario/colección/EAN, INSERT ON CONFLICT DO NOTHING evita duplicados y sobrescribir referencias existentes. IndexedDB v2 conserva cola anterior; cierra conexiones antiguas al actualizar esquema. Service worker shell v6, sin cachear APIs privadas. Sin migraciones ni datos reales modificados.
+
+Validación: tests/offline-start.cjs en modo móvil y PC, stock-offline-ui y stock-api pasan. Verificados apertura offline, 320/390/1366px, calculadora sin desplazamiento, carga biblioteca, envío único y referencias conservadas, cuenta incorrecta403/colección404/EAN422. Capturas calculadora y pendientes revisadas. Cámara Chrome simulada y SQLite temporal; falta prueba en teléfono real y PostgreSQL de producción. No se crean/renombran/eliminan colecciones offline. Probar entrando primero con conexión, modo avión, cargas y reconexión.
+
+Reversión: revertir commit de esta entrega restaura archivos/versiones; no borrar IndexedDB para evitar perder pendientes locales. Mantener copia de colas antes de volver a una versión anterior.
