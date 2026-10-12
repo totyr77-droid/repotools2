@@ -254,3 +254,8 @@ Icono duplicado: el título dinámico de Palet elimina la decoración automátic
 Validado tests/stock-branches.php en SQLite y rama aislada Neon PostgreSQL con rollback (directorio compartido, duplicados, permisos admin/manager, aislamiento de enlaces y reutilización/paginación); tests/stock-branches-ui.cjs prueba dos cuentas, rechazo de edición/borrado de usuario, alta inline de sucursal al reclamar QR todavía sin productos, ausencia de doble icono, CSRF/idempotencia/AJAX y geometría320/390/1366/táctil zurdo. Regresiones tests/stock.php y tests/stock-api.cjs pasan. Captura inline-branch-390.png revisada, en tmp ignorado. Falta prueba física del usuario y confirmar despliegue Render. Mapa sigue pendiente al final.
 
 Revertir el commit Refine common branch permissions and pallet preparation conserva las tablas de migración16 y datos; no revertir datos ni quitar columnas. Detalles actualizados en docs/SUCURSALES.md.
+
+
+## Stock: retirar bloques del inicio — 11/10/2026
+
+El usuario confirmó quitar solo los bloques Sucursales y Enlaces compartidos del inicio de Stock. Permanecen elegir/crear sucursal dentro del palet, filtro y Compartir selección. No se eliminan datos ni se revocan enlaces existentes. Los avisos de sucursales quedan fuera del panel oculto para seguir visibles. Se actualiza la prueba UI para comprobar que ambos paneles permanecen ocultos después de compartir y navegar por AJAX; mantiene alta inline y asignación desde el palet. Para revertir, restaurar interfaz/JS y versión del recurso del commit de este ajuste, sin cambios de esquema.

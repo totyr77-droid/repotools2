@@ -40,3 +40,8 @@ Pendiente: prueba del usuario en iPhone/Android y confirmar despliegue de Render
 Al incorporar nuevas acciones al registro unificado, considerar auditoría específica de sucursales y enlaces: el estado ya se guarda, pero esta entrega no crea una nueva categoría de eventos para sus cambios. Mantener la restricción anterior de notas y permisos de moderación.
 
 Aclaración del 11/10: la columna stock_branches.owner_id conserva al creador como metadato interno; ya no restringe el directorio ni los permisos de edición. No requiere otra migración. Se preservan registros anteriores; no se fusionaron ni borraron posibles duplicados históricos de distintas cuentas. Los nuevos duplicados se reutilizan y los históricos pueden ser revisados por admin/manager.
+
+
+## Stock: retirar bloques del inicio — 11/10/2026
+
+El usuario confirmó quitar solo los bloques Sucursales y Enlaces compartidos del inicio de Stock. Permanecen elegir/crear sucursal dentro del palet, filtro y Compartir selección. No se eliminan datos ni se revocan enlaces existentes. Los avisos de sucursales quedan fuera del panel oculto para seguir visibles. Se actualiza la prueba UI para comprobar que ambos paneles permanecen ocultos después de compartir y navegar por AJAX; mantiene alta inline y asignación desde el palet. Para revertir, restaurar interfaz/JS y versión del recurso del commit de este ajuste, sin cambios de esquema.
