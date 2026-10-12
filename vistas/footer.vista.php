@@ -27,7 +27,7 @@
 <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261011-camera3"></script>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-branches1"></script>
-<script src="js/device-connection.js?v=20261012-desktop2"></script>
+<script src="js/device-connection.js?v=20261012-relay-alert"></script>
 <script src="js/action-notices.js?v=20261012-security"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>

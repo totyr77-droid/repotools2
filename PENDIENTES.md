@@ -384,3 +384,10 @@ Verificación adicional: apertura offline y carga pendiente/sincronización pasa
 ## Correos minimalistas — 12/10/2026
 
 Cabecera con marca sobre fondo claro, sin bloque violeta sólido; se mantienen botones #27187e, tarjetas blancas, fondo #f4f7fb y confirmación verde. Padding más compacto y metadatos de esquema claro (el cliente puede ignorarlos). Tablas de ambos modelos sin espaciado implícito. Validado PHP, tests/password-reset.php y render Chrome móvil sin desborde. Sin cambios de contraseña, tokens ni sesiones reales. Envío desde Render pendiente: no hay credencial Resend ni sesión de consola disponible localmente; no afirmar envío realizado. Revertir commit de plantilla restaura diseño anterior sin alterar datos.
+
+
+## Solicitud de lector móvil y acceso flotante — 12/10/2026
+
+Solicitud PC en celular presentada en diálogo modal con fondo oscurecido, cierre por cruz y bloqueo de desplazamiento de fondo. Aceptación explícita conserva validación existente de misma cuenta/CSRF; aceptar cierra aviso. Botón circular flotante inferior, verde al conectar y amarillo mientras espera, abre controles de escaneo/desconexión; izquierda para zurdos en móvil y derecha por defecto. Cerrar solicitud permite volver desde botón sin repetir modal en cada consulta. Limpieza al navegar para evitar controles duplicados. PC conserva su aviso existente. Recursos versionados.
+
+Validado node --check y tests/device-connection-ui.cjs: modal automático, cierre tras aceptar, posición por mano y relay Inicio/Stock/Biblioteca, aislamiento/permisos y desconexión. Prueba física móvil pendiente. Sin migraciones ni cambios de seguridad. Revertir commit de JS/CSS/vistas/tests restaura aviso en bloque sin alterar conexiones ni datos.
