@@ -283,3 +283,6 @@ Se oculta información duplicada de sucursal sobre la barra del palet; nombre qu
 
 
 Sin coincidencias de sucursal: mensaje centrado, botón Agregar sucursal centrado de ancho ajustado al texto y altura mínima40px, conserva SVG y flecha de despliegue. Ajuste visual sin cambiar búsqueda/alta/permisos; revertir CSS y texto del botón para restaurar tamaño anterior.
+
+
+Agregar sucursal siempre visible en pestaña Buscar, haya coincidencias o no: locales con mismo nombre y diferente dirección son válidos. Estilo compacto discreto con borde fino sin relleno, alineado al extremo derecho. Mapa pendiente: almacenar latitud/longitud por sucursal, permitir fijar pin al crear/corregir, solicitar geolocalización solo al abrir pestaña ubicación y ofrecer alternativa si se rechaza. Elegir proveedor de mapas y condiciones antes de integrar; sin servicio nuevo en esta entrega.
