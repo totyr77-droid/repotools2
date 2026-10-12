@@ -23,7 +23,7 @@ try {
     else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
     stock_expire($db); $result=[];
     if ($method==='POST') {
-        foreach (['action','id','revision','pallet_id','branch_id','title','pallet_ids'] as $field) {
+        foreach (['action','id','revision','pallet_id','branch_id','title','pallet_ids','latitude','longitude'] as $field) {
             if (isset($_POST[$field])&&!is_string($_POST[$field])) throw new CatalogException('El formulario no es válido.',422);
         }
         foreach (['id','revision','pallet_id','branch_id'] as $field) {
@@ -51,11 +51,11 @@ try {
                 break;
             default: throw new CatalogException('Acción no válida.',422);
         }
-        if(isset($result['branch'])) $result['branch']=array_intersect_key($result['branch'],array_flip(['id','name','address','locality','province','description','revision']));
+        if(isset($result['branch'])) $result['branch']=array_intersect_key($result['branch'],array_flip(['id','name','address','locality','province','description','revision','latitude','longitude']));
         $result['ok']=true; $result['csrf']=$csrf;
         stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     } else {
-        $result=['can_manage_branches'=>stock_is_admin($db,$uid),'branches'=>stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.revision, (SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.owner_id=? AND p.released=0 AND p.activated=1) AS pallet_count FROM stock_branches b ORDER BY LOWER(b.name),b.id',[$uid])->fetchAll(),'shares'=>stock_query($db,'SELECT id,token,title,branch_id,created_at FROM stock_shares WHERE owner_id=? AND active=1 ORDER BY id DESC',[$uid])->fetchAll(),'pallets'=>stock_query($db,'SELECT id,code,description,branch_id,revision,activated FROM pallets WHERE owner_id=? AND released=0 ORDER BY updated_at DESC,id DESC',[$uid])->fetchAll(),'csrf'=>$csrf];
+        $result=['can_manage_branches'=>stock_is_admin($db,$uid),'branches'=>stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.revision,b.latitude,b.longitude, (SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.owner_id=? AND p.released=0 AND p.activated=1) AS pallet_count FROM stock_branches b ORDER BY LOWER(b.name),b.id',[$uid])->fetchAll(),'shares'=>stock_query($db,'SELECT id,token,title,branch_id,created_at FROM stock_shares WHERE owner_id=? AND active=1 ORDER BY id DESC',[$uid])->fetchAll(),'pallets'=>stock_query($db,'SELECT id,code,description,branch_id,revision,activated FROM pallets WHERE owner_id=? AND released=0 ORDER BY updated_at DESC,id DESC',[$uid])->fetchAll(),'csrf'=>$csrf];
     }
     $db->commit(); branch_response(200,$result);
 } catch(CatalogException $e) { if($db?->inTransaction())$db->rollBack(); branch_response($e->status,['error'=>$e->getMessage()]); }

@@ -159,6 +159,11 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX stock_shares_owner ON stock_shares(owner_id,active)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(16)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 17')->fetchColumn()) {
+            $db->exec('ALTER TABLE stock_branches ADD COLUMN latitude DOUBLE PRECISION');
+            $db->exec('ALTER TABLE stock_branches ADD COLUMN longitude DOUBLE PRECISION');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(17)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

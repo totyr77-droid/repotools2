@@ -7,7 +7,7 @@
 .stock-branches details[open]>summary svg:last-child { transform:rotate(180deg); }
 .branch-toolbar { display:flex; align-items:center; gap:10px; margin:12px 0; flex-wrap:wrap; }
 .branch-toolbar label { display:flex;align-items:center;gap:8px; flex:1;min-width:0;margin:0; }
-.branch-toolbar svg,.branch-pallet-info svg,.branch-card-name svg,.branch-dialog svg,.branch-public-pallet h2 svg,#publicStockShare h1 svg { width:20px;height:20px;flex-shrink:0; }
+.branch-toolbar svg,.branch-pallet-info svg,.branch-card-name svg,.branch-dialog svg:not(.leaflet-zoom-animated),.branch-public-pallet h2 svg,#publicStockShare h1 svg { width:20px;height:20px;flex-shrink:0; }
 .branch-toolbar input,.branch-toolbar select,.branch-dialog input,.branch-dialog select,.branch-dialog textarea { width:100%;min-width:0;box-sizing:border-box; padding:11px 12px; border:1px solid #dce1eb; border-radius:10px;background:white;color:#172033;font:inherit;min-height:44px; }
 .branch-toolbar button,.branch-dialog button,.branch-dialog a { display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px; }
 .branch-stock-filter select { max-width:400px; }
@@ -52,3 +52,7 @@
 #palletBranchEmpty{text-align:center;margin:8px 0 0;font-size:.85rem;line-height:1.45}#palletBranchForm #newPalletBranch{justify-self:center;width:auto;min-height:40px;padding:8px 12px;font-size:.85rem;border-radius:9px}#newPalletBranch>svg{width:17px;height:17px}#newPalletBranch .branch-create-chevron svg{width:15px;height:15px}
 
 #palletBranchForm #newPalletBranch{justify-self:end;background:transparent;color:#625783;border:1px solid #ded9e9;font-weight:500;box-shadow:none;padding:7px 10px}#palletBranchForm #newPalletBranch:hover{background:#f0edf7;border-color:#c9c0dd}
+
+.branch-map{height:300px;width:100%;border:1px solid #ded9e9;border-radius:12px;box-sizing:border-box;z-index:0}.branch-map-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:10px 0}.branch-map-toolbar button{font-size:.8rem;padding:8px 10px}.branch-map-toolbar span{flex:1;min-width:140px;font-size:.8rem}.branch-point-details summary{display:flex;align-items:center;gap:8px;cursor:pointer;color:#625783;font-size:.85rem;min-height:44px}.branch-point-details summary .branch-create-chevron{margin-left:auto}.branch-point-details[open] summary .branch-create-chevron{transform:rotate(180deg)}.branch-map .leaflet-popup-content{overflow-wrap:anywhere}.branch-map .leaflet-popup-content button{font-size:.8rem;min-height:40px}.branch-map .leaflet-control-attribution{font-size:10px}.branch-map .leaflet-control a{min-height:0;display:block}.branch-map .leaflet-control-zoom a{line-height:30px}@media(max-width:400px){.branch-map{height:260px}}
+#palletBranchDialog .branch-map .leaflet-control-attribution a{display:inline;min-height:0;padding:0;margin:0}
+#palletBranchDialog .branch-map .leaflet-control-attribution svg{width:12px;height:8px}

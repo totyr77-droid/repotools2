@@ -15,11 +15,23 @@ function branch_input(array $input): array {
         if (!is_string($value)||mb_strlen(trim($value))>$max||($field!=='description'&&trim($value)==='')) throw new CatalogException('Completa el nombre, dirección, localidad y provincia de la sucursal.',422);
         $result[$field]=preg_replace('/\s+/u',' ',trim($value));
     }
+    $latitude=$input['latitude']??''; $longitude=$input['longitude']??'';
+    if (($latitude===''||$latitude===null)&&($longitude===''||$longitude===null)) { $result['latitude']=null; $result['longitude']=null; }
+    else {
+        foreach (['latitude'=>[$latitude,90],'longitude'=>[$longitude,180]] as $field=>[$value,$limit]) {
+            if ((!is_string($value)&&!is_int($value)&&!is_float($value))||!is_numeric($value)||!is_finite((float)$value)||abs((float)$value)>$limit) throw new CatalogException('La ubicación de la sucursal no es válida.',422);
+            $result[$field]=(float)$value;
+        }
+    }
     return $result;
 }
 function branch_save(PDO $db, int $user, array $input): array {
-    $values=branch_input($input); $id=(int)($input['id']??0);
+    $id=(int)($input['id']??0);
     if ($id&&!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden modificar sucursales.',403);
+    if ($id&&!array_key_exists('latitude',$input)&&!array_key_exists('longitude',$input)) {
+        $existing=branch_owned($db,$id,$user); $input['latitude']=$existing['latitude']; $input['longitude']=$existing['longitude'];
+    }
+    $values=branch_input($input);
     $key=fn($v)=>strtr(mb_strtolower(preg_replace('/\s+/u',' ',trim($v))),['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u']);
     foreach (stock_query($db,'SELECT id,name,address,locality,province FROM stock_branches WHERE id<>? ORDER BY id',[$id])->fetchAll() as $existing) {
         $same=true;foreach(['name','address','locality','province'] as $field) if($key($values[$field])!==$key($existing[$field])){$same=false;break;}
@@ -27,11 +39,11 @@ function branch_save(PDO $db, int $user, array $input): array {
     }
     if ($id) {
         branch_owned($db,$id,$user);
-        $changed=stock_query($db,'UPDATE stock_branches SET name=?,address=?,locality=?,province=?,description=?,revision=revision+1 WHERE id=? AND revision=?',[...array_values($values),$id,(int)($input['revision']??0)])->rowCount();
+        $changed=stock_query($db,'UPDATE stock_branches SET name=?,address=?,locality=?,province=?,description=?,latitude=?,longitude=?,revision=revision+1 WHERE id=? AND revision=?',[...array_values($values),$id,(int)($input['revision']??0)])->rowCount();
         if (!$changed) throw new CatalogException('La sucursal cambió. Vuelve a abrirla antes de guardar.',409);
     } else {
         if ((int)stock_query($db,'SELECT COUNT(*) FROM stock_branches WHERE owner_id=?',[$user])->fetchColumn()>=200) throw new CatalogException('Puedes tener hasta 200 sucursales. Edita una existente.',422);
-        $id=(int)stock_query($db,'INSERT INTO stock_branches(owner_id,name,address,locality,province,description) VALUES(?,?,?,?,?,?) RETURNING id',[$user,...array_values($values)])->fetchColumn();
+        $id=(int)stock_query($db,'INSERT INTO stock_branches(owner_id,name,address,locality,province,description,latitude,longitude) VALUES(?,?,?,?,?,?,?,?) RETURNING id',[$user,...array_values($values)])->fetchColumn();
     }
     return ['branch'=>branch_owned($db,$id,$user)];
 }
