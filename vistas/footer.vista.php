@@ -25,8 +25,8 @@
 <?php endif; ?>
 <!-- SCRIPTS -->
 <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261012-offline-home"></script>
-<script src="js/stock-offline.js?v=20261012-library-offline"></script>
-<?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-library-offline"></script><?php endif; ?>
+<script src="js/stock-offline.js?v=20261012-sync-dialog"></script>
+<?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-sync-dialog"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-branches1"></script>
 <script src="js/device-connection.js?v=20261012-standby"></script>
