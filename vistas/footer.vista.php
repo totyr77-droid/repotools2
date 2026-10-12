@@ -58,7 +58,7 @@
 <script src="js/stock.js?v=20261012-open-code"></script>
 <script src="js/public-pallet.js?v=20261012-reserver"></script>
 <script src="js/branch-maps.js?v=20261012-vector"></script>
-<script src="js/stock-branches.js?v=20261012-revocation"></script>
+<script src="js/stock-branches.js?v=20261012-public-layout"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>

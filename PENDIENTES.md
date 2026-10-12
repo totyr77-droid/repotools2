@@ -521,3 +521,10 @@ Registros: búsqueda por nombre del usuario que ejecutó acción, combinada con 
 Aclaración: registros incluyen edición directa producto, revisión reporte, bloqueos, rangos, perfiles, sucursales y acciones palet registradas para admin/manager. No representan todos los escaneos o movimientos de cualquier usuario.
 
 Validación PHP/JS sintaxis; Chrome/SQLite temporal verifica filtro por nombre parcial + aprobado, cero coincidencias, comodín literal, input array422 y usuario normal403, UI combinada y 390 px sin overflow. Regresiones visuales reportes/Biblioteca pasan. Sin consultar/modificar datos reales; PostgreSQL no ejecutado. Revertir commit restaura API/vista/JS/CSS anteriores.
+
+
+## Stock compartido adaptable — 12/10/2026
+
+Página pública: hoja CSS propia y limitada a stock-compartido.php. Palets como tarjetas separadas; escritorio ancho en dos columnas desde1100px, móvil una columna. Productos separan nombre/referencia/catálogo, EAN con SVG, cantidad y vencimiento con iconos y colores existentes; móvil cantidades/vencimiento debajo, escritorio al lado. Propietario y último movimiento en metadata legible, sin cadena de separadores. Estado éxito verde/error rojo, cargar más accesible. Reusa texto escapado vía textContent, paginación, revisión de enlace y API existentes. Sin cambios acceso público/datos/permisos.
+
+Validación JS/PHP sintaxis y prueba visual Chrome con datos simulados: 320/390/768/1366px sin overflow, palets/productos/cantidad/fechas, enlace410 limpia contenido, sin errores JS. Capturas PC y móvil revisadas. No datos reales modificados. Revertir commit restaura layout previo; CSS nuevo puede retirarse junto a su link.
