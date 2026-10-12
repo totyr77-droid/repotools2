@@ -528,3 +528,10 @@ Validación PHP/JS sintaxis; Chrome/SQLite temporal verifica filtro por nombre p
 Página pública: hoja CSS propia y limitada a stock-compartido.php. Palets como tarjetas separadas; escritorio ancho en dos columnas desde1100px, móvil una columna. Productos separan nombre/referencia/catálogo, EAN con SVG, cantidad y vencimiento con iconos y colores existentes; móvil cantidades/vencimiento debajo, escritorio al lado. Propietario y último movimiento en metadata legible, sin cadena de separadores. Estado éxito verde/error rojo, cargar más accesible. Reusa texto escapado vía textContent, paginación, revisión de enlace y API existentes. Sin cambios acceso público/datos/permisos.
 
 Validación JS/PHP sintaxis y prueba visual Chrome con datos simulados: 320/390/768/1366px sin overflow, palets/productos/cantidad/fechas, enlace410 limpia contenido, sin errores JS. Capturas PC y móvil revisadas. No datos reales modificados. Revertir commit restaura layout previo; CSS nuevo puede retirarse junto a su link.
+
+
+## Selector de autores con registros — 12/10/2026
+
+Sustituye búsqueda textual por select Todos los usuarios + personas con eventos para filtro de acción actual, consultadas en servidor sobre unión de eventos antes de paginar. Selección por ID exacto; homónimos se distinguen con ID visible si duplicados. Cambiar acción reinicia persona/página. Autor no limita opciones para permitir cambiar de cuenta; listado no depende solo de página visible. Valida ID y mantiene permisos audit y parámetros PDO. No emails ni datos privados extra en opciones. Sin migraciones.
+
+Validación PHP/JS sintaxis y Chrome/SQLite temporal: actor1/aprobados, actor2 o inexistente sin resultados, opciones solo autor con eventos, selector/cambio acción/reseteo, arrays y texto inválido422, usuario normal403, móvil sin overflow. PostgreSQL no ejecutado. Revertir commit restaura filtro textual previo.

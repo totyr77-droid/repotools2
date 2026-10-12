@@ -28,23 +28,25 @@ try {
             if(!is_string($filter)||($filter!==''&&!isset($filters[$filter])))throw new CatalogException('Filtro no válido.',422);
             $params=[];$where='';
             if($filter!==''){$definition=$filters[$filter];$where=' WHERE event_type=?';$params[]=$definition['type'];if(isset($definition['action'])){$where.=' AND action=?';$params[]=$definition['action'];}}
+            $actionWhere=$where;$actionParams=$params;
             $actor=$_GET['actor']??'';
-            if(!is_string($actor)||strlen($actor)>480)throw new CatalogException('Usuario no válido.',422);
-            $actor=trim($actor);
-            if($actor!==''){$where.=($where===''?' WHERE ':' AND ')."LOWER(actor) LIKE LOWER(?) ESCAPE '!'";$params[]='%'.str_replace(['!','%','_'],['!!','!%','!_'],$actor).'%';}
+            if(!is_string($actor)||($actor!==''&&(!ctype_digit($actor)||(int)$actor<1)))throw new CatalogException('Usuario no válido.',422);
+            if($actor!==''){$where.=($where===''?' WHERE ':' AND ').'actor_id=?';$params[]=(int)$actor;}
             $directEdit=catalog_direct_edit_condition($db,'e.after_data');
-            $query = $db->prepare("SELECT * FROM (
-                SELECT 'product_edit' AS event_type, u.name AS actor, e.ean AS target, e.created_at, NULL AS report_id, 'edited' AS action, e.id AS event_id FROM product_edits e JOIN users u ON u.id = e.user_id WHERE {$directEdit}
-                UNION ALL SELECT 'report_review', u.name, r.ean, r.reviewed_at, r.id, r.status, r.id FROM product_reports r JOIN users u ON u.id = r.reviewed_by WHERE r.reviewed_at IS NOT NULL
-                UNION ALL SELECT 'report_block', a.name, u.name, e.created_at, NULL, e.action, e.id FROM report_block_events e JOIN users a ON a.id = e.actor_id JOIN users u ON u.id = e.user_id
-                UNION ALL SELECT 'pallet_admin', u.name, e.code, e.created_at, NULL, e.action, e.id FROM pallet_admin_events e JOIN users u ON u.id = e.user_id
-            UNION ALL SELECT 'user_role', a.name, u.name, e.created_at, NULL, e.old_role || ' → ' || e.new_role, e.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
-            UNION ALL SELECT 'user_profile', a.name, u.name, e.created_at, NULL, 'profile_updated', e.id FROM user_profile_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
-            UNION ALL SELECT 'branch', a.name, e.branch_name, e.created_at, NULL, e.action, e.id FROM branch_events e JOIN users a ON a.id=e.actor_id
-            ) events{$where} ORDER BY created_at DESC, event_type, event_id DESC LIMIT 51 OFFSET {$offset}");
+            $events = "(
+                SELECT 'product_edit' AS event_type, u.name AS actor, e.ean AS target, e.created_at, NULL AS report_id, 'edited' AS action, e.id AS event_id, u.id AS actor_id FROM product_edits e JOIN users u ON u.id = e.user_id WHERE {$directEdit}
+                UNION ALL SELECT 'report_review', u.name, r.ean, r.reviewed_at, r.id, r.status, r.id, u.id FROM product_reports r JOIN users u ON u.id = r.reviewed_by WHERE r.reviewed_at IS NOT NULL
+                UNION ALL SELECT 'report_block', a.name, u.name, e.created_at, NULL, e.action, e.id, a.id FROM report_block_events e JOIN users a ON a.id = e.actor_id JOIN users u ON u.id = e.user_id
+                UNION ALL SELECT 'pallet_admin', u.name, e.code, e.created_at, NULL, e.action, e.id, u.id FROM pallet_admin_events e JOIN users u ON u.id = e.user_id
+            UNION ALL SELECT 'user_role', a.name, u.name, e.created_at, NULL, e.old_role || ' → ' || e.new_role, e.id, a.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
+            UNION ALL SELECT 'user_profile', a.name, u.name, e.created_at, NULL, 'profile_updated', e.id, a.id FROM user_profile_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
+            UNION ALL SELECT 'branch', a.name, e.branch_name, e.created_at, NULL, e.action, e.id, a.id FROM branch_events e JOIN users a ON a.id=e.actor_id
+            ) events";
+            $actorsQuery=$db->prepare("SELECT DISTINCT actor_id AS id, actor AS name FROM {$events}{$actionWhere} ORDER BY name, id");$actorsQuery->execute($actionParams);$actors=$actorsQuery->fetchAll();
+            $query=$db->prepare("SELECT * FROM {$events}{$where} ORDER BY created_at DESC, event_type, event_id DESC LIMIT 51 OFFSET {$offset}");
             $query->execute($params);$items=$query->fetchAll();
         }
-        report_response(200, ['items' => array_slice($items, 0, 50), 'has_more' => count($items) > 50, 'can_audit' => true, 'csrf' => $csrf]);
+        report_response(200, ['actors' => $actors ?? [], 'items' => array_slice($items, 0, 50), 'has_more' => count($items) > 50, 'can_audit' => true, 'csrf' => $csrf]);
     }
     if ($method === 'GET' && isset($_GET['pending_count'])) {
         if (!$moderator) throw new CatalogException('No tienes permiso para revisar reportes.', 403);
