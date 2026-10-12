@@ -344,3 +344,12 @@ Validado sintaxisPHP/JS, tests/stock-branches.php SQLite: ocultar excluido, inco
 Formulario producto: calculadora en despliegue nativo con SVG y flecha giratoria, cerrada por defecto. Recuerda apertura/cierre con localStorage por user_id en este navegador; no sincroniza dispositivos ni agrega telemetría, y tolera almacenamiento bloqueado. Se aplica al agregar/editar y al volver a abrir/navegar. Mantiene cálculo escrito, teclado de calculadora y Enter; no invierte iconos ni teclado. Placeholder simple8 cerrado, 8×5 abierto. Cantidad de unidades/cajas/bultos según presentación, total legible y validación de tamaño por caja antes de mostrar números incorrectos; vacío sin error prematuro. Botón igual destacado, C discreto rojo y separación compacta.
 
 Validado sintaxisPHP/JS, tests/stock.php y tests/stock-branches-ui.cjs Chrome: cerrado inicial, 8×5=40, cajas40×5=200, preferencia abierta al reabrir y cerrada tras recarga, regresiones de Stock y resto de flujos. Sin migraciones/servidor nuevo, permisos y datos conservados. Falta prueba física en móvil. Revertir archivos del commit para calculadora siempre visible; la clave local puede conservarse sin efecto.
+
+
+## Diagnóstico de desactivación de enlaces — 12/10/2026
+
+Usuario informa link aún visible tras desactivar y recargar. Consulta HTTP de solo lectura al enlace indicado: API200 con2 palets, Cache-Control:no-store en dominio raíz/www; código de desactivación nuevo desplegado. Esto demuestra enlace activo en servidor, no caché, pero no se identificó causa exacta de su intento anterior. No se alteraron enlaces/datos reales ni se guardó token en documentación.
+
+Corregido fallo adicional de vista pública: error de revalidación dejaba palets anteriores visibles. Ahora se limpia contenido/datos y oculta Ver más; al volver a pestaña/foco/pageshow se revalida y respuestas obsoletas no repintan. Desactivación desde lista comprueba404 público antes de confirmar éxito. Cada enlace muestra referencia de6 caracteres y fecha; confirmación aclara que otros enlaces del mismo stock siguen activos. Sin cambio DB.
+
+Validado node sintaxis y tests/stock-branches-ui.cjs Chrome: revocar enlace ya abierto, foco limpia palets, recarga sigue sin contenido; revocación desde modal con comprobación404 y flujos anteriores pasan. Pendiente: usuario reintentar enlace concreto tras despliegue y comprobarlo; no afirmar que el enlace real ya se desactivó. Revertir commit de JS/vista conserva estados de links enDB.
