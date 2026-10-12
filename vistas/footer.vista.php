@@ -45,7 +45,7 @@
 <script src="js/product-reports.js?v=20261011-orientation4"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/ean-scanner.js?v=20261012-continuous"></script>
-<script src="js/branch-maps.js?v=20261012-exclusions"></script>
+<script src="js/branch-maps.js?v=20261012-mouse"></script>
 <script src="js/branch-management.js?v=20261012-management"></script>
 <script src="js/reports-page.js?v=20261012-log-select"></script>
 <?php elseif (!empty($paginaStock)): ?>
@@ -59,7 +59,7 @@
 
 <script src="js/stock.js?v=20261012-offline-sync"></script>
 <script src="js/public-pallet.js?v=20261012-reserver"></script>
-<script src="js/branch-maps.js?v=20261012-vector"></script>
+<script src="js/branch-maps.js?v=20261012-mouse"></script>
 <script src="js/stock-branches.js?v=20261012-public-layout"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>

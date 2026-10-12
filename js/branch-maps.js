@@ -26,7 +26,7 @@
   const coords=b=>b?.latitude!==null&&b?.latitude!==undefined&&b?.latitude!==''&&b?.longitude!==null&&b?.longitude!==undefined&&b?.longitude!==''&&Number.isFinite(Number(b.latitude))&&Number.isFinite(Number(b.longitude));
   async function create(container,status,{branches=[],onSelect,onPoint,onBrowse,point=null}={}){
     const L=await load();if(left||!container.isConnected||!container.closest('dialog')?.open||container.closest('[hidden]'))return null;
-    const map=L.map(container,{scrollWheelZoom:false,zoomAnimation:false,fadeAnimation:false}).setView([-34.6037,-58.3816],12),group=L.layerGroup().addTo(map);
+    const map=L.map(container,{scrollWheelZoom:window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches,dragging:true,doubleClickZoom:true,boxZoom:true,keyboard:true,zoomAnimation:false,fadeAnimation:false}).setView([-34.6037,-58.3816],12),group=L.layerGroup().addTo(map);
     const markers=new Map();let pin,userMarker,dead=false,geoVersion=0;
     const dispose=()=>{dead=true;geoVersion++;clearTimeout(timer);instances.delete(dispose);map.remove();};instances.add(dispose);
     let vector,timer,raster=false;
