@@ -449,3 +449,10 @@ Validado tests/device-connection-ui.cjs: celular vinculado con petición QR en P
 Recepción en campos PC ahora emite evento explícito repotools:scan-code tras input/change. Entrada solo-código del lector y formulario manual de palet ejecutan su submit existente para analizar/abrir automáticamente; Biblioteca solo avanza en etapa enteringEan, nunca guarda automáticamente. Stock EAN y filtro ya hacen lookup/búsqueda por input. Escritura local normal conserva comportamiento teclado/Enter. El evento no se aplica a nombres/cantidades/contraseñas ni provoca claim/guardar producto. Validación, permisos y busy existentes conservados.
 
 Validado tests/device-connection-ui.cjs: código17309735 enviado desde celular al campo manual PC abre ficha sin clic extra y cierra formulario; EAN en Biblioteca avanza a referencia/Guardar sin crear producto. Regresiones completas de relay/lector local y permisos pasan Chrome/SQLite; JS sintaxis correcta. Sin DB/migraciones. Revertir commit completo restaura avance manual tras código remoto, conserva datos/conexión.
+
+
+## Solicitar lectura al abrir entrada de código — 12/10/2026
+
+PC al abrir Código del palet o formulario producto Stock con EAN editable prepara automáticamente el campo para teclado/lector y activa petición móvil existente, sin clic/foco manual del usuario. EAN fijo por escaneo/edición no pide nueva lectura. Biblioteca y entradas del lector ya preparaban campo al abrir: verificado retirando focus explícito de pruebas. Móvil conserva comportamiento previo sin activar teclado por esta corrección. Blur/cierre sigue pausando recepción; no pide lectura por abrir secciones sin entrada de código ni guarda formularios automáticamente.
+
+Validado tests/device-connection-ui.cjs sin focus manual en entrada palet y Biblioteca: abrir/código remoto/avance completo y regresiones. JS sintaxis correcta. Sin DB ni permisos nuevos. Revertir commit restaura preparación manual en Stock, conserva datos y vinculación.
