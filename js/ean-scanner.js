@@ -86,7 +86,7 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, canAccept = () => true, relayBypass = false }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, canAccept = () => true, keepOpen = () => false, relayBypass = false }) {
     const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
@@ -291,6 +291,7 @@
         const current = { reader, accepting: true, token, isQR, validate, confirm: confirmation(validate) };
         session = current;
         const accept = (code, source = 'camera') => {
+          if(current.lastDelivered===code){const elapsed=Date.now()-current.lastDeliveredSeen;current.lastDeliveredSeen=Date.now();if(elapsed<900)return;}
           if (!current.accepting || session !== current || token !== revision || !canAccept()) return;
           // Con object-fit: cover se confirma únicamente la zona que el usuario
           // ve. El lector oculto usa ese mismo recorte, sin bandas negras.
@@ -310,6 +311,15 @@
           if (!isQR) rememberScanPhoto(code, element);
           current.accepting = false; clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
+          if(keepOpen()){
+            current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
+            Promise.resolve().then(()=>{beep();return onCode(code);}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
+              if(token!==revision||session!==current)return;
+              current.confirm=confirmation(validate);current.accepting=true;element.classList.remove('ean-confirmed');
+              try{background(current,accept);}catch{}
+            }).catch(error=>{if(token===revision)onError(error);});
+            return;
+          }
           enqueue(async () => {
             await new Promise(resolve => setTimeout(resolve, 100)); await release(current);
             if (token === revision) Promise.resolve().then(() => { if (token === revision) { beep(); return onCode(code); } }).catch(error => { if (token === revision) onError(error); });

@@ -463,3 +463,12 @@ Validado tests/device-connection-ui.cjs sin focus manual en entrada palet y Bibl
 Campana centrada verticalmente en header, sin padding/margen heredado. Conexión PC compacta alineada a la derecha, icono de celular y texto Celular conectado; desconectar con icono, nombre accesible y tooltip. Estado de espera neutro; móvil conserva aviso y controles. Versiones de assets actualizadas. Sin cambios en DB o permisos.
 
 Validación: sintaxis JS/PHP y regresión device-connection-ui.cjs en Chrome/SQLite, incluida lectura remota EAN/QR, desconexión y anchos móviles/PC. Captura de Stock revisada. Falta prueba de campo en teléfono físico. Revertir este commit restaura presentación anterior, sin afectar datos o conexiones.
+
+
+## Lector remoto continuo y espera sobre cámara — 12/10/2026
+
+Celular: botón Mantener abierto con icono y estado pulsado permite lecturas sucesivas sin cerrar modal ni liberar cámara entre códigos. Opción por apertura de página, sin bloquear cierre manual, desconexión o navegación. Scanner compartido incorpora keepOpen opcional, apagado por defecto para lectores normales: rearma confirmaciones y análisis tras envío, conserva cámara; evita repetir código sostenido delante del lector hasta retirarlo al menos 900 ms. Cambio EAN/QR conserva reinicio necesario del lector.
+
+Aviso de estado integrado sobre imagen; mientras PC no recibe, overlay con blur y mensaje, sin aceptar códigos. Recupera vista al volver petición. Avisos iniciales del lector no sustituyen mensaje de espera. Controles siguen accesibles y preferencia de mano existente conservada. Sin cambios DB/permisos.
+
+Validado tests/ean-scanner.cjs y tests/device-connection-ui.cjs en Chrome/SQLite: dos lecturas con cámara activa, código sostenido no se reenvía, pausa con blur y reanudación, cierre libera cámara, regresiones EAN/QR, móvil local y conexión. Sintaxis JS y PHP correctas. Falta hardware físico. Revertir commit restaura lector remoto de una lectura y aviso externo, conserva datos.
