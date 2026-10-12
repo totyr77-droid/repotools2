@@ -297,7 +297,7 @@
           const video = source === 'camera' ? element.querySelector?.('video') : null;
           if (video?.videoWidth && document.createElement && typeof reader.qrcode?.decodeRobustlyAsync === 'function') {
             const frame = visibleFrame(video);
-            if (frame.width < video.videoWidth - 2 || frame.height < video.videoHeight - 2) return;
+            if (!isQR && (frame.width < video.videoWidth - 2 || frame.height < video.videoHeight - 2)) return;
           }
           if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();

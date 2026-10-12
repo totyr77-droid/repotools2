@@ -17,3 +17,5 @@
 body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialog{overscroll-behavior:contain}.relay-connection-fab:focus-visible{outline:3px solid #4930d9;outline-offset:3px}
 
 .relay-scanner-dialog[data-ready=false] #relayPhoneReader{outline:2px solid #c52a3c;outline-offset:2px}.relay-scanner-dialog[data-ready=false] #qr-shaded-region>div{background-color:#c52a3c!important}.relay-scanner-dialog[data-ready=false] [role=status]{color:#a52334;background:#fff0f1;border-radius:10px;padding:10px 12px}
+
+.relay-scanner-dialog .library-heading h2{font-size:1.05rem;margin:0}.relay-scanner-dialog>[role=status]{font-size:.84rem;line-height:1.45;margin:8px 0 12px}.relay-reader-actions{display:flex;justify-content:flex-end;margin-top:12px}.relay-reader-actions .relay-disconnect{display:inline-flex;align-items:center;gap:7px;width:auto!important;min-height:42px;padding:9px 12px!important;border:1px solid #f2cbd0;border-radius:10px;background:#fff0f1;color:#a52334;font-size:.85rem;cursor:pointer}.relay-disconnect svg{width:18px;height:18px;flex:none}@media(max-width:1023px){body[data-hand=left] .relay-reader-actions{justify-content:flex-start}}
