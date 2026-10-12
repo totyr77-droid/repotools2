@@ -477,3 +477,10 @@ Validado tests/ean-scanner.cjs y tests/device-connection-ui.cjs en Chrome/SQLite
 ## Conexión junto al logotipo — 12/10/2026
 
 PC: indicador celular conectado y desconexión trasladados al header junto al logo, siguiendo aclaración del usuario. Opciones del menú alineadas hacia derecha, campana conserva centrado. Indicador compacto con colores legibles sobre nav y estado de espera; ventanas estrechas muestran solo iconos. Móvil conserva fab/modal. Sin cambios permisos, DB o relay. Validación sintaxis JS y regresión device-connection-ui.cjs Chrome/SQLite con anchos y navegación. Revertir commit restaura ubicación en contenido.
+
+
+## Menús y organización PC/móvil — 12/10/2026
+
+Nav PC: enlaces de ancho natural, altura uniforme 44 px, iconos con espacio fijo, separación icono/texto y selección redondeada. Biblioteca escritorio: productos con tarjeta individual, borde sutil, 12 px entre tarjetas; móvil mantiene separadores existentes. Moderación deja de heredar centrado vertical, ocupa área de trabajo desde arriba. Menú principal corrige grilla de tres columnas con cuatro opciones a cuatro columnas; en celular icono encima de texto, sin segunda fila. Pendientes/Resueltos conservan mitad de ancho cada uno. Sin cambios datos/permisos.
+
+Validación: tests/device-connection-ui.cjs pasa; verificación visual temporal Chrome/SQLite de Moderación a 320,390,768,1024,1366 px, cuatro pestañas en una fila sin overflow, ancho desktop >1200 px y navegación alineada. Capturas móvil/PC y Biblioteca con tres productos revisadas. Sin datos reales. Revertir commit restaura estilos/versiones anteriores.
