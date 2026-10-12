@@ -484,3 +484,10 @@ PC: indicador celular conectado y desconexión trasladados al header junto al lo
 Nav PC: enlaces de ancho natural, altura uniforme 44 px, iconos con espacio fijo, separación icono/texto y selección redondeada. Biblioteca escritorio: productos con tarjeta individual, borde sutil, 12 px entre tarjetas; móvil mantiene separadores existentes. Moderación deja de heredar centrado vertical, ocupa área de trabajo desde arriba. Menú principal corrige grilla de tres columnas con cuatro opciones a cuatro columnas; en celular icono encima de texto, sin segunda fila. Pendientes/Resueltos conservan mitad de ancho cada uno. Sin cambios datos/permisos.
 
 Validación: tests/device-connection-ui.cjs pasa; verificación visual temporal Chrome/SQLite de Moderación a 320,390,768,1024,1366 px, cuatro pestañas en una fila sin overflow, ancho desktop >1200 px y navegación alineada. Capturas móvil/PC y Biblioteca con tres productos revisadas. Sin datos reales. Revertir commit restaura estilos/versiones anteriores.
+
+
+## Controles de lector para PC — 12/10/2026
+
+Mantener abierto renombrado Escaneo continuo. Dos botones principales 50/50 con separación y ancho total; reintentar ocupa fila propia si hay error. Título Escanear para la PC con SVG PC/celular. Marco rojo en pseudo-elemento por encima de overlay blur, sin bloquear cerrar/desconectar. Controles cámara inert y sin interacción durante pausa; vuelven accesibles cuando PC recibe. Estado aplicado después de crear controles y de cambiar modo EAN/QR.
+
+Validado tests/device-connection-ui.cjs con anchos iguales, marco sobre blur, inert activado/desactivado según petición y regresiones; captura móvil zurdo revisada. JS sintaxis correcta. Cámara simulada Chrome/SQLite; falta hardware real. Sin cambios DB/permisos. Revertir commit restaura nombre, layout y controles anteriores.
