@@ -280,3 +280,6 @@ Aclaración: botón Sucursal de barra del palet ahora muestra el nombre del loca
 
 
 Se oculta información duplicada de sucursal sobre la barra del palet; nombre queda en botón y dirección/descripción al abrirlo. Descripción propia del palet permanece. UI verifica ausencia del bloque duplicado y nombre actualizado tras asignar. Revertir JS y versión del recurso para restaurar bloque, sin cambiar datos.
+
+
+Sin coincidencias de sucursal: mensaje centrado, botón Agregar sucursal centrado de ancho ajustado al texto y altura mínima40px, conserva SVG y flecha de despliegue. Ajuste visual sin cambiar búsqueda/alta/permisos; revertir CSS y texto del botón para restaurar tamaño anterior.
