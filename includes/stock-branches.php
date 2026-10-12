@@ -92,7 +92,7 @@ function branch_delete(PDO $db,int $user,array $input): void {
 }
 function branch_share_create(PDO $db,int $user,array $input): array {
     $branchId=(int)($input['branch_id']??0); $ids=[];
-    if ($branchId) { $b=branch_owned($db,$branchId,$user); $title=$b['name']; }
+    if ($branchId) { $b=branch_owned($db,$branchId,$user);if(!stock_query($db,'SELECT id FROM pallets WHERE owner_id=? AND branch_id=? AND released=0 AND activated=1 LIMIT 1',[$user,$branchId])->fetchColumn())throw new CatalogException('Esta sucursal no tiene palets tuyos cargados para compartir.',422); $title=$b['name']; }
     else {
         $ids=json_decode(is_string($input['pallet_ids']??null)?$input['pallet_ids']:'',true);
         if (!is_array($ids)||!array_is_list($ids)||!count($ids)||count($ids)>200) throw new CatalogException('Selecciona entre 1 y 200 palets.',422);
