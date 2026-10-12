@@ -277,3 +277,6 @@ Selector de sucursal al usar/cambiar palet: dos pestañas iguales Buscar y Por u
 
 
 Aclaración: botón Sucursal de barra del palet ahora muestra el nombre del local asignado, con lápiz separado al lado para cambiarlo directamente. Sin asignación mantiene Sucursal. Nombre largo se trunca, controles siguen juntos y permisos del propietario se conservan. Revertir ajuste de vista/JS/CSS sin cambios de DB.
+
+
+Se oculta información duplicada de sucursal sobre la barra del palet; nombre queda en botón y dirección/descripción al abrirlo. Descripción propia del palet permanece. UI verifica ausencia del bloque duplicado y nombre actualizado tras asignar. Revertir JS y versión del recurso para restaurar bloque, sin cambiar datos.
