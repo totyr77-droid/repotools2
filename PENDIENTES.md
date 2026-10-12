@@ -414,3 +414,10 @@ QR: servidor acepta dominios raíz/www del APP_URL exclusivamente (http/https, s
 Usuario informa17309735 vuelve a lector. Identificado reinicio automático de cámara en catch de envío; eliminado. Error mantiene mensaje visible durante polling y muestra Volver a escanear explícito; no reinicia por cambio de modo mientras error. Estado se limpia al reintentar. En PC, lectura de palet con fallo de consulta muestra código+motivo en estado enfocado, sin reabrir cámara ni guardar palet. Conserva comportamiento de etiquetas libres generadas y permisos; no crea códigos arbitrarios.
 
 Validación Chrome/SQLite:17309735 usado como código inexistente únicamente en DB temporal, aviso PC404 y ambos lectores cerrados; URL ajena rechazada conserva motivo y reintento explícito. Regresiones de relay EAN/QR, entrega Stock/Biblioteca, permisos, foco y posiciones. No se consultó/modificó estado real de ese palet. Sin migraciones. Revertir commit completo restaura manejo de errores anterior sin alterar datos.
+
+
+## Ficha de etiqueta reservada y manager — 12/10/2026
+
+Consulta pública autorizada confirmó17309735 como etiqueta existente disponible, con reserva vigente, sin palet asignado; no es código inexistente. Ficha en Stock muestra pendiente de utilizar, aviso amarillo si reserva pertenece a otra cuenta, fecha de reserva en hora argentina24h e información sin propietario/productos. Manager conserva impresión/eliminación según servidor; no se permite apropiarse de reserva ajena. Enlace histórico repotools2.onrender.com reconocido exclusivamente como alias del proyecto cuando APP_URL es repotools.online; parser local Stock acepta dominios conocidos del mismo proyecto. Otros hosts siguen rechazados. No se confirmó que alias fuera causa exacta del intento del usuario; se pidió enlace leído.
+
+Prueba ampliada con manager y etiqueta reservada por otra cuenta en SQLite temporal: QR de Render llega desde celular y abre ficha en PC con reserva/metadatos, Utilizar oculto. Regresiones relay y errores pasan, sintaxisPHP/JS correcta. Sin tocar cuentas/palets reales, sin migraciones. Revertir commit restaura textos/parser anteriores sin modificar datos ni permisos.
