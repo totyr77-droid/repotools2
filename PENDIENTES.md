@@ -379,3 +379,8 @@ Correos de recuperación y contraseña actualizada con los mismos colores de la 
 Retirada cámara de escritorio, incluidas preferencias antiguas guardadas: teclado/lector o celular vinculado. Perfil por QR en PC acepta enlace/lector; móvil mantiene cámara. Offline en PC abre entrada manual, sin cámara. Espera del celular usa aviso lavanda con icono y explicación breve, cambia a verde al conectar. Se elimina fondo negro y altura reservada de cámara en Inicio/Biblioteca/Stock; botón para volver a teclado/lector. Caché offline v5 para actualizar lector. Validación del relay completo con móvil simulado, preferencia antigua y fondo blanco; pruebas de lector y navegación. Revertir este commit conserva DB/sesiones/conexiones y devuelve cámara opcional en PC.
 
 Verificación adicional: apertura offline y carga pendiente/sincronización pasan tanto con User-Agent móvil como de escritorio; PC no crea video, móvil sí conserva cámara. Vista de espera revisada mediante captura Chrome.
+
+
+## Correos minimalistas — 12/10/2026
+
+Cabecera con marca sobre fondo claro, sin bloque violeta sólido; se mantienen botones #27187e, tarjetas blancas, fondo #f4f7fb y confirmación verde. Padding más compacto y metadatos de esquema claro (el cliente puede ignorarlos). Tablas de ambos modelos sin espaciado implícito. Validado PHP, tests/password-reset.php y render Chrome móvil sin desborde. Sin cambios de contraseña, tokens ni sesiones reales. Envío desde Render pendiente: no hay credencial Resend ni sesión de consola disponible localmente; no afirmar envío realizado. Revertir commit de plantilla restaura diseño anterior sin alterar datos.
