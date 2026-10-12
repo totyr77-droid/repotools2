@@ -491,3 +491,10 @@ Validación: tests/device-connection-ui.cjs pasa; verificación visual temporal 
 Mantener abierto renombrado Escaneo continuo. Dos botones principales 50/50 con separación y ancho total; reintentar ocupa fila propia si hay error. Título Escanear para la PC con SVG PC/celular. Marco rojo en pseudo-elemento por encima de overlay blur, sin bloquear cerrar/desconectar. Controles cámara inert y sin interacción durante pausa; vuelven accesibles cuando PC recibe. Estado aplicado después de crear controles y de cambiar modo EAN/QR.
 
 Validado tests/device-connection-ui.cjs con anchos iguales, marco sobre blur, inert activado/desactivado según petición y regresiones; captura móvil zurdo revisada. JS sintaxis correcta. Cámara simulada Chrome/SQLite; falta hardware real. Sin cambios DB/permisos. Revertir commit restaura nombre, layout y controles anteriores.
+
+
+## Scroll horizontal del lector Inicio PC — 12/10/2026
+
+Corregida discrepancia entre padding real 24 px de diálogo Inicio PC y variables del encabezado 32 px, causante de desbordamiento horizontal. Variables igualadas; lectores restringen overflow horizontal, conservan vertical y overscroll contenido. Texto de espera y formularios pueden reducirse/partirse sin exceder ancho. Sin cambios lógica/cámara/permisos.
+
+Validación: captura espera PC revisada sin barra; tests/device-connection-ui.cjs verifica scrollWidth <= clientWidth del diálogo en modo celular remoto y regresiones. Revertir commit restaura CSS/versiones y prueba anteriores.

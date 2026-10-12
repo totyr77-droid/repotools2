@@ -70,3 +70,9 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 .relay-scanner-dialog[data-ready=false] #relayPhoneReader{outline:none}
 .relay-scanner-dialog[data-ready=false] .relay-camera-stage::after{content:'';position:absolute;inset:4px;z-index:6;border:2px solid #e34859;border-radius:11px;pointer-events:none}
 .relay-scanner-dialog[data-ready=false] .ean-camera-controls{pointer-events:none;opacity:.35}
+
+/* El encabezado del lector comparte el padding real del diálogo. */
+.library-scanner-dialog{overflow-x:hidden;overscroll-behavior:contain}
+.scan-phone-wait>div{min-width:0;overflow-wrap:anywhere}
+.scan-method-picker,.scan-method-picker form{min-width:0;max-width:100%}
+@media(min-width:1024px){.home-page #contenedormax.library-dialog{--dialog-padding-x:24px;--dialog-padding-y:24px}}
