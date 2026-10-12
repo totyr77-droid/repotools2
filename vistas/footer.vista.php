@@ -55,8 +55,8 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 <script src="js/stock-offline.js?v=20261011-offline1"></script>
-<script src="js/stock.js?v=20261012-reserved-label"></script>
-<script src="js/public-pallet.js?v=20261012-public-label"></script>
+<script src="js/stock.js?v=20261012-reserver"></script>
+<script src="js/public-pallet.js?v=20261012-reserver"></script>
 <script src="js/branch-maps.js?v=20261012-vector"></script>
 <script src="js/stock-branches.js?v=20261012-revocation"></script>
 <?php elseif (empty($paginaCuenta)): ?>

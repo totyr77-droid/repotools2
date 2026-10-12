@@ -44,7 +44,7 @@ function stock_product_names(array $product): array {
 }
 function stock_detail(PDO $db, string $code, ?int $user): array {
     $label=stock_label($db,$code); $admin=stock_is_admin($db,$user);
-    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
+    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'reserved_name'=>$label['reserved_by'] && (int)$label['reserved_until']>time() ? (stock_query($db,'SELECT name FROM users WHERE id=?',[(int)$label['reserved_by']])->fetchColumn() ?: null) : null,'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
     $p=stock_query($db,'SELECT p.*,u.name AS owner_name,u.company AS owner_company,a.name AS updated_name FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
     if (!$p) throw new CatalogException('Este palet ya no está disponible. Recarga la lista.',409);
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);

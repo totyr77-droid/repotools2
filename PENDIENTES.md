@@ -428,3 +428,10 @@ Prueba ampliada con manager y etiqueta reservada por otra cuenta en SQLite tempo
 Vista palet.php dejaba mensaje fijo disponible/iniciar sesión incluso cuando etiqueta tenía reserva o visitante ya estaba conectado. Ahora distingue etiqueta reservada ajena/anon (aviso amarillo, pendiente de utilizar), reservante conectado (puede utilizar desde Stock), etiqueta libre y palet con propietario/contenido. Muestra reserva horaArgentina y ausencia de propietario/productos también fuera de Stock. No expone identidad del reservante. Consultar/leer QR no exige permiso de edición ni rango; acciones siguen permisos servidor sin cambios.
 
 Validación añadida a tests/device-connection-ui.cjs: mismo QR reservado consultado anónimo, manager y usuario reservante; estado y metadata correctos, sin petición engañosa de sesión. Regresiones scanner/relay pasan en Chrome/SQLite; sintaxis JS correcta. Sin cambios DB. Revertir commit restaura mensajes/estilo públicos anteriores sin cambiar datos o permisos.
+
+
+## Nombre de reservante y liberación inmediata — 12/10/2026
+
+Por solicitud explícita se muestra Reservado por con nombre e icono de usuario en Stock y página pública de QR; servidor retorna únicamente reserved_name para reserva vigente sin palet asignado. No email/DNI/IP ni ID del reservante. Confirmado que eliminar palet y eliminar etiqueta pendiente ya limpian pallet_id/reserved_by/reserved_until de forma transaccional; no fue necesario cambiar eliminación. Reserva anterior no se conserva tras eliminación, código utilizable inmediatamente por otra cuenta.
+
+Validado tests/stock-api.cjs con reserva/ocupación/productos/eliminación, reserved_until0 y reserved_name null, uso inmediato por otra cuenta; también eliminar etiqueta pendiente. tests/device-connection-ui.cjs verifica nombre en Stock y QR público (anónimo, manager y reservante) y resto del relay. PHP/JS válidos. SQLite/Chrome; sin modificación producción, sin migraciones. Revertir commit restaura ficha sin nombre; liberación permanece comportamiento existente.
