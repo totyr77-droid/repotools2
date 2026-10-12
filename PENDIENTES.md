@@ -294,3 +294,6 @@ Mapa: tocar un punto muestra sucursales de nuestra DB dentro de100m (máximo5) y
 
 
 Carga de dirección: aviso arriba del nombre con SVG animado (respeta movimiento reducido), campos y guardar deshabilitados/inertes durante consulta; se liberan al terminar, fallar o cerrar. Revisión se muestra como notificación verde, error como aviso ámbar. Cercanía pasa a200m: al tocar cerca se abre automáticamente ficha del local más próximo en el mapa y permanece Agregar sucursal aquí para otro comercio. Prueba Chrome con respuesta retenida verifica bloqueo, orden del aviso, desbloqueo y ficha automática manteniendo alta. Revertir commit de UX para disposición previa, sin cambios de datos.
+
+
+Mapa UX: diálogo más ancho solo en Por ubicación y mapa más alto; ubicación como botón de icono flotante, zoom con superficie translúcida y objetivos táctiles44px. Marcadores con icono de local y ficha compacta; cercanos usan nombre/dirección en dos líneas, sin botones pesados. Conserva OSM/retina y atribución: este ajuste mejora presentación, no sustituye el proveedor raster ni promete nitidez vectorial. Pruebas de mapa y formulario siguen; revertir commit de estilo sin tocar datos.
