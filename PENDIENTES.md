@@ -239,3 +239,18 @@ Revertir el commit `Add private stock branches and revocable public sharing` rev
 Pendiente: prueba del usuario en iPhone/Android y confirmar despliegue de Render. La selección mediante mapa es una etapa posterior; primero decidir proveedor y condiciones de costos/almacenamiento. No añadir Google Places ni facturación sin ese acuerdo. No hay gestión de sucursales ajenas, integración de supervisores, empresas anexas ni nueva suscripción en esta entrega. Esos proyectos siguen pendientes.
 
 Al incorporar nuevas acciones al registro unificado, considerar auditoría específica de sucursales y enlaces: el estado ya se guarda, pero esta entrega no crea una nueva categoría de eventos para sus cambios. Mantener la restricción anterior de notas y permisos de moderación.
+
+
+## Ajuste de sucursales comunes y preparación de palets — 11/10/2026
+
+Esta aclaración reemplaza la decisión anterior de sucursales privadas: usuario confirmó lista común para todos. Todas las cuentas registradas ven/crean/seleccionan las mismas sucursales; solo administrador y manager editan/eliminan, validado contra el rango fresco en DB. El nombre puede repetirse si la dirección, localidad o provincia son distintas. Al crear con la misma identidad normalizada (mayúsculas/acentos habituales/espacios), se selecciona la existente sin sobrescribirla. Se conservan posibles duplicados históricos; no se borraron datos de producción. Columna owner_id de sucursal queda como creador interno, no limita acceso; no nueva migración.
+
+Los palets y enlaces siguen por propietario: compartir una sucursal común muestra solo stock del creador del enlace, incluyendo sus futuras asignaciones. Contador del directorio también es por cuenta. Admin/manager eliminar sucursal afecta asignaciones/enlaces de todas las cuentas, con confirmación explícita, y conserva palets/productos. Los datos de cuenta del creador no aparecen en la respuesta del directorio ni al guardar/reutilizar una sucursal.
+
+Usar un QR disponible abre selección opcional de sucursal (Sin sucursal por defecto). Crear nueva se despliega en ese mismo diálogo, con flecha que gira, cierre habitual y formulario compacto; evita usar el palet mientras la nueva sucursal todavía no se guardó. API prepare valida sucursal y reclama/asigna QR en la misma transacción/idempotencia, con reubicación ante competencia. También se puede cambiar sucursal de palets propios sin productos; etiquetas sin reclamar no se comparten.
+
+Icono duplicado: el título dinámico de Palet elimina la decoración automática al incorporar su SVG. CSS evita el pseudoicono en títulos con SVG directo. Editores de sucursal ahora usan el encabezado habitual con cruz a la derecha (izquierda para zurdos en móvil), fijo al desplazar el diálogo.
+
+Validado tests/stock-branches.php en SQLite y rama aislada Neon PostgreSQL con rollback (directorio compartido, duplicados, permisos admin/manager, aislamiento de enlaces y reutilización/paginación); tests/stock-branches-ui.cjs prueba dos cuentas, rechazo de edición/borrado de usuario, alta inline de sucursal al reclamar QR todavía sin productos, ausencia de doble icono, CSRF/idempotencia/AJAX y geometría320/390/1366/táctil zurdo. Regresiones tests/stock.php y tests/stock-api.cjs pasan. Captura inline-branch-390.png revisada, en tmp ignorado. Falta prueba física del usuario y confirmar despliegue Render. Mapa sigue pendiente al final.
+
+Revertir el commit Refine common branch permissions and pallet preparation conserva las tablas de migración16 y datos; no revertir datos ni quitar columnas. Detalles actualizados en docs/SUCURSALES.md.

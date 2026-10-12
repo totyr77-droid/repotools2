@@ -46,7 +46,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <link href="css/notifications.css?v=20261011-compactpalets17" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=20261011-branches1" rel="stylesheet" type="text/css"><link href="css/stock.css?v=20261011-security3" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=20261011-branches2" rel="stylesheet" type="text/css"><link href="css/stock.css?v=20261011-security3" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261011-lock1" rel="stylesheet" type="text/css">
@@ -56,7 +56,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-directory7" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
-<link href="css/title-icons.css?v=20261011-icons1" rel="stylesheet">
+<link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>

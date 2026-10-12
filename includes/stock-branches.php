@@ -3,8 +3,9 @@ declare(strict_types=1);
 require_once __DIR__.'/stock.php';
 
 function branch_owned(PDO $db, int $id, int $user): array {
-    $branch=stock_query($db,'SELECT * FROM stock_branches WHERE id=? AND owner_id=?',[$id,$user])->fetch();
-    if (!$branch) throw new CatalogException('Esta sucursal no está disponible en tu cuenta.',404);
+    // Legacy helper name: entries are now shared, not scoped to their creator.
+    $branch=stock_query($db,'SELECT * FROM stock_branches WHERE id=?',[$id])->fetch();
+    if (!$branch) throw new CatalogException('Esta sucursal no está disponible.',404);
     return $branch;
 }
 function branch_input(array $input): array {
@@ -12,17 +13,21 @@ function branch_input(array $input): array {
     foreach (['name'=>100,'address'=>160,'locality'=>100,'province'=>80,'description'=>300] as $field=>$max) {
         $value=$input[$field]??'';
         if (!is_string($value)||mb_strlen(trim($value))>$max||($field!=='description'&&trim($value)==='')) throw new CatalogException('Completa el nombre, dirección, localidad y provincia de la sucursal.',422);
-        $result[$field]=trim($value);
+        $result[$field]=preg_replace('/\s+/u',' ',trim($value));
     }
     return $result;
 }
 function branch_save(PDO $db, int $user, array $input): array {
     $values=branch_input($input); $id=(int)($input['id']??0);
-    $duplicate=stock_query($db,'SELECT id FROM stock_branches WHERE owner_id=? AND id<>? AND LOWER(name)=LOWER(?) AND LOWER(address)=LOWER(?) AND LOWER(locality)=LOWER(?) AND LOWER(province)=LOWER(?)',[$user,$id,$values['name'],$values['address'],$values['locality'],$values['province']])->fetchColumn();
-    if ($duplicate) throw new CatalogException('Ya tienes esta sucursal. Selecciónala en la lista o edita sus datos.',422);
+    if ($id&&!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden modificar sucursales.',403);
+    $key=fn($v)=>strtr(mb_strtolower(preg_replace('/\s+/u',' ',trim($v))),['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u']);
+    foreach (stock_query($db,'SELECT id,name,address,locality,province FROM stock_branches WHERE id<>? ORDER BY id',[$id])->fetchAll() as $existing) {
+        $same=true;foreach(['name','address','locality','province'] as $field) if($key($values[$field])!==$key($existing[$field])){$same=false;break;}
+        if($same){if(!$id)return ['branch'=>branch_owned($db,(int)$existing['id'],$user),'reused'=>true];throw new CatalogException('Esa sucursal ya existe con el mismo nombre y dirección. Selecciónala en la lista.',422);}
+    }
     if ($id) {
         branch_owned($db,$id,$user);
-        $changed=stock_query($db,'UPDATE stock_branches SET name=?,address=?,locality=?,province=?,description=?,revision=revision+1 WHERE id=? AND owner_id=? AND revision=?',[...array_values($values),$id,$user,(int)($input['revision']??0)])->rowCount();
+        $changed=stock_query($db,'UPDATE stock_branches SET name=?,address=?,locality=?,province=?,description=?,revision=revision+1 WHERE id=? AND revision=?',[...array_values($values),$id,(int)($input['revision']??0)])->rowCount();
         if (!$changed) throw new CatalogException('La sucursal cambió. Vuelve a abrirla antes de guardar.',409);
     } else {
         if ((int)stock_query($db,'SELECT COUNT(*) FROM stock_branches WHERE owner_id=?',[$user])->fetchColumn()>=200) throw new CatalogException('Puedes tener hasta 200 sucursales. Edita una existente.',422);
@@ -32,9 +37,8 @@ function branch_save(PDO $db, int $user, array $input): array {
 }
 function branch_assign(PDO $db,int $user,array $input): void {
     $id=(int)($input['pallet_id']??0); $p=stock_editable($db,$id,$user,true);
-    // A branch belongs to the owner, even when an administrator can edit stock.
+    // The directory is shared; only the pallet owner assigns its location.
     if ((int)$p['owner_id']!==$user) throw new CatalogException('Solo el propietario puede asignar la sucursal.',403);
-    if (!(int)$p['activated']) throw new CatalogException('Carga el primer producto antes de asignar una sucursal.',422);
     $branchId=(int)($input['branch_id']??0);
     if ($branchId) branch_owned($db,$branchId,$user);
     $changed=stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=? AND revision=?',[$branchId?:null,$id,(int)($input['revision']??0)])->rowCount();
@@ -42,11 +46,12 @@ function branch_assign(PDO $db,int $user,array $input): void {
     stock_touch($db,$id,$user);
 }
 function branch_delete(PDO $db,int $user,array $input): void {
+    if (!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden eliminar sucursales.',403);
     $id=(int)($input['id']??0); branch_owned($db,$id,$user);
     if ((int)stock_query($db,'SELECT revision FROM stock_branches WHERE id=?',[$id])->fetchColumn()!==(int)($input['revision']??0)) throw new CatalogException('La sucursal cambió. Vuelve a abrirla.',409);
     stock_query($db,'UPDATE pallets SET branch_id=NULL,revision=revision+1 WHERE branch_id=?',[$id]);
     stock_query($db,'UPDATE stock_shares SET active=0,branch_id=NULL WHERE branch_id=?',[$id]);
-    stock_query($db,'DELETE FROM stock_branches WHERE id=? AND owner_id=?',[$id,$user]);
+    stock_query($db,'DELETE FROM stock_branches WHERE id=?',[$id]);
 }
 function branch_share_create(PDO $db,int $user,array $input): array {
     $branchId=(int)($input['branch_id']??0); $ids=[];
@@ -73,7 +78,7 @@ function branch_public(PDO $db,string $token,int $page=0): array {
     $share=stock_query($db,'SELECT * FROM stock_shares WHERE token=? AND active=1',[$token])->fetch();
     if (!$share) throw new CatalogException('Este enlace fue desactivado o no existe.',404);
     $branch=$share['branch_id']?branch_owned($db,(int)$share['branch_id'],(int)$share['owner_id']):null;
-    $sql='SELECT p.id,p.code,p.description,p.updated_at,u.name AS owner_name,u.company AS owner_company,a.name AS updated_name,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by LEFT JOIN stock_branches b ON b.id=p.branch_id AND b.owner_id=p.owner_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
+    $sql='SELECT p.id,p.code,p.description,p.updated_at,u.name AS owner_name,u.company AS owner_company,a.name AS updated_name,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
     $args=[$share['owner_id']];
     if ($branch) { $sql.=' AND p.branch_id=?'; $args[]=$branch['id']; }
     else { $sql.=' AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=? AND sp.pallet_id=p.id)'; $args[]=$share['id']; }

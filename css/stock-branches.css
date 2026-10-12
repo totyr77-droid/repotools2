@@ -18,9 +18,13 @@
 .branch-actions .stock-icon { width:40px;min-height:40px;padding:9px;border-radius:10px; }
 .branch-dialog { width:min(520px,calc(100% - 24px));box-sizing:border-box;--dialog-padding-x:20px;--dialog-padding-y:20px;padding:20px; }
 .branch-dialog form { display:grid;gap:12px;margin:0; }
+#palletBranchCreateSlot { margin-top:16px;padding-top:16px;border-top:1px solid #e1e5ed; }
+.branch-create-chevron { display:inline-flex;transition:transform .18s; }
+#newPalletBranch[aria-expanded=true] .branch-create-chevron { transform:rotate(180deg); }
 .branch-dialog label { display:grid;gap:6px;font-size:.9rem;margin:0; }
 .branch-dialog label small { color:#626b7a; }
-.branch-dialog .library-dialog-heading h2 { display:flex;align-items:center;gap:8px; }
+.branch-dialog .library-heading h2 { display:flex;align-items:center;gap:8px; }
+#branchDialog,#palletBranchDialog,#stockShareDialog { --dialog-padding-x:20px;--dialog-padding-y:20px; }
 .branch-form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
 .branch-share-choices { max-height:42vh;overflow:auto; }
 .branch-share-choices label { display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #edf0f5;overflow-wrap:anywhere; }
