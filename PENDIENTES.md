@@ -268,3 +268,6 @@ Palets: bloque principal sin tarjeta blanca, borde ni padding exterior. Sucursal
 
 
 Sucursal del palet: búsqueda instantánea sin distinguir acentos/mayúsculas por nombre, dirección, localidad, provincia y descripción. Resultados con dirección y selección visible; Sin sucursal sigue opcional. Sin coincidencias ofrece Nueva sucursal en el mismo diálogo y precarga el nombre escrito. Prueba UI verifica búsqueda por dirección, selección y alta tras búsqueda sin resultados; mantener permisos de servidor. Sin migraciones.
+
+
+12/10: al abrir Sucursal de un palet ya asignado, muestra primero nombre del supermercado, dirección completa y descripción si tiene, junto a botón de lápiz para cambiar la asignación. Sin sucursal abre búsqueda directamente. Conserva permisos del propietario; cambiar sucursal no edita el directorio común. UI prueba vista previa y paso a edición; reversión solo de vista/JS/CSS sin datos.
