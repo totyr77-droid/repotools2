@@ -24,7 +24,7 @@
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
 <!-- SCRIPTS -->
-<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261011-camera3"></script>
+<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261012-offline-home"></script>
 <script src="js/stock-offline.js?v=20261012-library-offline"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-library-offline"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>

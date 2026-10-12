@@ -546,3 +546,10 @@ Biblioteca permite agregar productos sin conexión a colecciones previamente con
 Validación: tests/offline-start.cjs en modo móvil y PC, stock-offline-ui y stock-api pasan. Verificados apertura offline, 320/390/1366px, calculadora sin desplazamiento, carga biblioteca, envío único y referencias conservadas, cuenta incorrecta403/colección404/EAN422. Capturas calculadora y pendientes revisadas. Cámara Chrome simulada y SQLite temporal; falta prueba en teléfono real y PostgreSQL de producción. No se crean/renombran/eliminan colecciones offline. Probar entrando primero con conexión, modo avión, cargas y reconexión.
 
 Reversión: revertir commit de esta entrega restaura archivos/versiones; no borrar IndexedDB para evitar perder pendientes locales. Mantener copia de colas antes de volver a una versión anterior.
+
+
+## Inicio sin conexión — 12/10/2026
+
+Nueva pestaña Inicio en shell offline: mismo detector EAN local, cámara móvil y entrada manual/lector PC; lista local persistente por cuenta o invitado (máximo200), códigos únicos, nombres del catálogo local cuando disponibles. Resultados con EAN8/EAN13 SVG generado localmente, anterior/siguiente, compartir EAN o lista (fallback portapapeles), borrado con diálogo. No consulta APIs al escanear offline ni suma TOP; lista permanece local y no se mezcla con colas Stock/Biblioteca. Registro service worker también para invitados, sin cachear datos privados. Shellv7. Aviso distingue códigos locales de cargas pendientes de sincronización. Inicio offline directo para index o raíz; Stock/Biblioteca conservan su vista.
+
+Validación tests/offline-start.cjs móvil/PC: escaneo manual, duplicados, persistencia al recargar, navegación y confirmación borrado, 320/390/1366px; código SVG7803403004612 decodificado por Quagga al número original, invitado con EAN8 y acceso Stock sin datos privados. Regresiones sincronización Stock/Biblioteca pasan. Captura móvil revisada. Cámara simulada; falta teléfono real. Revertir commit restaura shell anterior; conservar lista local si se desea recuperar códigos.
