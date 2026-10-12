@@ -367,3 +367,8 @@ Diseño PC ampliado: Stock/palets, Biblioteca, Moderación, Ajustes e Inicio con
 ## Aviso de contraseña actualizada — 12/10/2026
 
 Contraseña actualizada y cierre de otras sesiones ahora usan la notificación compartida verde, borde suave, esquinas redondeadas e icono SVG de confirmación. No cambia seguridad ni mensajes del servidor. Clasificación JS verificada para éxito, error y vacío; sintaxis correcta. Revertir este commit restaura presentación anterior sin cambios de datos.
+
+
+## Paleta de correos — 12/10/2026
+
+Correos de recuperación y contraseña actualizada con los mismos colores de la web: violeta #27187e, fondo #f4f7fb, etiqueta lavanda #e9e6f5 y confirmación verde #eaf7ef/#17633d. Marca en cabecera violeta y texto blanco; botones conservan violeta. HTML de confirmación extraído a función para previsualizar sin enviar mensajes. Validación PHP y render HTML local; no se enviaron correos. Los clientes de correo pueden adaptar colores en modo oscuro. Revertir este commit restaura plantillas anteriores sin cambiar envío, tokens ni sesiones.
