@@ -259,3 +259,6 @@ Revertir el commit Refine common branch permissions and pallet preparation conse
 ## Stock: retirar bloques del inicio — 11/10/2026
 
 El usuario confirmó quitar solo los bloques Sucursales y Enlaces compartidos del inicio de Stock. Permanecen elegir/crear sucursal dentro del palet, filtro y Compartir selección. No se eliminan datos ni se revocan enlaces existentes. Los avisos de sucursales quedan fuera del panel oculto para seguir visibles. Se actualiza la prueba UI para comprobar que ambos paneles permanecen ocultos después de compartir y navegar por AJAX; mantiene alta inline y asignación desde el palet. Para revertir, restaurar interfaz/JS y versión del recurso del commit de este ajuste, sin cambios de esquema.
+
+
+Stock: también se retira del inicio el selector de sucursales y Compartir selección para dejar el buscador de productos seguido de Palets, según aclaración del usuario. Se oculta el contenedor completo sin ocupar espacio; elegir/crear sucursal dentro del palet y los datos/enlaces existentes permanecen. Prueba UI adaptada al inicio simplificado; compartir se verifica mediante API. Revertir este ajuste de vista para recuperar los controles.

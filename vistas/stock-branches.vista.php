@@ -1,4 +1,4 @@
-<section id="stockBranches" class="stock-branches">
+<section id="stockBranches" class="stock-branches" hidden>
  <details id="branchDetails" hidden><summary><?= stock_icon('branch') ?><span>Sucursales</span><?= stock_icon('chevron') ?></summary>
   <div class="branch-toolbar"><label class="branch-search"><?= stock_icon('search') ?><input id="branchSearch" type="search" placeholder="Buscar sucursal o dirección" aria-label="Buscar sucursal"></label><button id="newBranch" class="library-primary stock-icon" type="button" aria-label="Agregar sucursal" title="Agregar sucursal"><?= stock_icon('plus') ?></button></div>
   <div id="branchList" class="branch-list"></div>
