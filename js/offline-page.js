@@ -15,7 +15,7 @@
   if(fresh(snapshot?.libraries))for(const collection of snapshot.libraries.data)for(const product of collection.products)remember(product);
   const scanner=RepoEANScanner.create('offlineReader',{onCode:ean=>{$('offlineScanner').close();openProduct(ean);},onStatus:message=>$('offlineScannerStatus').textContent=message,onError:()=>{$('offlineScannerStatus').textContent='No pudimos abrir la cámara. Podés ingresar el EAN manualmente.';},onManual:()=>{$('offlineScanner').close();openManual();}});
   function openManual(){if(!target)return;$('offlineManualStatus').textContent='';$('offlineManualForm').reset();$('offlineManual').showModal();$('offlineEAN').focus();}
-  function openScan(pallet){target=pallet;$('offlineScannerStatus').textContent='';$('offlineScanner').showModal();scanner.start().catch(()=>{$('offlineScannerStatus').textContent='No pudimos abrir la cámara. Usá el teclado para ingresar el EAN.';});}
+  function openScan(pallet){target=pallet;if(!/Mobile|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){openManual();return;}$('offlineScannerStatus').textContent='';$('offlineScanner').showModal();scanner.start().catch(()=>{$('offlineScannerStatus').textContent='No pudimos abrir la cámara. Usá el teclado para ingresar el EAN.';});}
   $('offlineScanner').addEventListener('close',()=>{scanner.stop();RepoEANScanner.clearScanPhoto();});
   $('offlineScannerManual').addEventListener('click',()=>{$('offlineScanner').close();openManual();});
   window.addEventListener('pagehide',()=>{scanner.stop();RepoEANScanner.clearScanPhoto();});

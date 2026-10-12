@@ -346,7 +346,7 @@
       });
     }
     page?.onLeave(stop);
-    const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods&&elementId!=='userReader'?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual},raw):raw;
+    const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
   window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, takeScanPhoto, clearScanPhoto };
