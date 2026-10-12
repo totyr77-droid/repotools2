@@ -107,3 +107,38 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 .stock-offline{background:#fff7dd;border:1px solid #efd99c;border-radius:12px;padding:14px;color:#705315}.stock-offline-row{border-left:3px solid #dfa826;background:#fffaf0;padding:10px 12px;border-radius:8px;margin-top:8px}.stock-offline-row strong,.stock-offline-row small{display:block;line-height:1.45}.stock-offline-row small{margin-top:3px}
 
 .offline-sync-view{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;border:1px solid #b4ddc5;border-radius:10px;background:#fff;color:#17633d;cursor:pointer;font:inherit}.offline-sync-dialog{position:fixed;inset:0;margin:auto;width:min(620px,calc(100% - 24px));max-height:85dvh;overflow:auto;overscroll-behavior:contain;padding:20px;border:1px solid #e0e4ed;border-radius:16px;background:#fff;color:#252239}.offline-sync-dialog::backdrop{background:rgba(20,15,40,.45)}.offline-sync-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.offline-sync-heading h2{display:flex;align-items:center;gap:8px;margin:0;font-size:1.1rem}.offline-sync-dialog svg{width:20px;height:20px;flex:none}.offline-sync-dialog .app-close{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:0;border-radius:10px;background:#eeebf7;color:#27187e;cursor:pointer}.offline-sync-dialog ul{list-style:none;padding:0;margin:14px 0 0}.offline-sync-dialog li{padding:12px 0;border-top:1px solid #e5e7ef;overflow-wrap:anywhere}.offline-sync-dialog li p{margin:5px 0;font-size:.9rem}.offline-sync-dialog small{color:#6a7184;font-size:.8rem}@media(max-width:768px) and (pointer:coarse){body[data-hand=left] .offline-sync-heading{flex-direction:row-reverse}}
+
+/* Ventanas de trabajo en escritorio: conservar tamaños móviles y diálogos breves. */
+@media(min-width:1024px){
+ :is(#reviewReportDialog,#productReportDialog){width:min(1120px,calc(100% - 64px));max-height:88dvh}
+ :is(#productEditDialog,#stockProductDialog,#libraryProductDialog,#libraryInfoDialog,#libraryImportDialog,#palletAccessDialog,#stockShareDialog,#stockSharesDialog,#branchDialog,#userEditDialog){width:min(900px,calc(100% - 64px));max-height:88dvh}
+ #accountEditDialog{width:min(720px,calc(100% - 64px));max-height:88dvh}
+ #palletBranchDialog,#palletBranchDialog:has(#branchLocationTab[aria-selected=true]){width:min(1000px,calc(100% - 64px));max-height:88dvh}
+ #palletBranchDialog:has(#palletBranchCreateSlot:not([hidden])){width:min(1160px,calc(100% - 64px))}
+ :is(#reviewReportForm,#productReportForm,#productEditForm,#userEditForm,#accountEditForm):not([hidden]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px;align-items:start}
+ :is(#reviewReportForm,#productReportForm,#productEditForm,#userEditForm,#accountEditForm)>label{min-width:0;margin:0}
+ :is(#reviewReportForm,#productReportForm,#productEditForm,#userEditForm,#accountEditForm)>:is(p,details,fieldset,.library-dialog-actions,button){grid-column:1/-1;margin-block:0}
+ #reportProblem,#reviewReportForm>label:has(textarea){grid-column:1/-1}
+ :is(#reviewReportForm,#productReportForm) .report-more-data[open]{display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+ :is(#reviewReportForm,#productReportForm) .report-more-data>summary{grid-column:1/-1}
+ #reportPhotos{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}
+ #reportPhotos>p{grid-column:1/-1}#reportPhotos .report-photo{margin-top:0;min-width:0}
+ #reportPhotos .report-photo-preview{height:180px;max-height:180px}
+ #reviewReportDialog .report-comparison{column-gap:24px}
+ #branchFormFields{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;min-width:0}
+ #branchFormFields>label{margin:0;min-width:0}
+ #branchFormFields>:is(.branch-form-row,details,small,button),#branchFormFields>label:has(textarea){grid-column:1/-1}
+ #branchFormFields .branch-form-row{gap:20px}
+ #branchSearchPanel:has(#palletBranchCreateSlot:not([hidden])){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+ #palletBranchCreateSlot:not([hidden]){border-left:1px solid #e4e1ee;padding-left:24px;min-width:0}
+ #palletBranchResults{max-height:42dvh}
+ #branchLocationMap{height:min(540px,60dvh)!important}
+ #stockShareChoices,#stockShareBranchPalets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px;max-height:45dvh}
+ #stockShareList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ #libraryInfoDialog .product-details dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
+ .offline-sync-dialog{width:min(900px,calc(100% - 64px))}.offline-sync-dialog ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
+}
+
+@media(min-width:1024px){#stockProductForm,#libraryProductForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px;align-items:start}#stockProductForm>label,#libraryProductForm>label{margin:0;min-width:0}#stockProductForm>:is(p,details,.stock-form-row,.library-dialog-actions),#libraryProductForm>:is(p,.library-dialog-actions){grid-column:1/-1;margin-block:0}#reviewReportDetails{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}#reviewReportDetails>:not(.report-photo-evidence){grid-column:1/-1}#reviewReportDetails>.report-photo-evidence{margin:0;min-width:0}.library-dialog .library-dialog-actions{justify-content:flex-end}#branchFormFields label input{min-width:0}#libraryInfoDialog .product-details dl>div{min-width:0}}
+
+@media(min-width:1024px){:is(#reviewReportDialog,#productReportDialog,#productEditDialog,#stockProductDialog,#libraryProductDialog,#libraryInfoDialog,#libraryImportDialog,#palletAccessDialog,#stockShareDialog,#stockSharesDialog,#branchDialog,#palletBranchDialog,#userEditDialog,#accountEditDialog){--dialog-padding-x:24px;--dialog-padding-y:24px;padding:24px}:is(#reviewReportForm,#productReportForm):not([hidden]){grid-template-columns:repeat(3,minmax(0,1fr))}}
