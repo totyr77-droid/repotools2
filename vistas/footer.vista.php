@@ -27,7 +27,7 @@
 <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261011-camera3"></script>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-branches1"></script>
-<script src="js/device-connection.js?v=20261012-mobile-local"></script>
+<script src="js/device-connection.js?v=20261012-auto-code"></script>
 <script src="js/action-notices.js?v=20261012-security"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -37,7 +37,7 @@
 <script src="js/product-info.js?v=20261011-fresh2"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261011-reportphotofallback10"></script>
-<script src="js/biblioteca.js?v=20261011-reference4"></script>
+<script src="js/biblioteca.js?v=20261012-auto-code"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261011-orientation4"></script>
@@ -55,7 +55,7 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 <script src="js/stock-offline.js?v=20261011-offline1"></script>
-<script src="js/stock.js?v=20261012-reserver"></script>
+<script src="js/stock.js?v=20261012-auto-code"></script>
 <script src="js/public-pallet.js?v=20261012-reserver"></script>
 <script src="js/branch-maps.js?v=20261012-vector"></script>
 <script src="js/stock-branches.js?v=20261012-revocation"></script>

@@ -211,6 +211,7 @@
   get('collectionSettings').addEventListener('toggle', () => {
     if (get('collectionSettings').open) get('collectionSettings').querySelector('.library-settings-menu').scrollIntoView({ block: 'nearest' });
   });
+  get('libraryProductEan').addEventListener('repotools:scan-code',()=>{if(enteringEan&&window.RepoEANScanner.validEAN(get('libraryProductEan').value))get('libraryProductForm').requestSubmit();});
   get('libraryProductForm').addEventListener('submit', async event => {
     event.preventDefault();
     const ean = get('libraryProductEan').value.replace(/[\s\u200B-\u200D\uFEFF-]/g, '');

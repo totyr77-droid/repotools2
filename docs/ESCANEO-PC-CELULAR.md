@@ -30,3 +30,5 @@ Queda probar cámara real, pistola USB/Bluetooth y Safari/Android con el desplie
 ## Revertir
 
 Revertir el commit completo de esta entrega (UI, autenticación, endpoint, seguridad y navegación de dispositivos), conservando las tablas y datos 21/22. Al quitar la validación de cupos vuelven a permitirse múltiples sesiones. No quitar solamente la actualización de account_devices en api/seguridad.php mientras esté activo el control de sesiones: cerraría también la sesión que cambia su contraseña. Las preferencias locales pueden quedar guardadas sin efecto.
+
+Al recibir un código del celular, los formularios destinados solo a leer un código avanzan automáticamente: apertura de palet, entrada del lector y primer paso EAN de Biblioteca. Los filtros buscan al actualizarse y Stock consulta el EAN. Esto no guarda productos/cantidades ni activa un palet automáticamente.

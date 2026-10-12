@@ -442,3 +442,10 @@ Validado tests/stock-api.cjs con reserva/ocupación/productos/eliminación, rese
 Antes todo lector normal móvil heredaba modo solicitado por PC y enviaba resultados a ella, impidiendo guardar normalmente en teléfono. Corregido: botones normales procesan localmente y conservan su propio modo EAN/QR; solo lector flotante raw para PC envía vía relay. Al iniciar lector normal, se cierra diálogo remoto y se espera su stop para liberar cámara. Conexión sigue activa sin cerrar sesión ni desconectar la PC. Documentado en docs/ESCANEO-PC-CELULAR.md.
 
 Validado tests/device-connection-ui.cjs: celular vinculado con petición QR en PC lee EAN local y QR local sin enviar código; se verifica único lector activo mediante mock que rechaza cámara ocupada; conexión conservada y resto del relay completo. tests/ean-scanner.cjs y node sintaxis pasan. Simulación Chrome; falta teléfono físico para verificar hardware/permisos. Sin migraciones o modificación de cuentas reales. Revertir commit restaura envío automático desde lectores normales, conservar tablas/datos.
+
+
+## Código remoto como lectura completa — 12/10/2026
+
+Recepción en campos PC ahora emite evento explícito repotools:scan-code tras input/change. Entrada solo-código del lector y formulario manual de palet ejecutan su submit existente para analizar/abrir automáticamente; Biblioteca solo avanza en etapa enteringEan, nunca guarda automáticamente. Stock EAN y filtro ya hacen lookup/búsqueda por input. Escritura local normal conserva comportamiento teclado/Enter. El evento no se aplica a nombres/cantidades/contraseñas ni provoca claim/guardar producto. Validación, permisos y busy existentes conservados.
+
+Validado tests/device-connection-ui.cjs: código17309735 enviado desde celular al campo manual PC abre ficha sin clic extra y cierra formulario; EAN en Biblioteca avanza a referencia/Guardar sin crear producto. Regresiones completas de relay/lector local y permisos pasan Chrome/SQLite; JS sintaxis correcta. Sin DB/migraciones. Revertir commit completo restaura avance manual tras código remoto, conserva datos/conexión.
