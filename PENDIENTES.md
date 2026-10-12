@@ -472,3 +472,8 @@ Celular: botón Mantener abierto con icono y estado pulsado permite lecturas suc
 Aviso de estado integrado sobre imagen; mientras PC no recibe, overlay con blur y mensaje, sin aceptar códigos. Recupera vista al volver petición. Avisos iniciales del lector no sustituyen mensaje de espera. Controles siguen accesibles y preferencia de mano existente conservada. Sin cambios DB/permisos.
 
 Validado tests/ean-scanner.cjs y tests/device-connection-ui.cjs en Chrome/SQLite: dos lecturas con cámara activa, código sostenido no se reenvía, pausa con blur y reanudación, cierre libera cámara, regresiones EAN/QR, móvil local y conexión. Sintaxis JS y PHP correctas. Falta hardware físico. Revertir commit restaura lector remoto de una lectura y aviso externo, conserva datos.
+
+
+## Conexión junto al logotipo — 12/10/2026
+
+PC: indicador celular conectado y desconexión trasladados al header junto al logo, siguiendo aclaración del usuario. Opciones del menú alineadas hacia derecha, campana conserva centrado. Indicador compacto con colores legibles sobre nav y estado de espera; ventanas estrechas muestran solo iconos. Móvil conserva fab/modal. Sin cambios permisos, DB o relay. Validación sintaxis JS y regresión device-connection-ui.cjs Chrome/SQLite con anchos y navegación. Revertir commit restaura ubicación en contenido.
