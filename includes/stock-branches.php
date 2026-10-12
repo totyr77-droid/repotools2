@@ -16,6 +16,19 @@ function branch_favorite(PDO $db,int $user,array $input): void {
 function branch_recent(PDO $db,int $user,int $id): void {
     stock_query($db,'INSERT INTO user_branch_preferences(user_id,branch_id,last_used,use_count) VALUES(?,?,?,1) ON CONFLICT(user_id,branch_id) DO UPDATE SET last_used=excluded.last_used,use_count=user_branch_preferences.use_count+1',[$user,$id,time()]);
 }
+function branch_event(PDO $db,int $user,string $action,?array $before,?array $after): void {
+    $b=$after??$before; $fields=array_flip(['name','address','locality','province','description','latitude','longitude']);
+    stock_query($db,'INSERT INTO branch_events(actor_id,branch_id,branch_name,action,before_data,after_data) VALUES(?,?,?,?,?,?)',[$user,$b['id'],$b['name'],$action,json_encode(array_intersect_key($before??[],$fields),JSON_UNESCAPED_UNICODE),json_encode(array_intersect_key($after??[],$fields),JSON_UNESCAPED_UNICODE)]);
+}
+function branch_management(PDO $db,int $user,array $query): array {
+    if (!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden gestionar sucursales.',403);
+    if(isset($query['id'])) { if(!is_string($query['id'])||!preg_match('/^[0-9]{1,15}$/D',$query['id']))throw new CatalogException('Sucursal no valida.',422);return ['branch'=>array_intersect_key(branch_owned($db,(int)$query['id'],$user),array_flip(['id','name','address','locality','province','description','latitude','longitude','revision']))]; }
+    $page=filter_var($query['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);$q=$query['q']??'';
+    if($page===false||!is_string($q)||mb_strlen($q)>160)throw new CatalogException('Busqueda no valida.',422);
+    $q=mb_strtolower(trim($q));$offset=$page*20;
+    $items=stock_query($db,"SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.latitude,b.longitude,b.revision,(SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.released=0) AS pallet_count FROM stock_branches b WHERE LOWER(b.name || ' ' || b.address || ' ' || b.locality || ' ' || b.province) LIKE ? ESCAPE '!' ORDER BY LOWER(b.name),b.id LIMIT 21 OFFSET {$offset}",['%'.strtr($q,['!'=>'!!','%'=>'!%','_'=>'!_']).'%'])->fetchAll();
+    return ['items'=>array_slice($items,0,20),'has_more'=>count($items)>20,'page'=>$page];
+}
 function branch_input(array $input): array {
     $result=[];
     foreach (['name'=>100,'address'=>160,'locality'=>100,'province'=>80,'description'=>300] as $field=>$max) {
@@ -39,6 +52,7 @@ function branch_save(PDO $db, int $user, array $input): array {
     if ($id&&!array_key_exists('latitude',$input)&&!array_key_exists('longitude',$input)) {
         $existing=branch_owned($db,$id,$user); $input['latitude']=$existing['latitude']; $input['longitude']=$existing['longitude'];
     }
+    $before=$id?branch_owned($db,$id,$user):null;
     $values=branch_input($input);
     $key=fn($v)=>strtr(mb_strtolower(preg_replace('/\s+/u',' ',trim($v))),['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u']);
     foreach (stock_query($db,'SELECT id,name,address,locality,province FROM stock_branches WHERE id<>? ORDER BY id',[$id])->fetchAll() as $existing) {
@@ -53,7 +67,8 @@ function branch_save(PDO $db, int $user, array $input): array {
         if ((int)stock_query($db,'SELECT COUNT(*) FROM stock_branches WHERE owner_id=?',[$user])->fetchColumn()>=200) throw new CatalogException('Puedes tener hasta 200 sucursales. Edita una existente.',422);
         $id=(int)stock_query($db,'INSERT INTO stock_branches(owner_id,name,address,locality,province,description,latitude,longitude) VALUES(?,?,?,?,?,?,?,?) RETURNING id',[$user,...array_values($values)])->fetchColumn();
     }
-    return ['branch'=>branch_owned($db,$id,$user)];
+    $after=branch_owned($db,$id,$user);branch_event($db,$user,$id&&$before?'branch_updated':'branch_created',$before,$after);
+    return ['branch'=>$after];
 }
 function branch_assign(PDO $db,int $user,array $input): void {
     $id=(int)($input['pallet_id']??0); $p=stock_editable($db,$id,$user,true);
@@ -72,6 +87,7 @@ function branch_delete(PDO $db,int $user,array $input): void {
     if ((int)stock_query($db,'SELECT revision FROM stock_branches WHERE id=?',[$id])->fetchColumn()!==(int)($input['revision']??0)) throw new CatalogException('La sucursal cambió. Vuelve a abrirla.',409);
     stock_query($db,'UPDATE pallets SET branch_id=NULL,revision=revision+1 WHERE branch_id=?',[$id]);
     stock_query($db,'UPDATE stock_shares SET active=0,branch_id=NULL WHERE branch_id=?',[$id]);
+    branch_event($db,$user,'branch_deleted',branch_owned($db,$id,$user),null);
     stock_query($db,'DELETE FROM stock_branches WHERE id=?',[$id]);
 }
 function branch_share_create(PDO $db,int $user,array $input): array {

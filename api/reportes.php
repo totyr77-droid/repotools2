@@ -36,6 +36,7 @@ try {
                 UNION ALL SELECT 'pallet_admin', u.name, e.code, e.created_at, NULL, e.action, e.id FROM pallet_admin_events e JOIN users u ON u.id = e.user_id
             UNION ALL SELECT 'user_role', a.name, u.name, e.created_at, NULL, e.old_role || ' → ' || e.new_role, e.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
             UNION ALL SELECT 'user_profile', a.name, u.name, e.created_at, NULL, 'profile_updated', e.id FROM user_profile_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
+            UNION ALL SELECT 'branch', a.name, e.branch_name, e.created_at, NULL, e.action, e.id FROM branch_events e JOIN users a ON a.id=e.actor_id
             ) events{$where} ORDER BY created_at DESC, event_type, event_id DESC LIMIT 51 OFFSET {$offset}");
             $query->execute($params);$items=$query->fetchAll();
         }

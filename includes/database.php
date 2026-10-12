@@ -168,6 +168,11 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE user_branch_preferences (user_id {$ref} NOT NULL REFERENCES users(id) ON DELETE CASCADE, branch_id {$ref} NOT NULL REFERENCES stock_branches(id) ON DELETE CASCADE, favorite INTEGER NOT NULL DEFAULT 0, last_used BIGINT NOT NULL DEFAULT 0, use_count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(user_id,branch_id))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(18)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 19')->fetchColumn()) {
+            $db->exec("CREATE TABLE branch_events (id {$id}, actor_id {$ref} NOT NULL REFERENCES users(id), branch_id {$ref}, branch_name TEXT NOT NULL, action TEXT NOT NULL, before_data TEXT NOT NULL, after_data TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX branch_events_date ON branch_events(created_at)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(19)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

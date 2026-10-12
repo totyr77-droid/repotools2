@@ -55,6 +55,8 @@ try {
         if(isset($result['branch'])) $result['branch']=array_intersect_key($result['branch'],array_flip(['id','name','address','locality','province','description','revision','latitude','longitude']));
         $result['ok']=true; $result['csrf']=$csrf;
         stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
+    } elseif (isset($_GET['manage'])) {
+        $result=branch_management($db,$uid,$_GET);$result['csrf']=$csrf;
     } else {
         $result=['can_manage_branches'=>stock_is_admin($db,$uid),'branches'=>stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.revision,b.latitude,b.longitude, COALESCE(pref.favorite,0) AS favorite, COALESCE(pref.last_used,0) AS last_used, COALESCE(pref.use_count,0) AS use_count, (SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.owner_id=? AND p.released=0 AND p.activated=1) AS pallet_count FROM stock_branches b LEFT JOIN user_branch_preferences pref ON pref.branch_id=b.id AND pref.user_id=? ORDER BY LOWER(b.name),b.id',[$uid,$uid])->fetchAll(),'shares'=>stock_query($db,'SELECT id,token,title,branch_id,created_at FROM stock_shares WHERE owner_id=? AND active=1 ORDER BY id DESC',[$uid])->fetchAll(),'pallets'=>stock_query($db,'SELECT id,code,description,branch_id,revision,activated FROM pallets WHERE owner_id=? AND released=0 ORDER BY updated_at DESC,id DESC',[$uid])->fetchAll(),'csrf'=>$csrf];
     }
