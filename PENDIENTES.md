@@ -265,3 +265,6 @@ Stock: también se retira del inicio el selector de sucursales y Compartir selec
 
 
 Palets: bloque principal sin tarjeta blanca, borde ni padding exterior. Sucursal pasa de la tuerca a botón directo a la derecha de la barra del palet; conserva permisos de propietario y el diálogo existente. Validación UI de asignación sin abrir configuración y tamaños móviles/PC. Revertir commit de diseño para volver a la disposición anterior, sin cambios de datos.
+
+
+Sucursal del palet: búsqueda instantánea sin distinguir acentos/mayúsculas por nombre, dirección, localidad, provincia y descripción. Resultados con dirección y selección visible; Sin sucursal sigue opcional. Sin coincidencias ofrece Nueva sucursal en el mismo diálogo y precarga el nombre escrito. Prueba UI verifica búsqueda por dirección, selección y alta tras búsqueda sin resultados; mantener permisos de servidor. Sin migraciones.
