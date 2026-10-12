@@ -173,6 +173,10 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX branch_events_date ON branch_events(created_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(19)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 20')->fetchColumn()) {
+            $db->exec("CREATE TABLE stock_share_exclusions (share_id {$ref} NOT NULL REFERENCES stock_shares(id) ON DELETE CASCADE, pallet_id {$ref} NOT NULL REFERENCES pallets(id) ON DELETE CASCADE, PRIMARY KEY(share_id,pallet_id))");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(20)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

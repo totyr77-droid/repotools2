@@ -328,3 +328,12 @@ Validación: sintaxis PHP/JS, tests/stock-branches.php SQLite (reglas previas, s
 
 
 Aclaración enlaces compartidos12/10: botón del ojo visible únicamente con al menos1 enlace activo propio. No basta tener palets cargados. Al crear el primero aparece y al desactivar el último se oculta; el modal abierto conserva aviso de éxito. Compartir mantiene condición de palet activado. Prueba Chrome comprueba estados antes/después de crear/desactivar. Revertir este ajuste JS para visibilidad anterior; sin DB nueva ni cambios a enlaces.
+
+
+## Sucursales compartidas con exclusiones — 12/10/2026
+
+En compartir por sucursal, despliegue Ver palets incluidos con contador, chevron giratorio y casillas inicialmente marcadas. Desmarcar excluye del enlace sin convertirlo en lista fija: futuros palets propios activados de esa sucursal se incorporan automáticamente. Puede excluir todos los actuales; próximos siguen incluidos. En Enlaces compartidos, lápiz Elegir palets incluidos permite cambiar exclusiones manteniendo token/URL; sucursal y título bloqueados al editar. Excluidos guardados por ID interno del palet, no código reutilizable.
+
+Migración20 aditiva stock_share_exclusions, claves share/pallet y cascada. API autenticada/CSRF/idempotencia valida propiedad del enlace activo y de cada ID, límite200 exclusiones; el público y contador aplican NOT EXISTS antes de paginar. Cuentas ajenas no pueden editar ni excluir palets ajenos. Enlaces anteriores sin exclusiones mantienen comportamiento. Valores excluidos se conservan por enlace y no modifican palets ni permisos.
+
+Validado sintaxisPHP/JS, tests/stock-branches.php SQLite: ocultar excluido, incorporar nuevo, restaurar en mismaURL y rechazo de cuenta/ID ajenos; tests/stock-branches-ui.cjs Chrome: despliegue/desmarcado, público vacío, lápiz/estado persistido y restauración sin cambiarURL, regresiones previas. PostgreSQL aislado pendiente por credenciales previas; no cambio manual producción. Falta prueba física y despliegue Render. Reversión segura: restaurar solo UI manteniendo filtro de exclusiones en público/API. Revertir todo el backend haría reaparecer excluidos: antes habría que desactivar enlaces de sucursal con exclusiones. Conservar tabla20 y datos.

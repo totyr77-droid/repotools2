@@ -90,8 +90,21 @@ function branch_delete(PDO $db,int $user,array $input): void {
     branch_event($db,$user,'branch_deleted',branch_owned($db,$id,$user),null);
     stock_query($db,'DELETE FROM stock_branches WHERE id=?',[$id]);
 }
+function branch_exclusion_ids(PDO $db,int $user,array $input): array {
+    $ids=json_decode(is_string($input['excluded_ids']??null)?$input['excluded_ids']:'[]',true);
+    if(!is_array($ids)||!array_is_list($ids)||count($ids)>200)throw new CatalogException('Puedes excluir hasta 200 palets por enlace.',422);
+    foreach($ids as $id){if(!is_int($id)||$id<1)throw new CatalogException('La seleccion no es valida.',422);if(!stock_query($db,'SELECT id FROM pallets WHERE id=? AND owner_id=?',[$id,$user])->fetchColumn())throw new CatalogException('Solo puedes excluir tus propios palets.',403);}
+    return array_values(array_unique($ids));
+}
+function branch_share_exclusions(PDO $db,int $user,array $input): void {
+    $share=stock_query($db,'SELECT id FROM stock_shares WHERE id=? AND owner_id=? AND active=1 AND branch_id IS NOT NULL',[(int)($input['id']??0),$user])->fetchColumn();
+    if(!$share)throw new CatalogException('Este enlace no esta disponible en tu cuenta.',404);
+    $ids=branch_exclusion_ids($db,$user,$input);
+    stock_query($db,'DELETE FROM stock_share_exclusions WHERE share_id=?',[$share]);
+    foreach($ids as $id)stock_query($db,'INSERT INTO stock_share_exclusions(share_id,pallet_id) VALUES(?,?)',[$share,$id]);
+}
 function branch_share_create(PDO $db,int $user,array $input): array {
-    $branchId=(int)($input['branch_id']??0); $ids=[];
+    $branchId=(int)($input['branch_id']??0); $ids=[];$excluded=$branchId?branch_exclusion_ids($db,$user,$input):[];
     if ($branchId) { $b=branch_owned($db,$branchId,$user);if(!stock_query($db,'SELECT id FROM pallets WHERE owner_id=? AND branch_id=? AND released=0 AND activated=1 LIMIT 1',[$user,$branchId])->fetchColumn())throw new CatalogException('Esta sucursal no tiene palets tuyos cargados para compartir.',422); $title=$b['name']; }
     else {
         $ids=json_decode(is_string($input['pallet_ids']??null)?$input['pallet_ids']:'',true);
@@ -108,6 +121,7 @@ function branch_share_create(PDO $db,int $user,array $input): array {
     $token=bin2hex(random_bytes(32));
     $id=(int)stock_query($db,'INSERT INTO stock_shares(owner_id,token,branch_id,title) VALUES(?,?,?,?) RETURNING id',[$user,$token,$branchId?:null,$title])->fetchColumn();
     foreach ($ids as $palletId) stock_query($db,'INSERT INTO stock_share_pallets(share_id,pallet_id) VALUES(?,?)',[$id,$palletId]);
+    if($branchId)branch_share_exclusions($db,$user,['id'=>$id,'excluded_ids'=>json_encode($excluded)]);
     return ['share'=>['id'=>$id,'token'=>$token,'title'=>$title,'branch_id'=>$branchId?:null]];
 }
 function branch_public(PDO $db,string $token,int $page=0): array {
@@ -117,7 +131,7 @@ function branch_public(PDO $db,string $token,int $page=0): array {
     $branch=$share['branch_id']?branch_owned($db,(int)$share['branch_id'],(int)$share['owner_id']):null;
     $sql='SELECT p.id,p.code,p.description,p.updated_at,u.name AS owner_name,u.company AS owner_company,a.name AS updated_name,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
     $args=[$share['owner_id']];
-    if ($branch) { $sql.=' AND p.branch_id=?'; $args[]=$branch['id']; }
+    if ($branch) { $sql.=' AND p.branch_id=? AND NOT EXISTS(SELECT 1 FROM stock_share_exclusions x WHERE x.share_id=? AND x.pallet_id=p.id)'; $args[]=$branch['id'];$args[]=$share['id']; }
     else { $sql.=' AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=? AND sp.pallet_id=p.id)'; $args[]=$share['id']; }
     $pallets=[];
     $rows=stock_query($db,$sql.' ORDER BY p.code,p.id LIMIT 21 OFFSET '.($page*20),$args)->fetchAll();
