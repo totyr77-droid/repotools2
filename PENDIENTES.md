@@ -498,3 +498,10 @@ Validado tests/device-connection-ui.cjs con anchos iguales, marco sobre blur, in
 Corregida discrepancia entre padding real 24 px de diálogo Inicio PC y variables del encabezado 32 px, causante de desbordamiento horizontal. Variables igualadas; lectores restringen overflow horizontal, conservan vertical y overscroll contenido. Texto de espera y formularios pueden reducirse/partirse sin exceder ancho. Sin cambios lógica/cámara/permisos.
 
 Validación: captura espera PC revisada sin barra; tests/device-connection-ui.cjs verifica scrollWidth <= clientWidth del diálogo en modo celular remoto y regresiones. Revertir commit restaura CSS/versiones y prueba anteriores.
+
+
+## Solicitud móvil en espera — 12/10/2026
+
+Cerrar con cruz o Escape guarda standby en sessionStorage por cuenta para esta pestaña: no reabre automáticamente la misma espera al navegar/recargar. Fab amarillo sigue disponible para abrir voluntariamente. Se limpia standby cuando deja de estar pendiente (conectado o solicitud terminada). No acepta ni rechaza conexión al cerrar. Aviso espera amarillo; botón Conectar verde movido fuera del bloque de aviso, debajo. Referencia del botón conservada para listeners/render.
+
+Validación tests/device-connection-ui.cjs Chrome/SQLite: cierre permanece cerrado tras polling y reload, fab amarillo reabre y permite aceptar, botón fuera del aviso y color amarillo, regresiones conexión/lecturas. Captura móvil revisada. Sin DB/permisos nuevos. Revertir commit restaura presentación y memoria local previa.
