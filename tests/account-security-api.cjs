@@ -2,8 +2,8 @@ const {spawn,spawnSync}=require('child_process'),fs=require('fs'),os=require('os
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'repo-reset-')),php='C:/xampp/php/php.exe',env={...process.env,DATABASE_URL:'',REPOTOOLS_REQUIRE_DATABASE_URL:'0',REPOTOOLS_DB_PATH:path.join(dir,'db.sqlite'),RESEND_API_KEY:'',MAIL_FROM:''},base='http://127.0.0.1:18824/';
 const seed=spawnSync(php,['-r',"require 'includes/database.php';database()->prepare('INSERT INTO users(name,email,password_hash) VALUES(?,?,?)')->execute(['User','user@example.invalid',password_hash('old-password-123',PASSWORD_DEFAULT)]);"],{env,encoding:'utf8'});assert.equal(seed.status,0,seed.stderr);
 const server=spawn(php,['-S','127.0.0.1:18824','-t',process.cwd()],{env,stdio:'ignore'});
-function client(){let cookie='';return async(url,data)=>{const r=await fetch(base+url,{redirect:'manual',headers:{Cookie:cookie},...(data?{method:'POST',body:new URLSearchParams(data)}:{})});const c=r.headers.get('set-cookie');if(c)cookie=c.split(';')[0];return {status:r.status,text:await r.text()};};}
-const logged=client(),reset=client(),fresh=client(),csrf=html=>html.match(/name="csrf" value="([^"]+)"/)[1];
+function client(agent='Windows Desktop'){let cookie='';return async(url,data)=>{const r=await fetch(base+url,{redirect:'manual',headers:{Cookie:cookie,'User-Agent':agent},...(data?{method:'POST',body:new URLSearchParams(data)}:{})});const c=r.headers.get('set-cookie');if(c)cookie=c.split(';')[0];return {status:r.status,text:await r.text()};};}
+const logged=client(),reset=client(),fresh=client('iPhone Mobile'),csrf=html=>html.match(/name="csrf" value="([^"]+)"/)[1];
 (async()=>{for(let i=0;i<40;i++){try{await fetch(base);break;}catch{await new Promise(r=>setTimeout(r,100));}}let page=await logged('cuenta.php');assert.equal((await logged('cuenta.php',{csrf:csrf(page.text),email:'user@example.invalid',password:'old-password-123'})).status,302);
 
 page=await fresh('cuenta.php');await fresh('cuenta.php',{csrf:csrf(page.text),email:'user@example.invalid',password:'old-password-123'});

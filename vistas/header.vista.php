@@ -43,6 +43,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261011-result3" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
+
     <link href="css/responsive.css" rel="stylesheet" type="text/css">
     <link href="css/notifications.css?v=20261011-compactpalets17" rel="stylesheet" type="text/css">
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
@@ -57,6 +58,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
+<link href="css/device-workspace.css?v=20261012-devices" rel="stylesheet" type="text/css">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
@@ -100,3 +102,5 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <div class="account-bar"><span class="account-greeting" title="Hola, <?= escape(current_user()['name']) ?>">Hola, <strong><?= escape(current_user()['name']) ?></strong><?php if (isset($roleLabels[$navRole])): $badge = $roleLabels[$navRole]; ?><span class="account-role account-role-<?= escape($navRole) ?>" title="<?= escape($badge[1]) ?>" aria-label="<?= escape($badge[1]) ?>"><i class="fa-solid <?= escape($badge[2]) ?>" aria-hidden="true"></i><?= escape($badge[0]) ?></span><?php endif; ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/></svg><span>Salir</span></button></form></div>
     <?php endif; ?>
 
+
+<?php if(current_user()): ?><aside id="deviceConnection" class="device-connection" data-user="<?= (int)current_user()['id'] ?>" data-kind="<?= escape($_SESSION['device_kind']) ?>" data-csrf="<?= escape(csrf_token()) ?>" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg><span data-relay-message role="status"></span><button type="button" data-relay-accept hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 15l6-6M8 12l-2 2a4 4 0 0 0 6 6l2-2M16 12l2-2a4 4 0 0 0-6-6l-2 2"/></svg>Conectar</button><button type="button" data-relay-scan hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/></svg>Escanear para PC</button><button type="button" data-relay-disconnect hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 4H3v16h3m8-12 4 4-4 4M8 12h13"/></svg>Desconectar</button></aside><?php endif; ?>

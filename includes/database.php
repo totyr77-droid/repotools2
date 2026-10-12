@@ -177,6 +177,14 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE stock_share_exclusions (share_id {$ref} NOT NULL REFERENCES stock_shares(id) ON DELETE CASCADE, pallet_id {$ref} NOT NULL REFERENCES pallets(id) ON DELETE CASCADE, PRIMARY KEY(share_id,pallet_id))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(20)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 21')->fetchColumn()) {
+            $db->exec("CREATE TABLE account_devices (user_id {$ref} NOT NULL REFERENCES users(id) ON DELETE CASCADE, kind TEXT NOT NULL, token_hash TEXT NOT NULL, auth_version INTEGER NOT NULL, expires_at BIGINT NOT NULL, PRIMARY KEY(user_id,kind))");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(21)');
+        }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 22')->fetchColumn()) {
+            $db->exec("CREATE TABLE scan_relays (user_id {$ref} PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, desktop_hash TEXT NOT NULL, mobile_hash TEXT NOT NULL DEFAULT '', context_key TEXT NOT NULL DEFAULT '', mode TEXT NOT NULL, context TEXT NOT NULL, ready INTEGER NOT NULL DEFAULT 0, code TEXT NOT NULL DEFAULT '', sequence INTEGER NOT NULL DEFAULT 0, expires_at BIGINT NOT NULL)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(22)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

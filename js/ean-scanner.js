@@ -86,7 +86,7 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, relayBypass = false }) {
     const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
@@ -346,7 +346,8 @@
       });
     }
     page?.onLeave(stop);
-    return { start, stop };
+    const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods&&elementId!=='userReader'?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual},raw):raw;
   }
-  window.RepoEANScanner = { create, validEAN, confirmation, takeScanPhoto, clearScanPhoto };
+  function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
+  window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, takeScanPhoto, clearScanPhoto };
 })();

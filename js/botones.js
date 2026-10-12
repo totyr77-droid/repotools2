@@ -67,9 +67,11 @@ document.querySelectorAll('.password-toggle').forEach((button) => {
 });
 
 document.querySelectorAll('.account-panel form[method="post"]').forEach((form) => {
-  form.addEventListener('submit', () => {
-    const button = form.querySelector('button[type="submit"]');
+  form.querySelectorAll('button[type="submit"]').forEach(b=>{b.dataset.originalLabel=b.textContent;});
+  form.addEventListener('submit', event => {
+    const button = event.submitter || form.querySelector('button[type="submit"]');
     if (!button) return;
+    if(button.name){const field=document.createElement('input');field.type='hidden';field.name=button.name;field.value=button.value;form.append(field);}
     button.disabled = true;
     button.textContent = 'Un momento…';
   });
@@ -78,7 +80,7 @@ document.querySelectorAll('.account-panel form[method="post"]').forEach((form) =
 (page ? page.listen : window.addEventListener.bind(window))('pageshow', () => {
   document.querySelectorAll('.account-panel form[method="post"] button[type="submit"]').forEach((button) => {
     button.disabled = false;
-    button.textContent = document.querySelector('input[name="name"]') ? 'CREAR CUENTA' : 'ENTRAR';
+    button.textContent = button.dataset.originalLabel || 'ENTRAR';
   });
 });
 

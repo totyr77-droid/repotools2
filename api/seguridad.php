@@ -12,6 +12,7 @@ $password=is_string($_POST['password']??null)?$_POST['password']:'';
 if($action==='password' && (!is_string($_POST['confirmation']??null)||$password!==$_POST['confirmation']))security_response(422,['error'=>'Las contraseñas nuevas no coinciden.']);
 try {
     $version=account_security_update(database(),$user,$current,$action==='password'?$password:null);
+    database()->prepare('UPDATE account_devices SET auth_version=? WHERE user_id=? AND kind=? AND token_hash=?')->execute([$version,$user['id'],$_SESSION['device_kind'],hash('sha256',$_SESSION['device_token'])]);
     $_SESSION['user']['auth_version']=$version;
     session_regenerate_id(true);session_write_close();
     $mail=null;

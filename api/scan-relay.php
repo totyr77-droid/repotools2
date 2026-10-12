@@ -1,0 +1,39 @@
+<?php
+require_once __DIR__.'/../includes/auth.php';
+require_once __DIR__.'/../includes/catalog.php';
+header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');
+function relay_response(int $status,array $body): never {http_response_code($status);echo json_encode($body,JSON_UNESCAPED_UNICODE);exit;}
+$user=current_user();if(!$user)relay_response(401,['error'=>'Inicia sesión para conectar tus dispositivos.']);
+$method=$_SERVER['REQUEST_METHOD'];if(!in_array($method,['GET','POST'],true))relay_response(405,['error'=>'Solicitud no válida.']);if($method==='POST'&&!valid_csrf())relay_response(403,['error'=>'Recarga la página para conectar.']);
+$uid=(int)$user['id'];$kind=$_SESSION['device_kind'];$hash=hash('sha256',$_SESSION['device_token']);$csrf=csrf_token();session_write_close();
+try {
+ $db=database();$db->beginTransaction();if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql'){$q=$db->prepare('SELECT auth_version FROM users WHERE id=? FOR UPDATE');$q->execute([$uid]);}
+ $q=$db->prepare('SELECT token_hash FROM account_devices WHERE user_id=? AND kind=? AND expires_at>? AND auth_version=(SELECT auth_version FROM users WHERE id=?)');$q->execute([$uid,$kind,time(),$uid]);$active=$q->fetchColumn();if(!$active||!hash_equals($active,$hash))throw new RuntimeException('Tu sesión cambió. Ingresa nuevamente.');
+ $q=$db->prepare('SELECT * FROM scan_relays WHERE user_id=?');$q->execute([$uid]);$row=$q->fetch();
+ if($row){$q=$db->prepare('SELECT kind,token_hash FROM account_devices WHERE user_id=? AND expires_at>? AND auth_version=?');$q->execute([$uid,time(),$user['auth_version']]);$slots=array_column($q->fetchAll(),'token_hash','kind');if($row['expires_at']<time()||!hash_equals($slots['desktop']??'', $row['desktop_hash'])||($row['mobile_hash']!==''&&!hash_equals($slots['mobile']??'', $row['mobile_hash']))){$db->prepare('DELETE FROM scan_relays WHERE user_id=?')->execute([$uid]);$row=false;}}
+ if($method==='POST') {
+  $action=$_POST['action']??'';if(!is_string($action))relay_response(422,['error'=>'Solicitud no válida.']);
+  if($action==='request') {
+   if($kind!=='desktop')throw new RuntimeException('Esta acción se inicia desde la computadora.');$mode=$_POST['mode']??'ean';$context=$_POST['context']??'Escaneo de productos';$flow=$_POST['flow']??'';if(!is_string($flow)||!preg_match('/^[a-f0-9-]{36}$/D',$flow))throw new RuntimeException('Abre nuevamente el escáner.');if(!is_string($mode)||!in_array($mode,['ean','qr'],true)||!is_string($context)||mb_strlen($context)>100)throw new RuntimeException('El escaneo no es válido.');
+   if($row&&hash_equals($row['desktop_hash'],$hash)){$db->prepare("UPDATE scan_relays SET mode=?,context=?,context_key=?,ready=1,code='',sequence=sequence+1,expires_at=? WHERE user_id=?")->execute([$mode,$context,$flow,time()+1800,$uid]);}
+   else {$db->prepare("INSERT INTO scan_relays(user_id,desktop_hash,mobile_hash,mode,context,context_key,ready,code,sequence,expires_at) VALUES(?,?,'',?,?,?,1,'',0,?) ON CONFLICT(user_id) DO UPDATE SET desktop_hash=excluded.desktop_hash,mobile_hash='',mode=excluded.mode,context=excluded.context,context_key=excluded.context_key,ready=1,code='',sequence=0,expires_at=excluded.expires_at")->execute([$uid,$hash,$mode,$context,$flow,time()+1800]);}
+  } elseif($action==='accept') {
+   if($kind!=='mobile'||!$row)throw new RuntimeException('No hay una computadora esperando.');$db->prepare('UPDATE scan_relays SET mobile_hash=?,expires_at=? WHERE user_id=?')->execute([$hash,time()+1800,$uid]);
+  } elseif($action==='disconnect') {
+   if($row&&hash_equals($kind==='desktop'?$row['desktop_hash']:$row['mobile_hash'],$hash))$db->prepare('DELETE FROM scan_relays WHERE user_id=?')->execute([$uid]);
+  } elseif($action==='pause'||$action==='ack') {
+   if($kind!=='desktop'||!$row||!hash_equals($row['desktop_hash'],$hash))throw new RuntimeException('La conexión ya no está disponible.');
+   if(!is_string($_POST['flow']??null)||!hash_equals($row['context_key'],$_POST['flow']))throw new RuntimeException('Este escaneo ya terminó.');
+   if($action==='pause')$db->prepare("UPDATE scan_relays SET ready=0,code='' WHERE user_id=?")->execute([$uid]);
+   else{$sequence=filter_var($_POST['sequence']??null,FILTER_VALIDATE_INT);if($sequence===false)throw new RuntimeException('Lectura no válida.');$db->prepare("UPDATE scan_relays SET code='' WHERE user_id=? AND sequence=?")->execute([$uid,$sequence]);}
+  } elseif($action==='send') {
+   if($kind!=='mobile'||!$row||!hash_equals($row['mobile_hash'],$hash)||!$row['ready']||$row['code']!=='')throw new RuntimeException('Espera a que la computadora esté lista.');
+   $code=$_POST['code']??'';if(!is_string($code)||strlen($code)>300)throw new RuntimeException('Código no válido.');
+   if($row['mode']==='ean'&&!valid_product_ean($code))throw new RuntimeException('El EAN no es válido.');if($row['mode']==='qr'){if(!preg_match('/^[0-9]{8}$/D',$code)){ $parts=parse_url($code);parse_str($parts['query']??'',$query);$expected=parse_url(getenv('APP_URL')?:'https://repotools.online',PHP_URL_HOST);if(($parts['host']??'')!==$expected||basename($parts['path']??'')!=='palet.php'||(!is_string($query['codigo']??null)||!preg_match('/^[0-9]{8}$/D',$query['codigo'])))throw new RuntimeException('Este QR no corresponde a un palet.');$code=$query['codigo'];}}
+   $db->prepare('UPDATE scan_relays SET code=?,sequence=sequence+1,expires_at=? WHERE user_id=?')->execute([$code,time()+1800,$uid]);
+  } else throw new RuntimeException('Solicitud no válida.');
+ }
+ $q=$db->prepare('SELECT * FROM scan_relays WHERE user_id=?');$q->execute([$uid]);$row=$q->fetch();$result=['csrf'=>$csrf,'kind'=>$kind,'connected'=>false,'waiting'=>false];
+ if($row){$mine=hash_equals($kind==='desktop'?$row['desktop_hash']:$row['mobile_hash'],$hash);$result+=['flow'=>$row['context_key'],'context'=>$row['context'],'mode'=>$row['mode'],'ready'=>(bool)$row['ready']&&($kind==='desktop'||$row['code']===''),'sequence'=>(int)$row['sequence']];$result['waiting']=$kind==='mobile'&&$row['mobile_hash']==='';$result['connected']=$mine&&$row['mobile_hash']!=='';if($kind==='desktop'&&$mine){$result['requested']=true;$result['code']=$row['code'];}}
+ $db->commit();relay_response(200,$result);
+}catch(Throwable $e){if(isset($db)&&$db->inTransaction())$db->rollBack();relay_response(($e instanceof RuntimeException&&!$e instanceof PDOException)?409:503,['error'=>($e instanceof RuntimeException&&!$e instanceof PDOException)?$e->getMessage():'No pudimos conectar los dispositivos.']);}

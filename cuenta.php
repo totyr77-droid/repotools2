@@ -10,6 +10,15 @@ unset($_SESSION['logout_error']);
 $name = '';
 $email = '';
 $company = '';
+$deviceConflict=false;
+function finish_account_login(array $user,string $token,string $kind,string $next): void { session_regenerate_id(true);unset($_SESSION['pending_device_login']);$_SESSION['user']=$user;$_SESSION['device_token']=$token;$_SESSION['device_kind']=$kind;$_SESSION['csrf']=bin2hex(random_bytes(32));header('Location: '.account_destination($next));exit; }
+if($_SERVER['REQUEST_METHOD']==='POST'&&isset($_POST['device_decision'])&&!current_user()){
+    $pending=$_SESSION['pending_device_login']??null;
+    if(!valid_csrf()||!$pending||(int)$pending['expires']<time()){$error='La confirmación venció. Ingresa nuevamente.';unset($_SESSION['pending_device_login']);}
+    elseif($_POST['device_decision']==='cancel'){unset($_SESSION['pending_device_login']);}
+    elseif($_POST['device_decision']==='replace'){if(device_claim(database(),$pending['user'],$pending['kind'],$pending['token'],true))finish_account_login($pending['user'],$pending['token'],$pending['kind'],$pending['next']);else{$error='Tu acceso cambió. Ingresa nuevamente.';unset($_SESSION['pending_device_login']);}}
+}
+
 function account_icon(string $name): string {
     $paths=['user'=>'<circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/>','mail'=>'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>','lock'=>'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>','company'=>'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 21v-4h6v4M8 7h2m4 0h2M8 11h2m4 0h2"/>'];
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$paths[$name].'</svg>';
@@ -25,7 +34,7 @@ if (current_user() && $next) {
     header('Location: ' . account_destination($next));
     exit;
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) && !current_user()) {
     $name = trim(is_string($_POST['name'] ?? null) ? $_POST['name'] : '');
     $email = strtolower(trim(is_string($_POST['email'] ?? null) ? $_POST['email'] : ''));
     $company = trim(is_string($_POST['company'] ?? null) ? $_POST['company'] : '');
@@ -59,20 +68,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !current_user()) {
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($user && password_verify($password, $user['password_hash'])) {
                     $db->prepare('DELETE FROM login_attempts WHERE key = ?')->execute([$key]);
-                    session_regenerate_id(true);
-                    unset($user['password_hash']);
-                    $_SESSION['user'] = $user;
-                    $_SESSION['csrf'] = bin2hex(random_bytes(32));
-                    header('Location: ' . account_destination($next));
-                    exit;
+                    unset($user['password_hash']);$token=bin2hex(random_bytes(32));$kind=device_kind();
+                    if(device_claim($db,$user,$kind,$token))finish_account_login($user,$token,$kind,$next);
+                    $_SESSION['pending_device_login']=['user'=>$user,'token'=>$token,'kind'=>$kind,'expires'=>time()+300,'next'=>$next];$deviceConflict=true;
+                } else {
+                    $error='El correo o la contraseña no son correctos.';
                 }
-                $error = 'El correo o la contraseña no son correctos.';
+
             }
         } catch (PDOException $exception) {
             $error = is_unique_violation($exception) ? 'No se pudo crear la cuenta con ese correo. Intenta iniciar sesión.' : 'No pudimos acceder a las cuentas. Intenta más tarde.';
         }
     }
 }
+$deviceConflict=$deviceConflict||isset($_SESSION['pending_device_login']);
 include __DIR__ . '/vistas/header.vista.php';
 ?>
 <main class="account-main">
@@ -95,6 +104,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
     <p class="account-intro"><?= $register ? 'Guarda tus productos y organiza tus palets.' : 'Continúa con tus productos y palets.' ?></p>
     <?php if ($error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
+    <?php if($deviceConflict): ?><aside class="account-device-notice" role="status"><?= account_icon('lock') ?><div><strong>Ya tienes otra <?= ($_SESSION['pending_device_login']['kind']??'desktop')==='desktop'?'computadora':'sesión de celular' ?> conectada</strong><p>¿Quieres cerrar esa sesión y entrar aquí? Las cargas pendientes se conservarán en el equipo anterior.</p></div></aside><form method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><div class="account-device-actions"><button type="submit" name="device_decision" value="cancel" class="library-secondary">Cancelar</button><button type="submit" name="device_decision" value="replace" class="library-primary">Entrar aquí</button></div></form><?php else: ?>
     <form method="post">
       <input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>">
       <?php if ($register): ?><label><span class="account-field-title"><?= account_icon('user') ?>Nombre</span><input name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Tu nombre" required value="<?= escape($name) ?>"></label>
@@ -102,7 +112,7 @@ include __DIR__ . '/vistas/header.vista.php';
       <label><span class="account-field-title"><?= account_icon('mail') ?>Correo electrónico</span><input type="email" name="email" autocomplete="email" maxlength="254" placeholder="nombre@correo.com" required value="<?= escape($email) ?>"></label>
       <label><span class="account-field-title"><?= account_icon('lock') ?>Contraseña</span><span class="account-password-field"><input id="accountPassword" type="password" name="password" autocomplete="<?= $register ? 'new-password' : 'current-password' ?>" placeholder="<?= $register ? 'Al menos 10 caracteres' : 'Tu contraseña' ?>" <?= $register ? 'minlength="10" maxlength="72"' : '' ?> required><button class="password-toggle" type="button" aria-label="Mostrar contraseña" title="Mostrar contraseña" aria-controls="accountPassword" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></span></label>
       <button type="submit"><?= $register ? 'CREAR CUENTA' : 'INGRESAR' ?></button>
-    </form>
+    </form><?php endif; ?>
     <?php if (!$register): ?><a class="account-create-button" href="cuenta.php?mode=registro&amp;next=<?= escape($next) ?>"><?= account_icon('user') ?><span>Crear cuenta</span></a><?php endif; ?>
     <nav class="account-auth-links" aria-label="Opciones de acceso"><?php if ($register): ?><a href="cuenta.php?mode=login&amp;next=<?= escape($next) ?>">Ya tengo cuenta</a><?php endif; ?>
     <?php if (!$register): ?><a href="recuperar.php">Olvidé mi contraseña</a><?php endif; ?>

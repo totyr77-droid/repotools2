@@ -9,6 +9,7 @@ if (!valid_csrf()) {
     header('Location: cuenta.php', true, 303);
     exit;
 }
+device_release(database(),(int)current_user()['id'],$_SESSION['device_token']??'',$_SESSION['device_kind']??device_kind());
 $_SESSION = [];
 $params = session_get_cookie_params();
 setcookie(session_name(), '', ['expires' => time() - 3600, 'path' => $params['path'], 'secure' => $params['secure'], 'httponly' => true, 'samesite' => 'Lax']);

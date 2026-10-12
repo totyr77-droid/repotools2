@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/sessions.php';
+require_once __DIR__.'/account-devices.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     ini_set('session.use_strict_mode', '1');
@@ -31,7 +32,15 @@ function current_user(): ?array {
     if(!array_key_exists($user['id'],$versions)){$q=database()->prepare('SELECT auth_version,name,email,company FROM users WHERE id=?');$q->execute([$user['id']]);$versions[$user['id']]=$q->fetch(PDO::FETCH_ASSOC);}
     $fresh=$versions[$user['id']];
     if($fresh===false||(int)$fresh['auth_version']!==(int)($user['auth_version']??1)){unset($_SESSION['user']);return null;}
-    return $_SESSION['user']=array_replace($user,$fresh);
+    $user=array_replace($user,$fresh);
+    if(!isset($_SESSION['device_token'])){
+        $token=bin2hex(random_bytes(32));$kind=device_kind();
+        if(!device_claim(database(),$user,$kind,$token)){unset($_SESSION['user']);$_SESSION['logout_error']='Esta cuenta ya tiene una sesión abierta en otro equipo. Ingresa para cambiarla.';return null;}
+        $_SESSION['device_token']=$token;$_SESSION['device_kind']=$kind;
+    }
+    if(!device_valid(database(),$user,$_SESSION['device_token'],$_SESSION['device_kind'])){unset($_SESSION['user']);$_SESSION['logout_error']='Tu sesión se abrió en otro equipo. Puedes volver a ingresar aquí.';return null;}
+    if((int)($_SESSION['device_renewed']??0)<time()-600){database()->prepare('UPDATE account_devices SET expires_at=? WHERE user_id=? AND kind=? AND token_hash=?')->execute([time()+30*86400,$user['id'],$_SESSION['device_kind'],hash('sha256',$_SESSION['device_token'])]);$_SESSION['device_renewed']=time();}
+    return $_SESSION['user']=$user;
 }
 
 function escape(string $value): string {
