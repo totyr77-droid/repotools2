@@ -14,6 +14,9 @@ DirectoryIndex index.php index.html
     RewriteEngine On
     RewriteCond %{HTTP_HOST} ^repotools2\.onrender\.com(?::[0-9]+)?$ [NC]
     RewriteRule ^ https://repotools.online%{REQUEST_URI} [R=308,L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^s/([A-Za-z0-9_-]{22}|[a-f0-9]{64})/?$ stock-compartido.php?token=$1 [END]
 </IfModule>
 <FilesMatch "^(\.env.*|\.neon|neon\.ts)$">
     Require all denied

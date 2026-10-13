@@ -2,6 +2,13 @@
 require_once __DIR__ . "/../includes/auth.php";
 require_once __DIR__ . "/../includes/catalog.php";
 require_once __DIR__ . "/../includes/reports.php";
+$previewTitle=$publicPageTitle??'Repotools - Escáner para Repositores';
+$previewDescription=$publicPageDescription??'Escaneá productos, controlá stock y organizá tu trabajo.';
+$previewUrl='https://repotools.online/';
+if(isset($publicPageTitle)){
+    $origin=parse_url(getenv('APP_URL')?:'https://repotools.online');
+    if(!empty($origin['host'])&&in_array($origin['scheme']??'',['https','http'],true))$previewUrl=$origin['scheme'].'://'.$origin['host'].(isset($origin['port'])?':'.$origin['port']:'').($_SERVER['REQUEST_URI']??'/');
+}
 $userHand = '';
 $navModerator = false; $navPending = 0; $navRole = '';
 if (current_user()) {
@@ -17,11 +24,12 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <html lang="es">
   <head>
     <meta charset="utf-8">
+    <?php if(isset($publicShareBase)): ?><base href="<?= escape($publicShareBase) ?>"><?php endif; ?>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
     <title>Repotools - Escáner para Repositores | Gestión de Stock e Inventario</title>
-    <meta property="og:title" content="Repotools - Escáner para Repositores">
-    <meta property="og:description" content="Escaneá productos, controlá stock y organizá tu trabajo.">
+    <meta property="og:title" content="<?= escape($previewTitle) ?>">
+    <meta property="og:description" content="<?= escape($previewDescription) ?>">
     <meta property="og:image" content="https://repotools.online/img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-pwa-512x512.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="512">
@@ -29,11 +37,11 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <meta property="og:image:alt" content="Logo de Repotools blanco sobre fondo negro">
     <meta property="og:site_name" content="Repotools">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Repotools - Escáner para Repositores">
-    <meta name="twitter:description" content="Escaneá productos, controlá stock y organizá tu trabajo.">
+    <meta name="twitter:title" content="<?= escape($previewTitle) ?>">
+    <meta name="twitter:description" content="<?= escape($previewDescription) ?>">
     <meta name="twitter:image" content="https://repotools.online/img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-pwa-512x512.png">
     <meta name="twitter:image:alt" content="Logo de Repotools blanco sobre fondo negro">
-    <meta property="og:url" content="https://repotools.online/">
+    <meta property="og:url" content="<?= escape($previewUrl) ?>">
     <meta property="og:type" content="website">
 
     <meta name="description" content="Escaneá productos, controlá stock y organizá tu trabajo con Repotools. Herramientas para repositores.">
@@ -73,7 +81,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
-<link href="css/device-workspace.css?v=20261013-map-scroll" rel="stylesheet" type="text/css">
+<link href="css/device-workspace.css?v=20261013-share-links" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>

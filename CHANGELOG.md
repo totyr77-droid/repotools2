@@ -1,5 +1,10 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Continuación completada
+
+- Fotos de reportes desde el celular vinculado a PC, evidencia EAN temporal, reemplazo de fotos y cancelación segura. Validación y reversión en [FOTOS-PC-CELULAR](docs/FOTOS-PC-CELULAR.md); migración aditiva 23 verificada en rama Neon sin datos.
+- Enlaces cortos seguros compatibles con los anteriores, compartir con contexto y controles alineados en móvil/PC. Validación y reversión en [ENLACES-CORTOS](docs/ENLACES-CORTOS.md); sin migración para enlaces. Cámara física, Safari y despliegue pendientes de verificar.
+
 Resumen del código actual y entregas registradas. El [historial anterior completo](docs/HISTORIAL-PROYECTO.md) conserva notas, validaciones y procedimientos de reversión; contiene propuestas y afirmaciones luego reemplazadas. Para pendientes vigentes usar exclusivamente [ROADMAP.md](ROADMAP.md).
 
 ## 13/10/2026

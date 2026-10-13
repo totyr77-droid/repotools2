@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/stock.php';
+require_once __DIR__.'/share-links.php';
 
 function branch_owned(PDO $db, int $id, int $user): array {
     // Legacy helper name: entries are now shared, not scoped to their creator.
@@ -118,14 +119,13 @@ function branch_share_create(PDO $db,int $user,array $input): array {
         $title=catalog_text($input['title']??'Palets compartidos',100)?:'Palets compartidos';
     }
     if ((int)stock_query($db,'SELECT COUNT(*) FROM stock_shares WHERE owner_id=? AND active=1',[$user])->fetchColumn()>=100) throw new CatalogException('Desactiva un enlace anterior antes de crear otro.',422);
-    $token=bin2hex(random_bytes(32));
-    $id=(int)stock_query($db,'INSERT INTO stock_shares(owner_id,token,branch_id,title) VALUES(?,?,?,?) RETURNING id',[$user,$token,$branchId?:null,$title])->fetchColumn();
+    $created=stock_share_insert($db,$user,$branchId?:null,$title);$token=$created['token'];$id=$created['id'];
     foreach ($ids as $palletId) stock_query($db,'INSERT INTO stock_share_pallets(share_id,pallet_id) VALUES(?,?)',[$id,$palletId]);
     if($branchId)branch_share_exclusions($db,$user,['id'=>$id,'excluded_ids'=>json_encode($excluded)]);
     return ['share'=>['id'=>$id,'token'=>$token,'title'=>$title,'branch_id'=>$branchId?:null]];
 }
 function branch_public(PDO $db,string $token,int $page=0): array {
-    if (!preg_match('/^[a-f0-9]{64}$/D',$token)) throw new CatalogException('El enlace no está disponible.',404);
+    if (!stock_share_token_valid($token)) throw new CatalogException('El enlace no está disponible.',404);
     $share=stock_query($db,'SELECT * FROM stock_shares WHERE token=? AND active=1',[$token])->fetch();
     if (!$share) throw new CatalogException('Este enlace fue desactivado o no existe.',404);
     $branch=$share['branch_id']?branch_owned($db,(int)$share['branch_id'],(int)$share['owner_id']):null;

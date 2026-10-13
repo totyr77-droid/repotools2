@@ -61,7 +61,7 @@
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261012-branch-refresh"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
-<script src="js/stock-branches.js?v=20261013-map-compact"></script>
+<script src="js/stock-branches.js?v=20261013-share-links"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>

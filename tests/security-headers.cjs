@@ -3,7 +3,7 @@ const apache=process.env.APACHE_BIN||'C:/xampp/apache/bin/httpd.exe';
 if(!fs.existsSync(apache)){console.log('SKIP: definir APACHE_BIN para validar cabeceras con Apache.');process.exit(0);}
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'repo-headers-')),root=dir.replaceAll('\\','/'),serverRoot=path.resolve(path.dirname(apache),'..').replaceAll('\\','/'),config=path.join(dir,'httpd.conf'),base='http://127.0.0.1:18850';let server;
 (async()=>{
- fs.copyFileSync('.htaccess',path.join(dir,'.htaccess'));for(const file of ['index.php','recuperar.php','sw.js','.env.test','neon.ts'])fs.writeFileSync(path.join(dir,file),'fixture');fs.copyFileSync('manifest.webmanifest',path.join(dir,'manifest.webmanifest'));
+ fs.copyFileSync('.htaccess',path.join(dir,'.htaccess'));for(const file of ['index.php','recuperar.php','sw.js','.env.test','neon.ts'])fs.writeFileSync(path.join(dir,file),'fixture');fs.writeFileSync(path.join(dir,'stock-compartido.php'),'shared-fixture');fs.copyFileSync('manifest.webmanifest',path.join(dir,'manifest.webmanifest'));
  const modules=['authz_core','authz_host','dir','mime','headers','rewrite'];fs.writeFileSync(config,`ServerRoot "${serverRoot}"
 Listen 127.0.0.1:18850
 ServerName localhost
@@ -23,5 +23,6 @@ Require all granted
  assert.equal((await fetch(base+'/recuperar.php')).headers.get('referrer-policy'),'no-referrer');assert.ok((await fetch(base+'/sw.js')).headers.get('cache-control').includes('no-cache'));assert.ok((await fetch(base+'/manifest.webmanifest')).headers.get('content-type').includes('application/manifest+json'));
  for(const file of ['.env.test','neon.ts'])assert.equal((await fetch(base+'/'+file)).status,403);
  const redirect=await new Promise((resolve,reject)=>require('http').get(base+'/stock.php?test=1',{headers:{Host:'repotools2.onrender.com'}},response=>{response.resume();resolve(response);}).on('error',reject));assert.equal(redirect.statusCode,308);assert.equal(redirect.headers.location,'https://repotools.online/stock.php?test=1');
- console.log('OK: Apache headers, recuperacion no-referrer, DirectoryIndex, redireccion, archivos protegidos y manifest MIME.');
+ for(const token of ['K7xP2nQ9vLm4Rt8BcYw3Za','a'.repeat(64)]){const r=await fetch(base+'/s/'+token);assert.equal(r.status,200);assert.equal(await r.text(),'shared-fixture');assert.equal(r.url,base+'/s/'+token);}assert.equal((await fetch(base+'/s/invalid')).status,404);
+ console.log('OK: short-share rewrite, Apache headers, recuperacion no-referrer, DirectoryIndex, redireccion, archivos protegidos y manifest MIME.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(server&&!server.killed){server.kill();await new Promise(resolve=>{server.once('exit',resolve);setTimeout(resolve,2000);});}fs.rmSync(dir,{recursive:true,force:true});});

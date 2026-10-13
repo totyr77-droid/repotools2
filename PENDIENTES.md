@@ -12,4 +12,6 @@ Al retomar: probar instalación y modo avión en teléfono real, verificar despl
 
 Mantener minimalismo, SVG, comodidad móvil, preferencia de mano y adaptación PC. Validar permisos en servidor, conservar cambios locales y documentar validación/reversión. No publicar credenciales, datos privados ni bases.
 
-Actualizaci?n posterior: cr?ditos discretos y cuerpo del mapa sin colapso, validado Chrome m?vil/PC; Safari real pendiente. Perfil local en docs/RENDIMIENTO.md: continuar con medici?n Render/Neon antes de optimizar. No hay cambios de esquema.
+Actualización posterior: créditos discretos y cuerpo del mapa sin colapso; Safari real pendiente. Continuar la medición Render/Neon de docs/RENDIMIENTO.md antes de optimizar.
+
+Entrega retomada: fotos desde celular vinculado a PC, evidencia EAN temporal y cancelación segura (migración aditiva 23; docs/FOTOS-PC-CELULAR.md). Enlaces nuevos /s/token, compatibilidad anterior, contexto formal y controles alineados (docs/ENLACES-CORTOS.md). Pruebas locales pasan; cámara física, Safari y despliegue Render por verificar. La prueba antigua de reportes conserva un fallo de fixture por el límite de una sesión PC; no se declara toda la suite aprobada.
