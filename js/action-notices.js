@@ -1,5 +1,15 @@
 (() => {
   const page=window.RepoNavigation?.page,doc=page?.document||document;
+  let toast, toastTimer;
+  window.RepoToast = message => {
+    clearTimeout(toastTimer); toast?.remove();
+    toast=doc.createElement('p');toast.className='repotools-send-toast';toast.setAttribute('role','status');
+    toast.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></svg>';
+    const label=doc.createElement('span');label.textContent=message;toast.append(label);
+    (doc.querySelector('dialog[open]')||doc.body).append(toast);
+    toastTimer=setTimeout(()=>toast?.remove(),2400);
+  };
+  page?.onLeave(()=>{clearTimeout(toastTimer);toast?.remove();});
   const selector='[role="status"],.library-status,.library-form-status,.account-error';
   function decorate(el){
     const text=el.textContent.trim();

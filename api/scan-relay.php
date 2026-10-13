@@ -22,6 +22,12 @@ try {
    if($kind!=='mobile'||!$row)throw new RuntimeException('No hay una computadora esperando.');$db->prepare('UPDATE scan_relays SET mobile_hash=?,expires_at=? WHERE user_id=?')->execute([$hash,time()+1800,$uid]);
   } elseif($action==='disconnect') {
    if($row&&hash_equals($kind==='desktop'?$row['desktop_hash']:$row['mobile_hash'],$hash)){$db->prepare('DELETE FROM scan_relays WHERE user_id=?')->execute([$uid]);relay_drop_photo($db,$uid);}
+  } elseif($action==='cancel_photo') {
+   $photoFlow=$_POST['flow']??null;
+   if(!$row||!is_string($photoFlow)||!hash_equals($row['context_key'],$photoFlow)||!hash_equals($kind==='desktop'?$row['desktop_hash']:$row['mobile_hash'],$hash)||!in_array($row['mode'],['photo_ean','photo_product'],true))throw new RuntimeException('La solicitud de foto ya terminó.');
+   relay_drop_photo($db,$uid);
+   if($row['mobile_hash']==='')$db->prepare('DELETE FROM scan_relays WHERE user_id=?')->execute([$uid]);
+   else $db->prepare("UPDATE scan_relays SET ready=0,code='',mode='ean',context='' WHERE user_id=?")->execute([$uid]);
   } elseif($action==='pause'||$action==='ack') {
    if($kind!=='desktop'||!$row||!hash_equals($row['desktop_hash'],$hash))throw new RuntimeException('La conexión ya no está disponible.');
    if(!is_string($_POST['flow']??null)||!hash_equals($row['context_key'],$_POST['flow']))throw new RuntimeException('Este escaneo ya terminó.');

@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Avisos de envío celular–PC
+
+Confirmación flotante con SVG después de envío exitoso de foto/EAN/QR, aviso compacto de solicitud y cancelación de fotografía desde ambos equipos sin desconectarlos. Autorización de cancel_photo validada en servidor; sin migración ni cambios del detector. Detalle, pruebas y reversión en docs/AVISOS-ENVIO.md.
+
 ## 13/10/2026 — Introducción opcional
 
 Guía breve de cuatro pasos, omitir/X/Escape, estado versionado por identidad local y replay desde Configuración. Se evita abrirla durante interacción, carga o ventanas críticas. Accesibilidad, móvil/PC y mano preferida; pruebas onboarding, conexión celular-PC y PWA pasan. Detalle/reversión en docs/INTRODUCCION.md; no cambia DB ni negocio.
