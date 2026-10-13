@@ -133,6 +133,12 @@ function branch_public(PDO $db,string $token,int $page=0): array {
     $args=[$share['owner_id']];
     if ($branch) { $sql.=' AND p.branch_id=? AND NOT EXISTS(SELECT 1 FROM stock_share_exclusions x WHERE x.share_id=? AND x.pallet_id=p.id)'; $args[]=$branch['id'];$args[]=$share['id']; }
     else { $sql.=' AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=? AND sp.pallet_id=p.id)'; $args[]=$share['id']; }
+    $summary=[];
+    if($page===0){
+        $scope='SELECT p.id'.substr($sql,strpos($sql,' FROM pallets p '));
+        $totals=stock_query($db,"SELECT b.ean,MIN(NULLIF(b.name,'')) AS name,b.expires,SUM(b.units) AS units,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$scope}) GROUP BY b.ean,b.expires,c.name,c.brand,c.quantity ORDER BY b.ean,b.expires",$args)->fetchAll();
+        foreach($totals as $product)$summary[]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','catalog_name','expires','units']));
+    }
     $pallets=[];
     $rows=stock_query($db,$sql.' ORDER BY p.code,p.id LIMIT 21 OFFSET '.($page*20),$args)->fetchAll();
     $hasMore=count($rows)>20;
@@ -148,5 +154,5 @@ function branch_public(PDO $db,string $token,int $page=0): array {
         $updated=(new DateTimeImmutable($row['updated_at'],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
         $pallets[]=['code'=>$row['code'],'description'=>$row['description'],'branch'=>$branchInfo,'owner_name'=>$row['owner_name'],'owner_company'=>$row['owner_company'],'updated_at'=>$updated,'updated_name'=>$row['updated_name'],'products'=>$products[$row['id']]??[]];
     }
-    return ['title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page];
+    return ['title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page,'summary'=>$summary];
 }
