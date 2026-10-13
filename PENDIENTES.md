@@ -14,6 +14,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Etiquetas A4 horizontal y PDF directo iPhone en desarrollo: una hoja por palet, QR/número/logo negros, avisos completos. HTML/PDF1/2/6 y seis QR renderizados validados; Safari/AirPrint/distancia físicos pendientes. Detalle/reversión docs/ETIQUETAS-HORIZONTAL.md.
+
 Zoom continuo en desarrollo: rango/paso real, input en vivo, cola último valor y accesos compatibles; mínimo1× conservado. Pruebas/reversión docs/ZOOM-DESLIZANTE.md. Safari/cámara real pendiente.
 
 Responsive profesional en desarrollo: capa compartida al final, Inicio/Stock/Biblioteca/Ajustes/modales adaptados, controles de cámara según mano y palet público compacto. Pruebas y reversión en docs/RESPONSIVE-2026-10-13.md. Safari físico pendiente; funciones/permisos intactos.

@@ -25,3 +25,7 @@ No hay nuevas APIs, migraciones, reservas ni cambios de QR. etiqueta.php valida 
 Validación: node tests/pending-label-print.cjs pasa con SQLite temporal y Chrome simulado. Verifica selección sin abrir palet, cancelar, todos/ninguno, dos etiquetas A4, decode y llamada a print, rechazo403 de etiqueta ajena, desaparición del control con una etiqueta y ausencia de desbordamiento320/390/1366. Captura320px zurdo revisada. Sintaxis JS y lint PHP pasan. Impresora física, diálogo Safari y despliegue Render pendientes.
 
 Reversión: restaurar stock.php, js/stock.js, css/stock.css y versiones header/footer a15afbc9; retirar la prueba nueva y esta nota. No eliminar datos ni cambiar permisos existentes.
+
+## Actualización13/10/2026
+
+La entrega horizontal reemplaza el formato vertical anterior descrito en esta nota. Ver docs/ETIQUETAS-HORIZONTAL.md para composición, PDF iPhone, pruebas1/2/6 y reversión. Safari/impresora físicos pendientes.
