@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Resumen de ejemplo de Stock más compacto: números18px, etiquetas12,8px, menor padding y separación; ancho máximo640px en PC, dos columnas móviles conservadas. Solo CSS de demo y versión del recurso; guest-demo pasa320/375/390/430/1366 y revisión visual390/1366. Revertir css/guest-demo.css y versión header a e857d9c; no cambia datos ni Stock real.
+
 Etiquetas de palets ajustadas a una sola hoja A4: margen de impresión8mm y alto280mm evitan desbordamiento por redondeo; salto solo entre etiquetas. Logo original06_horizontal_blanco_transparente integrado y filtrado a negro, QR vectorial grande y código200px; texto cercano legible. PNG para compartir reutiliza la misma composición. PDF Chrome con1/2/5 etiquetas produce1/2/5 páginas y QR decodificado correcto; selección y permisos anteriores pasan. Probar impresora/Safari reales; detalle y reversión en docs/IMPRESION-PENDIENTES.md.
 
 Ajustes terminado: Perfil/Preferencias/Accesos y Seguridad conservada, sonido/vibración con switches y días con autosave. API preferencias existente ampliada, users.sound_enabled/vibration_enabled default1 (migración25); días siguen en stock_preferences, mano en users. Principal Normal/Rápido y su lector remoto respetan opciones, tono/háptica existentes sin reimplementación; otros lectores intactos. Pruebas SQLite/PostgreSQL aislado, UI360/390/430/PC, sesiones, ON/OFF, ausencia de Vibration API y regresiones pasan. Validación física/Render pendientes; archivos y reversión en docs/AJUSTES-PREFERENCIAS.md. No continuar TOPs2.0.

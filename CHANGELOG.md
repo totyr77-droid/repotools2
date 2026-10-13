@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Resumen de demo Stock compacto
+
+Palets activos, Productos, Por vencer y Vencidos con tipografía, padding y separación menores, ancho limitado en PC y dos columnas en móvil. Conserva indicación de demo y datos. Prueba guest-demo320/375/390/430/1366 y revisión visual móvil/PC pasan; lint header correcto. Reversión: css/guest-demo.css y versión en vistas/header.vista.php a e857d9c.
+
 ## 13/10/2026 — Etiqueta A4 sin página sobrante
 
 Impresión con margen seguro, alto contenido y saltos entre etiquetas, sin segunda hoja residual. Logo horizontal original06 renderizado negro sobre blanco, QR grande, código y texto legibles; exportación PNG y vista SVG comparten composición. Validación PDF1/2/5 páginas, logo monocromo, QR decodificado y regresión de impresión múltiple/permisos. Detalles y reversión en docs/IMPRESION-PENDIENTES.md.
