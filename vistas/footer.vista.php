@@ -27,8 +27,8 @@
 <?php if(!empty($paginaDemo)): ?><script src="js/guest-demo.js?v=20261013-demo1"></script><?php endif; ?>
 <script src="js/loading.js?v=20261013-loading1"></script>
 <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261013-floating"></script>
-<script src="js/stock-offline.js?v=20261012-sync-dialog"></script>
-<?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-sync-dialog"></script><?php endif; ?>
+<script src="js/stock-offline.js?v=20261013-sync-status"></script>
+<?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=20261013-sync-status"><script src="js/sync-status.js?v=20261013-sync-status"></script><script src="js/library-offline.js?v=20261013-sync-status"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261013-transition1"></script>
 <script src="js/device-connection.js?v=20261013-settings1"></script>
@@ -59,7 +59,7 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261013-print-code"></script>
 
-<script src="js/stock.js?v=20261013-activity1-20261013-batch1"></script>
+<script src="js/stock.js?v=20261013-sync-status"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261013-loading1"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>

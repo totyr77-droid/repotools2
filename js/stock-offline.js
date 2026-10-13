@@ -10,7 +10,7 @@
   ready.catch(()=>{});
   async function transact(store,mode,fn) {
     const db=await ready;
-    return new Promise((resolve,reject)=>{const tx=db.transaction(store,mode),request=fn(tx.objectStore(store));let value;request.onsuccess=()=>value=request.result;tx.oncomplete=()=>resolve(value);tx.onerror=tx.onabort=()=>reject(Error('No pudimos guardar en este dispositivo. Mantén abierto el formulario.'));});
+    return new Promise((resolve,reject)=>{const tx=db.transaction(store,mode),request=fn(tx.objectStore(store));let value;request.onsuccess=()=>value=request.result;tx.oncomplete=()=>{resolve(value);if(mode==='readwrite'&&['loads','libraryLoads'].includes(store))window.dispatchEvent(new CustomEvent('repotools:queue-changed'));};tx.onerror=tx.onabort=()=>reject(Error('No pudimos guardar en este dispositivo. Mantén abierto el formulario.'));});
   }
   window.RepoLibraryOffline=user=>({
     async list(){return (await transact('libraryLoads','readonly',s=>s.getAll())).filter(r=>r.user===user).sort((a,b)=>a.created-b.created);},
