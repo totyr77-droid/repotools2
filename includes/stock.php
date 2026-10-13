@@ -146,7 +146,7 @@ function stock_save_product(PDO $db,int $user,array $input): array {
     } else stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size) VALUES(?,?,?,?,?,?,?)',[$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size']]);
     if ($v['kind']!=='units') stock_query($db,'INSERT INTO stock_product_references(ean,kind,pack_size,updated_by) VALUES(?,?,?,?) ON CONFLICT(ean,kind) DO UPDATE SET pack_size=excluded.pack_size,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP',[$v['ean'],$v['kind'],$v['pack_size'],$user]);
     stock_query($db,'UPDATE pallets SET activated=1 WHERE id=?',[$id]); stock_touch($db,$id,$user);
-    return ['code'=>$p['code'],'relocated'=>$relocated];
+    return ['code'=>$p['code'],'id'=>$id,'relocated'=>$relocated];
 }
 function stock_warning_days(PDO $db,int $user): int {
     $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();

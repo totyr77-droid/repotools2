@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__.'/../includes/auth.php';
 require_once __DIR__.'/../includes/stock.php';
+require_once __DIR__.'/../includes/pallet-activity.php';
 header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); header('X-Content-Type-Options: nosniff');
 function stock_response(int $status,array $body): void { http_response_code($status); echo json_encode($body,JSON_UNESCAPED_UNICODE); exit; }
 $user=current_user(); $uid=$user?(int)$user['id']:null; $method=$_SERVER['REQUEST_METHOD'];
@@ -44,6 +45,10 @@ try {
         $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
         if ($cached!==false) { $db->commit(); stock_response(200,json_decode($cached,true)); }
         $action=$_POST['action']??''; $id=(int)($_POST['pallet_id']??0); $result=[];
+        $tracks=in_array($action,['claim','import','save_product','delete_product','description','delete','invite','accept','decline','revoke','leave'],true);
+        $historyId=$id;
+        if($action==='claim'||($action==='save_product'&&!$id))$historyId=(int)(stock_label($db,(string)($_POST['code']??''))['pallet_id']??0);
+        $historyBefore=$tracks&&$historyId?pallet_activity_snapshot($db,$historyId):null;
         switch($action) {
             case 'generate':
                 $count=filter_var($_POST['count']??1,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>100]]);
@@ -56,7 +61,7 @@ try {
                     if ($current['code']!==($_POST['code']??'') || (int)$current['revision']!==(int)$_POST['offline_revision']) throw new CatalogException('El palet cambió desde tu última consulta. Revisa la carga pendiente antes de enviarla.',409);
                 }
                 $result=stock_save_product($db,$uid,$_POST);
-                $result['pallet_revision']=(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$id])->fetchColumn();
+                $result['pallet_revision']=(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$result['id']])->fetchColumn();
                 break;
             case 'import':
                 $products=json_decode(is_string($_POST['products']??null)?$_POST['products']:'',true);
@@ -111,6 +116,7 @@ try {
                 stock_query($db,'INSERT INTO stock_preferences(user_id,expiry_days) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET expiry_days=excluded.expiry_days',[$uid,$days]); break;
             default: throw new CatalogException('Acción no válida.',422);
         }
+        if($tracks){$historyId=(int)($result['id']??$historyId);if($historyId)pallet_activity_record($db,$uid,$historyId,($historyBefore&& (int)$historyBefore['id']===$historyId)?$historyBefore:null,pallet_activity_snapshot($db,$historyId));}
         if (stock_is_admin($db,$uid)&&($id||isset($_POST['code']))) {
             $target=$id?stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn():(string)$_POST['code'];
             $details=$_POST;unset($details['csrf'],$details['operation_key']);

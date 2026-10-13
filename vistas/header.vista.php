@@ -92,6 +92,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 <!-- Development-only marker: exclude this integration when publishing to main. -->
 <link href="css/development.css?v=20261013-beta1" rel="stylesheet">
+<?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261013-activity1" rel="stylesheet"><?php endif; ?>
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>

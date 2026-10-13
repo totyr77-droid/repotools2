@@ -14,6 +14,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Punto3 Actividad del palet en desarrollo: captura backend/transacción/stock_operations, migración27 tabla actor/metadata mínima e índice palet+id, GET privado25+cursor, lista plegable sin modal. Creación/productos/cantidades/vencimientos/colaboradores/descripción; nombres públicos dinámicos, sin IDs personales/email. UI/permisos/retry offline/pruebas de regresión pasan; PostgreSQL esquema temporal validó26/27, fechas, FK SET NULL y rollback. docs/ACTIVIDAD-PALETS.md. No implementar Puntos4/5/7. Pendiente campo Safari/beta real.
+
 Punto2 TOPs2.0 autorizado en desarrollo: Semana/Mes/Histórico, Códigos distintos/Escaneos totales/Reportes aprobados, public_name seguro sin IDs/nombre privado, actualización local, top50+posición propia, migración26 índices por fecha. Pruebas tops.php/tops-ui pasan; docs/TOPS-2.md. Aportes pospuesto por duplicar métrica de aprobaciones. Antes de Punto3 confirmar push de Punto2. PostgreSQL/Safari beta pendientes.
 
 Solo desarrollo: número del palet ampliado a2040px de ancho disponible, fuente360px y ajuste SVG, centrado entre título y texto inferior. PDF1/2/5 páginas, límites del número sin superposición y lectura QR pasan; impresión múltiple pasa. Mismos SVG/PNG; no cambia QR ni A4. Revertir commit de esta entrega, conservando configuración de desarrollo.

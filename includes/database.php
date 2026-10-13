@@ -210,6 +210,11 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX rewards_period_user ON report_rewards(created_at,user_id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(26)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 27')->fetchColumn()) {
+            $db->exec("CREATE TABLE pallet_activity (id {$id}, user_id {$ref} REFERENCES users(id) ON DELETE SET NULL, pallet_id {$ref} REFERENCES pallets(id) ON DELETE SET NULL, product_id {$ref} REFERENCES pallet_products(id) ON DELETE SET NULL, action TEXT NOT NULL, metadata TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX pallet_activity_recent ON pallet_activity(pallet_id,id)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(27)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();
