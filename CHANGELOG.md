@@ -151,3 +151,7 @@ Control existente ahora responde al arrastre, toma rango/paso real, muestra nive
 ## 13/10/2026 — Etiquetas horizontales y PDF iPhone (desarrollo)
 
 Una etiqueta por A4 horizontal, QR grande con quiet zone, logo negro, número y aviso en la misma composición. Impresión HTML corregida y PDF directo con tamaño fijo para iPhone/iPad, disponible en todos los navegadores. Pruebas HTML/PDF1/2/6 páginas, seis QR decodificados, selección y permisos pasan. Safari/AirPrint físicos pendientes. Detalle y reversión: docs/ETIQUETAS-HORIZONTAL.md.
+
+## 13/10/2026 — Sistema global de movimiento (desarrollo)
+
+Selectores con un fondo deslizante, microinteracciones y transiciones de paneles/menús/diálogos/navegación; movimiento reducido, cleanup AJAX y exclusión de cámara/mapas. Incluye offline sin librerías nuevas ni cambios de negocio. Navegación liberada al iniciar el fundido. Pruebas, compatibilidad y reversión en docs/MOVIMIENTO-GLOBAL.md.

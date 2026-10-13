@@ -35,7 +35,8 @@
       setTimeout(() => {
         if (ticket !== generation) { resolve(); return; }
         root.classList.remove('is-loading'); mark('LOADER_HIDDEN_MS');
-        fade = setTimeout(() => { if (ticket === generation) { state = 'hidden'; node().hidePopover?.(); window.dispatchEvent(new Event('repotools:page-ready')); } resolve(); }, immediate ? 0 : 220);
+        fade = setTimeout(() => { if (ticket === generation) { state = 'hidden'; node().hidePopover?.(); window.dispatchEvent(new Event('repotools:page-ready')); } }, immediate ? 0 : 220);
+        resolve(); // Navigation may continue while the visual fade finishes.
       }, immediate ? 0 : Math.max(0, 250 - (performance.now() - shown)));
     });
   }

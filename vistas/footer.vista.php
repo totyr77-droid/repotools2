@@ -30,7 +30,7 @@
 <script src="js/stock-offline.js?v=20261013-sync-status"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=20261013-sync-status"><script src="js/sync-status.js?v=20261013-sync-status"></script><script src="js/library-offline.js?v=20261013-sync-status"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
-<script src="js/navigation.js?v=20261013-transition1"></script>
+<script src="js/navigation.js?v=20261013-motion1"></script>
 <script src="js/device-connection.js?v=20261013-zoom2"></script>
 <script src="js/action-notices.js?v=20261013-zoom2"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
@@ -91,5 +91,6 @@
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261013-activity1"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261013-overview1"><script src="js/stock-overview.js?v=20261013-overview1"></script><?php endif; ?>
+<script src="js/motion.js?v=20261013-global1"></script>
 </body>
 </html>
