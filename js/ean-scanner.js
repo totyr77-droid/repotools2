@@ -53,17 +53,33 @@
   }
   async function beep() {
     if (!audioContext) return;
+    let restoreSession = () => {}, scheduled = false;
     try {
-      if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient';
+      // Ambient obeys the iPhone Silent switch. Request playback only for
+      // the confirmed tone, then restore the previous mixing policy.
+      const session = window.navigator?.audioSession;
+      if (session) {
+        const previous = session.type;
+        let restored = false;
+        session.type = 'playback';
+        restoreSession = () => {
+          if (restored) return; restored = true;
+          try { if (session.type === 'playback') session.type = previous; } catch {}
+        };
+      }
       if (audioContext.state !== 'running') await audioContext.resume();
       if (audioContext.state !== 'running') return;
       const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
       oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1100, now);
       gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.18, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
       oscillator.connect(gain); gain.connect(audioContext.destination);
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+      const restore = restoreSession;
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
       oscillator.start(now); oscillator.stop(now + .15);
-    } catch {}
+      scheduled = true;
+      // Release the exclusive policy even if iOS interrupts before onended.
+      setTimeout(restore, 500);
+    } catch {} finally { if (!scheduled) restoreSession(); }
   }
   function visibleFrame(video) {
     const width = video.videoWidth, height = video.videoHeight;

@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Demo explícita y pitido con silencio en iPhone
+
+Aviso amarillo DEMO y muestras etiquetadas sin modificar datos. El escáner compartido solicita playback solo durante el tono150ms y restaura el modo previo, con respaldo500ms; corrige el uso permanente de ambient durante el pitido. Pruebas EAN/QR, fallo de audio, evidencia y demo pasan. Safari físico/mezcla con música y Render pendientes. Detalle y reversión en docs/PITIDO-IPHONE.md y docs/DEMO-Y-AVISOS.md.
+
 ## 13/10/2026 — Transición visual RT sin carga intermedia
 
 Overlay desde head, isotipo local inline, navegación cubierta hasta fuentes/UI listas y salida220ms. Límite5s, recuperación BFCache y bienvenida coordinada; sin cambios funcionales ni de datos. Pruebas, causa comprobada, limitaciones de red lenta y reversión en docs/TRANSICIONES.md.

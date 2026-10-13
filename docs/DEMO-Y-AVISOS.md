@@ -14,6 +14,8 @@ Prueba tests/guest-demo.cjs: exploración, diálogos y CTA, sin requests API Sto
 
 ## Avisos celular–PC
 
+Actualización visual13/10: la demo lleva etiqueta DEMO, aviso amarillo «Estás viendo una demo», explicación explícita de cantidades/vencimientos ficticios y acceso a registro arriba. «Tu lista» pasa a «Lista de ejemplo»; tarjetas de palets se titulan «Palet de ejemplo» y usan borde discontinuo/fondo suave. No cambia el conjunto de datos ni lógica de cuentas. guest-demo pasa320/375/390/430/1366, exploración y aislamiento. Captura móvil revisada. Revertir solo vista/CSS y versión CSS del header a d9f7ec7 para deshacer este ajuste sin quitar controles de acceso.
+
 El z-index no atraviesa la capa superior de dialog.showModal. RepoToast usa un popover manual, sin interacción ni cambios de foco, para aparecer sobre ventanas y backdrops. Mantiene SVG, verde,2,4 segundos, safe area y limpieza al navegar. En navegadores sin Popover API usa el diálogo activo/último abierto como respaldo. La PC confirma EAN/QR después de procesar el código, sin repetir avisos por cada sondeo. Las fotos mantienen su confirmación propia.
 
 tests/toast-top-layer.cjs pasa con dos modales abiertos, aviso en :popover-open dentro de body y eliminación temporizada. tests/device-connection-ui.cjs y device-report-photos.cjs pasan conexión, códigos, evidencia/fotos y cancelaciones. Captura PC revisada con el aviso sobre backdrop. Cámara física/Safari real pendientes; no se modificó detector, flash, zoom ni APIs del enlace entre dispositivos.

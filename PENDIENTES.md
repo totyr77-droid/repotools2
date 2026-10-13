@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Demo de visitantes explícita con aviso amarillo, etiqueta DEMO y palets/lista de ejemplo. Pitido: playback solo durante el tono y restauración posterior; ambient silenciaba iPhone. Probar iPhone real en silencio y con música; no garantizar mezcla. Pruebas/reversión en docs/DEMO-Y-AVISOS.md y docs/PITIDO-IPHONE.md.
+
 Transición visual RT desde el head, cobertura continua AJAX, espera de fuentes/UI y salida220ms con límite5s. Se conserva carga local de datos. Causa, pruebas, excepción en red muy lenta y reversión: docs/TRANSICIONES.md. Confirmar Safari/BFCache real y Render.
 
 Acceso a reportes protegido en servidor (login/403, APIs401/403/IDOR/CSRF), configuración pública mínima para enviar reportes sin cuenta. Demo independiente Stock/Biblioteca para visitantes, sin datos reales ni operaciones. Avisos EAN/QR/fotos en capa superior y confirmación en PC. Pruebas y reversión: docs/ACCESO-REPORTES.md y docs/DEMO-Y-AVISOS.md. Safari/Render pendientes; suite antigua reports-api usa políticas anónimas anteriores.

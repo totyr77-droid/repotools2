@@ -1,0 +1,13 @@
+# Pitido y modo silencio — 13/10/2026
+
+El escáner sí ejecutaba su tono, pero prepareSound y beep fijaban navigator.audioSession.type='ambient'. En iOS ese modo respeta el interruptor de silencio: AudioContext running no implica audio audible. WebKit confirma el comportamiento y el uso de playback desde iOS17: [reporte237322](https://bugs.webkit.org/show_bug.cgi?id=237322). [WebKit252746](https://bugs.webkit.org/show_bug.cgi?format=multiple&id=252746) explica que mezclar otras aplicaciones mediante ambient implica respetar silencio. [W3C Audio Session](https://www.w3.org/TR/audio-session/) clasifica playback como exclusivo; no prometer mezcla sin interrupciones.
+
+En js/ean-scanner.js la preparación sigue dentro del toque que abre la cámara, sin tono ni reproducción exclusiva. Solo al confirmar EAN/QR, beep solicita playback cuando AudioSession está disponible. Conserva frecuencia1100Hz, envolvente y duración150ms. onended restaura el tipo anterior; respaldo500ms lo restaura si iOS interrumpe el evento. También se restaura si resume falla. Sin AudioSession se conserva Web Audio existente: no se garantiza ignorar silencio en navegadores antiguos. No hay loop silencioso, archivos de audio, botones nuevos ni cambio de detector/cámara.
+
+footer.vista.php e index.html actualizan versión ean-scanner a20261013-audio2. El lector es compartido por Inicio/Biblioteca/Stock/moderación/celular-PC. Service worker sin cambios; el recurso scanner usa network-first con respaldo offline existente. Una instalación ya preparada sin conexión puede conservar el lector anterior hasta actualizar sus recursos; no se declara corregido el caché offline previo.
+
+Pruebas tests/ean-scanner.cjs: desbloqueo inicial, playback al emitir EAN/QR, restauración, fallo resume sin perder lectura y confirmación única. tests/ean-scan-photo.cjs: evidencia asociada al EAN y vigencia intactas. tests/guest-demo.cjs y lint pasan. Audio simulado, no prueba el altavoz de un iPhone físico.
+
+Probar tras Render: abrir Inicio, volumen multimedia audible, interruptor de silencio activado; tocar escanear y confirmar primer EAN, siguientes y QR. Repetir en Biblioteca/Stock y con música. Safari puede interrumpir música al tomar playback; la web no puede forzar que otra app reanude ni garantizar pitido audible en silencio y mezcla a la vez. Se prioriza la petición actual de escuchar el pitido en silencio y se limita el modo exclusivo al tono.
+
+Revertir solo ean-scanner.js, versiones en footer/index.html y pruebas de sonido a d9f7ec7 para recuperar ambient permanente. Conservar cambios visuales de demo si se revierte solo audio. Sin migraciones, APIs, permisos, datos o credenciales.
