@@ -59,7 +59,7 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 
-<script src="js/stock.js?v=20261013-loading1"></script>
+<script src="js/stock.js?v=20261013-batch1"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261013-loading1"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>

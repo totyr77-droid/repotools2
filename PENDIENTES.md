@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Impresión múltiple en Pendientes cuando hay más de una etiqueta: selección inline, Todos/Ninguno, Cancelar e Imprimir con contador. Reutiliza etiqueta.php y A4 existente, hasta100 por lote; permisos de cada etiqueta siguen en servidor. Prueba pending-label-print pasa con dos hojas, impresión simulada,403 ajeno,320/390/1366 y fallback de una etiqueta. Reversión y validación física pendiente en docs/IMPRESION-PENDIENTES.md.
+
 Inicio unifica Normal/Rápido con el celular remoto: transmite el contexto al lector, oculta el segundo control continuo y mantiene/cierra la cámara según el modo de PC. Cada apertura principal empieza en Normal. Resultados rápidos con altura reservada y acciones compactas; Normal al alcance de la mano elegida solo en móvil. Pruebas main-rapid-scanner, device-connection-ui, scan-result y ean-scanner pasan; reversión y límites en docs/ESCANEO-RAPIDO.md.
 
 Punto6: Normal/Rápido solo en Inicio, misma lista y stream, contador de sesión, filtro repetido configurable exclusivo principal1500ms y Finalizar. Pruebas20 EAN/cámara única/duplicados/Normal/otros lectores y revisión320zurdo/390/1366: docs/ESCANEO-RAPIDO.md. Probar Safari/cámara reales y Render. No avanzar Punto7 sin nuevo pedido.

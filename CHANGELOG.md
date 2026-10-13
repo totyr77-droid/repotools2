@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Imprimir varias etiquetas pendientes
+
+Seleccionar aparece solo con dos o más etiquetas pendientes. Los mismos bloques permiten elegir varias, todas o ninguna; Imprimir muestra la cantidad y abre las hojas A4 existentes en otra pestaña, sin abrir cada palet ni reservar códigos nuevos. Mantiene permisos del servidor, límite100, móvil y mano preferida. Prueba y reversión en docs/IMPRESION-PENDIENTES.md.
+
 ## 13/10/2026 — Modo rápido consistente y bloque estable
 
 Normal/Rápido de Inicio controla también el lector remoto: el teléfono no ofrece un segundo interruptor continuo para esa solicitud. Apertura principal reinicia Normal; resultados largos no estiran el bloque rápido, acciones de reporte compactas y prioridad de Normal según mano móvil. No cambia la conexión ni los otros destinos. Pruebas y reversión en docs/ESCANEO-RAPIDO.md.
