@@ -9,10 +9,16 @@ function report_response(int $status, array $body): void { http_response_code($s
 $method = $_SERVER['REQUEST_METHOD'];
 if (!in_array($method, ['GET', 'POST'], true)) report_response(405, ['error' => 'Solicitud no válida.']);
 $user = current_user();
+$publicConfig=$method==='GET'&&($_GET['config']??'')==='1'&&count($_GET)===1;
+$protectedAction=in_array($_POST['action']??'',['review','block_reports','unblock_reports'],true);
+if(!$user&&($method==='GET'&&!$publicConfig||$method==='POST'&&$protectedAction))report_response(401,['error'=>'Iniciá sesión para consultar o gestionar reportes.']);
+if($method==='GET'&&in_array($_GET['action']??'',['review','block_reports','unblock_reports'],true))report_response(405,['error'=>'Usá POST para gestionar reportes.']);
 if ($method === 'POST' && !valid_csrf()) report_response(403, ['error' => 'La sesión venció. Recarga la página.']);
 $csrf = csrf_token(); session_write_close();
 try {
     $db = database(); $moderator = can_edit_catalog($db, $user);
+    if($publicConfig)report_response(200,['csrf'=>$csrf,'can_submit'=>!report_is_blocked($db,$user),'photos_enabled'=>report_storage_ready(),'registered'=>$user!==null]);
+    if($method==='GET'&&($_GET['queue']??'')==='1'&&!$moderator)throw new CatalogException('No tenés permiso para moderar reportes.',403);
     $audit = report_can_audit($db, $user);
     $excludedUser=report_is_manager($db,$user)?0:(int)($user['id']??0);
     if($method==='GET'&&($_GET['view']??'')==='general'){
@@ -77,7 +83,7 @@ try {
             foreach (['ean', 'product'] as $kind) if ($jpeg = prepare_report_photo($_FILES['photo_' . $kind] ?? [])) $photos[$kind] = $jpeg;
             $report = submit_product_report($db, $user, $owner, $_POST, $photos);
         }
-        report_response(200, ['report' => $report]);
+        report_response(200, $user ? ['report' => $report] : ['submitted'=>true]);
     }
     if (isset($_GET['id'])) {
         $report = report_detail($db, (int) $_GET['id'], $owner, $moderator);

@@ -152,7 +152,7 @@
     const version = ++revision; active = null; form.reset(); form.hidden = true; status.textContent = 'Cargando…';
     if (!dialog.open) dialog.showModal();
     try {
-      const [config, lookup] = await Promise.all([request(), window.RepoProductInfo.get(ean,{image:true,fresh:true}).then(product => ({ product, missing: product === null })).catch(() => ({ product: null, missing: false }))]);
+      const [config, lookup] = await Promise.all([request('?config=1'), window.RepoProductInfo.get(ean,{image:true,fresh:true}).then(product => ({ product, missing: product === null })).catch(() => ({ product: null, missing: false }))]);
       const { product, missing } = lookup;
       const scanPhoto = await photoPending;
       if (version !== revision || !dialog.open) return;
@@ -189,7 +189,7 @@
         if (file && !document.getElementById('reportPhotos').disabled) body.set('photo_' + kind, await compress(file), kind + '.jpg');
       }
       const result = await request('', body); form.hidden = true; ['ean', 'product'].forEach(removePhoto);
-      status.replaceChildren(document.createTextNode(`Reporte #${result.report.id} enviado. `));
+      status.replaceChildren(document.createTextNode(result.report ? `Reporte #${result.report.id} enviado. ` : 'Reporte enviado. '));
       const link = document.createElement('a'); link.href = 'reportes.php'; link.textContent = 'Ver mis reportes'; status.append(link);
     } catch (error) { status.textContent = error.message; }
     finally { busy = false; send.disabled = false; close.disabled = false; }

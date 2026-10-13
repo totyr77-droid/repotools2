@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 if (is_string($_GET['share'] ?? null) && preg_match('/^[a-f0-9]{64}$/D', $_GET['share'])) $_SESSION['library_share'] = $_GET['share'];
+if(!current_user()){
+    require_once __DIR__.'/includes/stock-icons.php';
+    $demoSection='biblioteca';$paginaDemo=true;$paginaBiblioteca=true;
+    include __DIR__.'/vistas/header.vista.php';include __DIR__.'/vistas/guest-demo.vista.php';
+    $paginaBiblioteca=false;include __DIR__.'/vistas/footer.vista.php';exit;
+}
 require_account('biblioteca');
 $pendingShare = $_SESSION['library_share'] ?? null;
 unset($_SESSION['library_share']);

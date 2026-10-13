@@ -88,3 +88,6 @@ Kit sustituido por CSS/fuentes oficiales Free 6.7.2, mismas clases Solid/Brands,
 # Nombre público — 13/10/2026
 
 Campo users.public_name y migración 24 con generación UTF-8 sin sobrescribir valores elegidos. Edición propia con CSRF; vistas compartidas usan nombres públicos dinámicos, administración conserva nombre real. PostgreSQL aislado, SQLite, UI, permisos y enlaces pasan. Auditoría previa solo lectura: 6 cuentas pendientes, 0 colisiones. Detalles/reversión: docs/NOMBRES-PUBLICOS.md.
+# Acceso, demo y capa de avisos — 13/10/2026
+
+Reportes exige sesión, queue exige rol y API deniega consultas anónimas; mantiene envío anónimo con config seguro y recibo simple. Stock/Biblioteca sin sesión tienen demo ficticia separada. Toasts usan top layer y PC confirma EAN/QR. Pruebas específicas de acceso/demo/capa, reports.php unitario y conexiones/fotos pasan. Ver docs/ACCESO-REPORTES.md y docs/DEMO-Y-AVISOS.md para matriz, límites y reversión.

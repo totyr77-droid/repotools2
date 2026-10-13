@@ -6,7 +6,11 @@
     toast=doc.createElement('p');toast.className='repotools-send-toast';toast.setAttribute('role','status');
     toast.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></svg>';
     const label=doc.createElement('span');label.textContent=message;toast.append(label);
-    (doc.querySelector('dialog[open]')||doc.body).append(toast);
+    if(typeof toast.showPopover==='function'){
+      toast.setAttribute('popover','manual');doc.body.append(toast);toast.showPopover();
+    }else{
+      const dialogs=[...doc.querySelectorAll('dialog[open]')];(doc.activeElement?.closest('dialog[open]')||dialogs.at(-1)||doc.body).append(toast);
+    }
     toastTimer=setTimeout(()=>toast?.remove(),2400);
   };
   page?.onLeave(()=>{clearTimeout(toastTimer);toast?.remove();});

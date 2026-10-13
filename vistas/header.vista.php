@@ -56,6 +56,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link rel="stylesheet" href="css/vendor/fontawesome-6.7.2/css/brands.min.css">
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
     <link href="css/loading.css?v=20261013-loading1" rel="stylesheet" type="text/css">
+    <?php if(!empty($paginaDemo)): ?><link href="css/guest-demo.css?v=20261013-demo1" rel="stylesheet"><?php endif; ?>
     <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=20261013-intro1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
@@ -84,7 +85,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
-<link href="css/device-workspace.css?v=20261013-send-notices1" rel="stylesheet" type="text/css">
+<link href="css/device-workspace.css?v=20261013-toplayer2" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>

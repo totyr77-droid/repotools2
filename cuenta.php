@@ -4,7 +4,7 @@ $paginaCuenta = true;
 require_once __DIR__.'/includes/stock-icons.php';
 $mostrarCreditos = true;
 $register = ($_GET['mode'] ?? '') === 'registro';
-$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca'], true) ? $_GET['next'] : '';
+$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion'], true) ? $_GET['next'] : '';
 $error = $_SESSION['logout_error'] ?? '';
 unset($_SESSION['logout_error']);
 $name = '';
@@ -24,7 +24,7 @@ function account_icon(string $name): string {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$paths[$name].'</svg>';
 }
 function account_destination(string $next): string {
-    $target=$next?$next.'.php':'index.php';
+    $target=$next==='moderacion'?'reportes.php?queue=1':($next?$next.'.php':'index.php');
     if ($next==='stock' && preg_match('/^[0-9]{8}$/D',$_SESSION['pending_stock_code']??'')) {
         $target.='?codigo='.$_SESSION['pending_stock_code']; unset($_SESSION['pending_stock_code']);
     }

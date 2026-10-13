@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Acceso a reportes protegido en servidor (login/403, APIs401/403/IDOR/CSRF), configuración pública mínima para enviar reportes sin cuenta. Demo independiente Stock/Biblioteca para visitantes, sin datos reales ni operaciones. Avisos EAN/QR/fotos en capa superior y confirmación en PC. Pruebas y reversión: docs/ACCESO-REPORTES.md y docs/DEMO-Y-AVISOS.md. Safari/Render pendientes; suite antigua reports-api usa políticas anónimas anteriores.
+
 Nombre público separado, migración 24, edición en Mi cuenta y presentación dinámica en TOPs/palets/stock compartido/colaboradores/invitaciones. Auditoría previa: 6 cuentas pendientes, sin colisiones; validación PostgreSQL aislado y SQLite en docs/NOMBRES-PUBLICOS.md. Confirmar migración en Render y Safari real. Mantener name privado y relaciones por ID.
 
 Font Awesome Free 6.7.2 local, Solid/Brands y precache shell-v10. Mediciones locales, inventario, validaciones y reversión en docs/ICONOGRAFIA-LOCAL.md. CDN anterior bloqueado en el entorno: no hay comparación fiable de latencia; medir Render/Safari real y cabeceras Apache.

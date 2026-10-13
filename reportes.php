@@ -1,5 +1,14 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__.'/includes/reports.php';
+header('Cache-Control: no-store');
+require_account(($_GET['queue']??'')==='1'?'moderacion':'reportes');
+if(($_GET['queue']??'')==='1'&&!can_edit_catalog(database(),current_user())){
+    http_response_code(403);header('Cache-Control: no-store');
+    $paginaCuenta=true;include __DIR__.'/vistas/header.vista.php';
+    echo '<main class="reports-main"><h1>No tenés permiso para acceder.</h1><p>La moderación está disponible para el equipo autorizado.</p><a href="index.php">Volver al inicio</a></main>';
+    include __DIR__.'/vistas/footer.vista.php';exit;
+}
 require_once __DIR__.'/includes/report-log-filters.php';
 require_once __DIR__.'/includes/stock-icons.php';
 $paginaCuenta = true; $paginaReportes = true;
