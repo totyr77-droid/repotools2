@@ -90,11 +90,13 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/device-workspace.css?v=20261013-settings1" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaCuenta) && current_user()): ?><link href="css/settings.css?v=20261013-settings1" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
+<!-- Development-only marker: exclude this integration when publishing to main. -->
+<link href="css/development.css?v=20261013-beta1" rel="stylesheet">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
       <div class="header-contenedor">
-        <a class="logo" href="./" aria-label="Inicio Repotools"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"></a>
+        <a class="logo" href="./" aria-label="Inicio Repotools — versión beta"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"><span class="development-badge">BETA</span></a>
 
         <nav class="nav" aria-label="Navegacion principal">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
