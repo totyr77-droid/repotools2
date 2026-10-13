@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Introducción opcional de cuatro pasos en Inicio y replay en Configuración, localStorage por identidad/navegador. Pruebas, limitaciones y reversión en docs/INTRODUCCION.md; Safari real pendiente. No hay migraciones ni cambios funcionales de escáner/Stock.
+
 Preview social 1200×630, metadatos centrales y canonical depurado: docs/PREVIEW-SOCIAL.md. Pruebas locales pasan; verificar acceso público tras Render y caché de plataformas. Pitido conservado: usuario confirmó iPhone en silencio; probar sonido con silencio desactivado y música, sin prometer mezcla física.
 
 Aviso «Modo sin conexión preparado» flotante superior durante 2,4 segundos; entra y sale sin desplazar contenido. Detalles y reversión en CHANGELOG.

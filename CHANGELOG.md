@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Introducción opcional
+
+Guía breve de cuatro pasos, omitir/X/Escape, estado versionado por identidad local y replay desde Configuración. Se evita abrirla durante interacción, carga o ventanas críticas. Accesibilidad, móvil/PC y mano preferida; pruebas onboarding, conexión celular-PC y PWA pasan. Detalle/reversión en docs/INTRODUCCION.md; no cambia DB ni negocio.
+
 ## 13/10/2026 — Tarjeta social y canonical
 
 Preview PNG de marca 1200×630, helper central de metadatos, título/description/canonical y Twitter large image sin duplicados ni datos personales. Pruebas de imagen HTTP, formatos compartidos y privacidad pasan. Informe y reversión en docs/PREVIEW-SOCIAL.md. Audio sin cambios: iPhone en modo silencio explica el pitido ausente con ambient; prueba física pendiente.

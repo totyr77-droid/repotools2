@@ -53,6 +53,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <script src="https://kit.fontawesome.com/d9b377fc7f.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
     <link href="css/loading.css?v=20261013-loading1" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=20261013-intro1" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <link href="css/contador.css" rel="stylesheet" type="text/css">

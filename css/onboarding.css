@@ -1,0 +1,18 @@
+.onboarding-dialog{width:min(480px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);box-sizing:border-box;margin:auto;padding:24px;border:1px solid #39324f;border-radius:20px;background:#17132c;color:#fff;overflow:auto;overscroll-behavior:contain}
+.onboarding-dialog::backdrop{background:#17132c99}
+.onboarding-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.onboarding-heading img{display:block;width:44px;height:44px;object-fit:contain}
+.onboarding-dialog .onboarding-close{position:static;display:grid;place-items:center;width:44px;height:44px;min-height:44px;padding:10px;border:0;border-radius:12px;background:#ffffff12;color:#fff}
+.onboarding-close svg{width:22px;height:22px}
+.onboarding-content{text-align:center;min-height:182px}
+#onboardingIcon{width:54px;height:54px;margin:0 auto 16px;display:block;color:#c7bcff}
+.onboarding-content h2{font-size:1.4rem;line-height:1.3;color:#fff;margin:0 0 12px}
+.onboarding-content p{font-size:1rem;line-height:1.6;color:#dad6e7;margin:0}
+.onboarding-progress{font-size:.8rem;color:#aaa2c0;text-align:center;margin:16px 0}
+.onboarding-actions{display:flex;gap:10px}.onboarding-actions button{flex:1;min-width:0;min-height:46px;border:0;border-radius:12px;display:flex;justify-content:center;align-items:center;gap:8px;padding:12px;font:inherit;font-size:.95rem;cursor:pointer}
+.onboarding-secondary{background:#ffffff12;color:#e1dceb}.onboarding-primary{background:#c8bdff;color:#27187e;font-weight:600}.onboarding-primary svg{width:20px;height:20px}
+.onboarding-replay{display:inline-flex;align-items:center;gap:8px;background:#f0edf8;color:#27187e;border:1px solid #e1dced;border-radius:10px;padding:10px 12px;min-height:44px;margin-top:12px;cursor:pointer;font:inherit;font-size:.85rem}.onboarding-replay svg{width:20px;height:20px}
+.onboarding-dialog button:focus-visible,.onboarding-replay:focus-visible{outline:2px solid #a69aff;outline-offset:3px}
+@media(max-width:768px) and (pointer:coarse){body[data-hand=left] .onboarding-heading{flex-direction:row-reverse}body[data-hand=left] .onboarding-actions{flex-direction:row-reverse}}
+@media(max-height:550px){.onboarding-dialog{padding:16px}.onboarding-heading{margin-bottom:10px}.onboarding-content{min-height:0}#onboardingIcon{width:38px;height:38px;margin-bottom:10px}.onboarding-content h2{font-size:1.2rem}.onboarding-content p{font-size:.9rem}.onboarding-progress{margin:12px 0}}
+@media(prefers-reduced-motion:reduce){.onboarding-dialog[open],.onboarding-dialog[open]::backdrop{animation:none}}
