@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Tarjeta social y canonical
+
+Preview PNG de marca 1200×630, helper central de metadatos, título/description/canonical y Twitter large image sin duplicados ni datos personales. Pruebas de imagen HTTP, formatos compartidos y privacidad pasan. Informe y reversión en docs/PREVIEW-SOCIAL.md. Audio sin cambios: iPhone en modo silencio explica el pitido ausente con ambient; prueba física pendiente.
+
 ## 13/10/2026 — Aviso offline flotante
 
 Aviso de preparación fuera del flujo: posición fija superior, entrada/bajada y salida hacia arriba; confirmación dura 2,4 segundos en lugar de 6. Conserva colores, icono, role=status y reduce movimiento según preferencia. No modifica caché ni service worker. Validación: sintaxis JS, PHP lint y prueba offline-start. Revertir css/device-workspace.css, js/offline-cache.js y versión del pie desde 0d0b1c2.
