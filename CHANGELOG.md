@@ -79,3 +79,6 @@ Reversión de presentación/PWA/documentación: revertir el commit completo de e
 - Validaci?n: Stock y Moderaci?n pasan; Moderaci?n a?ade control de altura >200 px del cuerpo y tama?os 320/390 con alto600 y PC1366/900. PHP lint y JS syntax pasan. Capturas Chrome revisadas; Safari f?sico pendiente. Mapas externos simulados en las pruebas.
 - Perfil inicial local en docs/RENDIMIENTO.md y dos pruebas reproducibles. No se aplicaron optimizaciones de DB ni se toc? producci?n.
 - Revertir esta entrega restaurando CSS, product-info, cache versions header/footer y pruebas desde la entrega anterior 0a2a8f2. No borrar datos ni modificar esquema.
+# Corrección de bienvenida — 13/10/2026
+
+Logo publicado como `img/onboarding-logo.png` y ruta absoluta en la bienvenida: el archivo original existía localmente pero no en Git. Validación: carga y dimensiones de la imagen en la prueba de introducción. Reversión: restaurar la vista desde d0e6391 y retirar el nuevo PNG.
