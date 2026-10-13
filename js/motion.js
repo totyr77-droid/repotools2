@@ -1,6 +1,7 @@
 (() => {
  const groups='.main-scan-modes,.hand-options,.stock-tabs,.reports-tabs,.reports-state-tabs,.library-collections,.branch-picker-tabs,.branch-shortcuts,.share-mode-tabs,.tops-periods,.offline-tabs,.nav,.nav-celular';
  const panels='#reportsList,#collectionPanel,#palletProducts,#ownedPanel,#pendingPanel,#sharedSection,#adminPanel,#stockShareResult,#palletBranchPreview,#mainRapidPanel,#userWorkspace,#userProfile,#userDirectoryList,#topsRanking,#offlineContent,#stockSearchResults,.library-status,.report-photo-request,.report-more-data,.report-sender-data,.library-empty-notice';
+ const fields='#stockPackLabel,#stockEanLabel,#userEditEmailLabel,#offlineStockFields,.library-status';
  const ignored='.ean-reader,video,canvas,.branch-map,.leaflet-container,.maplibregl-map';
  function mount(body,page){
    let frame=0,disposed=false;const tracked=new Map(),dirty=new Set(),animations=new Set(),lastReveal=new WeakMap(),reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -9,7 +10,7 @@
    window.addEventListener('repotools:navigated',enterPage);window.addEventListener('repotools:page-ready',enterPage);
    const stopAnimation=animation=>{animation.cancel();animations.delete(animation);};
    function reveal(node){
-     if(/ScannerStatus|mainScannerStatus/.test(node.id)||node.closest('.repotools-send-toast')||disposed||reduced.matches||!node.isConnected||!node.getClientRects().length||node.closest(ignored)||node.getAttribute('aria-busy')==='true'||typeof node.animate!=='function')return;
+     if(node.classList.contains('motion-field')&&CSS.supports('interpolate-size','allow-keywords')||/ScannerStatus|mainScannerStatus/.test(node.id)||node.closest('.repotools-send-toast')||disposed||reduced.matches||!node.isConnected||!node.getClientRects().length||node.closest(ignored)||node.getAttribute('aria-busy')==='true'||typeof node.animate!=='function')return;
      const now=performance.now();if(now-(lastReveal.get(node)||-1000)<300)return;lastReveal.set(node,now);
      const animation=node.animate([{opacity:.65,translate:'0 4px'},{opacity:1,translate:'0 0'}],{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});animations.add(animation);animation.finished.catch(()=>{}).finally(()=>animations.delete(animation));
    }
@@ -33,7 +34,7 @@
    function schedule(group){if(group)dirty.add(group);if(!frame&&!disposed)frame=requestAnimationFrame(flush);}
    const resize=typeof ResizeObserver==='function'?new ResizeObserver(entries=>entries.forEach(entry=>schedule(entry.target))):null;
    function register(group){if(tracked.has(group))return;const position=group.style.position;if(getComputedStyle(group).position==='static')group.style.position='relative';tracked.set(group,{position,background:null});resize?.observe(group);schedule(group);}
-   function discover(root){if(root.nodeType!==1||root.closest(ignored))return;if(root.matches(groups))register(root);root.querySelectorAll(groups).forEach(register);}
+   function discover(root){if(root.nodeType!==1||root.closest(ignored))return;const smallField=node=>{if(!/ScannerStatus|mainScannerStatus/.test(node.id)&&!node.closest(ignored))node.classList.add('motion-field');};if(root.matches(fields))smallField(root);root.querySelectorAll(fields).forEach(smallField);if(root.matches(groups))register(root);root.querySelectorAll(groups).forEach(register);}
    discover(body);
    const observer=new MutationObserver(records=>{
      for(const record of records){const target=record.target;if(target.nodeType!==1||target.closest(ignored))continue;
@@ -56,5 +57,13 @@
    if(!document.documentElement.classList.contains('is-loading'))enterPage();
    page?.onLeave(cleanup);return cleanup;
  }
- window.RepoMotion??={mount};window.RepoMotion.mount(document.body,window.RepoNavigation?.page);
+ function retire(node){
+   // Resolve the user's decision immediately; only defer removal of its visual shell.
+   node.inert=true;node.removeAttribute('aria-labelledby');node.removeAttribute('aria-describedby');node.querySelectorAll('[id]').forEach(child=>child.removeAttribute('id'));
+   if(matchMedia('(prefers-reduced-motion: reduce)').matches||!CSS.supports('overlay','auto')){node.remove();return;}
+   const running=node.getAnimations();if(!running.length){node.remove();return;}
+   let timer=setTimeout(()=>node.remove(),280);
+   Promise.allSettled(running.map(animation=>animation.finished)).then(()=>{clearTimeout(timer);node.remove();});
+ }
+ window.RepoMotion={mount,retire};window.RepoMotion.mount(document.body,window.RepoNavigation?.page);
 })();

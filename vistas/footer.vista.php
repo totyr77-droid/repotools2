@@ -80,7 +80,7 @@
 <script src="js/dialog-scroll.js?v=20261011-lock1"></script>
 <script src="js/title-icons.js?v=20261011-icons1"></script>
 
-<script src="js/botones.js?v=20261012-devices"></script>
+<script src="js/botones.js?v=20261013-motion2"></script>
 <script src="js/report-notifications.js?v=20261011-pendingcounts1"></script>
 <script src="js/notifications.js?v=20261011-compactpalets17"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261013-zoom2"></script><script src="js/public-name.js?v=20261013-public1"></script><script src="js/account-edit.js?v=20261011-dialog2"></script><script src="js/account-security.js?v=20261011-security2"></script><?php endif; ?>
@@ -91,6 +91,6 @@
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261013-activity1"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261013-overview1"><script src="js/stock-overview.js?v=20261013-overview1"></script><?php endif; ?>
-<script src="js/motion.js?v=20261013-global1"></script>
+<script src="js/motion.js?v=20261013-global2"></script>
 </body>
 </html>

@@ -94,7 +94,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/development.css?v=20261013-beta1" rel="stylesheet">
 <?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261013-activity1" rel="stylesheet"><?php endif; ?>
 <link href="css/responsive.css?v=20261013-workspaces1" rel="stylesheet" type="text/css">
-<link href="css/motion.css?v=20261013-global1" rel="stylesheet">
+<link href="css/motion.css?v=20261013-global2" rel="stylesheet">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>

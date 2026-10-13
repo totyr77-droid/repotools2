@@ -155,3 +155,7 @@ Una etiqueta por A4 horizontal, QR grande con quiet zone, logo negro, número y 
 ## 13/10/2026 — Sistema global de movimiento (desarrollo)
 
 Selectores con un fondo deslizante, microinteracciones y transiciones de paneles/menús/diálogos/navegación; movimiento reducido, cleanup AJAX y exclusión de cámara/mapas. Incluye offline sin librerías nuevas ni cambios de negocio. Navegación liberada al iniciar el fundido. Pruebas, compatibilidad y reversión en docs/MOVIMIENTO-GLOBAL.md.
+
+## 13/10/2026 — Completar transiciones
+
+Salida de flyouts/notificaciones, campos condicionales pequeños y confirmaciones dinámicas sin demorar la decisión. FormData/estados/permisos intactos; fallback inmediato, reduced motion y scanner excluido. Pruebas específicas y reversión en docs/MOVIMIENTO-GLOBAL.md. Safari físico pendiente.

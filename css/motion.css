@@ -42,3 +42,20 @@ dialog:not([open]),dialog:not([open])::backdrop { pointer-events:none; }
 /* Entrance transforms must never create a sideways scroll, including offline. */
 html,body { overflow-x:clip; }
 .offline-tabs { overflow:hidden; border-radius:12px; }
+/* Complete entry/exit for small fields and flyouts, without postponing state changes. */
+@supports (transition-behavior:allow-discrete) {
+ :is(.library-settings-menu,.stock-export-menu,.notification-panel) { opacity:0; translate:0 -5px; transition:opacity var(--motion-panel) ease,translate var(--motion-panel) var(--motion-ease),display var(--motion-panel) allow-discrete; animation:none!important; }
+ :is(.library-settings,.stock-export)::details-content { transition:content-visibility var(--motion-panel) allow-discrete; }
+ :is(.library-settings,.stock-export)[open]>:is(.library-settings-menu,.stock-export-menu),.notification-panel:not([hidden]) { opacity:1; translate:0 0; }
+ :is(.library-settings,.stock-export):not([open])>:is(.library-settings-menu,.stock-export-menu),.notification-panel[hidden] { pointer-events:none; }
+ @starting-style { :is(.library-settings,.stock-export)[open]>:is(.library-settings-menu,.stock-export-menu),.notification-panel:not([hidden]) { opacity:0; translate:0 -5px; } }
+}
+@supports (interpolate-size:allow-keywords) and (transition-behavior:allow-discrete) {
+ .motion-field { interpolate-size:allow-keywords; height:auto; overflow:clip; transition:height var(--motion-panel) var(--motion-ease),opacity var(--motion-panel) ease,display var(--motion-panel) allow-discrete; }
+ .motion-field[hidden],.library-status.motion-field:empty { height:0; min-height:0; opacity:0; pointer-events:none; }
+ @starting-style { .motion-field:not([hidden]):not(:empty) { height:0; opacity:0; } }
+}
+@media(prefers-reduced-motion:reduce) {
+ .motion-field,.library-settings-menu,.stock-export-menu,.notification-panel { transition:none!important; }
+}
+.motion-field[hidden] { display:none!important; }

@@ -14,6 +14,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Cierre de lista de animaciones: campos pequeños, salida de menús/notificaciones y confirmaciones sin demora lógica; global2/SW-v13. Pruebas/reversión docs/MOVIMIENTO-GLOBAL.md. Queda Safari/iPhone físico; no continuar funciones ajenas sin nuevo pedido.
+
 Movimiento global0c15647 en desarrollo, desplegado: portada/JS/CSS betaHTTP200 y hashes correctos verificados por el pedido actual. indicadores deslizantes, microinteracciones, paneles/menús/diálogos/navegación y offline; reducido/hand/cleanup. Cámara y mapas excluidos. Pruebas/reversión docs/MOVIMIENTO-GLOBAL.md. Safari físico pendiente.
 
 Etiquetas A4 horizontal y PDF directo iPhone en desarrollo: una hoja por palet, QR/número/logo negros, avisos completos. HTML/PDF1/2/6 y seis QR renderizados validados; Safari/AirPrint/distancia físicos pendientes. Detalle/reversión docs/ETIQUETAS-HORIZONTAL.md.

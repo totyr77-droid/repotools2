@@ -34,3 +34,13 @@ Revertir el commit: quitar recursos/integación, devolver espera/guard de navega
 Resultado final: regresión completa53 suites JS ejecutada:51 pasan en el lote; Normal/Rápido falló solo por redondeo0,00006px (fixture corregido) y mapa de sucursales agotó una espera de renderizado en paralelo. Ambas suites repetidas tras finalizar el lote pasan; quedan53 suites verificadas, sin afirmar que todas pasaron en una única ejecución paralela. Lint PHP y comprobación sintáctica JS pasan. Ningún fallo conocido de operación permanece reproducible en estas pruebas.
 
 Despliegue comprobado13/10/2026 después del push0c15647: portada pública de betaHTTP200, integra motion.css/motion.js con la versión correcta y mantiene BETA. Ambos recursos devuelven200 y su hash SHA256 coincide con los archivos publicados. El pedido actual de verificar despliegue reemplaza la indicación anterior de omitirlo; la revisión automática aceptó la comprobación al presentarse esa autorización. No se iniciaron sesiones ni se consultaron/modificaron datos privados. No sustituye una prueba física Safari.
+
+## Cierre de la lista — 13/10/2026
+
+Se completan salida de menús/notificaciones, expansión/contracción de campos pequeños y salida visual de confirmaciones creadas dinámicamente. CSS nativo con guardas: hidden/open cambian inmediatamente y los controles ocultos dejan de interceptar toques; valores y FormData intactos. `motion-field` se limita a unidades por caja/EAN, email administrativo, campos offline y avisos, excluyendo estados del lector. En navegadores sin interpolación/discrete se conserva feedback de entrada y cierre inmediato.
+
+`RepoMotion.retire` conserva únicamente la carcasa cerrada de la confirmación mientras termina la transición, con inert y sin IDs duplicados; devuelve la decisión de inmediato. El fallback quita la carcasa al momento. Temporizador de seguridad280ms, sin retrasar operaciones ni una segunda decisión. No hay clones de campos ni cambios de datos/validación/permisos.
+
+Recursos global2 y SW shell-v13. Pruebas motion-completion y motion-ui: alturas, menús, decisiones rápidas, valores de formulario, eliminación y movimiento reducido. Regresiones específicas Ajustes, sucursales/compartir, offline, edición administrativa y Normal/Rápido. Lint/syntax de archivos afectados. De la lista queda validación física Safari/iPhone; no se agregan funciones fuera del sistema de animaciones.
+
+Reversión de este complemento mediante su propio commit, conservando el sistema base0c15647 y la documentación941a6ff.

@@ -25,7 +25,7 @@ window.RepoConfirm = ({ title, message, confirmLabel = 'Eliminar' }) => {
     cancel.addEventListener('click', () => dialog.close());
     accept.addEventListener('click', () => dialog.close('confirmed'));
     dialog.addEventListener('close', () => {
-      const confirmed = dialog.returnValue === 'confirmed'; dialog.remove(); confirmationOpen = false; resolve(confirmed);
+      const confirmed = dialog.returnValue === 'confirmed'; if(window.RepoMotion?.retire)window.RepoMotion.retire(dialog);else dialog.remove(); confirmationOpen = false; resolve(confirmed);
     }, { once: true });
     actions.append(cancel, accept); dialog.append(heading, description, actions); document.body.append(dialog);
     dialog.showModal(); cancel.focus();
