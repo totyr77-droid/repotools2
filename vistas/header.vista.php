@@ -50,7 +50,10 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link rel="apple-touch-icon" href="img/Repotools_Logo_Pack_Blanco/05_apple/apple-touch-icon-180x180.png" sizes="180x180">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <script src="https://kit.fontawesome.com/d9b377fc7f.js" crossorigin="anonymous"></script>
+    <link rel="preload" href="css/vendor/fontawesome-6.7.2/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/vendor/fontawesome-6.7.2/css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/vendor/fontawesome-6.7.2/css/solid.min.css">
+    <link rel="stylesheet" href="css/vendor/fontawesome-6.7.2/css/brands.min.css">
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
     <link href="css/loading.css?v=20261013-loading1" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=20261013-intro1" rel="stylesheet" type="text/css"><?php endif; ?>

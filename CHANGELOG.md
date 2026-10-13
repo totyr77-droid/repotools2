@@ -82,3 +82,6 @@ Reversión de presentación/PWA/documentación: revertir el commit completo de e
 # Corrección de bienvenida — 13/10/2026
 
 Logo publicado como `img/onboarding-logo.png` y ruta absoluta en la bienvenida: el archivo original existía localmente pero no en Git. Validación: carga y dimensiones de la imagen en la prueba de introducción. Reversión: restaurar la vista desde d0e6391 y retirar el nuevo PNG.
+# Font Awesome local — 13/10/2026
+
+Kit sustituido por CSS/fuentes oficiales Free 6.7.2, mismas clases Solid/Brands, preload Solid y caché SW shell-v10. Solo recursos de iconografía nuevos cache-first; sin cambios de negocio. Pruebas local-icons y pwa-presentation pasan. Informe de mediciones/limitaciones y reversión: docs/ICONOGRAFIA-LOCAL.md.
