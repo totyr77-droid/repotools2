@@ -45,18 +45,25 @@ let ultimoAgregado = null;
 let resultadoActual = "";
 let scanResultRevision = 0;
 let viewerRevision = 0;
+let rapidActive = false, rapidCount = 0;
 
 const scanner = window.RepoEANScanner.create('contenedor', {
   onManual: abrirEntradaManual,
+  keepOpen: () => rapidActive,
+  repeatCooldown: 1500,
+  rearmRepeated: true,
+  canAccept: () => !rapidActive || !document.querySelector('dialog[open]:not(#contenedormax)'),
   onCode: codigo => {
     const result = mostrarResultadoEscaneo(codigo);
+    if (rapidActive) { result.catch(() => {}); return; }
     return result;
   },
-  onStatus: text => { document.getElementById('mainScannerStatus').textContent = text; },
+  onStatus: text => { document.getElementById('mainScannerStatus').textContent = rapidActive && text === 'Código confirmado.' ? 'Centrá el próximo EAN.' : text; },
   onError: mostrarErrorScanner
 });
 
 inicializar();
+page?.onLeave(() => { rapidActive = false; ++scannerRevision; ++scanResultRevision; return scanner.stop(); });
 
 function inicializar() {
   cargarListaCompartida();
@@ -65,6 +72,9 @@ function inicializar() {
 }
 
 function bindEventos() {
+  document.getElementById('mainScanNormal')?.addEventListener('click', () => cambiarModoRapido(false));
+  document.getElementById('mainScanRapid')?.addEventListener('click', () => cambiarModoRapido(true));
+  document.getElementById('mainRapidFinish')?.addEventListener('click', cerrarScanner);
   els.borrarD?.addEventListener("click", borrarTodo);
   els.ver?.addEventListener("click", abrirResultados);
   els.cantidadBox?.addEventListener("click", () => {
@@ -259,13 +269,41 @@ function abrirScanner() {
   iniciarScanner();
 }
 
+function actualizarModoRapido() {
+  document.getElementById('mainScanNormal')?.setAttribute('aria-pressed', String(!rapidActive));
+  document.getElementById('mainScanRapid')?.setAttribute('aria-pressed', String(rapidActive));
+  const panel = document.getElementById('mainRapidPanel'); if (panel) panel.hidden = !rapidActive;
+}
+function cambiarModoRapido(enabled) {
+  if (enabled === rapidActive) return;
+  rapidActive = enabled;
+  if (enabled) {
+    rapidCount = 0;
+    document.getElementById('mainRapidCount').textContent = 'Escaneados: 0';
+    document.getElementById('mainRapidLast').textContent = 'Listo para escanear';
+    document.getElementById('mainRapidCode').textContent = '';
+    document.getElementById('mainRapidActions').replaceChildren();
+    document.getElementById('mainRapidPanel').dataset.state = 'idle';
+    document.getElementById('mainScannerTitle').textContent = 'Escaneo rápido';
+  }
+  actualizarModoRapido();
+  // The existing live stream can switch to keepOpen without restarting it.
+  if (!enabled || els.contenedor.hidden) iniciarScanner();
+}
+function mostrarProductoRapido(product) {
+  document.getElementById('mainRapidLast').textContent = product && typeof product === 'object'
+    ? window.RepoProductInfo.summary(product)
+    : typeof product === 'string' ? product : 'Producto no encontrado';
+  if (!product || typeof product === 'string') document.getElementById('mainRapidPanel').dataset.state = 'warning';
+}
+
 async function iniciarScanner() {
   const revision = ++scannerRevision;
   scanResultRevision++;
   resultadoActual = '';
   ultimoAgregado = null;
   els.copy.disabled = true;
-  document.getElementById('mainScannerTitle').textContent = 'Escanea el producto';
+  document.getElementById('mainScannerTitle').textContent = rapidActive ? 'Escaneo rápido' : 'Escanea el producto';
   document.getElementById('scanProductActions')?.replaceChildren();
   els.cartelScaner.style.display = 'none';
   els.contenedor.hidden = false;
@@ -284,12 +322,15 @@ function mostrarErrorScanner() {
 }
 
 function cerrarScanner() {
+  const total = rapidActive ? rapidCount : null;
+  rapidActive = false; actualizarModoRapido();
   scannerRevision++;
   scanResultRevision++;
   resultadoActual = '';
   els.copy.disabled = true;
   els.contenedormax.close();
   scanner.stop().catch(() => {});
+  if (total !== null) window.RepoToast?.(`Escaneados: ${total}`);
 }
 
 async function mostrarResultadoEscaneo(codigo,lectura=true) {
@@ -305,6 +346,23 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
     guardarLista();
   }
   indiceActual = lista.indexOf(codigo) + 1;
+
+  if (rapidActive) {
+    rapidCount++;
+    document.getElementById('mainRapidCount').textContent = `Escaneados: ${rapidCount}`;
+    document.getElementById('mainRapidCode').textContent = codigo;
+    document.getElementById('mainRapidLast').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto agregado';
+    document.getElementById('mainRapidPanel').dataset.state = esDuplicado ? 'warning' : 'success';
+    const actions = document.getElementById('mainRapidActions'); actions.replaceChildren();
+    window.RepoProductInfo.editButton(actions, codigo);
+    actualizarContadores();
+    const input = els.contenedor.querySelector?.('input'); if (input) { input.value = ''; input.focus(); }
+    const product = await buscarProductoPorEAN(codigo);
+    if (revision !== scanResultRevision || !rapidActive || !els.contenedormax.open) return;
+    mostrarProductoRapido(product);
+    actions.replaceChildren(); window.RepoProductInfo.editButton(actions, codigo);
+    return;
+  }
 
   els.contenedor.hidden = true;
   document.getElementById('mainScannerStatus').hidden = true;
@@ -491,6 +549,7 @@ window.quitarOverlay = quitarOverlay;
 (page ? page.listen : window.addEventListener.bind(window))('repotools:product-updated', event => {
   const { ean, product } = event.detail;
   if (els.contenedormax.open && resultadoActual === ean) {
+    if (rapidActive) { mostrarProductoRapido(product); return; }
     window.RepoProductInfo.renderSummary(els.resultadoApi, product);
     document.getElementById('scanProductActions')?.replaceChildren();
     window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), ean);
@@ -508,7 +567,7 @@ async function abrirEntradaManual(){
   document.body.append(dialog);let accepted=false;
   dialog.querySelector('.app-close').addEventListener('click',()=>dialog.close());
   dialog.addEventListener('close',()=>{dialog.remove();if(!accepted&&els.contenedormax.open)iniciarScanner();},{once:true});
-  dialog.querySelector('form').addEventListener('submit',e=>{e.preventDefault();const code=dialog.querySelector('input').value.trim();if(!window.RepoEANScanner.validEAN(code)){dialog.querySelector('[role=status]').textContent='Ingresa un EAN válido de 8 o 13 números.';return;}accepted=true;dialog.close();mostrarResultadoEscaneo(code,false);});dialog.showModal();
+  dialog.querySelector('form').addEventListener('submit',e=>{e.preventDefault();const code=dialog.querySelector('input').value.trim();if(!window.RepoEANScanner.validEAN(code)){dialog.querySelector('[role=status]').textContent='Ingresa un EAN válido de 8 o 13 números.';return;}accepted=true;dialog.close();mostrarResultadoEscaneo(code,false);if(rapidActive)scanner.start().catch(mostrarErrorScanner);});dialog.showModal();
 }
 
 })();

@@ -109,7 +109,7 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, canAccept = () => true, keepOpen = () => false, relayBypass = false }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
@@ -314,7 +314,7 @@
         const current = { reader, accepting: true, token, isQR, validate, confirm: confirmation(validate) };
         session = current;
         const accept = (code, source = 'camera') => {
-          if(current.lastDelivered===code){const elapsed=Date.now()-current.lastDeliveredSeen;current.lastDeliveredSeen=Date.now();if(elapsed<900)return;}
+          if(current.lastDelivered===code){const elapsed=Date.now()-current.lastDeliveredSeen;current.lastDeliveredSeen=Date.now();if(elapsed<repeatCooldown)return;if(rearmRepeated)current.lastDelivered='';}
           if (!current.accepting || session !== current || token !== revision || !canAccept()) return;
           // Con object-fit: cover se confirma únicamente la zona que el usuario
           // ve. El lector oculto usa ese mismo recorte, sin bandas negras.

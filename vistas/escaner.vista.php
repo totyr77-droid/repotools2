@@ -4,9 +4,18 @@
     <h2 id="mainScannerTitle">Escanea el producto</h2>
     <button id="conterdormaxc" class="library-secondary app-close" type="button" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
   </div>
+  <div id="mainScanModes" class="main-scan-modes" role="group" aria-label="Modo de escaneo">
+    <button id="mainScanNormal" class="library-secondary" type="button" aria-pressed="true">Normal</button>
+    <button id="mainScanRapid" class="library-secondary" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 6 6 6-6 6m10-12 6 6-6 6"/></svg>Rápido</button>
+  </div>
   <div id="contenedor" class="ean-reader"></div>
   <p id="mainScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
   <button id="retryMainScanner" class="library-primary" type="button" hidden>Intentar de nuevo</button>
+  <div id="mainRapidPanel" class="main-rapid-panel" hidden>
+    <div class="main-rapid-feedback" role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path class="rapid-check" d="m5 12 4 4 10-10"/><g class="rapid-warning"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3h.01"/></g></svg><span id="mainRapidLast">Listo para escanear</span></div>
+    <div class="main-rapid-meta"><span id="mainRapidCount">Escaneados: 0</span><span class="main-rapid-ean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/></svg><span id="mainRapidCode"></span></span><div id="mainRapidActions"></div></div>
+    <button id="mainRapidFinish" class="library-primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>Finalizar</button>
+  </div>
 
   <div id="cartelScaner">
     <div class="cartelscaner-box">

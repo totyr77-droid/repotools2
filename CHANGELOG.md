@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Punto6: escaneo rápido de Inicio
+
+Modo optativo del principal, captura continua sin reiniciar stream, feedback/contador y Finalizar. Misma lista/estadísticas y confirmación; lectura repetida rearmable tras retirar EAN1500ms solo en Inicio. Configuración predeterminada de otros lectores intacta. Pruebas20 EAN y regresiones/celular-PC pasan; documentación, validación física pendiente y reversión en docs/ESCANEO-RAPIDO.md.
+
 ## 13/10/2026 — Confirmación más audible y vibración compatible
 
 Amplitud del pitido0,18→0,45; pulso60ms cuando el navegador soporta vibración, sin detecciones parciales. Mantiene tono/corrección de silencio150ms y no cambia algoritmo. ean-scanner pasa; iPhone físico pendiente y Safari no ofrece navigator.vibrate. Reversión a680fcde detallada en docs/PITIDO-IPHONE.md.

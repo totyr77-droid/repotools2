@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Punto6: Normal/Rápido solo en Inicio, misma lista y stream, contador de sesión, filtro repetido configurable exclusivo principal1500ms y Finalizar. Pruebas20 EAN/cámara única/duplicados/Normal/otros lectores y revisión320zurdo/390/1366: docs/ESCANEO-RAPIDO.md. Probar Safari/cámara reales y Render. No avanzar Punto7 sin nuevo pedido.
+
 Pitido con mayor amplitud0,45 y vibración60ms al confirmar si navigator.vibrate está disponible; Safari/iPhone sin soporte de esa API. ean-scanner pasa. Probar altavoz, música y háptica en dispositivos reales; docs/PITIDO-IPHONE.md.
 
 Registro pide Nombre y apellido en un único campo, ejemplo Juan Pérez, con al menos dos palabras y máximo80 caracteres validados en servidor. No obliga a modificar cuentas existentes. public-names-ui y lint pasan. Revertir cuenta.php y extensión de prueba a96110df; sin migraciones ni cambios de nombre público.

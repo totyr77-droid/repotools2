@@ -3,8 +3,9 @@ const path = require('node:path');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 class Element {
-  constructor() { this.textContent = ''; this.style = {}; this.disabled = false; this.open = false; }
+  constructor() { this.textContent = ''; this.style = {}; this.disabled = false; this.open = false; this.parentElement = {dataset:{}}; }
   addEventListener() {}
+  setAttribute() {}
   replaceChildren() { this.textContent = ''; }
   showModal() { this.open = true; }
   close() { this.open = false; }
@@ -15,7 +16,7 @@ const storage = new Map([['lista', JSON.stringify(['96385074', '55007732'])]]);
 const copied = [], drawn = [];
 let finishCopy, oldProduct;
 const context = {
-  window: { location: { href: 'https://example.invalid/index.php' }, addEventListener() {}, RepoEANScanner: { create: () => ({ start: async () => {}, stop: async () => {} }), validEAN: code => ['7791234567898', '96385074'].includes(code) }, RepoProductInfo: { show() {}, clear() {}, editButton() {}, get: code => code === '7791234567898' ? new Promise(resolve => oldProduct = resolve) : Promise.resolve({ name: 'Actual', quantity: '1 L' }), summary: product => product.name + ' | ' + product.quantity } },
+  window: { location: { href: 'https://example.invalid/index.php' }, addEventListener() {}, RepoEANScanner: { create: () => ({ start: async () => {}, stop: async () => {} }), validEAN: code => ['7791234567898', '96385074'].includes(code) }, RepoProductInfo: { show() {}, clear() {}, editButton() {}, get: code => code === '7791234567898' ? new Promise(resolve => oldProduct = resolve) : Promise.resolve({ name: 'Actual', quantity: '1 L' }), renderSummary: (target,product) => { target.textContent = typeof product === 'string' ? product : product ? product.name + ' | ' + product.quantity : 'No tenemos información de este producto'; }, summary: product => product.name + ' | ' + product.quantity } },
   document: { getElementById: get, querySelector: get, addEventListener() {}, body: { classList: { add() {}, remove() {} } } },
   localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
   Audio: class { play() { return Promise.resolve(); } },
@@ -73,4 +74,3 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/script.js'), 'utf
   assert.equal(get('ver').disabled, true, 'Ver lista se desactiva sin productos');
   console.log('OK: EAN visible y copiado coinciden, duplicados preservados, producto y portapapeles tardíos no mezclan resultados.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
-
