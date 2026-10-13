@@ -47,3 +47,10 @@ Reversión de presentación/PWA/documentación: revertir el commit completo de e
 - Regresiones: `tests/ean-scanner.cjs`, `tests/navigation.cjs`, `tests/navigation-timeouts.cjs`, `tests/device-connection-ui.cjs` y `tests/offline-start.cjs` pasan. No quedan cargas externas de Html5Qrcode en código publicable. sw.js, IndexedDB, APIs y algoritmos no cambiaron.
 - No se ejecutó instalación física ni cámara real en Safari/iPhone/Android; verificar tras despliegue. Tampoco se confirma el fin del despliegue Render por publicar código.
 - El historial anterior se preservó completo con sus bytes originales; algunas notas históricas tienen codificación mixta. Los documentos actuales son UTF-8 y no repiten como pendientes funciones ya implementadas.
+
+## 13/10/2026 ? Cr?ditos discretos y altura del mapa
+
+- Cuerpo desplazable de sucursales usa flex-basis auto para evitar colapso en el tama?o intr?nseco del dialog. Guardar permanece fuera del scroll. Atribuciones mapa/Geoapify peque?as y legibles; informaci?n de producto muestra procedencia OFF/licencia si fuente o foto corresponde. No se ocultan atribuciones ni se alteran mapas, permisos o esc?ner.
+- Validaci?n: Stock y Moderaci?n pasan; Moderaci?n a?ade control de altura >200 px del cuerpo y tama?os 320/390 con alto600 y PC1366/900. PHP lint y JS syntax pasan. Capturas Chrome revisadas; Safari f?sico pendiente. Mapas externos simulados en las pruebas.
+- Perfil inicial local en docs/RENDIMIENTO.md y dos pruebas reproducibles. No se aplicaron optimizaciones de DB ni se toc? producci?n.
+- Revertir esta entrega restaurando CSS, product-info, cache versions header/footer y pruebas desde la entrega anterior 0a2a8f2. No borrar datos ni modificar esquema.

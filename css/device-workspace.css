@@ -158,7 +158,7 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 /* Sucursales: mapa primero y confirmación fuera del área desplazable. */
 :is(#branchDialog,#palletBranchDialog,#manageBranchDialog)[open]{display:flex;flex-direction:column;overflow:hidden;max-height:calc(100dvh - 32px)}
 :is(#branchDialog,#palletBranchDialog,#manageBranchDialog)>.library-heading{flex:none;margin-bottom:10px}
-.branch-dialog-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:8px;scroll-padding:12px}
+.branch-dialog-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:8px;scroll-padding:12px}
 .branch-dialog-footer{display:flex;justify-content:flex-end;gap:8px;flex:none;padding-top:10px;border-top:1px solid #edf0f5;background:white;z-index:3}
 .branch-dialog-footer button{min-width:180px;margin:0}
 #palletBranchDialog:has(#branchPicker[hidden])>.branch-dialog-footer,#palletBranchDialog:has(#palletBranchCreateSlot:not([hidden])) #savePalletBranch{display:none}
@@ -180,3 +180,9 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 .branch-dialog-body :is(input,textarea){margin-top:0}
 @media(max-width:768px){.branch-dialog-footer button{width:100%;min-width:0}}
 @media(max-width:768px) and (pointer:coarse){body[data-hand=left] .branch-map-controls{left:10px;right:auto}}
+/* Atribuciones legibles y discretas, sin ocultar la procedencia. */
+.branch-map .leaflet-control-attribution,.branch-map .maplibregl-ctrl-attrib{font-size:10px!important;line-height:1.4!important;max-width:100%;white-space:normal;background:rgba(255,255,255,.9)}
+.branch-map .maplibregl-ctrl-attrib a,.branch-map .leaflet-control-attribution a{color:#586176!important;font-weight:400}
+.branch-place-suggestions>a{font-size:10px;color:#586176;line-height:1.5}
+.product-source-credit{display:block;margin-top:12px;font-size:11px;line-height:1.5;color:#626b7a;overflow-wrap:anywhere}
+.product-source-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}

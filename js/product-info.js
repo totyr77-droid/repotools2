@@ -119,6 +119,15 @@
         term.textContent = label; detail.textContent = value; row.append(term, detail); list.append(row);
       }
       container.append(list);
+      if (product.source === 'openfoodfacts' || product.image_source === 'openfoodfacts') {
+        const credit = document.createElement('small'); credit.className = 'product-source-credit';
+        const source = document.createElement('a'); source.href = 'https://world.openfoodfacts.org/product/' + encodeURIComponent(ean);
+        source.target = '_blank'; source.rel = 'noopener'; source.textContent = 'Open Food Facts';
+        credit.append('Fuente: ', source, ' · ');
+        const license = document.createElement('a'); license.href = 'https://world.openfoodfacts.org/data';
+        license.target = '_blank'; license.rel = 'noopener'; license.textContent = product.image_source === 'openfoodfacts' ? 'ODbL · Foto CC BY-SA' : 'ODbL';
+        credit.append(license); container.append(credit);
+      }
       if (!list.children.length && !product.name) { status.textContent = 'Este producto todavía no tiene características cargadas.'; container.append(status); }
     } catch {
       if (activeRequests.get(container) !== token) return;

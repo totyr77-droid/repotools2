@@ -11,3 +11,5 @@ Mapa de sucursales primero en Stock/Moderación, sugerencias de tres en tres y c
 Al retomar: probar instalación y modo avión en teléfono real, verificar despliegue/cabeceras Render y configurar Geoapify. Detalles y demás pendientes en ROADMAP. No afirmar puntuación objetiva ni compatibilidad física sin pruebas.
 
 Mantener minimalismo, SVG, comodidad móvil, preferencia de mano y adaptación PC. Validar permisos en servidor, conservar cambios locales y documentar validación/reversión. No publicar credenciales, datos privados ni bases.
+
+Actualizaci?n posterior: cr?ditos discretos y cuerpo del mapa sin colapso, validado Chrome m?vil/PC; Safari real pendiente. Perfil local en docs/RENDIMIENTO.md: continuar con medici?n Render/Neon antes de optimizar. No hay cambios de esquema.
