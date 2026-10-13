@@ -89,5 +89,6 @@
 <?php include __DIR__ . '/onboarding.vista.php'; ?>
 <script src="js/onboarding.js?v=20261013-transition1"></script>
 <?php endif; ?>
+<?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
 </body>
 </html>

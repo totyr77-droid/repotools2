@@ -204,6 +204,12 @@ function initialize_database(PDO $db): void {
             }
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(25)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 26')->fetchColumn()) {
+            // Existing user-first indexes do not cover date-range rankings.
+            $db->exec('CREATE INDEX scans_period_user_code ON scan_events(created_at,user_id,code)');
+            $db->exec('CREATE INDEX rewards_period_user ON report_rewards(created_at,user_id)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(26)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();
