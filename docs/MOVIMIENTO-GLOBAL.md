@@ -44,3 +44,5 @@ Se completan salida de menús/notificaciones, expansión/contracción de campos 
 Recursos global2 y SW shell-v13. Pruebas motion-completion y motion-ui: alturas, menús, decisiones rápidas, valores de formulario, eliminación y movimiento reducido. Regresiones específicas Ajustes, sucursales/compartir, offline, edición administrativa y Normal/Rápido. Lint/syntax de archivos afectados. De la lista queda validación física Safari/iPhone; no se agregan funciones fuera del sistema de animaciones.
 
 Reversión de este complemento mediante su propio commit, conservando el sistema base0c15647 y la documentación941a6ff.
+
+Complemento7e5cbf0 desplegado y verificado: tras una espera breve, portada integra global2 y JS/CSS devuelvenHTTP200 con SHA256 igual a Git. Main intacto. Pruebas específicas del complemento aprobadas; la validación física Safari/iPhone permanece pendiente.

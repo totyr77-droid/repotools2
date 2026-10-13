@@ -2,9 +2,9 @@
 
 ## Rama de trabajo — 13/10/2026
 
-IMPORTANTE: distintivo BETA junto al logo exclusivo desarrollo, css/development.css e integración en vistas/header.vista.php. Por pedido explícito NUNCA llevar este distintivo a main; excluir este commit y sus fragmentos al publicar o fusionar mejoras futuras. El usuario confirma que ya creó el servicio Render de prueba; su URL y verificación Live todavía no se recibieron. Mantener el marcador en desarrollo.
+IMPORTANTE: distintivo BETA junto al logo exclusivo desarrollo, css/development.css e integración en vistas/header.vista.php. Por pedido explícito NUNCA llevar este distintivo a main; excluir este commit y sus fragmentos al publicar o fusionar mejoras futuras. Servicio de beta confirmado: https://repotools-desarrollo.onrender.com/ . Portada y recursos públicos verificados; mantener el marcador exclusivamente en desarrollo.
 
-Entorno de prueba preparado: nuevo proyecto Neon vacío repotools-desarrollo (`square-bonus-56273687`) y render-desarrollo.yaml, exclusivamente servicio nuevo Free en rama desarrollo. El original rechazó schema-only por límite de ramas; no se borraron ramas ni copiaron datos. Falta usuario crear Blueprint en Render, pegar conexión del proyecto nuevo, esperar Live y fijar APP_URL con la URL de prueba. Pasos y validación pendiente en docs/DESARROLLO-RENDER.md. No copiar DATABASE_URL/grupos privados de producción.
+Entorno de prueba preparado: nuevo proyecto Neon vacío repotools-desarrollo (`square-bonus-56273687`) y render-desarrollo.yaml, exclusivamente servicio nuevo Free en rama desarrollo. El original rechazó schema-only por límite de ramas; no se borraron ramas ni copiaron datos. La preparación de Blueprint y APP_URL descrita aquí es histórica; el servicio de beta ya existe. No inferir ni modificar variables privadas desde esa comprobación pública. Pasos y validación pendiente en docs/DESARROLLO-RENDER.md. No copiar DATABASE_URL/grupos privados de producción.
 
 Por pedido del usuario, continuar en la rama `desarrollo`, creada desde `main` en `3014899`. Los nuevos commits y pushes deben ir a `desarrollo`. No fusionar ni publicar esos cambios en `main` hasta que el usuario lo indique explícitamente. El servicio público debe conservar su rama `main`; una prueba remota requerirá un servicio independiente, sin cambiar el despliegue actual ni usar datos de producción para pruebas destructivas.
 
@@ -14,7 +14,7 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
-Cierre de lista de animaciones: campos pequeños, salida de menús/notificaciones y confirmaciones sin demora lógica; global2/SW-v13. Pruebas/reversión docs/MOVIMIENTO-GLOBAL.md. Queda Safari/iPhone físico; no continuar funciones ajenas sin nuevo pedido.
+Cierre de lista de animaciones7e5cbf0 publicado y confirmado en beta (global2, HTTP200 y hashes iguales a Git): campos pequeños, salida de menús/notificaciones y confirmaciones sin demora lógica; global2/SW-v13. Pruebas/reversión docs/MOVIMIENTO-GLOBAL.md. Queda Safari/iPhone físico; no continuar funciones ajenas sin nuevo pedido.
 
 Movimiento global0c15647 en desarrollo, desplegado: portada/JS/CSS betaHTTP200 y hashes correctos verificados por el pedido actual. indicadores deslizantes, microinteracciones, paneles/menús/diálogos/navegación y offline; reducido/hand/cleanup. Cámara y mapas excluidos. Pruebas/reversión docs/MOVIMIENTO-GLOBAL.md. Safari físico pendiente.
 
