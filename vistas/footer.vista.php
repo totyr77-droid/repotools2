@@ -90,6 +90,6 @@
 <script src="js/onboarding.js?v=20261013-transition1"></script>
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
-<?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261013-activity1"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><?php endif; ?>
+<?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261013-activity1"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261013-overview1"><script src="js/stock-overview.js?v=20261013-overview1"></script><?php endif; ?>
 </body>
 </html>

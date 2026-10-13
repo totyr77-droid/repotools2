@@ -37,9 +37,17 @@ function pallet_activity_list(PDO $db,int $user,int $id,int $cursor=0,int $limit
     $limit=max(1,min(30,$limit));$args=[$id];$filter='';if($cursor>0){$filter=' AND a.id<?';$args[]=$cursor;}
     // One join for actors; a batched member lookup below avoids per-event queries.
     $rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,u.public_name FROM pallet_activity a LEFT JOIN users u ON u.id=a.user_id WHERE a.pallet_id=?{$filter} ORDER BY a.id DESC LIMIT ".($limit+1),$args)->fetchAll();
-    $more=count($rows)>$limit;$rows=array_slice($rows,0,$limit);$memberIds=[];
+    $more=count($rows)>$limit;$rows=array_slice($rows,0,$limit);
+    return ['items'=>pallet_activity_present($db,$rows),'next_cursor'=>$more?(int)end($rows)['id']:null];
+}
+function pallet_activity_recent(PDO $db,int $user): array {
+    $rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,u.public_name,p.code FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id WHERE p.released=0 AND p.activated=1 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access v WHERE v.pallet_id=p.id AND v.user_id=? AND v.status='accepted')) ORDER BY a.id DESC LIMIT 5",[$user,$user])->fetchAll();
+    $items=pallet_activity_present($db,$rows);foreach($items as $i=>&$item)$item['code']=$rows[$i]['code'];unset($item);return $items;
+}
+function pallet_activity_present(PDO $db,array $rows): array {
+    $memberIds=[];
     foreach($rows as &$row){$row['metadata']=json_decode($row['metadata'],true)??[];if(isset($row['metadata']['member_id']))$memberIds[]=(int)$row['metadata']['member_id'];}unset($row);
     $members=[];if($memberIds){$ids=array_values(array_unique($memberIds));foreach(stock_query($db,'SELECT id,public_name FROM users WHERE id IN ('.implode(',',array_fill(0,count($ids),'?')).')',$ids)->fetchAll() as $member)$members[(int)$member['id']]=$member['public_name'];}
     $items=[];foreach($rows as $row){$meta=$row['metadata'];if(isset($meta['member_id'])){$meta['member']=get_public_user_name(['public_name'=>$members[$meta['member_id']]??'','name'=>'Usuario']);unset($meta['member_id']);}$items[]=['action'=>$row['action'],'metadata'=>$meta,'actor'=>get_public_user_name(['public_name'=>$row['public_name'],'name'=>'Usuario']),'created_at'=>$row['created_at']];}
-    return ['items'=>$items,'next_cursor'=>$more?(int)end($rows)['id']:null];
+    return $items;
 }
