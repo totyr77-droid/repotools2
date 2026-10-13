@@ -30,6 +30,8 @@ Moderación incluye reportes pendientes/resueltos; rangos autorizados administra
 
 Sucursales: `js/branch-maps.js` comparte Leaflet/MapLibre; mapa vectorial con respaldo raster. Al marcar un punto, `api/direccion-sucursal.php` busca primero DB dentro200m; Es otro local consulta Geoapify si está configurado. Se confirma antes de guardar en directorio común. La clave permanece en servidor; caché temporal no reemplaza la DB. La cuota local por instancia no garantiza la cuota global del proveedor.
 
+El selector abre primero el mapa. Alta/edición muestra el mapa arriba y tres sugerencias por vez, conservando las demás en memoria. Controles de centrar/quitar se integran en el mapa; confirmación queda fuera del área desplazable y conserva la asociación nativa con cada formulario. Limpiar el punto no elimina una sucursal: requiere guardar el formulario para persistir ese cambio.
+
 ## Offline y PWA
 
 Un único service worker: `sw.js`, registrado por `js/offline-cache.js`. Shell actualv9 con `offline.html`; no se cachean APIs privadas. Navegaciones cubiertas muestran shell offline al fallar la red. Requiere preparar recursos con conexión en el mismo origen antes de usarlos offline.

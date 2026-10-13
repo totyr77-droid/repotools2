@@ -154,3 +154,29 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 .branch-place-suggestions{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border-radius:12px;background:var(--surface-soft,#f2f0fa);margin-top:12px;grid-column:1/-1}.branch-place-suggestions[hidden]{display:none}.branch-place-suggestions>small{flex-basis:100%;color:var(--text-muted,#5f6475)}.branch-place-suggestions a{font-size:11px;color:inherit}.branch-place-suggestions button{white-space:normal;text-align:start;min-height:44px}.branch-place-suggestions[aria-busy=true]{opacity:.75}
 
 .header-contenedor .logo img{display:block;width:144px;max-width:100%;height:auto;flex:none}@media(min-width:1024px){.header-contenedor .logo img{width:160px}}
+
+/* Sucursales: mapa primero y confirmación fuera del área desplazable. */
+:is(#branchDialog,#palletBranchDialog,#manageBranchDialog)[open]{display:flex;flex-direction:column;overflow:hidden;max-height:calc(100dvh - 32px)}
+:is(#branchDialog,#palletBranchDialog,#manageBranchDialog)>.library-heading{flex:none;margin-bottom:10px}
+.branch-dialog-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:8px;scroll-padding:12px}
+.branch-dialog-footer{display:flex;justify-content:flex-end;gap:8px;flex:none;padding-top:10px;border-top:1px solid #edf0f5;background:white;z-index:3}
+.branch-dialog-footer button{min-width:180px;margin:0}
+#palletBranchDialog:has(#branchPicker[hidden])>.branch-dialog-footer,#palletBranchDialog:has(#palletBranchCreateSlot:not([hidden])) #savePalletBranch{display:none}
+#palletBranchDialog:has(#palletBranchCreateSlot:not([hidden])) #saveBranchSubmit{display:inline-flex}
+#branchForm>.branch-point-details,#manageBranchForm>.branch-point-details{grid-column:1/-1;margin:0}
+#branchForm>.branch-point-details>summary,#manageBranchForm>.branch-point-details>summary{min-height:36px}
+:is(#branchPointMap,#manageBranchMap,#branchLocationMap){height:clamp(230px,38dvh,360px);max-height:42dvh}
+.branch-map-controls{position:absolute;right:10px;bottom:28px;display:flex;gap:6px;z-index:500}
+.branch-map-controls button{width:44px;height:44px;min-height:44px;padding:10px;background:rgba(255,255,255,.94);border:1px solid #ded9e9;border-radius:12px;color:#27187e;box-shadow:0 2px 8px #17203320}
+.branch-map-controls button svg{width:22px;height:22px}
+.branch-place-suggestions{gap:6px;padding:10px;margin:0;font-size:.82rem}
+.branch-place-suggestions>.branch-nearby-option{flex:1 1 100%;justify-content:flex-start;padding:9px 10px;font-size:.82rem;line-height:1.35}
+.branch-suggestion-pages{display:flex;gap:6px;justify-content:flex-end;flex-basis:100%}
+.branch-suggestion-pages button{width:40px;min-height:40px;padding:8px}
+.branch-suggestion-pages button:disabled{opacity:.35;cursor:default}
+.branch-dialog-body :is(form,fieldset){gap:10px}
+#branchFormFields,#manageBranchForm{gap:10px 16px}
+#manageBranchForm>label:has(textarea){grid-column:1/-1}
+.branch-dialog-body :is(input,textarea){margin-top:0}
+@media(max-width:768px){.branch-dialog-footer button{width:100%;min-width:0}}
+@media(max-width:768px) and (pointer:coarse){body[data-hand=left] .branch-map-controls{left:10px;right:auto}}

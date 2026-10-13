@@ -6,7 +6,7 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
-Inicio más claro, Html5Qrcode local, cabeceras Apache, iconos aportados y manifest PWA sobre el único service worker existente. Documentación organizada sin perder historial. Pruebas de presentación, Apache, escaneo, navegación, offline y conexión celular-PC pasan; PHP lint67 archivos sin errores.
+Mapa de sucursales primero en Stock/Moderación, sugerencias de tres en tres y confirmación siempre visible. Centrar/quitar ubicación con iconos dentro del mapa; quitar conserva el mapa abierto. Pruebas Stock/Moderación, permisos, guardado y320/390/1366 pasan con Chrome/SQLite temporal. Reversión en CHANGELOG; no hay migraciones. Se conserva la entrega anterior de presentación/PWA y su validación.
 
 Al retomar: probar instalación y modo avión en teléfono real, verificar despliegue/cabeceras Render y configurar Geoapify. Detalles y demás pendientes en ROADMAP. No afirmar puntuación objetiva ni compatibilidad física sin pruebas.
 

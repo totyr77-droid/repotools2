@@ -4,6 +4,8 @@ Resumen del código actual y entregas registradas. El [historial anterior comple
 
 ## 13/10/2026
 
+- Selector de sucursales: mapa como primera pestaña/opción en Stock y alta/edición de Moderación. Sugerencias de tres en tres, con otras conservadas en memoria y navegación sin repetir consulta. Confirmación separada del área desplazable, siempre visible. Centrar/quitar ubicación dentro del mapa mediante iconos; quitar no cierra ni destruye el mapa. Controles accesibles y preferencia de mano móvil; formulario más compacto. No cambia API, cuota ni permisos.
+- Validación del selector: `tests/stock-branches-ui.cjs` y `tests/moderation-branch-map.cjs` pasan en Chrome/SQLite temporal: asignación/guardado/reapertura, mapa inicial, tres candidatos, paginación sin otra consulta, limpiar/centrar sin guardar coordenadas automáticamente, botón estable al desplazar320/390/1366 y controles de permisos. PHP/JS sintaxis y capturas móvil/PC revisadas. API/mapas externos simulados; prueba con locales reales en móvil pendiente. Revertir commit completo del selector conserva datos existentes, sin migraciones ni borrado local.
 - Inicio presenta Herramientas para repositores y descripción rioplatense, conserva escaneo como acción principal y funciones existentes.
 - Html5Qrcode2.3.8 pasa de unpkg a archivo local en vistas PHP y prueba estática; algoritmos intactos.
 - Cabeceras nosniff, política de referencia y SAMEORIGIN en Apache; recuperación mantiene no-referrer y Docker habilita mod_headers.

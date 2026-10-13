@@ -45,8 +45,8 @@
 <script src="js/product-reports.js?v=20261011-orientation4"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/ean-scanner.js?v=20261012-continuous"></script>
-<script src="js/branch-maps.js?v=20261013-branch-places"></script>
-<script src="js/branch-management.js?v=20261013-branch-places"></script>
+<script src="js/branch-maps.js?v=20261013-map-compact"></script>
+<script src="js/branch-management.js?v=20261013-map-compact"></script>
 <script src="js/reports-page.js?v=20261013-branch-map"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
@@ -60,8 +60,8 @@
 <script src="js/stock.js?v=20261012-offline-sync"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261012-branch-refresh"></script>
-<script src="js/branch-maps.js?v=20261013-branch-places"></script>
-<script src="js/stock-branches.js?v=20261013-branch-places"></script>
+<script src="js/branch-maps.js?v=20261013-map-compact"></script>
+<script src="js/stock-branches.js?v=20261013-map-compact"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>

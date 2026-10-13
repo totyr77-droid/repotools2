@@ -7,7 +7,7 @@ Consultar [ARCHITECTURE.md](ARCHITECTURE.md) para el estado actual y [CHANGELOG.
 - Probar instalación PWA en iPhone y Android reales, apertura desde su icono, sesión y cámara. La configuración existe; falta validar la experiencia física.
 - Confirmar en Safari iPhone el aviso de preparación offline y la recarga en modo avión desde el mismo dominio. Chrome simulado no prueba Safari.
 - Probar cámara real, QR lejanos, pistola USB/Bluetooth y conexión celular-PC en ambos sistemas. Las pruebas automatizadas utilizan lectores simulados.
-- Activar `GEOAPIFY_API_KEY` en Render y comprobar cobertura de locales reales en Stock/Moderación; dos locales cercanos deben seguir pudiendo registrarse por separado.
+- Verificar configuración de `GEOAPIFY_API_KEY` en Render y cobertura de locales reales en Stock/Moderación; probar selector de tres sugerencias, confirmación visible y dos locales cercanos distintos.
 - Verificar las nuevas cabeceras HTTP tras el despliegue Apache/Render, incluido `no-referrer` en recuperación.
 - Ejecutar las pruebas pendientes de conexión celular-PC y cambios recientes en una base PostgreSQL aislada; las últimas integraciones usaron SQLite temporal.
 
