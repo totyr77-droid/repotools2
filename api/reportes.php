@@ -15,6 +15,15 @@ try {
     $db = database(); $moderator = can_edit_catalog($db, $user);
     $audit = report_can_audit($db, $user);
     $excludedUser=report_is_manager($db,$user)?0:(int)($user['id']??0);
+    if($method==='GET'&&($_GET['view']??'')==='general'){
+        if(!report_is_manager($db,$user))throw new CatalogException('Solo managers pueden consultar el panel general.',403);
+        $today=(new DateTimeImmutable('now',new DateTimeZone('America/Buenos_Aires')))->format('Y-m-d');
+        $near=(new DateTimeImmutable($today))->modify('+30 days')->format('Y-m-d');
+        $stats=$db->query("SELECT (SELECT COUNT(*) FROM users) AS users,(SELECT COUNT(*) FROM pallets WHERE released=0 AND activated=1) AS pallets,(SELECT COUNT(*) FROM products) AS products,(SELECT COUNT(*) FROM stock_branches) AS branches,(SELECT COUNT(*) FROM product_reports WHERE status='pending') AS pending,(SELECT COUNT(*) FROM product_reports WHERE status='approved') AS approved,(SELECT COUNT(*) FROM product_reports WHERE status='rejected') AS rejected,(SELECT COUNT(*) FROM stock_shares WHERE active=1) AS shares,(SELECT COUNT(*) FROM report_blocks) AS blocked")->fetch();
+        $expiry=$db->prepare("SELECT COALESCE(SUM(CASE WHEN b.expires<? THEN b.units ELSE 0 END),0) AS expired,COALESCE(SUM(CASE WHEN b.expires>=? AND b.expires<=? THEN b.units ELSE 0 END),0) AS expiring FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND p.activated=1 AND b.expires<>''");$expiry->execute([$today,$today,$near]);
+        $stats=array_map('intval',array_merge($stats,$expiry->fetch()));
+        report_response(200,['stats'=>$stats,'roles'=>$db->query('SELECT role,COUNT(*) AS total FROM users GROUP BY role ORDER BY role')->fetchAll(),'csrf'=>$csrf]);
+    }
     if ($method === 'GET' && in_array($_GET['view'] ?? '', ['history', 'logs'], true)) {
         if (!$audit) throw new CatalogException('Solo administradores y managers pueden consultar esta sección.', 403);
         $page = filter_var($_GET['page'] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 10000]]);

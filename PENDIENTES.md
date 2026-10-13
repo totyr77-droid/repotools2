@@ -602,3 +602,12 @@ Validación tests/public-stock-summary.cjs extiende traslado, distingue sucursal
 Vista solo información sucursal del palet en PC compactada720px (selector/mapa/alta conservan anchos amplios). Información ocupa espacio flexible a izquierda y botones editar local/cambiar sucursal quedan contiguos a derecha,44px. No cambios móvil/permisos.
 
 Validación Chrome/SQLite temporal: botones misma línea/separación menor60px, ventanas390/1024/1366px sin overflow; captura revisada. Revertir commit restaura CSS/version anterior.
+
+
+## Panel General exclusivo manager — 12/10/2026
+
+Moderación añade pestaña General solo manager. API view=general valida rango actual en DB,403 para administrador/invitado; GET/no-store sin datos personales, sin migraciones. Totales usuarios, palets activos, catálogo, sucursales, reportes pendientes/aprobados/rechazados, enlaces activos y cuentas bloqueadas para reportar. Unidades vencidas y próximas30días solo palets activos, fecha Argentina; tarjetas amarillas/rojas para atención, iconos SVG, rangos agrupados. Consulta de conteos conserva PDO; filtros temporales parametrizados. Vista persistida al recargar y protecciones respuestas obsoletas existentes. Diseño adaptable, menú5opciones manager.
+
+Validación tests/manager-general.cjs Chrome/SQLite:11tarjetas, usuarios2/palets2,320/390/1366px sin overflow, cambio a Registros y acceso directo403 invitado/admin tras cambiar rango. PHP/JS sintaxis. Sin cuentas reales ni PostgreSQL producción modificados. Revertir commit restaura archivos anteriores; no datos nuevos en DB.
+
+Continuidad: ampliar panel con tendencias por período y accesos a pendientes solo si usuario lo solicita; por ahora totales actuales sin estimaciones. Pendiente prueba Safari iPhone tras aviso preparación offline; no afirmar compatibilidad real ya verificada. Informe real señalado resultó selección fija con título de sucursal; se explicó crear enlace por Sucursal, sin alterar enlace/datos reales. Mantener estética minimalista y permisos server.
