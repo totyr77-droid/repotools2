@@ -9,7 +9,7 @@ include 'vistas/header.vista.php';
   <div class="contenedor-main">
 <?php if (current_user() && $userHand === ''): ?><aside class="profile-pending" data-profile-pending role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3h.01"/></svg><span>Tienes información por completar en tu perfil.</span><a href="cuenta.php#handPreferences">Completar <span aria-hidden="true">→</span></a></aside><?php endif; ?>
     <div class="app-resumen">
-      <div><h1>Escáner</h1><p>Escanea y guarda tus productos.</p></div>
+      <div class="home-intro"><h1>Herramientas para repositores</h1><p>Escaneá productos, controlá stock y organizá tu trabajo.</p></div>
       <a class="home-tops" href="tops.php">TOPs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v6m-4 1h8"/></svg></a>
       <?php if (current_user()): ?><p id="scanStatsStatus" class="scan-stats-status" role="status"></p><?php endif; ?>
     </div>

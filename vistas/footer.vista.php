@@ -32,7 +32,7 @@
 <script src="js/device-connection.js?v=20261012-standby"></script>
 <script src="js/action-notices.js?v=20261012-security"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/ean-scanner.js?v=20261012-continuous"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
@@ -43,13 +43,13 @@
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261011-orientation4"></script>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/ean-scanner.js?v=20261012-continuous"></script>
 <script src="js/branch-maps.js?v=20261013-branch-places"></script>
 <script src="js/branch-management.js?v=20261013-branch-places"></script>
 <script src="js/reports-page.js?v=20261013-branch-map"></script>
 <?php elseif (!empty($paginaStock)): ?>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/ean-scanner.js?v=20261012-continuous"></script>
 <script src="js/product-info.js?v=20261011-fresh2"></script>
@@ -63,7 +63,7 @@
 <script src="js/branch-maps.js?v=20261013-branch-places"></script>
 <script src="js/stock-branches.js?v=20261013-branch-places"></script>
 <?php elseif (empty($paginaCuenta)): ?>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 <script src="js/product-info.js?v=20261011-fresh2"></script>

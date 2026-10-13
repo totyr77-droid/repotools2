@@ -10,7 +10,7 @@ WORKDIR /var/www/html
 COPY . .
 RUN printf '<Directory /var/www/html>\nAllowOverride All\nRequire all granted\n</Directory>\n' > /etc/apache2/conf-available/repotools.conf \
     && a2enconf repotools \
-    && a2enmod rewrite \
+    && a2enmod rewrite headers \
     && mkdir -p /var/lib/repotools \
     && chown -R www-data:www-data /var/lib/repotools
 

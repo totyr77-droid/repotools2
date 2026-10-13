@@ -19,17 +19,22 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
-    <title>Repotools - Escaner para Repositores | Gestion de Stock e Inventario</title>
-    <meta property="og:title" content="Repotools - Escaner para Repositores">
-    <meta property="og:description" content="Escanea productos y gestiona stock facilmente. Herramienta eficiente para repositores.">
+    <title>Repotools - Escáner para Repositores | Gestión de Stock e Inventario</title>
+    <meta property="og:title" content="Repotools - Escáner para Repositores">
+    <meta property="og:description" content="Escaneá productos, controlá stock y organizá tu trabajo.">
     <meta property="og:image" content="https://repotools.online/img/logo.png">
     <meta property="og:url" content="https://repotools.online/">
     <meta property="og:type" content="website">
 
-    <meta name="description" content="Optimiza tu trabajo como repositor con Repotools: escanea codigos de barras y gestiona tu stock sin cargar productos. Facil, rapido y eficiente.">
+    <meta name="description" content="Escaneá productos, controlá stock y organizá tu trabajo con Repotools. Herramientas para repositores.">
     <meta name="keywords" content="repositores, escaneo de codigos de barras, gestion de stock, inventario, productos, logistica, scanner de codigos, administracion de inventario, manejo de stock">
     <meta name="robots" content="index, follow">
-    <link rel="shortcut icon" href="img/logo.ico" type="image/x-icon">
+    <link rel="icon" href="img/Repotools_Logo_Pack_Blanco/03_isotipo_fondo_negro/repotools-icon-negro-32x32.png" sizes="32x32" type="image/png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#27187e">
+    <link rel="apple-touch-icon" href="img/Repotools_Logo_Pack_Blanco/05_apple/apple-touch-icon-180x180.png" sizes="180x180">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script src="https://kit.fontawesome.com/d9b377fc7f.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
@@ -52,19 +57,19 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261011-lock1" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261010" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=20261011-scanmeta3" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=20261013-pwa" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><?php endif; ?>
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-directory7" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
-<link href="css/device-workspace.css?v=20261013-branch-places" rel="stylesheet" type="text/css">
+<link href="css/device-workspace.css?v=20261013-pwa" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
       <div class="header-contenedor">
-        <a class="logo" href="./" aria-label="Inicio Repotools"><p>REPOTOOLS</p></a>
+        <a class="logo" href="./" aria-label="Inicio Repotools"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"></a>
 
         <nav class="nav" aria-label="Navegacion principal">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>

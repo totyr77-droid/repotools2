@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Repotools — Herramientas para repositores",
+  "short_name": "Repotools",
+  "description": "Escaneá productos, controlá stock y organizá tu trabajo.",
+  "lang": "es-AR",
+  "start_url": "./index.php",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f6fb",
+  "theme_color": "#27187e",
+  "icons": [
+    { "src": "img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-pwa-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-pwa-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-maskable-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-maskable-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
