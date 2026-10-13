@@ -58,10 +58,10 @@
 <script src="js/pallet-label.js?v=20261010-stock13"></script>
 
 <script src="js/stock.js?v=20261012-offline-sync"></script>
-<script src="js/stock-summary.js?v=20261012-totals"></script>
-<script src="js/public-pallet.js?v=20261012-totals"></script>
+<script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
+<script src="js/public-pallet.js?v=20261012-branch-refresh"></script>
 <script src="js/branch-maps.js?v=20261012-mouse"></script>
-<script src="js/stock-branches.js?v=20261012-totals"></script>
+<script src="js/stock-branches.js?v=20261012-branch-refresh"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>

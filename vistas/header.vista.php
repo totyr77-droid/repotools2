@@ -59,7 +59,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
 <link href="css/device-workspace.css?v=20261012-safari" rel="stylesheet" type="text/css">
-<?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-totals" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
