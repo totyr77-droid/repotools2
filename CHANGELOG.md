@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Confirmación más audible y vibración compatible
+
+Amplitud del pitido0,18→0,45; pulso60ms cuando el navegador soporta vibración, sin detecciones parciales. Mantiene tono/corrección de silencio150ms y no cambia algoritmo. ean-scanner pasa; iPhone físico pendiente y Safari no ofrece navigator.vibrate. Reversión a680fcde detallada en docs/PITIDO-IPHONE.md.
+
 ## 13/10/2026 — Nombre y apellido al crear cuenta
 
 Etiqueta y ejemplo explícitos en el registro; servidor rechaza nombre incompleto/vacío, normaliza espacios y conserva nombres compuestos. Mantiene un campo, SVG y autocomplete=name. public-names-ui valida rechazo y alta compuesta, además de privacidad y edición pública existente; lint pasa. Revertir cuenta.php y prueba a96110df. Sin datos ni permisos nuevos.

@@ -52,6 +52,7 @@
     } catch {}
   }
   async function beep() {
+    try { window.navigator?.vibrate?.(60); } catch {}
     if (!audioContext) return;
     let restoreSession = () => {}, scheduled = false;
     try {
@@ -71,7 +72,7 @@
       if (audioContext.state !== 'running') return;
       const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
       oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1100, now);
-      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.18, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
+      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.45, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
       oscillator.connect(gain); gain.connect(audioContext.destination);
       const restore = restoreSession;
       oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
