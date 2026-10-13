@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Solo desarrollo: número del palet ampliado a2040px de ancho disponible, fuente360px y ajuste SVG, centrado entre título y texto inferior. PDF1/2/5 páginas, límites del número sin superposición y lectura QR pasan; impresión múltiple pasa. Mismos SVG/PNG; no cambia QR ni A4. Revertir commit de esta entrega, conservando configuración de desarrollo.
+
 Resumen de ejemplo de Stock más compacto: números18px, etiquetas12,8px, menor padding y separación; ancho máximo640px en PC, dos columnas móviles conservadas. Solo CSS de demo y versión del recurso; guest-demo pasa320/375/390/430/1366 y revisión visual390/1366. Revertir css/guest-demo.css y versión header a e857d9c; no cambia datos ni Stock real.
 
 Etiquetas de palets ajustadas a una sola hoja A4: margen de impresión8mm y alto280mm evitan desbordamiento por redondeo; salto solo entre etiquetas. Logo original06_horizontal_blanco_transparente integrado y filtrado a negro, QR vectorial grande y código200px; texto cercano legible. PNG para compartir reutiliza la misma composición. PDF Chrome con1/2/5 etiquetas produce1/2/5 páginas y QR decodificado correcto; selección y permisos anteriores pasan. Probar impresora/Safari reales; detalle y reversión en docs/IMPRESION-PENDIENTES.md.

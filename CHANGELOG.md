@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Número de etiqueta al ancho disponible (desarrollo)
+
+Código del palet a2040px de ancho, fuente360px y posición reservada bajo el QR; márgenes A4 y texto inferior intactos. Prueba de límites geométricos, PDF1/2/5 páginas, QR y selección múltiple pasan; revisión visual PNG. Cambio exclusivo desarrollo, pendiente impresora real. Revertir el commit de esta entrega para volver al código anterior.
+
 ## 13/10/2026 — Resumen de demo Stock compacto
 
 Palets activos, Productos, Por vencer y Vencidos con tipografía, padding y separación menores, ancho limitado en PC y dos columnas en móvil. Conserva indicación de demo y datos. Prueba guest-demo320/375/390/430/1366 y revisión visual móvil/PC pasan; lint header correcto. Reversión: css/guest-demo.css y versión en vistas/header.vista.php a e857d9c.
