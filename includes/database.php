@@ -51,7 +51,10 @@ function initialize_database(PDO $db): void {
     try {
         if ($postgres) $db->query('SELECT pg_advisory_xact_lock(72684621)');
         $db->exec('CREATE TABLE IF NOT EXISTS app_schema_migrations (version INTEGER PRIMARY KEY)');
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 1')->fetchColumn()) {
+        // Read under the existing transaction/advisory lock. One round trip,
+        // preserving individual versions and safe upgrade/rollback behavior.
+        $applied=array_fill_keys(array_map('intval',$db->query('SELECT version FROM app_schema_migrations')->fetchAll(PDO::FETCH_COLUMN)),true);
+        if (!isset($applied[1])) {
             $db->exec("CREATE TABLE IF NOT EXISTS users (id {$id}, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'usuario', created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             if (!$postgres) {
                 $columns = $db->query('PRAGMA table_info(users)')->fetchAll(PDO::FETCH_COLUMN, 1);
@@ -64,7 +67,7 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE IF NOT EXISTS library_products (id {$id}, library_id {$ref} NOT NULL REFERENCES libraries(id), ean TEXT NOT NULL, name TEXT NOT NULL DEFAULT '', created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(library_id, ean))");
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (1)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 2')->fetchColumn()) {
+        if (!isset($applied[2])) {
             $db->exec("CREATE TABLE products (ean TEXT PRIMARY KEY, name TEXT NOT NULL DEFAULT '', brand TEXT NOT NULL DEFAULT '', quantity TEXT NOT NULL DEFAULT '', category TEXT NOT NULL DEFAULT '', packaging TEXT NOT NULL DEFAULT '', image TEXT NOT NULL DEFAULT '', source TEXT NOT NULL DEFAULT 'manual', source_url TEXT NOT NULL DEFAULT '', external_payload TEXT NOT NULL DEFAULT '{}', revision INTEGER NOT NULL DEFAULT 1, updated_by {$ref} REFERENCES users(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec("CREATE TABLE product_edits (id {$id}, ean TEXT NOT NULL REFERENCES products(ean), user_id {$ref} NOT NULL REFERENCES users(id), before_data TEXT NOT NULL, after_data TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('CREATE INDEX product_edits_ean ON product_edits(ean)');
@@ -73,7 +76,7 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX product_api_requests_time ON product_api_requests(requested_at)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (2)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 3')->fetchColumn()) {
+        if (!isset($applied[3])) {
             $db->exec("CREATE TABLE product_reports (id {$id}, submission_key TEXT NOT NULL UNIQUE, owner_key TEXT NOT NULL, user_id {$ref} REFERENCES users(id), ean TEXT NOT NULL, description TEXT NOT NULL, proposed_data TEXT NOT NULL, original_data TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', reviewed_by {$ref} REFERENCES users(id), review_note TEXT NOT NULL DEFAULT '', created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, submitted_at BIGINT NOT NULL, reviewed_at {$timestamp})");
             $db->exec('CREATE INDEX product_reports_owner ON product_reports(owner_key, id)');
             $db->exec('CREATE INDEX product_reports_queue ON product_reports(status, id)');
@@ -83,17 +86,17 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX report_rewards_user ON report_rewards(user_id)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (3)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 4')->fetchColumn()) {
+        if (!isset($applied[4])) {
             $db->exec("CREATE TABLE library_shares (token TEXT PRIMARY KEY, source_library_id {$ref} NOT NULL UNIQUE, owner_id {$ref} NOT NULL REFERENCES users(id), payload TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec("CREATE TABLE library_imports (user_id {$ref} NOT NULL REFERENCES users(id), source_library_id {$ref} NOT NULL, library_id {$ref} NOT NULL REFERENCES libraries(id), PRIMARY KEY(user_id, source_library_id))");
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (4)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 5')->fetchColumn()) {
+        if (!isset($applied[5])) {
             $db->exec("CREATE TABLE notifications (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), event_key TEXT NOT NULL UNIQUE, type TEXT NOT NULL, title TEXT NOT NULL, body TEXT NOT NULL, report_id {$ref} REFERENCES product_reports(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, read_at {$timestamp})");
             $db->exec('CREATE INDEX notifications_user ON notifications(user_id, id)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (5)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 6')->fetchColumn()) {
+        if (!isset($applied[6])) {
             $db->exec("CREATE TABLE pallets (id {$id}, code TEXT NOT NULL, owner_id {$ref} NOT NULL REFERENCES users(id), description TEXT NOT NULL DEFAULT '', prepared_until BIGINT NOT NULL, activated INTEGER NOT NULL DEFAULT 0, released INTEGER NOT NULL DEFAULT 0, revision INTEGER NOT NULL DEFAULT 1, updated_by {$ref} NOT NULL REFERENCES users(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec("CREATE TABLE pallet_labels (code TEXT PRIMARY KEY, reserved_by {$ref} REFERENCES users(id), reserved_until BIGINT NOT NULL DEFAULT 0, pallet_id {$ref} REFERENCES pallets(id))");
             $db->exec("CREATE TABLE pallet_products (id {$id}, pallet_id {$ref} NOT NULL REFERENCES pallets(id), ean TEXT NOT NULL, name TEXT NOT NULL DEFAULT '', expires TEXT NOT NULL DEFAULT '', units INTEGER NOT NULL, kind TEXT NOT NULL DEFAULT 'units', pack_size INTEGER NOT NULL DEFAULT 1, revision INTEGER NOT NULL DEFAULT 1, UNIQUE(pallet_id, ean, expires))");
@@ -106,51 +109,51 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX pallet_expiries ON pallet_products(expires,pallet_id)');
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (6)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 7')->fetchColumn()) {
+        if (!isset($applied[7])) {
             $db->exec("CREATE TABLE stock_product_references (ean TEXT NOT NULL, kind TEXT NOT NULL, pack_size INTEGER NOT NULL, updated_by {$ref} NOT NULL REFERENCES users(id), updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(ean,kind))");
             $db->exec("INSERT INTO stock_product_references(ean,kind,pack_size,updated_by) SELECT b.ean,b.kind,b.pack_size,p.updated_by FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.kind IN ('boxes','packs') ON CONFLICT(ean,kind) DO NOTHING");
             $db->exec('INSERT INTO app_schema_migrations (version) VALUES (7)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 8')->fetchColumn()) {
+        if (!isset($applied[8])) {
             $db->exec("CREATE TABLE pallet_admin_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), pallet_id {$ref} REFERENCES pallets(id), code TEXT NOT NULL, action TEXT NOT NULL, details TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(8)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 9')->fetchColumn()) {
+        if (!isset($applied[9])) {
             $db->exec("ALTER TABLE users ADD COLUMN company TEXT NOT NULL DEFAULT ''");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(9)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 10')->fetchColumn()) {
+        if (!isset($applied[10])) {
             $db->exec("ALTER TABLE product_reports ADD COLUMN submitter_ip TEXT NOT NULL DEFAULT ''");
             $db->exec("CREATE TABLE report_blocks (user_id {$ref} PRIMARY KEY REFERENCES users(id), blocked_by {$ref} NOT NULL REFERENCES users(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec("CREATE TABLE report_block_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), actor_id {$ref} NOT NULL REFERENCES users(id), action TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(10)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 11')->fetchColumn()) {
+        if (!isset($applied[11])) {
             $db->exec("CREATE TABLE user_profile_tokens (user_id {$ref} PRIMARY KEY REFERENCES users(id), token TEXT NOT NULL UNIQUE)");
             $db->exec("CREATE TABLE user_role_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), actor_id {$ref} NOT NULL REFERENCES users(id), old_role TEXT NOT NULL, new_role TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(11)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 12')->fetchColumn()) {
+        if (!isset($applied[12])) {
             $db->exec("ALTER TABLE users ADD COLUMN handedness TEXT NOT NULL DEFAULT ''");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(12)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 13')->fetchColumn()) {
+        if (!isset($applied[13])) {
             $db->exec("CREATE TABLE app_sessions (id_hash TEXT PRIMARY KEY, payload TEXT NOT NULL DEFAULT '', expires_at BIGINT NOT NULL, lock_token TEXT NOT NULL DEFAULT '', locked_until BIGINT NOT NULL DEFAULT 0)");
             $db->exec('CREATE INDEX app_sessions_expiry ON app_sessions(expires_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(13)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 14')->fetchColumn()) {
+        if (!isset($applied[14])) {
             $db->exec('ALTER TABLE users ADD COLUMN auth_version INTEGER NOT NULL DEFAULT 1');
             $db->exec("CREATE TABLE password_resets (token_hash TEXT PRIMARY KEY, user_id {$ref} NOT NULL REFERENCES users(id), expires_at BIGINT NOT NULL)");
             $db->exec('CREATE INDEX password_resets_user ON password_resets(user_id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(14)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 15')->fetchColumn()) {
+        if (!isset($applied[15])) {
             $db->exec("CREATE TABLE user_profile_events (id {$id}, user_id {$ref} NOT NULL REFERENCES users(id), actor_id {$ref} NOT NULL REFERENCES users(id), before_data TEXT NOT NULL, after_data TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('CREATE INDEX user_profile_events_user ON user_profile_events(user_id,created_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(15)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 16')->fetchColumn()) {
+        if (!isset($applied[16])) {
             $db->exec("CREATE TABLE stock_branches (id {$id}, owner_id {$ref} NOT NULL REFERENCES users(id), name TEXT NOT NULL, address TEXT NOT NULL, locality TEXT NOT NULL, province TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', revision INTEGER NOT NULL DEFAULT 1)");
             $db->exec("ALTER TABLE pallets ADD COLUMN branch_id {$ref} REFERENCES stock_branches(id)");
             $db->exec('CREATE INDEX stock_branches_owner ON stock_branches(owner_id,id)');
@@ -160,57 +163,57 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX stock_shares_owner ON stock_shares(owner_id,active)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(16)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 17')->fetchColumn()) {
+        if (!isset($applied[17])) {
             $db->exec('ALTER TABLE stock_branches ADD COLUMN latitude DOUBLE PRECISION');
             $db->exec('ALTER TABLE stock_branches ADD COLUMN longitude DOUBLE PRECISION');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(17)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 18')->fetchColumn()) {
+        if (!isset($applied[18])) {
             $db->exec("CREATE TABLE user_branch_preferences (user_id {$ref} NOT NULL REFERENCES users(id) ON DELETE CASCADE, branch_id {$ref} NOT NULL REFERENCES stock_branches(id) ON DELETE CASCADE, favorite INTEGER NOT NULL DEFAULT 0, last_used BIGINT NOT NULL DEFAULT 0, use_count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(user_id,branch_id))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(18)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 19')->fetchColumn()) {
+        if (!isset($applied[19])) {
             $db->exec("CREATE TABLE branch_events (id {$id}, actor_id {$ref} NOT NULL REFERENCES users(id), branch_id {$ref}, branch_name TEXT NOT NULL, action TEXT NOT NULL, before_data TEXT NOT NULL, after_data TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('CREATE INDEX branch_events_date ON branch_events(created_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(19)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 20')->fetchColumn()) {
+        if (!isset($applied[20])) {
             $db->exec("CREATE TABLE stock_share_exclusions (share_id {$ref} NOT NULL REFERENCES stock_shares(id) ON DELETE CASCADE, pallet_id {$ref} NOT NULL REFERENCES pallets(id) ON DELETE CASCADE, PRIMARY KEY(share_id,pallet_id))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(20)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 21')->fetchColumn()) {
+        if (!isset($applied[21])) {
             $db->exec("CREATE TABLE account_devices (user_id {$ref} NOT NULL REFERENCES users(id) ON DELETE CASCADE, kind TEXT NOT NULL, token_hash TEXT NOT NULL, auth_version INTEGER NOT NULL, expires_at BIGINT NOT NULL, PRIMARY KEY(user_id,kind))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(21)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 22')->fetchColumn()) {
+        if (!isset($applied[22])) {
             $db->exec("CREATE TABLE scan_relays (user_id {$ref} PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, desktop_hash TEXT NOT NULL, mobile_hash TEXT NOT NULL DEFAULT '', context_key TEXT NOT NULL DEFAULT '', mode TEXT NOT NULL, context TEXT NOT NULL, ready INTEGER NOT NULL DEFAULT 0, code TEXT NOT NULL DEFAULT '', sequence INTEGER NOT NULL DEFAULT 0, expires_at BIGINT NOT NULL)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(22)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 23')->fetchColumn()) {
+        if (!isset($applied[23])) {
             $db->exec("CREATE TABLE scan_relay_photos (user_id {$ref} PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, flow TEXT NOT NULL, sequence INTEGER NOT NULL, kind TEXT NOT NULL, photo TEXT NOT NULL, expires_at BIGINT NOT NULL)");
             $db->exec('CREATE INDEX scan_relay_photos_expiry ON scan_relay_photos(expires_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(23)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 24')->fetchColumn()) {
+        if (!isset($applied[24])) {
             $columns=$postgres ? $db->query("SELECT column_name FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='users'")->fetchAll(PDO::FETCH_COLUMN) : array_column($db->query('PRAGMA table_info(users)')->fetchAll(),'name');
             if (!in_array('public_name',$columns,true)) $db->exec("ALTER TABLE users ADD COLUMN public_name TEXT NOT NULL DEFAULT ''");
             backfill_public_user_names($db);
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(24)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 25')->fetchColumn()) {
+        if (!isset($applied[25])) {
             $columns=$postgres ? $db->query("SELECT column_name FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='users'")->fetchAll(PDO::FETCH_COLUMN) : array_column($db->query('PRAGMA table_info(users)')->fetchAll(),'name');
             foreach (['sound_enabled','vibration_enabled'] as $column) {
                 if (!in_array($column,$columns,true)) $db->exec("ALTER TABLE users ADD COLUMN {$column} INTEGER NOT NULL DEFAULT 1 CHECK ({$column} IN (0,1))");
             }
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(25)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 26')->fetchColumn()) {
+        if (!isset($applied[26])) {
             // Existing user-first indexes do not cover date-range rankings.
             $db->exec('CREATE INDEX scans_period_user_code ON scan_events(created_at,user_id,code)');
             $db->exec('CREATE INDEX rewards_period_user ON report_rewards(created_at,user_id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(26)');
         }
-        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 27')->fetchColumn()) {
+        if (!isset($applied[27])) {
             $db->exec("CREATE TABLE pallet_activity (id {$id}, user_id {$ref} REFERENCES users(id) ON DELETE SET NULL, pallet_id {$ref} REFERENCES pallets(id) ON DELETE SET NULL, product_id {$ref} REFERENCES pallet_products(id) ON DELETE SET NULL, action TEXT NOT NULL, metadata TEXT NOT NULL, created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('CREATE INDEX pallet_activity_recent ON pallet_activity(pallet_id,id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(27)');
