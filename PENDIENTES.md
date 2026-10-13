@@ -595,3 +595,10 @@ Validación tests/offline-start.cjs pasa e incluye preparación confirmada y rec
 Usuario vio dos palets tras cambiar sucursal de uno; tipo/enlace real aún no identificado. Prueba local confirma consulta por sucursal excluye palet movido y total45 pasa40, mientras enlace selección explícita conserva palet45 por diseño. No se cambia semántica de permisos ni selección sin confirmar caso. Añadido botón SVG Actualizar informe a enlace público, estado ocupado/giro respeta reduced-motion y recarga contenido/resumen juntos. Versiones CSS/JS actualizadas.
 
 Validación tests/public-stock-summary.cjs extiende traslado, distingue sucursal/selección y comprueba botón elimina tarjeta trasladada y actualiza total; paginación, QR, revocación y320/390/1366px pasan. Datos SQLite temporales, no cuenta real consultada. Pendiente identificar enlace del usuario para reproducir si persiste después de actualizar. Revertir commit retira botón/versiones y pruebas nuevas sin cambiar consulta existente.
+
+
+## Vista sucursal asignada PC — 12/10/2026
+
+Vista solo información sucursal del palet en PC compactada720px (selector/mapa/alta conservan anchos amplios). Información ocupa espacio flexible a izquierda y botones editar local/cambiar sucursal quedan contiguos a derecha,44px. No cambios móvil/permisos.
+
+Validación Chrome/SQLite temporal: botones misma línea/separación menor60px, ventanas390/1024/1366px sin overflow; captura revisada. Revertir commit restaura CSS/version anterior.
