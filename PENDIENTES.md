@@ -6,6 +6,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Nombre público separado, migración 24, edición en Mi cuenta y presentación dinámica en TOPs/palets/stock compartido/colaboradores/invitaciones. Auditoría previa: 6 cuentas pendientes, sin colisiones; validación PostgreSQL aislado y SQLite en docs/NOMBRES-PUBLICOS.md. Confirmar migración en Render y Safari real. Mantener name privado y relaciones por ID.
+
 Font Awesome Free 6.7.2 local, Solid/Brands y precache shell-v10. Mediciones locales, inventario, validaciones y reversión en docs/ICONOGRAFIA-LOCAL.md. CDN anterior bloqueado en el entorno: no hay comparación fiable de latencia; medir Render/Safari real y cabeceras Apache.
 
 Avisos flotantes de foto/EAN/QR enviados y solicitud de foto compacta. Cancelación desde ambos dispositivos limpia solo esa petición y conserva el vínculo. Validación/reversión en docs/AVISOS-ENVIO.md; cámara física/Safari pendientes.

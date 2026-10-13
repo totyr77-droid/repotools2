@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/catalog.php';
+require_once __DIR__ . '/public-names.php';
+
+function stock_public_identity(array $row): array {
+    foreach(['owner','updated'] as $prefix){
+        if(array_key_exists($prefix.'_name',$row)){
+            $row[$prefix.'_name']=get_public_user_name(['id'=>$row[$prefix.'_user_id']??0,'name'=>$row[$prefix.'_name'],'public_name'=>$row[$prefix.'_public_name']??'']);
+            unset($row[$prefix.'_public_name'],$row[$prefix.'_user_id']);
+        }
+    }
+    return $row;
+}
 
 function stock_query(PDO $db, string $sql, array $args = []): PDOStatement {
     $stmt = $db->prepare($sql); $stmt->execute($args); return $stmt;
@@ -44,8 +55,9 @@ function stock_product_names(array $product): array {
 }
 function stock_detail(PDO $db, string $code, ?int $user): array {
     $label=stock_label($db,$code); $admin=stock_is_admin($db,$user);
-    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'reserved_name'=>$label['reserved_by'] && (int)$label['reserved_until']>time() ? (stock_query($db,'SELECT name FROM users WHERE id=?',[(int)$label['reserved_by']])->fetchColumn() ?: null) : null,'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
-    $p=stock_query($db,'SELECT p.*,u.name AS owner_name,u.company AS owner_company,a.name AS updated_name FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
+    if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'reserved_name'=>$label['reserved_by'] && (int)$label['reserved_until']>time() ? get_public_user_name(stock_query($db,'SELECT id,name,public_name FROM users WHERE id=?',[(int)$label['reserved_by']])->fetch() ?: ['id'=>(int)$label['reserved_by']]) : null,'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
+    $p=stock_query($db,'SELECT p.*,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,a.name AS updated_name,a.public_name AS updated_public_name,a.id AS updated_user_id FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
+    $p=$p?stock_public_identity($p):$p;
     if (!$p) throw new CatalogException('Este palet ya no está disponible. Recarga la lista.',409);
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     $owner=$user !== null && (int)$p['owner_id']===$user;
@@ -54,7 +66,8 @@ function stock_detail(PDO $db, string $code, ?int $user): array {
     $p['products']=stock_query($db,'SELECT b.*,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id=? ORDER BY CASE WHEN b.expires=\'\' THEN 1 ELSE 0 END,b.expires,b.name,b.id',[$p['id']])->fetchAll();
     foreach ($p['products'] as &$product) $product=stock_product_names($product);
     unset($product);
-    if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
+    if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.public_name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
+    if(isset($p['members']))foreach($p['members'] as &$member){$member['name']=get_public_user_name($member);unset($member['public_name']);}unset($member);
     if ($p['can_edit'] && $p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch() ?: null;
     if (!$p['can_edit']) unset($p['description'],$p['branch_id']);
     // Only names and product details are public; account identifiers/access are private.
@@ -142,7 +155,7 @@ function stock_warning_days(PDO $db,int $user): int {
 function stock_list(PDO $db,int $user,bool $all=false): array {
     $all=$all&&stock_is_admin($db,$user);
     $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
-    return stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,u.company AS owner_company,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,(int)$all,$user,$user])->fetchAll();
+    return array_map('stock_public_identity',stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,(int)$all,$user,$user])->fetchAll());
 }
 function stock_notify(PDO $db,int $user): array {
     $days=stock_warning_days($db,$user);

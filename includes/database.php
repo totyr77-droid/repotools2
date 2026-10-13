@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/public-names.php';
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -189,6 +190,12 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE scan_relay_photos (user_id {$ref} PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, flow TEXT NOT NULL, sequence INTEGER NOT NULL, kind TEXT NOT NULL, photo TEXT NOT NULL, expires_at BIGINT NOT NULL)");
             $db->exec('CREATE INDEX scan_relay_photos_expiry ON scan_relay_photos(expires_at)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(23)');
+        }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 24')->fetchColumn()) {
+            $columns=$postgres ? $db->query("SELECT column_name FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='users'")->fetchAll(PDO::FETCH_COLUMN) : array_column($db->query('PRAGMA table_info(users)')->fetchAll(),'name');
+            if (!in_array('public_name',$columns,true)) $db->exec("ALTER TABLE users ADD COLUMN public_name TEXT NOT NULL DEFAULT ''");
+            backfill_public_user_names($db);
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(24)');
         }
         $db->commit();
     } catch (Throwable $error) {

@@ -13,10 +13,10 @@ try {
     $db = database();
     if ($category !== 'escaneos') {
         $table = $category === 'reportes' ? 'product_reports' : 'report_rewards';
-        $leaders = $db->query("SELECT u.id, u.name, COUNT(*) AS unique_codes, COUNT(*) AS total_scans FROM users u JOIN {$table} r ON r.user_id = u.id GROUP BY u.id, u.name ORDER BY unique_codes DESC, u.id ASC LIMIT 50")->fetchAll(PDO::FETCH_ASSOC);
+        $leaders = $db->query("SELECT u.id, u.name, u.public_name, COUNT(*) AS unique_codes, COUNT(*) AS total_scans FROM users u JOIN {$table} r ON r.user_id = u.id GROUP BY u.id, u.name, u.public_name ORDER BY unique_codes DESC, u.id ASC LIMIT 50")->fetchAll(PDO::FETCH_ASSOC);
         if ($viewerId !== null) { $stmt = $db->prepare("SELECT COUNT(*) FROM {$table} WHERE user_id = ?"); $stmt->execute([$viewerId]); $stats['unique_codes'] = (int) $stmt->fetchColumn(); }
     } else {
-    $leaders = $db->query('SELECT u.id, u.name, COUNT(DISTINCT s.code) AS unique_codes, COUNT(*) AS total_scans FROM users u JOIN scan_events s ON s.user_id = u.id GROUP BY u.id, u.name ORDER BY unique_codes DESC, u.id ASC LIMIT 50')->fetchAll(PDO::FETCH_ASSOC);
+    $leaders = $db->query('SELECT u.id, u.name, u.public_name, COUNT(DISTINCT s.code) AS unique_codes, COUNT(*) AS total_scans FROM users u JOIN scan_events s ON s.user_id = u.id GROUP BY u.id, u.name, u.public_name ORDER BY unique_codes DESC, u.id ASC LIMIT 50')->fetchAll(PDO::FETCH_ASSOC);
     if ($viewerId !== null) {
         $stmt = $db->prepare('SELECT COUNT(DISTINCT code) AS unique_codes, COUNT(*) AS total_scans FROM scan_events WHERE user_id = ?');
         $stmt->execute([$viewerId]);
@@ -49,7 +49,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <?php $position = 0; $previous = null; foreach ($leaders as $index => $leader):
         if ($previous !== (int) $leader['unique_codes']) $position = $index + 1;
         $previous = (int) $leader['unique_codes']; ?>
-      <tr<?= (int) $leader['id'] === $viewerId ? ' class="tops-me"' : '' ?>><td><span class="tops-position<?= $position <= 3 ? ' tops-position-' . $position : '' ?>"><?= $position ?></span></td><th scope="row"><?= escape($leader['name']) ?><?php if ((int) $leader['id'] === $viewerId): ?> <span class="tops-you">Vos</span><?php endif; ?></th><td><?= (int) $leader['unique_codes'] ?></td><?php if ($category === 'escaneos'): ?><td><?= (int) $leader['total_scans'] ?></td><?php endif; ?></tr>
+      <tr<?= (int) $leader['id'] === $viewerId ? ' class="tops-me"' : '' ?>><td><span class="tops-position<?= $position <= 3 ? ' tops-position-' . $position : '' ?>"><?= $position ?></span></td><th scope="row"><?= escape(get_public_user_name($leader)) ?><?php if ((int) $leader['id'] === $viewerId): ?> <span class="tops-you">Vos</span><?php endif; ?></th><td><?= (int) $leader['unique_codes'] ?></td><?php if ($category === 'escaneos'): ?><td><?= (int) $leader['total_scans'] ?></td><?php endif; ?></tr>
     <?php endforeach; ?>
     </tbody></table></div>
     <?php endif; ?>

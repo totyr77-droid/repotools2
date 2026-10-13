@@ -34,7 +34,8 @@ try {
         } else {
             if (!$uid) throw new CatalogException('Inicia sesión para ver tus palets.',401);
             $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$uid])->fetchColumn();
-            $result=['is_admin'=>stock_is_admin($db,$uid),'admin_pallets'=>[],'pallets'=>stock_list($db,$uid),'labels'=>stock_query($db,'SELECT code,reserved_until FROM pallet_labels WHERE reserved_by=? AND pallet_id IS NULL AND reserved_until>? ORDER BY reserved_until DESC',[$uid,time()])->fetchAll(),'invitations'=>stock_query($db,"SELECT p.id,p.code,u.name AS owner_name FROM pallet_access a JOIN pallets p ON p.id=a.pallet_id JOIN users u ON u.id=p.owner_id WHERE a.user_id=? AND a.status='pending' AND p.released=0",[$uid])->fetchAll(),'expiry_days'=>$days===false?30:(int)$days,'warning_days'=>stock_warning_days($db,$uid)];
+            $result=['is_admin'=>stock_is_admin($db,$uid),'admin_pallets'=>[],'pallets'=>stock_list($db,$uid),'labels'=>stock_query($db,'SELECT code,reserved_until FROM pallet_labels WHERE reserved_by=? AND pallet_id IS NULL AND reserved_until>? ORDER BY reserved_until DESC',[$uid,time()])->fetchAll(),'invitations'=>stock_query($db,"SELECT p.id,p.code,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id FROM pallet_access a JOIN pallets p ON p.id=a.pallet_id JOIN users u ON u.id=p.owner_id WHERE a.user_id=? AND a.status='pending' AND p.released=0",[$uid])->fetchAll(),'expiry_days'=>$days===false?30:(int)$days,'warning_days'=>stock_warning_days($db,$uid)];
+            $result['invitations']=array_map('stock_public_identity',$result['invitations']);
         }
     } else {
         $key=$_POST['operation_key']??'';
@@ -91,7 +92,7 @@ try {
                 if (!$invite) throw new CatalogException('No encontramos una cuenta con ese correo.',404);
                 if ((int)$invite===$uid) throw new CatalogException('Ya eres propietario de este palet.',422);
                 $inserted=stock_query($db,"INSERT INTO pallet_access(pallet_id,user_id,status) VALUES(?,?,'pending') ON CONFLICT(pallet_id,user_id) DO NOTHING",[$id,$invite])->rowCount();
-                if ($inserted) stock_query($db,'INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?)',[$invite,'pallet-invite:'.$id.':'.$invite.':'.$key,'stock_invitation','Te invitaron a un palet',$user['name'].' te invita al palet '.$p['code'].'. Acepta desde Stock.']); break;
+                if ($inserted) stock_query($db,'INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?)',[$invite,'pallet-invite:'.$id.':'.$invite.':'.$key,'stock_invitation','Te invitaron a un palet',get_public_user_name($user).' te invita al palet '.$p['code'].'. Acepta desde Stock.']); break;
             case 'accept': case 'decline':
                 $p=stock_query($db,'SELECT id FROM pallets WHERE id=? AND released=0',[$id])->fetchColumn();
                 if (!$p) throw new CatalogException('Este palet ya no está activo.',409);

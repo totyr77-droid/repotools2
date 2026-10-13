@@ -29,7 +29,7 @@ function current_user(): ?array {
     $user=$_SESSION['user']??null;
     if (!$user) return null;
     static $versions=[];
-    if(!array_key_exists($user['id'],$versions)){$q=database()->prepare('SELECT auth_version,name,email,company FROM users WHERE id=?');$q->execute([$user['id']]);$versions[$user['id']]=$q->fetch(PDO::FETCH_ASSOC);}
+    if(!array_key_exists($user['id'],$versions)){$q=database()->prepare('SELECT auth_version,name,public_name,email,company FROM users WHERE id=?');$q->execute([$user['id']]);$versions[$user['id']]=$q->fetch(PDO::FETCH_ASSOC);}
     $fresh=$versions[$user['id']];
     if($fresh===false||(int)$fresh['auth_version']!==(int)($user['auth_version']??1)){unset($_SESSION['user']);return null;}
     $user=array_replace($user,$fresh);

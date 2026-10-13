@@ -60,10 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) &
                 $db->prepare('DELETE FROM login_attempts WHERE started < ?')->execute([time() - 900]);
                 $db->prepare('INSERT INTO login_attempts (key, attempts, started) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET attempts = login_attempts.attempts + 1')->execute([$key, time()]);
                 if ($register) {
-                    $stmt = $db->prepare('INSERT INTO users (name, email, password_hash, company) VALUES (?, ?, ?, ?)');
-                    $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $company]);
+                    $initialPublicName=generate_public_user_name($name,0);
+                    $stmt = $db->prepare('INSERT INTO users (name, email, password_hash, company, public_name) VALUES (?, ?, ?, ?, ?) RETURNING id');
+                    $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $company, $initialPublicName]);
+                    $newUserId=(int)$stmt->fetchColumn();$stmt->closeCursor();
+                    if($initialPublicName==='Usuario #0') $db->prepare('UPDATE users SET public_name=? WHERE id=?')->execute([generate_public_user_name($name,$newUserId),$newUserId]);
                 }
-                $stmt = $db->prepare('SELECT id, name, email, role, company, password_hash, auth_version FROM users WHERE email = ?');
+                $stmt = $db->prepare('SELECT id, name, public_name, email, role, company, password_hash, auth_version FROM users WHERE email = ?');
                 $stmt->execute([$email]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($user && password_verify($password, $user['password_hash'])) {
@@ -94,6 +97,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <dialog id="accountEditDialog" class="account-edit-dialog"><div class="account-edit-heading"><h2>Información de la cuenta</h2><button type="button" class="app-close" aria-label="Cerrar" title="Cerrar"><?= stock_icon('close') ?></button></div><form id="accountEditForm"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><label><span class="account-field-title"><?= account_icon('user') ?>Nombre</span><input name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Tu nombre" required value="<?= escape(current_user()['name']) ?>"></label><label><span class="account-field-title"><?= account_icon('company') ?>Empresa o agencia <small>(opcional)</small></span><input name="company" autocomplete="organization" maxlength="100" placeholder="Marca, empresa o agencia" value="<?= escape(current_user()['company'] ?? '') ?>"></label><p id="accountEditStatus" role="status"></p><button type="submit">Guardar cambios</button></form></dialog><p id="accountSavedStatus" class="account-saved-status" role="status" hidden><?= stock_icon('check') ?><span>Información actualizada.</span></p>
     <details id="myProfileQR" class="profile-qr"><summary><?= stock_icon('qr') ?>Mi QR de perfil<span class="profile-chevron"><?= stock_icon('chevron') ?></span></summary><div class="profile-qr-image"></div><p role="status"></p></details>
 
+    <?php include __DIR__.'/vistas/public-name.vista.php'; ?>
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>

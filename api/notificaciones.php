@@ -25,6 +25,12 @@ try {
     $stmt = $db->prepare('SELECT n.event_key, n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? ORDER BY n.id DESC LIMIT 40');
     $stmt->execute([$userId]); $items = $stmt->fetchAll();
     foreach ($items as &$item) {
+        if($item['type']==='stock_invitation'){
+            if(preg_match('/^pallet-invite:(\d+):/',$item['event_key'],$match)){
+                $p=stock_query($db,'SELECT p.code,u.id,u.name,u.public_name FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.id=?',[(int)$match[1]])->fetch();
+                $item['body']=$p?get_public_user_name($p).' te invita al palet '.$p['code'].'. Acepta desde Stock.':'Te invitaron a un palet. Consultá Stock.';
+            }else $item['body']='Te invitaron a un palet. Consultá Stock.';
+        }
         if (isset($stockAlerts[$item['event_key']])) $item=array_merge($item,$stockAlerts[$item['event_key']]);
         unset($item['event_key']);
         $item['created_at']=(new DateTimeImmutable($item['created_at'],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);

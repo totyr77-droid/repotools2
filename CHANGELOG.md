@@ -85,3 +85,6 @@ Logo publicado como `img/onboarding-logo.png` y ruta absoluta en la bienvenida: 
 # Font Awesome local — 13/10/2026
 
 Kit sustituido por CSS/fuentes oficiales Free 6.7.2, mismas clases Solid/Brands, preload Solid y caché SW shell-v10. Solo recursos de iconografía nuevos cache-first; sin cambios de negocio. Pruebas local-icons y pwa-presentation pasan. Informe de mediciones/limitaciones y reversión: docs/ICONOGRAFIA-LOCAL.md.
+# Nombre público — 13/10/2026
+
+Campo users.public_name y migración 24 con generación UTF-8 sin sobrescribir valores elegidos. Edición propia con CSRF; vistas compartidas usan nombres públicos dinámicos, administración conserva nombre real. PostgreSQL aislado, SQLite, UI, permisos y enlaces pasan. Auditoría previa solo lectura: 6 cuentas pendientes, 0 colisiones. Detalles/reversión: docs/NOMBRES-PUBLICOS.md.
