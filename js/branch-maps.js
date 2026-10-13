@@ -58,5 +58,33 @@
     return {locate,update,openBranch:id=>markers.get(String(id))?.openPopup(),resize:()=>map.invalidateSize(),destroy:dispose};
   }
   window.RepoBranchMaps={create,coords};
+  window.RepoBranchLookup=function({form,host,csrf,onExisting,valid=()=>true,onBusy=()=>{},showLoading=true}){
+    const doc=host.ownerDocument,box=doc.createElement('div');box.className='branch-place-suggestions';box.hidden=true;host.prepend(box);
+    let generation=0,controller;
+    function clear(){generation++;controller?.abort();box.replaceChildren();box.hidden=true;box.removeAttribute('aria-busy');onBusy(false);}
+    function label(value){const n=doc.createElement('small');n.textContent=value;box.append(n);}
+    function button(value,fn){const b=doc.createElement('button');b.type='button';b.className='library-secondary branch-nearby-option';const svg=doc.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('aria-hidden','true');const p=doc.createElementNS(svg.namespaceURI,'path');p.setAttribute('d','M3 10h18l-2-6H5zM4 10v11h16V10M9 21v-7h6v7');svg.append(p);b.append(svg,doc.createTextNode(value));b.addEventListener('click',fn);box.append(b);}
+    async function lookup(point,external=false){
+      clear();const token=generation;controller=new AbortController();box.hidden=!showLoading;box.setAttribute('aria-busy','true');label('Buscando locales cercanos…');onBusy(true);
+      const initial=Object.fromEntries(['name','address','locality','province','latitude','longitude'].map(k=>[k,form.elements[k].value]));
+      try{
+        const response=await (page?.fetch||fetch.bind(window))('api/direccion-sucursal.php',{method:'POST',credentials:'same-origin',signal:controller.signal,body:new URLSearchParams({...point,mode:'places',external:external?'1':'0',csrf:csrf()})}),result=await response.json();
+        if(token!==generation||!valid())return;if(!response.ok)throw Error(result.error||'No pudimos buscar el local.');box.replaceChildren();
+        const locals=result.branches||[],places=result.places||[];
+        for(const k of ['address','locality','province'])if(form.elements[k].value===initial[k]&&typeof result.suggestion?.[k]==='string')form.elements[k].value=result.suggestion[k];
+        label(locals.length?'Ya hay sucursales cerca. ¿Es alguna de estas?':places.length?'Selecciona el local y revisa sus datos.':result.configured===false?'La búsqueda de locales todavía no está activada. Puedes completar los datos.':'No encontramos locales. Puedes completar los datos manualmente.');
+        for(const b of locals)button(b.name+' · '+b.address+' · '+b.distance+' m',()=>{clear();onExisting(b);});
+        if(locals.length)button('Es otro local · Buscar',()=>lookup(point,true));
+        for(const b of places)button(b.name+' · '+b.address+' · '+b.distance+' m',()=>{
+          for(const k of Object.keys(initial))if(form.elements[k].value===initial[k]&&b[k]!==undefined)form.elements[k].value=b[k];
+          box.replaceChildren();label('Datos sugeridos. Revisa y guarda la sucursal.');attribution();
+        });
+        function attribution(){const a=doc.createElement('a');a.href='https://www.geoapify.com/';a.target='_blank';a.rel='noopener';a.textContent='Powered by Geoapify';box.append(a);const osm=doc.createElement('a');osm.href='https://www.openstreetmap.org/copyright';osm.target='_blank';osm.rel='noopener';osm.textContent='© OpenStreetMap';box.append(osm);}
+        if(places.length)attribution();
+      }catch(e){if(token===generation&&valid()&&e.name!=='AbortError'){box.replaceChildren();label(e.message+' Puedes completar los datos manualmente.');}}
+      finally{if(token===generation){box.removeAttribute('aria-busy');box.hidden=!valid();onBusy(false);}}
+    }
+    page?.onLeave(clear);return {lookup,clear};
+  };
   page?.onLeave(()=>{left=true;for(const dispose of instances)dispose();instances.clear();});
 })();
