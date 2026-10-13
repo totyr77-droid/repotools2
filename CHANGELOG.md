@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Etiqueta A4 sin página sobrante
+
+Impresión con margen seguro, alto contenido y saltos entre etiquetas, sin segunda hoja residual. Logo horizontal original06 renderizado negro sobre blanco, QR grande, código y texto legibles; exportación PNG y vista SVG comparten composición. Validación PDF1/2/5 páginas, logo monocromo, QR decodificado y regresión de impresión múltiple/permisos. Detalles y reversión en docs/IMPRESION-PENDIENTES.md.
+
 ## 13/10/2026 — Ajustes y preferencias de confirmación
 
 Pantalla agrupada sin tarjetas anidadas: Perfil, Preferencias y Accesos, conservando Seguridad. Sonido/vibración guardados en la cuenta, activos por defecto también para usuarios existentes, días con autosave y mano con selección inmediata; feedback flotante existente, incluido error con reversión de control. API preferencias parcial y validada, misma infraestructura y persistencia de vencimientos. Principal Normal/Rápido y su lector celular remoto condicionan únicamente el aviso; tono, vibración, cámara y reconocimiento conservados. Migración25 validada en SQLite y PostgreSQL aislado; pruebas y reversión en docs/AJUSTES-PREFERENCIAS.md.

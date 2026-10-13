@@ -1,5 +1,17 @@
 # Impresión de etiquetas pendientes
 
+## Corrección de A4 — 13/10/2026
+
+La hoja anterior fijaba210×297mm completos sin margen de impresión. Ahora @page conserva A4 con8mm de margen; cada etiqueta usa280mm de alto,1mm por debajo del área imprimible, sin desbordamiento y con salto únicamente antes de la siguiente. Controles no se imprimen. Esto evita que el ajuste y redondeo de papel arrastren contenido a una página adicional.
+
+js/pallet-label.js integra el logo original06_horizontal_blanco_transparente de2048px como PNG embebido y filtro SVG negro que conserva su transparencia sobre fondo blanco; no depende de una descarga externa dentro de la imagen. Logo2040px, QR vectorial1920px con espacio blanco de lectura, código200px y texto48–64px dentro del lienzo A4 de2480×3508. Exportación PNG reutiliza exactamente el SVG; no hay dos diseños distintos. La URL y el código del QR se conservan. La fecha reservada usa horario argentino sin segundos.
+
+Archivos: css/pallet-label.css, js/pallet-label.js, versiones en etiqueta.php y vistas/footer.vista.php, tests/pallet-label-layout.cjs y continuidad. No modifica reservas, permisos, productos ni datos.
+
+Pruebas: node tests/pallet-label-layout.cjs genera PDF reales de Chrome con1/2/5 etiquetas y confirma exactamente1/2/5 páginas A4, sin página residual; logo original monocromo sobre blanco, PNG2480×3508 y QR decodificado con el lector local al enlace correcto. Vista PNG revisada. node tests/pending-label-print.cjs conserva selección, impresión, autorización403 y móvil/PC. Lint PHP y sintaxis JS pasan. Impresora física y Safari pendientes; imprimir en A4, escala100% y sin encabezados/pies añadidos por el navegador.
+
+Revertir solo esta corrección: git revert del commit de esta entrega, o restaurar los cuatro archivos de aplicación a0430763 y retirar su prueba/documentación. Sin migraciones ni cambios de datos.
+
 Stock → Pendientes → Seleccionar aparece cuando existen dos o más etiquetas reservadas para la cuenta. En modo selección, tocar un bloque marca/desmarca ese código en lugar de abrir el palet; aria-pressed expresa la selección y funciona también con teclado. Todos/Ninguno permite seleccionar hasta100, límite existente de etiqueta.php. Cancelar limpia la selección y recupera el comportamiento normal.
 
 Imprimir (cantidad) abre etiqueta.php?codigos=… en otra pestaña y conserva Stock. Una hoja A4 por etiqueta, QR, logo y código legible existentes; el usuario confirma la impresión con el botón de impresora de esa página. Sin selección, el enlace no tiene href y no es interactivo. Si queda una sola etiqueta, desaparece el control múltiple y conserva su reimpresión individual. Recargar la lista descarta códigos que dejaron de estar pendientes.

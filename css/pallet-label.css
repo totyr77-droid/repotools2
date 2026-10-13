@@ -1,3 +1,10 @@
 * { box-sizing: border-box; } body { margin: 0; font: 16px Arial,sans-serif; background: #eeecf5; color: #27187e; } .label-toolbar { display: flex; align-items: center; justify-content: space-between; max-width: 794px; margin: 16px auto; padding: 0 16px; } .label-toolbar button,.label-share { border: 0; width: 48px; height: 48px; border-radius: 10px; background: #27187e; color: white; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; } .label-toolbar svg,.label-share svg { width: 22px; height: 22px; } #labelStatus { text-align: center; padding: 0 16px; } .label-sheet { width: min(794px,100%); margin: 16px auto; } .label-sheet img { display: block; width: 100%; height: auto; } .label-share { display: flex; width: 48px; padding: 0; margin: 8px auto; }
-@page { size: A4 portrait; margin: 0; }
-@media print { body { background: white; } .label-toolbar,#labelStatus,.label-share { display: none !important; } .label-sheet { width: 210mm; height: 297mm; margin: 0; break-after: page; page-break-after: always; } .label-sheet:last-child { break-after: auto; page-break-after: auto; } .label-sheet img { width: 210mm; height: 297mm; } }
+@page { size: A4 portrait; margin: 8mm; }
+@media print {
+  html,body { margin: 0; padding: 0; background: white; }
+  .label-toolbar,#labelStatus,.label-share { display: none !important; }
+  /* Printable A4 area is 194 × 281mm; reserve 1mm for browser rounding. */
+  .label-sheet { width: 100%; height: 280mm; margin: 0; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+  .label-sheet + .label-sheet { break-before: page; page-break-before: always; }
+  .label-sheet img { width: 100%; height: 100%; object-fit: contain; }
+}
