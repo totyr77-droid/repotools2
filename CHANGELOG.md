@@ -2,7 +2,7 @@
 
 ## 13/10/2026 — Número de etiqueta al ancho disponible (desarrollo)
 
-Código del palet a2040px de ancho, fuente360px y posición reservada bajo el QR; márgenes A4 y texto inferior intactos. Prueba de límites geométricos, PDF1/2/5 páginas, QR y selección múltiple pasan; revisión visual PNG. Cambio exclusivo desarrollo, pendiente impresora real. Revertir el commit de esta entrega para volver al código anterior.
+Código del palet a2040px de ancho, fuente360px y posición reservada bajo el QR; márgenes A4 y texto inferior intactos. Prueba de límites geométricos, PDF1/2/5 páginas, QR y selección múltiple pasan; revisión visual PNG. Cambio autorizado para main13/10, pendiente impresora real. Revertir el commit de esta entrega para volver al código anterior.
 
 ## 13/10/2026 — Resumen de demo Stock compacto
 

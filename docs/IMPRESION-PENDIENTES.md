@@ -1,8 +1,8 @@
 # Impresión de etiquetas pendientes
 
-## Número al ancho disponible — desarrollo
+## Número al ancho disponible — publicado en main
 
-Nueva petición13/10: número del palet ocupa2040px del lienzo2480px mediante textLength y lengthAdjust, manteniendo220px a cada lado; fuente360px y línea base3150, título2800. Aprovecha todo el ancho útil sin salir de los márgenes ni superponerse al pie3240. SVG y PNG comparten ajuste; QR y paginación intactos. La prueba pallet-label-layout comprueba caja geométrica del número, márgenes y separación vertical además de PDF1/2/5 páginas y lectura QR. Reversión mediante git revert del commit de esta ampliación; solo rama desarrollo hasta autorización de fusionar.
+Nueva petición13/10: número del palet ocupa2040px del lienzo2480px mediante textLength y lengthAdjust, manteniendo220px a cada lado; fuente360px y línea base3150, título2800. Aprovecha todo el ancho útil sin salir de los márgenes ni superponerse al pie3240. SVG y PNG comparten ajuste; QR y paginación intactos. La prueba pallet-label-layout comprueba caja geométrica del número, márgenes y separación vertical además de PDF1/2/5 páginas y lectura QR. Reversión mediante git revert del commit de esta ampliación; publicación en main autorizada explícitamente13/10; configuración del entorno de desarrollo excluida.
 
 ## Corrección de A4 — 13/10/2026
 
