@@ -10,6 +10,8 @@ foreach(['stock'=>6,'palets'=>6,'vencimientos'=>7] as $type=>$columns){$out=fope
 export_check(stock_export_rows($db,2,'stock',1)->fetch()['units']===5,'Accepted access');
 try{stock_export_rows($db,3,'stock',1);throw new RuntimeException('IDOR not denied');}catch(CatalogException $e){export_check($e->status===403,'IDOR403');}
 $db->exec("UPDATE pallet_access SET status='pending' WHERE user_id=2");export_check(!stock_export_rows($db,2,'stock')->fetch(),'Pending denied');
+export_check(stock_csv_cell(-1)==='-1','Numeric expiry remains a number');
+$out=fopen('php://temp','w+');stock_write_csv($out,$db,2,'stock',stock_export_rows($db,2,'stock'));rewind($out);export_check(substr_count(stream_get_contents($out),"\n")===1,'Empty CSV still has header');fclose($out);
 export_check(stock_csv_cell('=HYPERLINK("x")')[0]==="'",'Formula injection');export_check(stock_csv_cell("\t+1")[0]==="'",'Whitespace formula');
 $today=new DateTimeImmutable('2026-10-13',new DateTimeZone('America/Buenos_Aires'));
 foreach(['2026-10-12'=>'Vencido','2026-10-13'=>'Hoy','2026-10-23'=>'Próximo','2026-10-24'=>'Normal'] as $date=>$state)export_check(stock_expiry_state($date,10,$today)['label']===$state,'Expiry boundary');

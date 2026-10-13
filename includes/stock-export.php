@@ -20,6 +20,7 @@ function stock_export_rows(PDO $db,int $user,string $type,?int $pallet=null): PD
     return stock_query($db,"SELECT b.ean,b.name,b.units,b.expires,p.code,s.name AS branch,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN stock_branches s ON s.id=p.branch_id LEFT JOIN products c ON c.ean=b.ean WHERE {$where} ORDER BY p.code,b.ean,b.expires",$args);
 }
 function stock_csv_cell($value): string {
+    if(is_int($value)||is_float($value))return (string)$value;
     $text=(string)($value??'');
     // Prevent spreadsheet formulas in user-provided names and preserve codes.
     return preg_match('/^[\s]*[=+@\-]/u',$text)?"'".$text:$text;

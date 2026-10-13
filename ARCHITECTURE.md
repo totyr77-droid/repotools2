@@ -34,7 +34,7 @@ El selector abre primero el mapa. Alta/edición muestra el mapa arriba y tres su
 
 ## Offline y PWA
 
-Un único service worker: `sw.js`, registrado por `js/offline-cache.js`. Shell actualv9 con `offline.html`; no se cachean APIs privadas. Navegaciones cubiertas muestran shell offline al fallar la red. Requiere preparar recursos con conexión en el mismo origen antes de usarlos offline.
+Un único service worker: `sw.js`, registrado por `js/offline-cache.js`. Shell actualv10 con `offline.html`; no se cachean APIs privadas. Navegaciones cubiertas muestran shell offline al fallar la red. Requiere preparar recursos con conexión en el mismo origen antes de usarlos offline.
 
 `js/stock-offline.js` utiliza IndexedDBv2 para cargas Stock/Biblioteca, catálogo y envíos recientes, separados por cuenta. `js/library-offline.js` y Stock verifican conectividad autenticada, identidad e idempotencia antes de sincronizar. Inicio offline conserva lista local, sin enviar lecturas a TOPs. No borrar IndexedDB al revertir una entrega.
 
@@ -44,4 +44,10 @@ Un único service worker: `sw.js`, registrado por `js/offline-cache.js`. Shell a
 
 Leer `PENDIENTES.md` y ROADMAP antes de continuar. Historial de decisiones y entregas en CHANGELOG; las notas antiguas no prevalecen sobre código actual. Mantener diseño minimalista, SVG y preferencia de mano móvil; escritorio conserva disposición diestra. Pruebas en `tests/` usan mayormente DB temporal/Chrome simulado, no equivalen a pruebas de campo.
 
-La raíz de trabajo no contiene Git; publicación mediante checkout `tmp/upstream` en main y despliegue automático Render. Versionar solo archivos de la entrega, conservar cambios del usuario y documentar validación/reversión. Publicar un commit no demuestra que Render haya terminado.
+La raíz de trabajo no contiene Git; publicación mediante checkout `tmp/upstream` en desarrollo (main requiere autorización explícita) y despliegue automático Render. Versionar solo archivos de la entrega, conservar cambios del usuario y documentar validación/reversión. Publicar un commit no demuestra que Render haya terminado.
+
+## Entrega4–8 (desarrollo)
+
+Indicador Stock/Biblioteca lee loads/libraryLoads existentes; eventos de escritura/envío, sin segunda cola. CSV privado api/stock-export.php: stock propio/aceptado, BOM/semicolon, referencias y nombres públicos, generación incremental. Resumen privado api/stock-overview.php: cuatro métricas por agregación y últimos cinco movimientos, saneamiento común pallet_activity_present. Productos cuenta lotes EAN+fecha, no unidades.
+
+initialize_database consulta todas las versiones una vez dentro de la transacción/bloqueo existentes; no usa MAX ni caché entre requests. Auditoría y límites de pruebas reales: docs/AUDITORIA-2026-10-13.md.

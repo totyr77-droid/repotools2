@@ -14,6 +14,9 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Nueva entrega puntos4–8 en desarrollo: sincronización383453d, CSVfa06e57, resumenStockec57fb9; pushes separados confirmados. Regresión49JS+20PHP+PostgreSQL temporal pasa. Auditoría midió producción pública y Neon; corrigió loader exteriorcdf70e6 y versiones migraciones5ba72e2 (27→1 consulta, ~84% menor comprobación remota). Informe, archivos, reversión y checklist físico: docs/AUDITORIA-2026-10-13.md. Main intacto, BETA exclusivo desarrollo. Falta URL/Live beta, medición autenticada dentro Render, Safari/Android/Excel/cámara reales. Esta autorización reemplaza los límites antiguos No implementar puntos4/5/7.
+
+
 Punto3 Actividad del palet en desarrollo: captura backend/transacción/stock_operations, migración27 tabla actor/metadata mínima e índice palet+id, GET privado25+cursor, lista plegable sin modal. Creación/productos/cantidades/vencimientos/colaboradores/descripción; nombres públicos dinámicos, sin IDs personales/email. UI/permisos/retry offline/pruebas de regresión pasan; PostgreSQL esquema temporal validó26/27, fechas, FK SET NULL y rollback. docs/ACTIVIDAD-PALETS.md. No implementar Puntos4/5/7. Pendiente campo Safari/beta real.
 
 Punto2 TOPs2.0 autorizado en desarrollo: Semana/Mes/Histórico, Códigos distintos/Escaneos totales/Reportes aprobados, public_name seguro sin IDs/nombre privado, actualización local, top50+posición propia, migración26 índices por fecha. Pruebas tops.php/tops-ui pasan; docs/TOPS-2.md. Aportes pospuesto por duplicar métrica de aprobaciones. Antes de Punto3 confirmar push de Punto2. PostgreSQL/Safari beta pendientes.
@@ -65,6 +68,7 @@ Mantener minimalismo, SVG, comodidad móvil, preferencia de mano y adaptación P
 Actualización posterior: créditos discretos y cuerpo del mapa sin colapso; Safari real pendiente. Continuar la medición Render/Neon de docs/RENDIMIENTO.md antes de optimizar.
 
 Entrega retomada: fotos desde celular vinculado a PC, evidencia EAN temporal y cancelación segura (migración aditiva 23; docs/FOTOS-PC-CELULAR.md). Enlaces nuevos /s/token, compatibilidad anterior, contexto formal y controles alineados (docs/ENLACES-CORTOS.md). Pruebas locales pasan; cámara física, Safari y despliegue Render por verificar. La prueba antigua de reportes conserva un fallo de fixture por el límite de una sesión PC; no se declara toda la suite aprobada.
-`nPunto4 autorizado por el nuevo pedido: indicador de sincronización Stock/Biblioteca, mismas colas e idempotencia. Pruebas offline/retry/actividad pasan; docs/SINCRONIZACION-VISIBLE.md. Continuar puntos5–8 en desarrollo, uno por commit y push; Safari físico pendiente.
+
+Punto4 autorizado por el nuevo pedido: indicador de sincronización Stock/Biblioteca, mismas colas e idempotencia. Pruebas offline/retry/actividad pasan; docs/SINCRONIZACION-VISIBLE.md. Continuar puntos5–8 en desarrollo, uno por commit y push; Safari físico pendiente.
 Punto5: CSV Stock/Palets/Vencimientos, permisos servidor, BOM/semicolon, protección de fórmulas y generación incremental. Pruebas backend3001filas/UI360–1366 pasan; docs/EXPORTACIONES.md. Excel/Safari reales pendientes. Detectado loader inicial de palets sin cierre en flujo sin invitaciones: revisar en auditoría punto8.
 Punto6: resumen Stock4 métricas + últimos5 movimientos plegados, alcance propio/aceptado, una petición, helper de actividad reutilizado; docs/RESUMEN-STOCK.md. Pruebas ceros/300palets/fronteras/privacidad/UI/error pasan. Seguir regresión7 y auditoría8 sin nuevas funciones.

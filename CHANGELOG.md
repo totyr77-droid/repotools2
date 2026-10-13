@@ -135,3 +135,7 @@ Campo users.public_name y migración 24 con generación UTF-8 sin sobrescribir v
 # Acceso, demo y capa de avisos — 13/10/2026
 
 Reportes exige sesión, queue exige rol y API deniega consultas anónimas; mantiene envío anónimo con config seguro y recibo simple. Stock/Biblioteca sin sesión tienen demo ficticia separada. Toasts usan top layer y PC confirma EAN/QR. Pruebas específicas de acceso/demo/capa, reports.php unitario y conexiones/fotos pasan. Ver docs/ACCESO-REPORTES.md y docs/DEMO-Y-AVISOS.md para matriz, límites y reversión.
+
+## 13/10/2026 — Desarrollo: sincronización, CSV y resumen
+
+Puntos4/5/6 publicados por separado383453d/fa06e57/ec57fb9. Indicador reutiliza IndexedDB; CSV3 privado con BOM/semicolon; resumen compacto y actividad reciente común. Auditoría: loader exteriorcdf70e6, consultas de versiones27→1 en5ba72e2 con comparación remota.49JS+20PHP+PostgreSQL temporal pasan; fixtures actualizados sin relajar permisos. Mobile/PC/mano izquierda y errores/retry verificados. Archivos, mediciones, reversión y pruebas físicas pendientes en docs/AUDITORIA-2026-10-13.md. Main intacto; beta Live no confirmado sin URL.
