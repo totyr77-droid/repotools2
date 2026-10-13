@@ -611,3 +611,10 @@ Moderación añade pestaña General solo manager. API view=general valida rango 
 Validación tests/manager-general.cjs Chrome/SQLite:11tarjetas, usuarios2/palets2,320/390/1366px sin overflow, cambio a Registros y acceso directo403 invitado/admin tras cambiar rango. PHP/JS sintaxis. Sin cuentas reales ni PostgreSQL producción modificados. Revertir commit restaura archivos anteriores; no datos nuevos en DB.
 
 Continuidad: ampliar panel con tendencias por período y accesos a pendientes solo si usuario lo solicita; por ahora totales actuales sin estimaciones. Pendiente prueba Safari iPhone tras aviso preparación offline; no afirmar compatibilidad real ya verificada. Informe real señalado resultó selección fija con título de sucursal; se explicó crear enlace por Sucursal, sin alterar enlace/datos reales. Mantener estética minimalista y permisos server.
+
+
+## Mapa de sucursales en Moderación — 13/10/2026
+
+Completado pedido pendiente: al abrir mapa de alta/edición en Moderación se consulta directorio común y se muestran marcadores de otros locales con coordenadas, aunque búsqueda/lista esté filtrada o paginada. Local editado se representa con punto propio, excluido del conjunto para evitar duplicación. Protección versión/mapVersion evita creación después de cerrar/navegar. Listado alineado al estilo Usuarios: filas compactas, metadata chip, iconos y acciones juntas. Diálogo PC960px, formulario2columnas, mapa mayor; mantiene móvil/mano. Permisos existentes admin/manager conservados; moderador no recibe nuevos privilegios. Sin migraciones/datos reales modificados.
+
+Validación tests/moderation-branch-map.cjs Chrome/SQLite: filtro Local Uno devuelve1fila, mapa carga marcador Local Dos creado por otra cuenta, nombre correcto, coordenadas del editado intactas;320/390/1366px sin overflow y APIgeneral sigue403 admin/invitado. JS sintaxis. Popup al hacer clic no verificado (prueba simulada no llegó a mostrarlo); probarlo en navegador real junto con interacción mapa. Revertir commit devuelve JS/CSS/versiones anteriores.
