@@ -22,7 +22,17 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <title>Repotools - Escáner para Repositores | Gestión de Stock e Inventario</title>
     <meta property="og:title" content="Repotools - Escáner para Repositores">
     <meta property="og:description" content="Escaneá productos, controlá stock y organizá tu trabajo.">
-    <meta property="og:image" content="https://repotools.online/img/logo.png">
+    <meta property="og:image" content="https://repotools.online/img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-pwa-512x512.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="Logo de Repotools blanco sobre fondo negro">
+    <meta property="og:site_name" content="Repotools">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Repotools - Escáner para Repositores">
+    <meta name="twitter:description" content="Escaneá productos, controlá stock y organizá tu trabajo.">
+    <meta name="twitter:image" content="https://repotools.online/img/Repotools_Logo_Pack_Blanco/04_pwa_fondo_negro/repotools-pwa-512x512.png">
+    <meta name="twitter:image:alt" content="Logo de Repotools blanco sobre fondo negro">
     <meta property="og:url" content="https://repotools.online/">
     <meta property="og:type" content="website">
 
