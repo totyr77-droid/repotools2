@@ -143,7 +143,11 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 
 @media(min-width:1024px){:is(#reviewReportDialog,#productReportDialog,#productEditDialog,#stockProductDialog,#libraryProductDialog,#libraryInfoDialog,#libraryImportDialog,#palletAccessDialog,#stockShareDialog,#stockSharesDialog,#branchDialog,#palletBranchDialog,#userEditDialog,#accountEditDialog){--dialog-padding-x:24px;--dialog-padding-y:24px;padding:24px}:is(#reviewReportForm,#productReportForm):not([hidden]){grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-.offline-preparation-notice{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:10px 12px;border:1px solid #c6e8d3;border-radius:10px;background:#eaf7ef;color:#17633d;font-size:.85rem}.offline-preparation-notice svg{width:20px;height:20px;flex:none}.offline-preparation-notice[data-error=true]{background:#fff7dd;border-color:#efd99c;color:#705315}
+.offline-preparation-notice{position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;translate:-50% 0;z-index:12000;display:flex;align-items:center;gap:8px;width:max-content;max-width:min(420px,calc(100vw - 32px));box-sizing:border-box;margin:0;padding:10px 12px;border:1px solid #c6e8d3;border-radius:12px;background:#eaf7ef;color:#17633d;font-size:.85rem;box-shadow:0 6px 20px #17203320;pointer-events:none;animation:offline-notice-enter 220ms ease-out}.offline-preparation-notice svg{width:20px;height:20px;flex:none}.offline-preparation-notice[data-error=true]{background:#fff7dd;border-color:#efd99c;color:#705315}
+.offline-preparation-notice--ready{animation:offline-notice-ready 2400ms ease both}
+@keyframes offline-notice-enter{from{opacity:0;transform:translateY(-28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes offline-notice-ready{0%{opacity:0;transform:translateY(-28px)}10%,86%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-28px)}}
+@media(prefers-reduced-motion:reduce){.offline-preparation-notice,.offline-preparation-notice--ready{animation:none}}
 
 @media(min-width:1024px){#palletBranchDialog:has(#palletBranchPreview:not([hidden])):has(#branchPicker[hidden]){width:min(720px,calc(100% - 64px))}#palletBranchPreview:not([hidden]){justify-content:flex-end;gap:8px}#palletBranchPreviewInfo{flex:1;min-width:0;margin-right:16px}#palletBranchPreview>button{flex:0 0 44px;height:44px}#palletBranchPreviewInfo strong{line-height:1.4}}
 

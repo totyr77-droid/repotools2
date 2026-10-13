@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Aviso offline flotante
+
+Aviso de preparación fuera del flujo: posición fija superior, entrada/bajada y salida hacia arriba; confirmación dura 2,4 segundos en lugar de 6. Conserva colores, icono, role=status y reduce movimiento según preferencia. No modifica caché ni service worker. Validación: sintaxis JS, PHP lint y prueba offline-start. Revertir css/device-workspace.css, js/offline-cache.js y versión del pie desde 0d0b1c2.
+
 ## 13/10/2026 — Cargas visuales
 
 Sistema central de indicadores, skeletons y botones con demora, cancelación y accesibilidad. Integración visual en navegación, fichas, listas y consultas públicas, sin cambiar negocio/APIs. Análisis, pruebas, limitaciones y reversión en [CARGAS-VISUALES](docs/CARGAS-VISUALES.md).

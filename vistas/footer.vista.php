@@ -25,7 +25,7 @@
 <?php endif; ?>
 <!-- SCRIPTS -->
 <script src="js/loading.js?v=20261013-loading1"></script>
-<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261012-safari"></script>
+<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/offline-cache.js?v=20261013-floating"></script>
 <script src="js/stock-offline.js?v=20261012-sync-dialog"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-sync-dialog"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
