@@ -139,3 +139,7 @@ Reportes exige sesión, queue exige rol y API deniega consultas anónimas; manti
 ## 13/10/2026 — Desarrollo: sincronización, CSV y resumen
 
 Puntos4/5/6 publicados por separado383453d/fa06e57/ec57fb9. Indicador reutiliza IndexedDB; CSV3 privado con BOM/semicolon; resumen compacto y actividad reciente común. Auditoría: loader exteriorcdf70e6, consultas de versiones27→1 en5ba72e2 con comparación remota.49JS+20PHP+PostgreSQL temporal pasan; fixtures actualizados sin relajar permisos. Mobile/PC/mano izquierda y errores/retry verificados. Archivos, mediciones, reversión y pruebas físicas pendientes en docs/AUDITORIA-2026-10-13.md. Main intacto; beta Live no confirmado sin URL.
+
+## 13/10/2026 — Distribución responsive (desarrollo)
+
+Capa responsive final con títulos/espacios compactos, Inicio arriba y dos columnas en PC, Biblioteca adaptable, Ajustes hasta tres columnas, modales limitados al viewport y formularios de acceso contenidos. Navegación existente conservada; acciones de cámara según mano en móvil y palet público con acción compacta. Sin cambios de negocio ni permisos. Validación y reversión: docs/RESPONSIVE-2026-10-13.md.

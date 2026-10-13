@@ -72,7 +72,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
 
-    <link href="css/responsive.css" rel="stylesheet" type="text/css">
+
     <link href="css/notifications.css?v=20261012-desktop-status" rel="stylesheet" type="text/css">
     <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=20261013-public1" rel="stylesheet"><?php endif; ?>
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
@@ -93,6 +93,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <!-- Development-only marker: exclude this integration when publishing to main. -->
 <link href="css/development.css?v=20261013-beta1" rel="stylesheet">
 <?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261013-activity1" rel="stylesheet"><?php endif; ?>
+<link href="css/responsive.css?v=20261013-workspaces1" rel="stylesheet" type="text/css">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
