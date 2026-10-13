@@ -143,3 +143,7 @@ Puntos4/5/6 publicados por separado383453d/fa06e57/ec57fb9. Indicador reutiliza 
 ## 13/10/2026 — Distribución responsive (desarrollo)
 
 Capa responsive final con títulos/espacios compactos, Inicio arriba y dos columnas en PC, Biblioteca adaptable, Ajustes hasta tres columnas, modales limitados al viewport y formularios de acceso contenidos. Navegación existente conservada; acciones de cámara según mano en móvil y palet público con acción compacta. Sin cambios de negocio ni permisos. Validación y reversión: docs/RESPONSIVE-2026-10-13.md.
+
+## 13/10/2026 — Zoom continuo (desarrollo)
+
+Control existente ahora responde al arrastre, toma rango/paso real, muestra nivel y agrupa ajustes pendientes sin reiniciar cámara. Hasta tres accesos compatibles, mínimo1× conservado, mano móvil existente, sin cambios de lector/audio/vibración. Pruebas y reversión: docs/ZOOM-DESLIZANTE.md.

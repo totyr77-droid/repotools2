@@ -137,7 +137,7 @@
           await track.applyConstraints({ ...constraints, advanced: [advanced] });
           if (!active()) return false;
           const actual = track.getSettings()[name];
-          if (name === 'torch' ? actual !== value : !Number.isFinite(actual) || Math.abs(actual - value) > .1) throw new Error('Control no disponible');
+          if (name === 'torch' ? actual !== value : !Number.isFinite(actual) || Math.abs(actual - value) > Math.max(.1, (zoom?.step || 0) / 2)) throw new Error('Control no disponible');
           return true;
         });
         updates = operation;
@@ -149,20 +149,62 @@
         text.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg>';
         const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
         input.setAttribute('aria-orientation', 'vertical');
-        input.min = minZoom; input.max = current.isQR ? zoom.max : Math.max(minZoom, Math.min(zoom.max, Math.max(3, minZoom + (zoom.step || .1)))); input.step = zoom.step > 0 ? zoom.step : .1;
-        let applied = Math.max(Number(input.min), Math.min(Number(input.max), settings.zoom ?? zoom.min));
-        input.value = applied;
-        const output = document.createElement('span'); output.className = 'ean-camera-zoom-value'; output.textContent = `${applied.toFixed(1)}×`;
-        const updateZoom = async () => {
-          if (!active()) return;
-          input.disabled = true;
-          try { if (await apply('zoom', Math.max(minZoom, Number(input.value)))) { applied = track.getSettings().zoom; output.textContent = `${applied.toFixed(1)}×`; } }
-          catch { if (active()) { input.value = applied; onStatus('No pudimos ajustar el zoom. Puedes seguir escaneando.'); } }
-          finally { input.disabled = false; }
+        const step = Number.isFinite(zoom.step) && zoom.step > 0 ? zoom.step : .1;
+        const snap = value => Math.max(Number(input.min), Math.min(Number(input.max), Number((zoom.min + Math.round((value - zoom.min) / step) * step).toFixed(6))));
+        input.min = Math.max(minZoom, Number((zoom.min + Math.ceil((minZoom - zoom.min) / step) * step).toFixed(6)));
+        input.max = Number((zoom.min + Math.floor((zoom.max - zoom.min) / step) * step).toFixed(6)); input.step = step;
+        let applied = snap(Number.isFinite(settings.zoom) ? settings.zoom : Number(input.min));
+        let pending = null, running = false, timer = null, disposed = false;
+        const output = document.createElement('span'); output.className = 'ean-camera-zoom-value';
+        const shortcuts = document.createElement('div'); shortcuts.className = 'ean-camera-zoom-shortcuts';
+        shortcuts.setAttribute('role', 'group'); shortcuts.setAttribute('aria-label', 'Zoom rápido');
+        const render = value => {
+          input.value = value;
+          const display = Number(value.toFixed(2)).toString();
+          output.textContent = display + '×';
+          input.setAttribute('aria-valuetext', display + ' aumentos');
+          shortcuts.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(Math.abs(Number(button.dataset.zoom) - value) < .001)));
         };
+        const flush = async () => {
+          timer = null;
+          if (disposed || !active() || running || pending === null) return;
+          running = true;
+          const value = pending; pending = null;
+          try {
+            if (Math.abs(value - applied) > .000001 && await apply('zoom', value)) applied = track.getSettings().zoom;
+          } catch {
+            if (!disposed && active() && pending === null) {
+              render(applied);
+              onStatus('No pudimos ajustar el zoom. Podés seguir escaneando.');
+            }
+          } finally {
+            running = false;
+            if (!disposed && active()) {
+              if (pending !== null) timer = setTimeout(flush, 60);
+              else render(applied);
+            }
+          }
+        };
+        const updateZoom = () => {
+          if (disposed || !active()) return;
+          pending = snap(Number(input.value));
+          render(pending);
+          if (!running && timer === null) timer = setTimeout(flush, 60);
+        };
+        input.addEventListener('input', updateZoom);
         input.addEventListener('change', updateZoom);
-        if (Number.isFinite(settings.zoom) && settings.zoom < minZoom) void updateZoom();
+        label.addEventListener('touchmove', event => event.stopPropagation(), { passive: true });
+        for (const value of (Number(input.max) >= 5 ? [1, 2, 5] : [1, 2, 3])) {
+          if (value < Number(input.min) || value > zoom.max || Math.abs(snap(value) - value) > .001) continue;
+          const button = document.createElement('button'); button.type = 'button'; button.dataset.zoom = value;
+          button.textContent = value + '×'; button.setAttribute('aria-label', 'Zoom ' + value + ' aumentos');
+          button.addEventListener('click', () => { input.value = value; updateZoom(); }); shortcuts.append(button);
+        }
+        render(applied);
+        if (Number.isFinite(settings.zoom) && settings.zoom < Number(input.min)) updateZoom();
         label.append(text, input, output); controls.append(label);
+        if (shortcuts.childElementCount > 1) controls.append(shortcuts);
+        current.cancelZoom = () => { disposed = true; pending = null; if (timer !== null) clearTimeout(timer); };
       }
       if (capabilities.torch === true) {
         const button = document.createElement('button'); button.type = 'button'; button.className = 'ean-camera-light';
@@ -180,7 +222,7 @@
         controls.append(button);
       }
       if(onManual){const manual=document.createElement('button');manual.type='button';manual.className='ean-camera-manual';if(capabilities.torch!==true)manual.classList.add('ean-camera-manual-only');manual.setAttribute('aria-label',current.isQR?'Ingresar código del palet':'Ingresar EAN');manual.title=manual.getAttribute('aria-label');manual.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M7 16h10"/></svg>';manual.addEventListener('click',()=>{if(active())Promise.resolve(onManual()).catch(onError);});controls.append(manual);}
-      current.disposeControls = () => controls.remove();
+      current.disposeControls = () => { current.cancelZoom?.(); controls.remove(); };
       element.append(controls);
     }
     function background(current, accept) {

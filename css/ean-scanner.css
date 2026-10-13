@@ -36,3 +36,10 @@
 #verc { z-index: 4; }
 
 .ean-camera-controls .ean-camera-zoom{touch-action:none;overscroll-behavior:none}
+/* Native range: dragging updates the live track without restarting it. */
+.ean-camera-controls .ean-camera-zoom { touch-action:none; }
+.ean-camera-zoom-value { min-width:38px; text-align:center; }
+.ean-camera-zoom-shortcuts { position:absolute; bottom:0; left:50%; transform:translateX(-50%); display:flex; gap:4px; pointer-events:auto; }
+.ean-camera-zoom-shortcuts button { width:44px; min-height:44px; padding:4px; border:1px solid #ffffff59; border-radius:50%; background:#f5f8ff29; color:white; font-size:.75rem; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); touch-action:manipulation; cursor:pointer; }
+.ean-camera-zoom-shortcuts button[aria-pressed=true] { background:#fff; color:#27187e; }
+@media(max-width:360px) { .ean-camera-zoom-shortcuts { gap:2px; } .ean-camera-zoom-shortcuts button { width:44px; } }

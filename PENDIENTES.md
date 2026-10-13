@@ -14,6 +14,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Zoom continuo en desarrollo: rango/paso real, input en vivo, cola último valor y accesos compatibles; mínimo1× conservado. Pruebas/reversión docs/ZOOM-DESLIZANTE.md. Safari/cámara real pendiente.
+
 Responsive profesional en desarrollo: capa compartida al final, Inicio/Stock/Biblioteca/Ajustes/modales adaptados, controles de cámara según mano y palet público compacto. Pruebas y reversión en docs/RESPONSIVE-2026-10-13.md. Safari físico pendiente; funciones/permisos intactos.
 
 Nueva entrega puntos4–8 en desarrollo: sincronización383453d, CSVfa06e57, resumenStockec57fb9; pushes separados confirmados. Regresión49JS+20PHP+PostgreSQL temporal pasa. Auditoría midió producción pública y Neon; corrigió loader exteriorcdf70e6 y versiones migraciones5ba72e2 (27→1 consulta, ~84% menor comprobación remota). Informe, archivos, reversión y checklist físico: docs/AUDITORIA-2026-10-13.md. Main intacto, BETA exclusivo desarrollo. URL beta confirmada por el usuario; omitir comprobaciones remotas por ahora. Falta medición autenticada dentro Render, Safari/Android/Excel/cámara reales. Esta autorización reemplaza los límites antiguos No implementar puntos4/5/7.

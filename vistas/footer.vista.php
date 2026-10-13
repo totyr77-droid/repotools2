@@ -31,12 +31,12 @@
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=20261013-sync-status"><script src="js/sync-status.js?v=20261013-sync-status"></script><script src="js/library-offline.js?v=20261013-sync-status"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261013-transition1"></script>
-<script src="js/device-connection.js?v=20261013-settings1"></script>
-<script src="js/action-notices.js?v=20261013-settings1"></script>
+<script src="js/device-connection.js?v=20261013-zoom2"></script>
+<script src="js/action-notices.js?v=20261013-zoom2"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
-<script src="js/ean-scanner.js?v=20261013-settings1"></script>
+<script src="js/ean-scanner.js?v=20261013-zoom2"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
@@ -46,14 +46,14 @@
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261013-access1"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/ean-scanner.js?v=20261013-settings1"></script>
+<script src="js/ean-scanner.js?v=20261013-zoom2"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
 <script src="js/branch-management.js?v=20261013-map-compact"></script>
 <script src="js/reports-page.js?v=20261013-loading1"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/ean-scanner.js?v=20261013-settings1"></script>
+<script src="js/ean-scanner.js?v=20261013-zoom2"></script>
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
@@ -71,9 +71,9 @@
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261013-access1"></script>
-<script src="js/ean-scanner.js?v=20261013-settings1"></script>
+<script src="js/ean-scanner.js?v=20261013-zoom2"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/script.js?v=20261013-settings1"></script>
+<script src="js/script.js?v=20261013-zoom2"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/scan-photo.js?v=20261011-orientation1"></script>
@@ -83,7 +83,7 @@
 <script src="js/botones.js?v=20261012-devices"></script>
 <script src="js/report-notifications.js?v=20261011-pendingcounts1"></script>
 <script src="js/notifications.js?v=20261011-compactpalets17"></script>
-<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261013-settings1"></script><script src="js/public-name.js?v=20261013-public1"></script><script src="js/account-edit.js?v=20261011-dialog2"></script><script src="js/account-security.js?v=20261011-security2"></script><?php endif; ?>
+<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261013-zoom2"></script><script src="js/public-name.js?v=20261013-public1"></script><script src="js/account-edit.js?v=20261011-dialog2"></script><script src="js/account-security.js?v=20261011-security2"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=20261011-directory7"></script><?php endif; ?>
 <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?>
 <?php include __DIR__ . '/onboarding.vista.php'; ?>
