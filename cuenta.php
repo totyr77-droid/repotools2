@@ -36,6 +36,7 @@ if (current_user() && $next) {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) && !current_user()) {
     $name = trim(is_string($_POST['name'] ?? null) ? $_POST['name'] : '');
+    if ($register) $name = preg_replace('/\s+/u', ' ', $name) ?? '';
     $email = strtolower(trim(is_string($_POST['email'] ?? null) ? $_POST['email'] : ''));
     $company = trim(is_string($_POST['company'] ?? null) ? $_POST['company'] : '');
     $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
@@ -43,8 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) &
         $error = 'La sesión del formulario venció. Intenta nuevamente.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 254) {
         $error = 'Ingresa un correo válido.';
-    } elseif ($register && (mb_strlen($name) < 2 || mb_strlen($name) > 80 || strlen($password) < 10 || strlen($password) > 72)) {
-        $error = 'El nombre debe tener entre 2 y 80 caracteres y la contraseña entre 10 y 72 bytes.';
+    } elseif ($register && (mb_strlen($name) < 3 || mb_strlen($name) > 80 || !preg_match('/^\S+(?: +\S+)+$/u', $name))) {
+        $error = 'Ingresá tu nombre y apellido (hasta 80 caracteres).';
+    } elseif ($register && (strlen($password) < 10 || strlen($password) > 72)) {
+        $error = 'La contraseña debe tener entre 10 y 72 bytes.';
     } elseif ($register && mb_strlen($company)>100) {
         $error = 'La empresa o agencia admite hasta 100 caracteres.';
     } else {
@@ -112,7 +115,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <?php if($deviceConflict): ?><aside class="account-device-notice" role="status"><?= account_icon('lock') ?><div><strong>Ya tienes otra <?= ($_SESSION['pending_device_login']['kind']??'desktop')==='desktop'?'computadora':'sesión de celular' ?> conectada</strong><p>¿Quieres cerrar esa sesión y entrar aquí? Las cargas pendientes se conservarán en el equipo anterior.</p></div></aside><form method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><div class="account-device-actions"><button type="submit" name="device_decision" value="cancel" class="library-secondary">Cancelar</button><button type="submit" name="device_decision" value="replace" class="library-primary">Entrar aquí</button></div></form><?php else: ?>
     <form method="post">
       <input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>">
-      <?php if ($register): ?><label><span class="account-field-title"><?= account_icon('user') ?>Nombre</span><input name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Tu nombre" required value="<?= escape($name) ?>"></label>
+      <?php if ($register): ?><label><span class="account-field-title"><?= account_icon('user') ?>Nombre y apellido</span><input name="name" autocomplete="name" minlength="3" maxlength="80" placeholder="Ej.: Juan Pérez" required value="<?= escape($name) ?>"></label>
       <label><span class="account-field-title"><?= account_icon('company') ?>Empresa o agencia <small>(opcional)</small></span><input name="company" autocomplete="organization" maxlength="100" placeholder="Marca, empresa o agencia" value="<?= escape($company) ?>"></label><p class="account-field-hint">Se mostrará junto a tu nombre en los palets.</p><?php endif; ?>
       <label><span class="account-field-title"><?= account_icon('mail') ?>Correo electrónico</span><input type="email" name="email" autocomplete="email" maxlength="254" placeholder="nombre@correo.com" required value="<?= escape($email) ?>"></label>
       <label><span class="account-field-title"><?= account_icon('lock') ?>Contraseña</span><span class="account-password-field"><input id="accountPassword" type="password" name="password" autocomplete="<?= $register ? 'new-password' : 'current-password' ?>" placeholder="<?= $register ? 'Al menos 10 caracteres' : 'Tu contraseña' ?>" <?= $register ? 'minlength="10" maxlength="72"' : '' ?> required><button class="password-toggle" type="button" aria-label="Mostrar contraseña" title="Mostrar contraseña" aria-controls="accountPassword" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></span></label>

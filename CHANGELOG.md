@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Nombre y apellido al crear cuenta
+
+Etiqueta y ejemplo explícitos en el registro; servidor rechaza nombre incompleto/vacío, normaliza espacios y conserva nombres compuestos. Mantiene un campo, SVG y autocomplete=name. public-names-ui valida rechazo y alta compuesta, además de privacidad y edición pública existente; lint pasa. Revertir cuenta.php y prueba a96110df. Sin datos ni permisos nuevos.
+
 ## 13/10/2026 — Demo explícita y pitido con silencio en iPhone
 
 Aviso amarillo DEMO y muestras etiquetadas sin modificar datos. El escáner compartido solicita playback solo durante el tono150ms y restaura el modo previo, con respaldo500ms; corrige el uso permanente de ambient durante el pitido. Pruebas EAN/QR, fallo de audio, evidencia y demo pasan. Safari físico/mezcla con música y Render pendientes. Detalle y reversión en docs/PITIDO-IPHONE.md y docs/DEMO-Y-AVISOS.md.
