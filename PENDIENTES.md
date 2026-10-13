@@ -1,5 +1,9 @@
 # Continuidad de Repotools
 
+## Rama de trabajo — 13/10/2026
+
+Por pedido del usuario, continuar en la rama `desarrollo`, creada desde `main` en `3014899`. Los nuevos commits y pushes deben ir a `desarrollo`. No fusionar ni publicar esos cambios en `main` hasta que el usuario lo indique explícitamente. El servicio público debe conservar su rama `main`; una prueba remota requerirá un servicio independiente, sin cambiar el despliegue actual ni usar datos de producción para pruebas destructivas.
+
 Antes de continuar, leer [ROADMAP.md](ROADMAP.md) para los pendientes actuales y [ARCHITECTURE.md](ARCHITECTURE.md) para entender el proyecto.
 
 Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se conservaron completas en [docs/HISTORIAL-PROYECTO.md](docs/HISTORIAL-PROYECTO.md); son historial, no instrucciones actuales.
