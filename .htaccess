@@ -7,3 +7,9 @@ DirectoryIndex index.php index.html
 <FilesMatch "^(\.env.*|\.neon|neon\.ts)$">
     Require all denied
 </FilesMatch>
+
+<Files "sw.js">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, must-revalidate"
+    </IfModule>
+</Files>
