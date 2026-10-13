@@ -13,6 +13,7 @@ async function scan(){await scanner.start();for(let i=0;i<3;i++){now+=100;succes
 (async()=>{
 await scan();assert.ok(drawn,'Captura solo después de confirmar');assert.ok(drawn[3]<video.videoWidth,'Usa el encuadre visible');assert.equal(drawn[4],video.videoHeight,'Conserva altura para localizar códigos verticales antes de recortar');assert.ok(Math.abs(drawn[1]+drawn[3]/2-video.videoWidth/2)<1,'Encuadre centrado');pendingBlob();assert.equal(api.takeScanPhoto('96385074'),null,'No adjunta una imagen de otro EAN');assert.equal(api.takeScanPhoto(ean),null,'Descarta la imagen que no corresponde');
 await scan();pendingBlob();assert.equal(api.takeScanPhoto(ean),image);assert.equal(api.takeScanPhoto(ean),null,'Se consume una sola vez');
+await scan();const pending=api.takeScanPhoto(ean);assert.equal(typeof pending.then,'function');pendingBlob();assert.equal(await pending,image,'Puede consumir la captura antes de que termine toBlob');assert.equal(api.takeScanPhoto(ean),null);
 await scan();const late=pendingBlob;await scanner.start();late();assert.equal(api.takeScanPhoto(ean),null,'No conserva una captura tardía del escaneo anterior');await scanner.stop();
 await scan();pendingBlob();const expiry=[...timers.values()].find(t=>t.delay===300000);assert.ok(expiry);expiry.cb();assert.equal(api.takeScanPhoto(ean),null,'Caduca sin persistir');
 console.log('OK: confirmed visible frame, EAN binding, one-use photo, stale capture rejection and five-minute expiry.');

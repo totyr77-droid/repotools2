@@ -17,5 +17,5 @@ try {
     echo json_encode(['environment' => 'temporary SQLite, no network/API', 'samples' => 30,
         'db_connect_ms' => round($connect, 3), 'new_schema_ms' => round($cold, 3),
         'warm_migration_median_ms' => round($checks[15], 3), 'warm_migration_p95_ms' => round($checks[28], 3),
-        'count_users_median_ms' => round($queries[15], 3), 'migration_version_checks' => 22], JSON_PRETTY_PRINT), PHP_EOL;
+        'count_users_median_ms' => round($queries[15], 3), 'migration_version_checks' => substr_count(file_get_contents(__DIR__ . '/../includes/database.php'), 'SELECT version FROM app_schema_migrations')], JSON_PRETTY_PRINT), PHP_EOL;
 } finally { $db = null; unlink($path); }

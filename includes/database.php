@@ -185,6 +185,11 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE scan_relays (user_id {$ref} PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, desktop_hash TEXT NOT NULL, mobile_hash TEXT NOT NULL DEFAULT '', context_key TEXT NOT NULL DEFAULT '', mode TEXT NOT NULL, context TEXT NOT NULL, ready INTEGER NOT NULL DEFAULT 0, code TEXT NOT NULL DEFAULT '', sequence INTEGER NOT NULL DEFAULT 0, expires_at BIGINT NOT NULL)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(22)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 23')->fetchColumn()) {
+            $db->exec("CREATE TABLE scan_relay_photos (user_id {$ref} PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, flow TEXT NOT NULL, sequence INTEGER NOT NULL, kind TEXT NOT NULL, photo TEXT NOT NULL, expires_at BIGINT NOT NULL)");
+            $db->exec('CREATE INDEX scan_relay_photos_expiry ON scan_relay_photos(expires_at)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(23)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

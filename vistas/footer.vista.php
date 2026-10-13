@@ -29,29 +29,29 @@
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-sync-dialog"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261011-branches1"></script>
-<script src="js/device-connection.js?v=20261012-standby"></script>
+<script src="js/device-connection.js?v=20261013-report-photo"></script>
 <script src="js/action-notices.js?v=20261012-security"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
-<script src="js/ean-scanner.js?v=20261012-continuous"></script>
+<script src="js/ean-scanner.js?v=20261013-report-photo"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=20261013-credits"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
-<script src="js/product-reports.js?v=20261011-reportphotofallback10"></script>
+<script src="js/product-reports.js?v=20261013-report-photo"></script>
 <script src="js/biblioteca.js?v=20261012-offline-add"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
-<script src="js/product-reports.js?v=20261011-orientation4"></script>
+<script src="js/product-reports.js?v=20261013-report-photo"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/ean-scanner.js?v=20261012-continuous"></script>
+<script src="js/ean-scanner.js?v=20261013-report-photo"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
 <script src="js/branch-management.js?v=20261013-map-compact"></script>
 <script src="js/reports-page.js?v=20261013-branch-map"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/ean-scanner.js?v=20261012-continuous"></script>
+<script src="js/ean-scanner.js?v=20261013-report-photo"></script>
 <script src="js/product-info.js?v=20261013-credits"></script>
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
@@ -68,8 +68,8 @@
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 <script src="js/product-info.js?v=20261013-credits"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
-<script src="js/product-reports.js?v=20261011-orientation4"></script>
-<script src="js/ean-scanner.js?v=20261012-continuous"></script>
+<script src="js/product-reports.js?v=20261013-report-photo"></script>
+<script src="js/ean-scanner.js?v=20261013-report-photo"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/script.js?v=20261011-result3"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>

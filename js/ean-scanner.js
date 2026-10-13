@@ -5,7 +5,9 @@
   let scanPhoto = null, photoTimer, photoVersion = 0;
   function clearScanPhoto() { ++photoVersion; scanPhoto = null; clearTimeout(photoTimer); }
   function takeScanPhoto(ean) {
-    const photo = scanPhoto?.ean === String(ean) && scanPhoto.expires > Date.now() ? scanPhoto.blob : null;
+    const matching = scanPhoto?.ean === String(ean) && scanPhoto.expires > Date.now();
+    if (matching) scanPhoto.taken = true;
+    const photo = matching ? scanPhoto.blob : null;
     clearScanPhoto(); return photo;
   }
   function rememberScanPhoto(ean, element) {
@@ -18,12 +20,16 @@
       const canvas = document.createElement('canvas');
       canvas.width = Math.max(1, Math.round(frame.width * scale)); canvas.height = Math.max(1, Math.round(frame.height * scale));
       canvas.getContext('2d').drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
+      let resolvePhoto;
+      const pending = new Promise(resolve => { resolvePhoto = resolve; });
+      const record = { ean: String(ean), blob: pending, expires: Date.now() + 300000, taken: false };
+      scanPhoto = record;
+      photoTimer = setTimeout(clearScanPhoto, 300000);
       canvas.toBlob(blob => {
-        if (version !== photoVersion || !blob || blob.size > 1024 * 1024) { canvas.width = canvas.height = 0; return; }
+        if ((version !== photoVersion && !record.taken) || record.expires <= Date.now() || !blob || blob.size > 1024 * 1024) { canvas.width = canvas.height = 0; resolvePhoto(null); return; }
         const photo = window.RepoScanPhoto ? window.RepoScanPhoto.normalize(canvas, String(ean), blob).finally(() => { canvas.width = canvas.height = 0; }) : blob;
         if (!window.RepoScanPhoto) canvas.width = canvas.height = 0;
-        scanPhoto = { ean: String(ean), blob: photo, expires: Date.now() + 300000 };
-        photoTimer = setTimeout(clearScanPhoto, 300000);
+        record.blob = photo; resolvePhoto(photo);
       }, 'image/jpeg', .8);
     } catch { /* Una foto opcional nunca bloquea el escaneo. */ }
   }

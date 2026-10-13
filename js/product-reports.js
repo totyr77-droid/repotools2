@@ -47,7 +47,7 @@
   const cameraStatus = document.getElementById('reportCameraStatus'), capture = document.getElementById('captureReportPhoto'), retryCamera = document.getElementById('retryReportCamera');
   const flash=document.getElementById('reportCameraFlash');let lightOn=false;
   const capturedPhotos = new Map(), previews = new Map();
-  let cameraVersion = 0, cameraKind, stream;
+  let cameraVersion = 0, cameraKind, stream, remoteCapture=null, cancelRemotePhoto=null, remoteRequestVersion=0;
   let revision = 0, active, busy = false, catalogPhoto='';
   function showProductPhoto(){const preview=document.getElementById('reportPreviewProduct'),fresh=capturedPhotos.has('product');const src=fresh?previews.get('product'):catalogPhoto;preview.hidden=!src;if(src)preview.src=src;else preview.removeAttribute('src');const note=document.getElementById('reportProductPhotoNote');note.textContent=fresh?'Foto nueva para este reporte.':src?'Foto actual del producto.':'';form.querySelector('[data-report-camera="product"]').textContent=fresh?'Volver a tomar':src?'Cambiar foto':'Tomar foto del producto';form.querySelector('[data-report-remove="product"]').hidden=!fresh;}
   function stopCamera() {
@@ -60,8 +60,19 @@
     form.querySelector(`[data-report-remove="${kind}"]`).hidden = true;
     form.querySelector(`[data-report-camera="${kind}"]`).textContent = kind === 'ean' ? 'Tomar foto del EAN' : 'Tomar foto del producto';if(kind==='product')showProductPhoto();
   }
+  function setPhoto(kind,blob){removePhoto(kind);capturedPhotos.set(kind,blob);const url=URL.createObjectURL(blob);previews.set(kind,url);const preview=document.getElementById(kind==='ean'?'reportPreviewEan':'reportPreviewProduct');preview.src=url;preview.hidden=false;form.querySelector('[data-report-remove="'+kind+'"]').hidden=false;form.querySelector('[data-report-camera="'+kind+'"]').textContent='Volver a tomar';if(kind==='product')showProductPhoto();}
+  const cancelPhotoButton=document.createElement('button');cancelPhotoButton.type='button';cancelPhotoButton.className='library-secondary report-photo-cancel';cancelPhotoButton.hidden=true;cancelPhotoButton.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>Cancelar foto';status.after(cancelPhotoButton);
+  function finishPhotoRequest(){++remoteRequestVersion;cancelRemotePhoto?.();cancelRemotePhoto=null;cancelPhotoButton.hidden=true;form.querySelectorAll('[data-report-camera]').forEach(b=>b.disabled=false);send.disabled=busy;}
+  cancelPhotoButton.addEventListener('click',()=>{finishPhotoRequest();status.textContent='Solicitud de foto cancelada.';});
+  async function requestPhonePhoto(kind){finishPhotoRequest();const requestVersion=remoteRequestVersion,reportVersion=revision;send.disabled=true;cancelPhotoButton.hidden=false;form.querySelectorAll('[data-report-camera]').forEach(b=>b.disabled=true);status.textContent='Toma la foto en tu celular. Aparecerá aquí.';
+   try{const cancel=await window.RepoScanMethods.requestPhoto(kind,{ean:active.ean,onPhoto:blob=>{if(requestVersion!==remoteRequestVersion||reportVersion!==revision||!dialog.open)return;setPhoto(kind,blob);finishPhotoRequest();status.textContent='Foto recibida del celular.';},onCancel:()=>{if(requestVersion===remoteRequestVersion&&reportVersion===revision){finishPhotoRequest();status.textContent='La solicitud de foto terminó. Puedes volver a intentarlo.';}}});if(requestVersion===remoteRequestVersion&&reportVersion===revision)cancelRemotePhoto=cancel;else cancel();}
+   catch(e){if(requestVersion===remoteRequestVersion){finishPhotoRequest();status.textContent=e.message;}}
+  }
+  function cancelRemoteCapture(){if(!remoteCapture)return;const pending=remoteCapture;remoteCapture=null;stopCamera();if(camera.open)camera.close();pending.resolve(null);}
+  function captureForPC(kind){if(dialog.open||busy)throw Error('Cierra el reporte del celular para tomar la foto para tu PC.');cancelRemoteCapture();return new Promise(resolve=>{remoteCapture={resolve};openCamera(kind).catch(()=>cancelRemoteCapture());});}
   async function openCamera(kind) {
-    if (busy || !active || document.getElementById('reportPhotos').disabled || !['ean', 'product'].includes(kind)) return;
+    if (busy || (!remoteCapture && (!active || document.getElementById('reportPhotos').disabled)) || !['ean', 'product'].includes(kind)) return;
+    if(!remoteCapture&&window.RepoScanMethods&&!window.RepoScanMethods.isMobile)return requestPhonePhoto(kind);
     stopCamera(); cameraKind = kind; const attempt = cameraVersion, reportVersion = revision;
     document.getElementById('reportCameraTitle').textContent = kind === 'ean' ? 'Foto del EAN' : 'Foto del producto';
     camera.dataset.photoKind = kind;
@@ -70,7 +81,7 @@
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
       const next = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, zoom: { ideal: 1 }, width: { ideal: 1280 }, height: { ideal: 960 } } });
-      if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) { next.getTracks().forEach(track => track.stop()); return; }
+      if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || (!remoteCapture && !dialog.open)) { next.getTracks().forEach(track => track.stop()); return; }
       stream = next;
       const track = next.getVideoTracks()[0], capabilities = track?.getCapabilities?.();
       if (capabilities?.zoom) {
@@ -93,7 +104,7 @@
   form.querySelectorAll('[data-report-remove]').forEach(button => button.addEventListener('click', () => { if (!busy) removePhoto(button.dataset.reportRemove); }));
   document.getElementById('closeReportCamera').addEventListener('click', () => { stopCamera(); camera.close(); });
   camera.addEventListener('cancel', stopCamera);
-  camera.addEventListener('close', () => { if (!camera.open) stopCamera(); });
+  camera.addEventListener('close', () => { if (!camera.open) {stopCamera();cancelRemoteCapture();} });
   flash.addEventListener('click',async()=>{const track=stream?.getVideoTracks()[0],attempt=cameraVersion;if(!track||flash.disabled)return;flash.disabled=true;try{const enabled=!lightOn,constraints=track.getConstraints?.()||{};await track.applyConstraints({...constraints,advanced:[{...Object.assign({},...(constraints.advanced||[])),torch:enabled}]});if(attempt!==cameraVersion||!camera.open)return;lightOn=track.getSettings?.().torch??enabled;flash.setAttribute('aria-pressed',String(lightOn));const label=lightOn?'Apagar luz':'Encender luz';flash.setAttribute('aria-label',label);flash.title=label;}catch{if(attempt===cameraVersion)cameraStatus.textContent='No pudimos cambiar la luz. Puedes tomar la foto igualmente.';}finally{if(attempt===cameraVersion)flash.disabled=false;}});
   retryCamera.addEventListener('click', () => openCamera(cameraKind));
   function cameraReady() {
@@ -118,8 +129,9 @@
       canvas.width = Math.max(1, Math.round(sourceWidth * scale)); canvas.height = Math.max(1, Math.round(sourceHeight * scale));
       canvas.getContext('2d').drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
-      if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || !dialog.open) return;
+      if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || (!remoteCapture&&!dialog.open)) return;
       if (!blob || blob.size > 1024 * 1024) throw new Error('No pudimos guardar la foto. Intenta otra vez.');
+      if(remoteCapture){const pending=remoteCapture;remoteCapture=null;stopCamera();camera.close();pending.resolve(blob);return;}
       removePhoto(kind); capturedPhotos.set(kind, blob); const url = URL.createObjectURL(blob); previews.set(kind, url);
       const preview = document.getElementById(kind === 'ean' ? 'reportPreviewEan' : 'reportPreviewProduct'); preview.src = url; preview.hidden = false;
       form.querySelector(`[data-report-remove="${kind}"]`).hidden = false; form.querySelector(`[data-report-camera="${kind}"]`).textContent = 'Volver a tomar';
@@ -128,11 +140,11 @@
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { stopCamera(); if (camera.open) camera.close(); } });
   (page ? page.listen : window.addEventListener.bind(window))('pagehide', stopCamera);
-  page?.onLeave(stopCamera);
+  page?.onLeave(()=>{finishPhotoRequest();cancelRemoteCapture();stopCamera();});
   page?.onLeave(() => { revision++; previews.forEach(url => URL.revokeObjectURL(url)); previews.clear(); capturedPhotos.clear(); });
   async function open(ean) {
     if (busy) return;
-    const photoPending = window.RepoEANScanner?.takeScanPhoto?.(ean);
+    finishPhotoRequest();const photoPending = window.RepoScanMethods?.takeScanPhoto?.(ean) || window.RepoEANScanner?.takeScanPhoto?.(ean);
     stopCamera(); if (camera.open) camera.close();catalogPhoto=''; ['ean', 'product'].forEach(removePhoto);
     const version = ++revision; active = null; form.reset(); form.hidden = true; status.textContent = 'Cargando…';
     if (!dialog.open) dialog.showModal();
@@ -163,7 +175,7 @@
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); });
   dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
-  dialog.addEventListener('close', () => { if (!dialog.open) { ++revision; active = null; stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto); } });
+  dialog.addEventListener('close', () => { if (!dialog.open) { finishPhotoRequest();++revision; active = null; stopCamera(); if (camera.open) camera.close(); ['ean', 'product'].forEach(removePhoto); } });
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (!active || busy) return;
     busy = true; send.disabled = true; close.disabled = true; status.textContent = 'Enviando…';
@@ -179,5 +191,5 @@
     } catch (error) { status.textContent = error.message; }
     finally { busy = false; send.disabled = false; close.disabled = false; }
   });
-  window.RepoProductReports = { open };
+  window.RepoProductReports = { open, captureForPC, cancelRemoteCapture };
 })();
