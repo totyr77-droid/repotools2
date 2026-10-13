@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Cargas visuales
+
+Sistema central de indicadores, skeletons y botones con demora, cancelación y accesibilidad. Integración visual en navegación, fichas, listas y consultas públicas, sin cambiar negocio/APIs. Análisis, pruebas, limitaciones y reversión en [CARGAS-VISUALES](docs/CARGAS-VISUALES.md).
+
 ## 13/10/2026 — Continuación completada
 
 - Fotos de reportes desde el celular vinculado a PC, evidencia EAN temporal, reemplazo de fotos y cancelación segura. Validación y reversión en [FOTOS-PC-CELULAR](docs/FOTOS-PC-CELULAR.md); migración aditiva 23 verificada en rama Neon sin datos.

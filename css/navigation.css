@@ -1,7 +1,4 @@
-html::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: #a69aff; z-index: 10000; opacity: 0; pointer-events: none; }
-html.app-navigating::after { opacity: 1; animation: navigation-progress 1s ease-in-out infinite; }
-@keyframes navigation-progress { from { transform: scaleX(.15); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
-@media (prefers-reduced-motion: reduce) { html.app-navigating::after { animation: none; } }
+/* El indicador de carga se centraliza en loading.css y respeta su demora. */
 
 /* El foco de lectura no necesita el contorno de un control interactivo. */
 html, body { overflow-x: clip; }

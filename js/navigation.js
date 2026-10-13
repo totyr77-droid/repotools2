@@ -94,6 +94,10 @@
     pending?.abort(); pending = new AbortController();
     const navigation=pending;
     document.documentElement.classList.add('app-navigating');
+    const content = document.querySelector?.('main');
+    const ranking = content?.querySelector('.tops-table-wrap, .tops-empty');
+    const sameTops = activeURL.pathname.endsWith('/tops.php') && new URL(href).pathname.endsWith('/tops.php');
+    const finishLoading = window.RepotoolsLoader?.start(sameTops && ranking ? ranking : content || document.documentElement, { type: sameTops && ranking ? 'skeleton' : content ? 'local' : 'fullscreen' });
     try {
       const response = await bounded(fetch(href, { credentials: 'same-origin', signal: navigation.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' }, cache: 'no-store' }),15000);
       if (new URL(response.url).origin !== location.origin) throw new Error('Unsupported redirect');
@@ -105,7 +109,7 @@
         if (token !== version) return;
         const finishStyles = await styles(next,navigation.signal);
         if (token !== version) return;
-        await page.dispose(); if(token!==version)return; resetConfig();
+        await page.dispose(); if(token!==version)return; finishLoading?.cancel(); window.RepotoolsLoader?.clear(); resetConfig();
         const scripts = [...next.body.querySelectorAll('script')]; scripts.forEach(script => script.remove());
         const destination = new URL(response.url);
         const sections = ['index.php', 'biblioteca.php', 'stock.php', 'tops.php', 'reportes.php', 'cuenta.php'];
@@ -132,7 +136,7 @@
       await commitQueue;
     } catch (error) {
       if (token === version && error.name !== 'AbortError') { navigation.abort(); location.assign(href); }
-    } finally { if (token === version) document.documentElement.classList.remove('app-navigating'); }
+    } finally { finishLoading?.(); if (token === version) document.documentElement.classList.remove('app-navigating'); }
   }
   page = createPage();
   document.addEventListener('keydown', event => {

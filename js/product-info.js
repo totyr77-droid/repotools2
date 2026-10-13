@@ -88,7 +88,9 @@
   async function show(container, ean, { fresh = false } = {}) {
     if (!container) return;
     const token = Symbol(); activeRequests.set(container, token);
-    container.replaceChildren(); container.setAttribute('aria-busy', 'true');
+    container.replaceChildren();
+    const finishLoading = window.RepotoolsLoader?.start(container);
+    container.setAttribute('aria-busy', 'true');
     const status = document.createElement('p'); status.className = 'product-details__status';
     status.setAttribute('role', 'status'); status.textContent = 'Buscando producto…'; container.append(status);
     try {
@@ -136,6 +138,7 @@
       retry.addEventListener('click', () => show(container, ean)); container.replaceChildren(status, retry);
       editButton(container, ean);
     } finally {
+      finishLoading?.();
       if (activeRequests.get(container) === token) container.setAttribute('aria-busy', 'false');
     }
   }

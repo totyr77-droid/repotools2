@@ -38,7 +38,8 @@
   page?.onLeave(() => { ++version; ++listVersion; clearPhotos(); });
   async function load() {
     const filterBox=document.getElementById('reportLogFilters');if(filterBox)filterBox.hidden=moderationView!=='logs';
-    const attempt = ++listVersion; const branches=moderationView==='branches';const branchWorkspace=document.getElementById('branchManagement');if(branchWorkspace)branchWorkspace.hidden=!branches;document.dispatchEvent(new CustomEvent('moderation:branches',{detail:branches}));const users=moderationView==='users'; const workspace=document.getElementById('userWorkspace'); if(workspace)workspace.hidden=!users; list.hidden=users||branches; document.getElementById('moderationPagination').hidden=true; if(users||branches){status.textContent='';return;} status.textContent = 'Cargando…'; list.replaceChildren();
+    const attempt = ++listVersion; const branches=moderationView==='branches';const branchWorkspace=document.getElementById('branchManagement');if(branchWorkspace)branchWorkspace.hidden=!branches;document.dispatchEvent(new CustomEvent('moderation:branches',{detail:branches}));const users=moderationView==='users'; const workspace=document.getElementById('userWorkspace'); if(workspace)workspace.hidden=!users; list.hidden=users||branches; document.getElementById('moderationPagination').hidden=true; if(users||branches){status.textContent='';return;} status.textContent = ''; list.replaceChildren();
+    const finishLoading = window.RepotoolsLoader?.start(list, {type:'skeleton'});
     document.getElementById('moderationPagination').hidden = true;
     try {
       if(queue&&moderationView==='general'){
@@ -92,10 +93,11 @@
           const button = text('button', sender.name, section); button.type = 'button'; button.className = 'library-secondary'; button.addEventListener('click', () => open(sender.report_id));
         }
       }
-    } catch (error) { if (attempt === listVersion) status.textContent = error.message; }
+    } catch (error) { if (attempt === listVersion) status.textContent = error.message; } finally { finishLoading?.(); }
   }
   async function open(id) {
     const attempt = ++version; active = null; clearPhotos(); details.replaceChildren(); form.hidden = true; message.textContent = 'Cargando…'; if (!dialog.open) dialog.showModal();
+    const finishLoading = window.RepotoolsLoader?.start(details);
     try {
       const result = await RepoReports.request('?id=' + id); if (attempt !== version || !dialog.open) return;
       active = result.report; csrf = result.csrf; document.getElementById('reviewReportTitle').textContent = `Reporte #${id}`;
@@ -169,17 +171,18 @@
         form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] || '';
         form.hidden = false;
       }
-    } catch (error) { if (attempt === version) message.textContent = error.message; }
+    } catch (error) { if (attempt === version) message.textContent = error.message; } finally { finishLoading?.(); }
   }
   async function review(decision) {
     if (!active || busy) return;
     if (decision === 'approved' && !form.reportValidity()) return;
+    const finishLoading = window.RepotoolsLoader?.start(decision === 'approved' ? approve : reject, {type:'button',label:'Guardando...'});
     busy = true; approve.disabled = reject.disabled = close.disabled = true; message.textContent = 'Guardando…';
     try {
       const body = new FormData(form); body.set('action', 'review'); body.set('id', active.id); body.set('decision', decision); body.set('revision', active.current?.revision || 0); body.set('csrf', csrf);
       const result = await RepoReports.request('', body); active = result.report;form.hidden=true;const notice=document.getElementById('reportActionStatus');notice.textContent=decision==='approved'?'Aprobado. Producto actualizado.':'Reporte rechazado.';dialog.close(); window.dispatchEvent(new Event('repotools:reports-changed'));await load();list.querySelector('button')?.focus();
     } catch (error) { message.textContent = error.message + (error.status === 409 ? ' Cierra y abre el reporte para revisar los datos actuales.' : ''); }
-    finally { busy = false; approve.disabled = reject.disabled = close.disabled = false; }
+    finally { finishLoading?.(); busy = false; approve.disabled = reject.disabled = close.disabled = false; }
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); }); dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); }); dialog.addEventListener('close', () => { ++version; active = null; clearPhotos(); });
   form.addEventListener('submit', event => { event.preventDefault(); review('approved'); }); reject.addEventListener('click', () => review('rejected'));

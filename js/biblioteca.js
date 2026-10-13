@@ -362,10 +362,11 @@
     } catch (error) { get('libraryImportStatus').textContent = error.message; control.disabled = false; }
   });
   get('newCollection').disabled = true;
+  const finishInitialLoading = window.RepotoolsLoader?.start(get('collectionList').parentElement, {type:'skeleton'});
   message('Cargando colecciones…');
   document.addEventListener('repotools:library-synced',()=>request().then(result=>{libraries=result;render();}).catch(()=>{}));
   request().then(result => {
     libraries = result; activeId = libraries.length ? Number(libraries[0].id) : null;
     render(); message(''); previewImport();
-  }).catch(error => message(error.message)).finally(() => get('newCollection').disabled = false);
+  }).catch(error => message(error.message)).finally(() => { finishInitialLoading?.(); get('newCollection').disabled = false; });
 })();
