@@ -31,12 +31,12 @@
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-sync-dialog"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261013-transition1"></script>
-<script src="js/device-connection.js?v=20261013-toplayer2"></script>
-<script src="js/action-notices.js?v=20261013-toplayer2"></script>
+<script src="js/device-connection.js?v=20261013-rapid2"></script>
+<script src="js/action-notices.js?v=20261013-rapid2"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
-<script src="js/ean-scanner.js?v=20261013-rapid1"></script>
+<script src="js/ean-scanner.js?v=20261013-rapid2"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
@@ -46,14 +46,14 @@
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261013-access1"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/ean-scanner.js?v=20261013-rapid1"></script>
+<script src="js/ean-scanner.js?v=20261013-rapid2"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
 <script src="js/branch-management.js?v=20261013-map-compact"></script>
 <script src="js/reports-page.js?v=20261013-loading1"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/ean-scanner.js?v=20261013-rapid1"></script>
+<script src="js/ean-scanner.js?v=20261013-rapid2"></script>
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
@@ -71,9 +71,9 @@
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261013-access1"></script>
-<script src="js/ean-scanner.js?v=20261013-rapid1"></script>
+<script src="js/ean-scanner.js?v=20261013-rapid2"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/script.js?v=20261013-rapid1"></script>
+<script src="js/script.js?v=20261013-rapid2"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/scan-photo.js?v=20261011-orientation1"></script>

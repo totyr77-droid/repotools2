@@ -13,8 +13,13 @@ window.Html5Qrcode=class{constructor(id){this.id=id;this.isScanning=false;reader
 await p.locator('#boton').click();await p.waitForFunction(()=>camera.starts===1);assert.equal(await p.locator('#mainScanNormal').getAttribute('aria-pressed'),'true');
 const emit=async(code,frames=3)=>{for(let i=0;i<frames;i++){await p.evaluate(c=>readers.at(-1).success(c),code);await p.waitForTimeout(110)}};
 await p.locator('#mainScanRapid').click();assert.equal(await p.evaluate(()=>camera.starts),1,'Switching to rapid preserves the live stream');
+const feedbackHeight=(await p.locator('.main-rapid-feedback').boundingBox()).height;
+await p.evaluate(()=>document.body.dataset.hand='left');assert.ok((await p.locator('#mainScanNormal').boundingBox()).x<(await p.locator('#mainScanRapid').boundingBox()).x,'Normal is reachable on the left');
+await p.evaluate(()=>document.body.dataset.hand='right');assert.ok((await p.locator('#mainScanNormal').boundingBox()).x>(await p.locator('#mainScanRapid').boundingBox()).x,'Normal is reachable on the right');
 for(let i=1;i<=20;i++){await emit(ean(i));await p.waitForTimeout(380);assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: '+i);assert.equal(await p.evaluate(()=>camera.starts),1);assert.equal(await p.evaluate(()=>camera.stops),0);if(i===5)await p.getByText('Producto no encontrado',{exact:true}).waitFor();}
 assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('lista')).length),20);assert.equal(await p.locator('#mainRapidCode').textContent(),ean(20));
+await p.evaluate(()=>{const last=document.getElementById('mainRapidLast');last.textContent='Producto con una referencia muy larga '.repeat(30);});
+assert.equal((await p.locator('.main-rapid-feedback').boundingBox()).height,feedbackHeight,'Long names do not stretch the rapid result');
 await emit(ean(20),8);assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: 20','Repeated detections while held do not count');
 await p.waitForTimeout(1600);await emit(ean(20));await p.waitForTimeout(380);assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: 21','Removing and intentionally rescanning is accepted');assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('lista')).length),20,'The original list stays unique');
 await p.evaluate(()=>{window.blocking=document.createElement('dialog');blocking.textContent='Reporte';document.body.append(blocking);blocking.showModal()});await emit(ean(21));assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: 21');await p.evaluate(()=>blocking.remove());

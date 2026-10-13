@@ -50,6 +50,7 @@ let rapidActive = false, rapidCount = 0;
 const scanner = window.RepoEANScanner.create('contenedor', {
   onManual: abrirEntradaManual,
   keepOpen: () => rapidActive,
+  scanContext: () => rapidActive ? 'Escaneo rápido de Inicio' : 'Escaneo normal de Inicio',
   repeatCooldown: 1500,
   rearmRepeated: true,
   canAccept: () => !rapidActive || !document.querySelector('dialog[open]:not(#contenedormax)'),
@@ -265,11 +266,14 @@ function cerrarResultados() {
 }
 
 function abrirScanner() {
+  rapidActive = false;
+  actualizarModoRapido();
   if (!els.contenedormax.open) els.contenedormax.showModal();
   iniciarScanner();
 }
 
 function actualizarModoRapido() {
+  els.contenedormax.dataset.scanMode = rapidActive ? 'rapid' : 'normal';
   document.getElementById('mainScanNormal')?.setAttribute('aria-pressed', String(!rapidActive));
   document.getElementById('mainScanRapid')?.setAttribute('aria-pressed', String(rapidActive));
   const panel = document.getElementById('mainRapidPanel'); if (panel) panel.hidden = !rapidActive;
@@ -288,12 +292,13 @@ function cambiarModoRapido(enabled) {
   }
   actualizarModoRapido();
   // The existing live stream can switch to keepOpen without restarting it.
-  if (!enabled || els.contenedor.hidden) iniciarScanner();
+  if (!enabled || els.contenedor.hidden || window.RepoScanMethods?.isMobile === false) iniciarScanner();
 }
 function mostrarProductoRapido(product) {
   document.getElementById('mainRapidLast').textContent = product && typeof product === 'object'
     ? window.RepoProductInfo.summary(product)
     : typeof product === 'string' ? product : 'Producto no encontrado';
+  document.getElementById('mainRapidLast').title = document.getElementById('mainRapidLast').textContent;
   if (!product || typeof product === 'string') document.getElementById('mainRapidPanel').dataset.state = 'warning';
 }
 

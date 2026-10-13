@@ -67,7 +67,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-reportphotofallback10" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261013-rapid1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261013-rapid2" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
 
@@ -86,7 +86,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
-<link href="css/device-workspace.css?v=20261013-toplayer2" rel="stylesheet" type="text/css">
+<link href="css/device-workspace.css?v=20261013-rapid2" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>

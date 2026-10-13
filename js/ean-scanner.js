@@ -109,7 +109,7 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
@@ -379,7 +379,7 @@
       });
     }
     page?.onLeave(stop);
-    const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual},raw):raw;
+    const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
   window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, takeScanPhoto, clearScanPhoto };

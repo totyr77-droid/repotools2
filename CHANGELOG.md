@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Modo rápido consistente y bloque estable
+
+Normal/Rápido de Inicio controla también el lector remoto: el teléfono no ofrece un segundo interruptor continuo para esa solicitud. Apertura principal reinicia Normal; resultados largos no estiran el bloque rápido, acciones de reporte compactas y prioridad de Normal según mano móvil. No cambia la conexión ni los otros destinos. Pruebas y reversión en docs/ESCANEO-RAPIDO.md.
+
 ## 13/10/2026 — Punto6: escaneo rápido de Inicio
 
 Modo optativo del principal, captura continua sin reiniciar stream, feedback/contador y Finalizar. Misma lista/estadísticas y confirmación; lectura repetida rearmable tras retirar EAN1500ms solo en Inicio. Configuración predeterminada de otros lectores intacta. Pruebas20 EAN y regresiones/celular-PC pasan; documentación, validación física pendiente y reversión en docs/ESCANEO-RAPIDO.md.

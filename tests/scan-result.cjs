@@ -3,7 +3,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 class Element {
-  constructor() { this.textContent = ''; this.style = {}; this.disabled = false; this.open = false; this.parentElement = {dataset:{}}; }
+  constructor() { this.textContent = ''; this.style = {}; this.dataset = {}; this.disabled = false; this.open = false; this.parentElement = {dataset:{}}; }
   addEventListener() {}
   setAttribute() {}
   replaceChildren() { this.textContent = ''; }
