@@ -2,6 +2,8 @@
 
 ## Rama de trabajo — 13/10/2026
 
+Entorno de prueba preparado: nuevo proyecto Neon vacío repotools-desarrollo (`square-bonus-56273687`) y render-desarrollo.yaml, exclusivamente servicio nuevo Free en rama desarrollo. El original rechazó schema-only por límite de ramas; no se borraron ramas ni copiaron datos. Falta usuario crear Blueprint en Render, pegar conexión del proyecto nuevo, esperar Live y fijar APP_URL con la URL de prueba. Pasos y validación pendiente en docs/DESARROLLO-RENDER.md. No copiar DATABASE_URL/grupos privados de producción.
+
 Por pedido del usuario, continuar en la rama `desarrollo`, creada desde `main` en `3014899`. Los nuevos commits y pushes deben ir a `desarrollo`. No fusionar ni publicar esos cambios en `main` hasta que el usuario lo indique explícitamente. El servicio público debe conservar su rama `main`; una prueba remota requerirá un servicio independiente, sin cambiar el despliegue actual ni usar datos de producción para pruebas destructivas.
 
 Antes de continuar, leer [ROADMAP.md](ROADMAP.md) para los pendientes actuales y [ARCHITECTURE.md](ARCHITECTURE.md) para entender el proyecto.
