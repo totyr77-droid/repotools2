@@ -30,7 +30,7 @@
 <script src="js/stock-offline.js?v=20261012-sync-dialog"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><script src="js/library-offline.js?v=20261012-sync-dialog"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
-<script src="js/navigation.js?v=20261013-loading1"></script>
+<script src="js/navigation.js?v=20261013-transition1"></script>
 <script src="js/device-connection.js?v=20261013-toplayer2"></script>
 <script src="js/action-notices.js?v=20261013-toplayer2"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
@@ -88,7 +88,7 @@
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/hand-preferences.js?v=20261011-alert2"></script><?php endif; ?>
 <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?>
 <?php include __DIR__ . '/onboarding.vista.php'; ?>
-<script src="js/onboarding.js?v=20261013-intro1"></script>
+<script src="js/onboarding.js?v=20261013-transition1"></script>
 <?php endif; ?>
 </body>
 </html>

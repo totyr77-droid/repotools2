@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Transición visual RT sin carga intermedia
+
+Overlay desde head, isotipo local inline, navegación cubierta hasta fuentes/UI listas y salida220ms. Límite5s, recuperación BFCache y bienvenida coordinada; sin cambios funcionales ni de datos. Pruebas, causa comprobada, limitaciones de red lenta y reversión en docs/TRANSICIONES.md.
+
 ## 13/10/2026 — Avisos de envío celular–PC
 
 Confirmación flotante con SVG después de envío exitoso de foto/EAN/QR, aviso compacto de solicitud y cancelación de fotografía desde ambos equipos sin desconectarlos. Autorización de cancel_photo validada en servidor; sin migración ni cambios del detector. Detalle, pruebas y reversión en docs/AVISOS-ENVIO.md.

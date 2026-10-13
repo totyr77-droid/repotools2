@@ -17,9 +17,10 @@ if (isset($navDb) && current_user()) {
 $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => ['ADM', 'Administrador', 'fa-user-gear'], 'moderador' => ['MOD', 'Moderador', 'fa-shield-halved'], 'supervisor' => ['SUP', 'Supervisor', 'fa-user-tie'], 'empresa' => ['EMP', 'Empresa', 'fa-building']];
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="is-loading">
   <head>
     <meta charset="utf-8">
+    <?php include __DIR__ . '/page-loader-head.vista.php'; ?>
     <?php if(isset($publicShareBase)): ?><base href="<?= escape($publicShareBase) ?>"><?php endif; ?>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">

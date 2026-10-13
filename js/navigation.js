@@ -90,14 +90,13 @@
   async function navigate(href, { historyMode = 'push', scroll = [0, 0] } = {}) {
     href = new URL(href, location.href).href;
     if (new URL(href).origin !== location.origin) { location.assign(href); return; }
+    if (window.RepotoolsPageLoader?.visible && pending) return;
+    window.RepotoolsPageLoader?.mark('NAVIGATION_CLICK_MS');
+    const loaderTicket = window.RepotoolsPageLoader?.show(true);
     const token = ++version;
     pending?.abort(); pending = new AbortController();
     const navigation=pending;
     document.documentElement.classList.add('app-navigating');
-    const content = document.querySelector?.('main');
-    const ranking = content?.querySelector('.tops-table-wrap, .tops-empty');
-    const sameTops = activeURL.pathname.endsWith('/tops.php') && new URL(href).pathname.endsWith('/tops.php');
-    const finishLoading = window.RepotoolsLoader?.start(sameTops && ranking ? ranking : content || document.documentElement, { type: sameTops && ranking ? 'skeleton' : content ? 'local' : 'fullscreen' });
     try {
       const response = await bounded(fetch(href, { credentials: 'same-origin', signal: navigation.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' }, cache: 'no-store' }),15000);
       if (new URL(response.url).origin !== location.origin) throw new Error('Unsupported redirect');
@@ -109,14 +108,13 @@
         if (token !== version) return;
         const finishStyles = await styles(next,navigation.signal);
         if (token !== version) return;
-        await page.dispose(); if(token!==version)return; finishLoading?.cancel(); window.RepotoolsLoader?.clear(); resetConfig();
+        await page.dispose(); if(token!==version)return; window.RepotoolsLoader?.clear(); resetConfig();
         const scripts = [...next.body.querySelectorAll('script')]; scripts.forEach(script => script.remove());
         const destination = new URL(response.url);
         const sections = ['index.php', 'biblioteca.php', 'stock.php', 'tops.php', 'reportes.php', 'cuenta.php'];
         const sectionIndex = url => sections.indexOf((url.pathname.split('/').pop() || 'index.php').replace('index.html', 'index.php'));
         const direction = sectionIndex(destination) < sectionIndex(activeURL) ? -1 : 1;
         const main = next.querySelector('main');
-        main.classList.add('app-page-enter');
         main.style.setProperty('--page-shift', `${direction * 28}px`);
         if (new URL(href).hash) destination.hash = new URL(href).hash;
         if (historyMode === 'push') history.replaceState({ ...history.state, appScroll: [scrollX, scrollY] }, '', location.href);
@@ -128,6 +126,7 @@
         finishStyles(); page = createPage();
         await execute(scripts,navigation.signal);
         if(token!==version)return;
+        await window.RepotoolsPageLoader?.ready(loaderTicket);
         window.scrollTo(...scroll);
         if (destination.hash) document.getElementById(decodeURIComponent(destination.hash.slice(1)))?.scrollIntoView();
         const heading = document.querySelector('main h1'); if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
@@ -136,7 +135,7 @@
       await commitQueue;
     } catch (error) {
       if (token === version && error.name !== 'AbortError') { navigation.abort(); location.assign(href); }
-    } finally { finishLoading?.(); if (token === version) document.documentElement.classList.remove('app-navigating'); }
+    } finally { if (token === version) { pending = null; document.documentElement.classList.remove('app-navigating'); } }
   }
   page = createPage();
   document.addEventListener('keydown', event => {
@@ -148,10 +147,11 @@
   document.addEventListener('click', event => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = event.target.closest('a[href]');
-    if (!link || link.download || (link.target && link.target !== '_self') || link.hasAttribute('data-full-navigation')) return;
+    if (!link || link.download || (link.target && link.target !== '_self')) return;
     const url = new URL(link.href);
     if (url.origin !== location.origin || new URL('.', url).pathname !== base.pathname || !routes.has(url.pathname.split('/').pop())) return;
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
+    if (link.hasAttribute('data-full-navigation')) { window.RepotoolsPageLoader?.show(true); return; }
     event.preventDefault(); navigate(url.href);
   });
   window.addEventListener('popstate', event => navigate(location.href, { historyMode: 'replace', scroll: event.state?.appScroll || [0, 0] }));

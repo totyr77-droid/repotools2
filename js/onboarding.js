@@ -30,7 +30,7 @@
     next.firstChild.textContent = index === 3 ? 'Empezar' : 'Siguiente';
   }
   function safe() {
-    return !disposed && dialog.isConnected && !document.documentElement.classList.contains('app-navigating') && !document.querySelector('.repotools-loader--fullscreen') && !doc.querySelector('dialog[open], [aria-busy="true"]') && ![...doc.querySelectorAll('video')].some(video => video.srcObject);
+    return !disposed && dialog.isConnected && !document.documentElement.classList.contains('app-navigating') && !document.documentElement.classList.contains('is-loading') && !document.querySelector('.repotools-loader--fullscreen') && !doc.querySelector('dialog[open], [aria-busy="true"]') && ![...doc.querySelectorAll('video')].some(video => video.srcObject);
   }
   function open() {
     if (!safe()) return;
@@ -60,10 +60,12 @@
   doc.addEventListener('keydown', interaction, {capture:true, once:true});
   function schedule() {
     if (disposed || interacted || seen() || dialog.dataset.auto !== 'true') return;
+    clearTimeout(timer);
     timer = setTimeout(() => { if (!interacted && !seen()) open(); }, 400);
   }
   // Wait for page resources, not for a camera or any real operation.
   if (document.readyState === 'complete') schedule();
   else (page?.listen || window.addEventListener.bind(window))('load', schedule, {once:true});
+  (page?.listen || window.addEventListener.bind(window))('repotools:page-ready', schedule);
   page?.onLeave(() => { disposed = true; clearTimeout(timer); dialog.remove(); });
 })();
