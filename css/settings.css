@@ -1,0 +1,38 @@
+.account-main:has(#accountPreferences){padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+.account-panel-profile .settings-layout{display:grid;gap:24px;margin-top:22px}
+.settings-group{min-width:0}
+.account-panel-profile .settings-group>h2{margin:0 0 8px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#626b7a;font-weight:600}
+.account-panel-profile .settings-group>h2::before{display:none}
+.account-panel-profile .settings-group .profile-qr,.account-panel-profile .settings-group .account-public-name{margin:0;padding:14px 0;border:0;border-bottom:1px solid #e6e2ed;background:transparent}
+.account-panel-profile .settings-group summary{font-size:.94rem;min-height:24px}
+.account-panel-profile .settings-group .stock-preferences{margin:0;padding:10px 0 16px;border:0;border-bottom:1px solid #e6e2ed}
+.account-panel-profile .settings-group h3,.account-panel-profile .settings-group .hand-preferences h2{display:flex;align-items:center;gap:8px;font-size:.94rem;margin:0 0 10px}
+.settings-group h3 svg{width:20px;height:20px;flex:none}
+.account-panel-profile #stockPreferences{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0}
+.account-panel-profile #stockPreferences input{width:76px;flex:none;min-height:44px;margin:0;text-align:center}
+.account-panel-profile .settings-hint{margin:6px 0 0;font-size:.78rem;color:#626b7a}
+.settings-feedback{border:0;border-bottom:1px solid #e6e2ed;margin:0;padding:16px 0 8px;min-width:0}
+.settings-feedback legend{font-size:.94rem;font-weight:600;padding:16px 0 0}
+.account-panel-profile label.settings-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;min-height:54px;cursor:pointer}
+.settings-toggle-name,.settings-toggle-control{display:flex;align-items:center;gap:8px;min-width:0;font-size:.9rem}
+.settings-toggle-name i{width:20px;text-align:center;color:#62577e}
+.settings-toggle-control{position:relative;min-height:44px}
+.settings-toggle-control small{font-size:.75rem;color:#626b7a;width:72px;text-align:end}
+.account-panel-profile .settings-toggle input{position:absolute;right:0;top:0;width:44px;height:44px;opacity:0;margin:0;cursor:pointer}
+.settings-toggle-track{display:block;width:42px;height:24px;border-radius:20px;background:#a5a4b0;pointer-events:none;transition:background .15s}
+.settings-toggle-track::after{content:'';display:block;width:18px;height:18px;margin:3px;background:white;border-radius:50%;transition:transform .15s}
+.settings-toggle input:checked+.settings-toggle-track{background:#27187e}
+.settings-toggle input:checked+.settings-toggle-track::after{transform:translateX(18px)}
+.settings-toggle input:focus-visible+.settings-toggle-track{outline:2px solid #8372d8;outline-offset:4px}
+.settings-toggle input:disabled+.settings-toggle-track{opacity:.6}
+.account-panel-profile .settings-group .hand-preferences,.account-panel-profile .settings-group .hand-preferences:has(.profile-pending-dot:not([hidden])){border:0;border-radius:0;background:transparent;padding:16px 0 0;margin:0}
+.account-panel-profile .settings-group .hand-preferences legend,.account-panel-profile .settings-group .hand-hint{display:none}
+.account-panel-profile .settings-group .hand-options label{margin:0}
+.account-panel-profile .settings-group .hand-options span{min-height:44px;padding:8px;box-sizing:border-box;font-size:.9rem}
+.account-panel-profile .settings-group .account-shortcuts{margin:0;gap:0 14px}
+.account-panel-profile .settings-group .account-shortcuts a{background:transparent;border:0;border-radius:0;border-bottom:1px solid #e6e2ed;box-shadow:none;padding:12px 0;min-height:48px}
+.account-panel-profile .settings-group .onboarding-replay{display:inline-flex;align-items:center;gap:8px;width:auto;min-height:44px;margin:12px 0 0;border:0;background:transparent;color:#62577e;font-size:.85rem;padding:8px 0}
+.account-panel-profile #handPreferenceStatus[hidden],.account-panel-profile #stockPreferenceStatus[hidden]{display:none!important}
+@media(min-width:900px){.account-panel-profile .settings-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px 48px}.settings-preferences{grid-column:2;grid-row:1/span 2}.settings-access{grid-column:1}}
+@media(max-width:768px) and (pointer:coarse){body[data-hand=left] .settings-toggle,body[data-hand=left] #stockPreferences{flex-direction:row-reverse}body[data-hand=left] .settings-toggle-name{flex-direction:row-reverse}body[data-hand=left] .settings-group>h2,body[data-hand=left] .settings-hint{text-align:right}body[data-hand=left] .settings-group h3{justify-content:flex-end}body[data-hand=left] .settings-group .account-shortcuts a{flex-direction:row-reverse;justify-content:flex-start}}
+@media(prefers-reduced-motion:reduce){.settings-toggle-track,.settings-toggle-track::after{transition:none}}

@@ -197,6 +197,13 @@ function initialize_database(PDO $db): void {
             backfill_public_user_names($db);
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(24)');
         }
+        if (!$db->query('SELECT version FROM app_schema_migrations WHERE version = 25')->fetchColumn()) {
+            $columns=$postgres ? $db->query("SELECT column_name FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='users'")->fetchAll(PDO::FETCH_COLUMN) : array_column($db->query('PRAGMA table_info(users)')->fetchAll(),'name');
+            foreach (['sound_enabled','vibration_enabled'] as $column) {
+                if (!in_array($column,$columns,true)) $db->exec("ALTER TABLE users ADD COLUMN {$column} INTEGER NOT NULL DEFAULT 1 CHECK ({$column} IN (0,1))");
+            }
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(25)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();

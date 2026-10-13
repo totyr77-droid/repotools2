@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Ajustes y preferencias de confirmación
+
+Pantalla agrupada sin tarjetas anidadas: Perfil, Preferencias y Accesos, conservando Seguridad. Sonido/vibración guardados en la cuenta, activos por defecto también para usuarios existentes, días con autosave y mano con selección inmediata; feedback flotante existente, incluido error con reversión de control. API preferencias parcial y validada, misma infraestructura y persistencia de vencimientos. Principal Normal/Rápido y su lector celular remoto condicionan únicamente el aviso; tono, vibración, cámara y reconocimiento conservados. Migración25 validada en SQLite y PostgreSQL aislado; pruebas y reversión en docs/AJUSTES-PREFERENCIAS.md.
+
 ## 13/10/2026 — Imprimir varias etiquetas pendientes
 
 Seleccionar aparece solo con dos o más etiquetas pendientes. Los mismos bloques permiten elegir varias, todas o ninguna; Imprimir muestra la cantidad y abre las hojas A4 existentes en otra pestaña, sin abrir cada palet ni reservar códigos nuevos. Mantiene permisos del servidor, límite100, móvil y mano preferida. Prueba y reversión en docs/IMPRESION-PENDIENTES.md.

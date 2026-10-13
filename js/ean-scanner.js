@@ -51,9 +51,9 @@
       }
     } catch {}
   }
-  async function beep() {
-    try { window.navigator?.vibrate?.(60); } catch {}
-    if (!audioContext) return;
+  async function beep(preferences = {}) {
+    if (preferences.vibration !== false) { try { window.navigator?.vibrate?.(60); } catch {} }
+    if (preferences.sound === false || !audioContext) return;
     let restoreSession = () => {}, scheduled = false;
     try {
       // Ambient obeys the iPhone Silent switch. Request playback only for
@@ -109,7 +109,7 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, feedbackPreferences = () => ({}), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
@@ -298,7 +298,7 @@
       clearScanPhoto();
       // Se habilita el audio en el toque que abre la cámara, antes de esperar
       // permisos o fotogramas, para que el primer escaneo también tenga sonido.
-      prepareSound();
+      if (feedbackPreferences().sound !== false) prepareSound();
       const token = ++revision;
       if (session) session.accepting = false;
       return enqueue(async () => {
@@ -336,7 +336,7 @@
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
-            Promise.resolve().then(()=>{beep();return onCode(code);}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
+            Promise.resolve().then(()=>{beep(feedbackPreferences());return onCode(code);}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
               if(token!==revision||session!==current)return;
               current.confirm=confirmation(validate);current.accepting=true;element.classList.remove('ean-confirmed');
               try{background(current,accept);}catch{}
@@ -345,7 +345,7 @@
           }
           enqueue(async () => {
             await new Promise(resolve => setTimeout(resolve, 100)); await release(current);
-            if (token === revision) Promise.resolve().then(() => { if (token === revision) { beep(); return onCode(code); } }).catch(error => { if (token === revision) onError(error); });
+            if (token === revision) Promise.resolve().then(() => { if (token === revision) { beep(feedbackPreferences()); return onCode(code); } }).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };
         onStatus('Abriendo cámara…');

@@ -1,6 +1,6 @@
 <details class="account-public-name">
   <summary><?= account_icon('user') ?>Nombre público<?= stock_icon('chevron') ?></summary>
-  <p>Este es el nombre que verán otros usuarios en rankings, palets y otras áreas públicas de Repotools.</p>
+  <p>Tu nombre en TOPs, palets y enlaces compartidos.</p>
   <form id="publicNameForm">
     <input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>">
     <input type="hidden" name="action" value="public_name">

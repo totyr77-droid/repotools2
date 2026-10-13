@@ -1,10 +1,11 @@
 (() => {
   const page=window.RepoNavigation?.page,doc=page?.document||document;
   let toast, toastTimer;
-  window.RepoToast = message => {
+  window.RepoToast = (message,{kind='success'}={}) => {
     clearTimeout(toastTimer); toast?.remove();
     toast=doc.createElement('p');toast.className='repotools-send-toast';toast.setAttribute('role','status');
-    toast.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></svg>';
+    toast.dataset.kind=kind;
+    toast.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="'+(kind==='error'?'M12 7v6m0 3h.01':'m7 12 3 3 7-7')+'"/></svg>';
     const label=doc.createElement('span');label.textContent=message;toast.append(label);
     if(typeof toast.showPopover==='function'){
       toast.setAttribute('popover','manual');doc.body.append(toast);toast.showPopover();

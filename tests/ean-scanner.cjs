@@ -137,6 +137,15 @@ function read(reader, code) { now += 100; reader.success(code, { decodedText: co
   assert.equal(beeps, tonesBeforeFailure);
   assert.equal(window.navigator.audioSession.type, 'ambient', 'Una falla al reanudar también libera playback');
   lastAudio.resume = originalResume;
+  // The existing feedback remains unchanged, with independent preferences.
+  for (const continuous of [false,true]) for (const sound of [false,true]) for (const vibrate of [false,true]) {
+    const delivered=[],beforeTone=beeps,beforeVibration=vibration.length;
+    const configured=service.create('configured',{onCode:code=>delivered.push(code),keepOpen:()=>continuous,feedbackPreferences:()=>({sound,vibration:vibrate})});
+    await configured.start();const r=readers.at(-1);read(r,a);read(r,a);read(r,a);await flush();
+    assert.deepEqual(delivered,[a]);assert.equal(beeps-beforeTone,sound?1:0);assert.equal(vibration.length-beforeVibration,vibrate?1:0);await configured.stop();
+  }
+  const vibrateMethod=window.navigator.vibrate;delete window.navigator.vibrate;
+  const unsupportedCodes=[],unsupported=service.create('no-vibration',{onCode:code=>unsupportedCodes.push(code),feedbackPreferences:()=>({sound:true,vibration:true})});await unsupported.start();const unsupportedReader=readers.at(-1);read(unsupportedReader,b);read(unsupportedReader,b);read(unsupportedReader,b);await flush();assert.deepEqual(unsupportedCodes,[b]);window.navigator.vibrate=vibrateMethod;
   const visibleCodes = [];
   const video = { videoWidth: 1280, videoHeight: 720, clientWidth: 320, clientHeight: 330 };
   const element = { classList: { add() {}, remove() {} }, querySelector: () => video };

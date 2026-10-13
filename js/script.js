@@ -51,6 +51,7 @@ const scanner = window.RepoEANScanner.create('contenedor', {
   onManual: abrirEntradaManual,
   keepOpen: () => rapidActive,
   scanContext: () => rapidActive ? 'Escaneo rápido de Inicio' : 'Escaneo normal de Inicio',
+  feedbackPreferences: () => ({sound:document.body.dataset?.scanSound!=='0',vibration:document.body.dataset?.scanVibration!=='0'}),
   repeatCooldown: 1500,
   rearmRepeated: true,
   canAccept: () => !rapidActive || !document.querySelector('dialog[open]:not(#contenedormax)'),

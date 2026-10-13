@@ -6,13 +6,14 @@ require_once __DIR__ . '/../includes/page-metadata.php';
 $metadata=repotools_page_metadata($publicPageTitle??null,$publicPageDescription??null);
 $previewTitle=$metadata['title'];$previewDescription=$metadata['description'];$previewUrl=$metadata['url'];
 $userHand = '';
+$scanSound = true; $scanVibration = true;
 $navModerator = false; $navPending = 0; $navRole = '';
 if (current_user()) {
     try { $navDb = database(); $navModerator = can_edit_catalog($navDb, current_user()); if ($navModerator) { $navCount = $navDb->prepare("SELECT COUNT(*) FROM product_reports WHERE status = 'pending' AND (user_id IS NULL OR user_id <> ?)"); $navCount->execute([report_is_manager($navDb,current_user())?0:current_user()['id']]); $navPending = (int) $navCount->fetchColumn(); } }
     catch (Throwable $error) { error_log('Repotools: no se pudo consultar el menú de moderación.'); }
 }
 if (isset($navDb) && current_user()) {
-    try { $roleQuery = $navDb->prepare('SELECT role,handedness FROM users WHERE id = ?'); $roleQuery->execute([current_user()['id']]); $navProfile = $roleQuery->fetch(); $navRole = (string) ($navProfile['role'] ?? ''); $userHand = (string) ($navProfile['handedness'] ?? ''); } catch (Throwable $ignored) {}
+    try { $roleQuery = $navDb->prepare('SELECT role,handedness,sound_enabled,vibration_enabled FROM users WHERE id = ?'); $roleQuery->execute([current_user()['id']]); $navProfile = $roleQuery->fetch(); $navRole = (string) ($navProfile['role'] ?? ''); $userHand = (string) ($navProfile['handedness'] ?? ''); $scanSound=(int)($navProfile['sound_enabled']??1)!==0; $scanVibration=(int)($navProfile['vibration_enabled']??1)!==0; } catch (Throwable $ignored) {}
 }
 $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => ['ADM', 'Administrador', 'fa-user-gear'], 'moderador' => ['MOD', 'Moderador', 'fa-shield-halved'], 'supervisor' => ['SUP', 'Supervisor', 'fa-user-tie'], 'empresa' => ['EMP', 'Empresa', 'fa-building']];
 ?>
@@ -67,7 +68,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-reportphotofallback10" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261013-rapid2" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261013-settings1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
 
@@ -76,7 +77,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=20261013-public1" rel="stylesheet"><?php endif; ?>
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=20261012-exclusions" rel="stylesheet" type="text/css"><link href="css/stock.css?v=20261013-batch1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <link href="css/action-notices.css?v=20261010-notices1" rel="stylesheet" type="text/css">
+    <link href="css/action-notices.css?v=20261013-settings1" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261013-loading1" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261010" rel="stylesheet" type="text/css"><?php endif; ?>
@@ -86,10 +87,11 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
-<link href="css/device-workspace.css?v=20261013-rapid2" rel="stylesheet" type="text/css">
+<link href="css/device-workspace.css?v=20261013-settings1" rel="stylesheet" type="text/css">
+<?php if (!empty($paginaCuenta) && current_user()): ?><link href="css/settings.css?v=20261013-settings1" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 </head>
-  <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
+  <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
       <div class="header-contenedor">
         <a class="logo" href="./" aria-label="Inicio Repotools"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"></a>

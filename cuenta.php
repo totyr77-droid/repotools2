@@ -88,6 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) &
     }
 }
 $deviceConflict=$deviceConflict||isset($_SESSION['pending_device_login']);
+$accountPreferences=null;
+if(current_user()){require_once __DIR__.'/includes/preferences.php';$accountPreferences=account_preferences(database(),(int)current_user()['id']);}
 include __DIR__ . '/vistas/header.vista.php';
 ?>
 <main class="account-main">
@@ -95,19 +97,31 @@ include __DIR__ . '/vistas/header.vista.php';
     <?php if (current_user() && $error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
     <?php if (current_user()): ?>
     <div class="account-profile-heading"><h1 class="account-title"><?= stock_icon('settings') ?>Configuración<span class="profile-pending-dot" data-profile-pending aria-label="Perfil por completar"<?= $userHand !== '' ? ' hidden' : '' ?>></span></h1></div>
-    <button id="replayOnboarding" type="button" class="onboarding-replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/></svg>Ver introducción</button>
     <div class="account-profile-contact"><div class="account-mail-tools"><p class="account-email"><?= escape(current_user()['email']) ?></p><button id="editAccount" type="button" aria-label="Editar información de la cuenta" title="Editar información de la cuenta"><?= stock_icon('settings') ?></button></div><p id="accountCompany" class="account-company"<?= empty(current_user()['company']) ? ' hidden' : '' ?>><?= account_icon('company') ?><span><?= escape(current_user()['company'] ?? '') ?></span></p></div>
     <dialog id="accountEditDialog" class="account-edit-dialog"><div class="account-edit-heading"><h2>Información de la cuenta</h2><button type="button" class="app-close" aria-label="Cerrar" title="Cerrar"><?= stock_icon('close') ?></button></div><form id="accountEditForm"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><label><span class="account-field-title"><?= account_icon('user') ?>Nombre</span><input name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Tu nombre" required value="<?= escape(current_user()['name']) ?>"></label><label><span class="account-field-title"><?= account_icon('company') ?>Empresa o agencia <small>(opcional)</small></span><input name="company" autocomplete="organization" maxlength="100" placeholder="Marca, empresa o agencia" value="<?= escape(current_user()['company'] ?? '') ?>"></label><p id="accountEditStatus" role="status"></p><button type="submit">Guardar cambios</button></form></dialog><p id="accountSavedStatus" class="account-saved-status" role="status" hidden><?= stock_icon('check') ?><span>Información actualizada.</span></p>
+    <div class="settings-layout"><section class="settings-group settings-profile" aria-labelledby="settingsProfileTitle"><h2 id="settingsProfileTitle">Perfil</h2>
     <details id="myProfileQR" class="profile-qr"><summary><?= stock_icon('qr') ?>Mi QR de perfil<span class="profile-chevron"><?= stock_icon('chevron') ?></span></summary><div class="profile-qr-image"></div><p role="status"></p></details>
 
     <?php include __DIR__.'/vistas/public-name.vista.php'; ?>
+    </section>
+    <section id="accountPreferences" class="settings-group settings-preferences" aria-labelledby="settingsPreferencesTitle" data-csrf="<?= escape(csrf_token()) ?>"><h2 id="settingsPreferencesTitle">Preferencias</h2>
+    <section class="stock-preferences"><h3><?= stock_icon('clock') ?>Avisos de vencimiento</h3><form id="stockPreferences"><label for="stockExpiryDays">Días de anticipación</label><input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="<?= (int)($accountPreferences['expiry_days']??30) ?>" required aria-describedby="expiryPreferenceHint"></form><p id="expiryPreferenceHint" class="settings-hint">Para tus palets y los compartidos.</p><p id="stockPreferenceStatus" role="status" hidden></p></section>
+    <fieldset class="settings-feedback"><legend>Sonido y vibración</legend>
+    <?php foreach(['sound'=>['Sonido','fa-volume-high'],'vibration'=>['Vibración','fa-mobile-screen-button']] as $key=>$setting): ?>
+    <label class="settings-toggle"><span class="settings-toggle-name"><i class="fa-solid <?= $setting[1] ?>" aria-hidden="true"></i><?= $setting[0] ?></span><span class="settings-toggle-control"><small data-preference-state="<?= $key ?>"><?= ($accountPreferences[$key]??true)?'Activado':'Desactivado' ?></small><input id="preference-<?= $key ?>" type="checkbox" role="switch" name="<?= $key ?>" aria-label="<?= $setting[0] ?>"<?= ($accountPreferences[$key]??true)?' checked':'' ?>><span class="settings-toggle-track" aria-hidden="true"></span></span></label>
+    <?php endforeach; ?>
+    </fieldset>
+    <?php include __DIR__ . '/includes/hand-preference-view.php'; ?>
+    </section>
+    <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2>
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
     <a href="stock.php"><?= stock_icon('qr') ?>Palets</a>
     <a href="index.php"><?= stock_icon('barcode') ?>Escáner</a></nav>
-    <section class="stock-preferences"><h2><?= stock_icon('clock') ?>Avisos de vencimiento</h2><p>Te avisamos en la web cuando se acerca el vencimiento de productos en tus palets y los compartidos.</p><form id="stockPreferences"><label>Días de anticipación <input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="30" required></label><button type="submit">Guardar preferencia</button><p id="stockPreferenceStatus" role="status"></p></form></section>
-    <?php include __DIR__ . '/includes/hand-preference-view.php'; include __DIR__.'/includes/account-security-view.php'; ?>
+    <button id="replayOnboarding" type="button" class="onboarding-replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/></svg>Ver introducción</button>
+    </section></div>
+    <?php include __DIR__.'/includes/account-security-view.php'; ?>
     <?php else: ?>
     <h1><?= $register ? 'Crear cuenta' : 'Iniciar sesión' ?></h1>
     <p class="account-intro"><?= $register ? 'Guarda tus productos y organiza tus palets.' : 'Continúa con tus productos y palets.' ?></p>
