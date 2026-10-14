@@ -26,7 +26,7 @@
 <!-- SCRIPTS -->
 <?php if(!empty($paginaDemo)): ?><script src="js/guest-demo.js?v=20261013-demo1"></script><?php endif; ?>
 <script src="js/loading.js?v=20261013-loading1"></script>
-<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=20261014-toasts"></script><script src="js/connectivity.js?v=20261014-silent1"></script><script src="js/offline-cache.js?v=20261014-silent1"></script><script src="js/offline-sync.js?v=20261014-toasts"></script>
+<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=20261014-toasts"></script><script src="js/connectivity.js?v=20261014-silent1"></script><script src="js/offline-cache.js?v=20261014-silent1"></script><script src="js/offline-sync.js?v=20261014-auto-add"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=20261014-silent1"><script src="js/sync-status.js?v=20261014-silent1"></script><script src="js/library-offline.js?v=20261014-toasts"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261013-motion1"></script>

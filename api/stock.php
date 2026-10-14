@@ -62,7 +62,9 @@ try {
             case 'save_product':
                 if (isset($_POST['offline_revision'])) {
                     $current=stock_editable($db,$id,$uid);
-                    if ($current['code']!==($_POST['code']??'') || (int)$current['revision']!==(int)$_POST['offline_revision']) throw new CatalogException('El palet cambió desde tu última consulta. Revisa la carga pendiente antes de enviarla.',409);
+                    // Offline creation adds units atomically; unrelated pallet changes do not overwrite data.
+                    if ($current['code']!==($_POST['code']??'')) throw new CatalogException('Este código ya no corresponde al palet original. La carga sigue guardada.',409);
+                    if ((int)($_POST['product_id']??0)!==0 || (int)$_POST['offline_revision']>(int)$current['revision']) throw new CatalogException('La versión de esta carga necesita revisión. La carga sigue guardada.',409);
                 }
                 $result=stock_save_product($db,$uid,$_POST);
                 $result['pallet_revision']=(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$result['id']])->fetchColumn();

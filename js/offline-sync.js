@@ -13,7 +13,7 @@
       await RepoOfflineStorage.runExclusive('repotools-'+type+'-sync-'+user,async()=>{
         const url=type==='stock'?'api/stock.php':'api/biblioteca.php';const identity=await request(url);if(Number(identity.user_id)!==user){const e=Error('Iniciá sesión con la cuenta original.');e.status=401;throw e;}
         for(const queued of await store.list()){
-          if(left)break;const row=(await store.list()).find(r=>r.key===queued.key);if(!row||['conflict','rejected'].includes(row.state)||(!force&&(row.nextAttemptAt||0)>Date.now()))continue;
+          if(left)break;const row=(await store.list()).find(r=>r.key===queued.key);if(type==='stock'&&row?.state==='conflict'&&row.error==='El palet cambió desde tu última consulta. Revisa la carga pendiente antes de enviarla.'){row.state='pending';row.error='';row.deferred=true;row.nextAttemptAt=0;await store.put(row);}if(!row||['conflict','rejected'].includes(row.state)||(!force&&(row.nextAttemptAt||0)>Date.now()))continue;
           try{
             if(type==='stock'&&(row.data?.action!=='save_product'||Number(row.data?.product_id)!==0||Number(row.data?.pallet_id)<1||row.data?.offline_revision===undefined)){const e=Error('Esta operación requiere conexión y confirmación. No se envió.');e.status=422;throw e;}
             row.state='sending';await store.put(row);
