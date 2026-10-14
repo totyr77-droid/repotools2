@@ -98,7 +98,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/motion.css?v=20261013-global2" rel="stylesheet">
 <link href="css/mobile-navigation.css?v=20261014-one-hand1" rel="stylesheet">
 <link href="css/one-hand-mode.css?v=20261014-one-hand1" rel="stylesheet">
-<link href="css/ux-polish.css?v=20261014-compact1" rel="stylesheet"></head>
+<link href="css/ux-polish.css?v=20261014-compact2" rel="stylesheet"></head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <script>try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <header>

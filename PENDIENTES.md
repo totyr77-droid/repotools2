@@ -171,3 +171,5 @@ Validación final: claves foráneas activas en SQLite de referidos y copia real 
 Pulido UX solicitado directamente a Main: preparado en tmp/release-main con integración selectiva de dependencias visuales, preservando lógicaMain y excluyendo Referidos/DB/sincronización nueva de beta. Pruebas locales Main6 suites aprobadas; docs/PULIDO-UX-MAIN.md. Desarrollo conserva cambios equivalentes. No se cambió hosting ni se asumió causa de incidentesFree.
 
 Publicación Main confirmada: b447a20a82afa41e59688295aa87261cbb1973fb, push HEAD:main desde tmp/release-main. ProducciónHTTP200/5assets coinciden (ux-polish JS/CSS, one-hand, mobile-nav, SW)/plantilla sinBETA e incluye pulido. ÚnicamenteUI/deps visuales; Referidos/SQL/sync nueva siguen fuera deMain. Safari/PWA/teclado físicos pendientes.
+
+Controles tradicionales compactados: historial junto a compartir y ojo condicional; Biblioteca agregar con +/EAN, 44px y etiquetas accesibles. Modo de una mano conservado. Prueba ux-polish ambos modos/manos y escritorio aprobada. Reversión: revertir commit de compactación; sin datos ni permisos modificados.
