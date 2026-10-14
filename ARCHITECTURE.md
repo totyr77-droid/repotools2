@@ -53,3 +53,6 @@ La raíz de trabajo no contiene Git; publicación mediante checkout `tmp/upstrea
 Indicador Stock/Biblioteca lee loads/libraryLoads existentes; eventos de escritura/envío, sin segunda cola. CSV privado api/stock-export.php: stock propio/aceptado, BOM/semicolon, referencias y nombres públicos, generación incremental. Resumen privado api/stock-overview.php: cuatro métricas por agregación y últimos cinco movimientos, saneamiento común pallet_activity_present. Productos cuenta lotes EAN+fecha, no unidades.
 
 initialize_database consulta todas las versiones una vez dentro de la transacción/bloqueo existentes; no usa MAX ni caché entre requests. Auditoría y límites de pruebas reales: docs/AUDITORIA-2026-10-13.md.
+
+## Offline inteligente
+Service Worker shell-v16 y modelos OCR en caché independiente. Conectividad real mediante API mínima, colas compartidas e IndexedDB v3. Consultar docs/OFFLINE-INTELIGENTE.md para alcance, aislamiento de cuenta y reversión; no se cachean respuestas API ni HTML privado.

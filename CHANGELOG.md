@@ -171,3 +171,6 @@ Salida de flyouts/notificaciones, campos condicionales pequeños y confirmacione
 ## 13/10/2026 — Refinar etiquetas beta
 
 Conserva A4 horizontal y PDF, adapta quiet zone del QR según módulos, elimina compresión de números para lectura/OCR y refuerza CSS de impresión. Pruebas1/2/6 páginas y QR de producción/beta/subcarpeta pasan. Solo desarrollo; Safari físico y lectura lejana pendientes. Detalle/archivos/reversión: docs/ETIQUETAS-HORIZONTAL.md.
+
+## 2026-10-13 — Offline inteligente (desarrollo)
+Conectividad comprobada, indicador compacto, sincronizador reutilizado en todas las secciones, reintentos y mutex entre pestañas. Biblioteca gana ledger idempotente y revisión explícita de referencias; Stock protege cargas offline y contenido de claves repetidas. Copias sanitizadas, aislamiento al cambiar cuenta, shell y OCR preparado. Alcance/pruebas/reversión: docs/OFFLINE-INTELIGENTE.md; validación física Safari pendiente.

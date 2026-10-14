@@ -24,3 +24,6 @@ Consultar [ARCHITECTURE.md](ARCHITECTURE.md) para el estado actual y [CHANGELOG.
 - Transferencia de palets: definir aceptación del nuevo propietario antes de implementarla.
 - Suscripciones y límites comerciales: por definir. El cupo técnico actual de una sesión PC y una móvil ya existe; no hay planes de pago implementados.
 - Tendencias por período en General de Moderación, únicamente si se decide ampliar los conteos actuales.
+
+## Offline inteligente — validación pendiente en campo
+Implementación progresiva en desarrollo: shell, copias autorizadas, colas compartidas, reintentos y conflictos. Probar Safari físico, red móvil lenta/intermitente y retención de IndexedDB. La lista EAN offline aún es separada de Inicio online; evaluar unificación por identidad sin perder listas existentes. Ver docs/OFFLINE-INTELIGENTE.md.

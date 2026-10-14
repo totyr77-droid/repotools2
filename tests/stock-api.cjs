@@ -34,6 +34,9 @@ async function post(request,csrf,data,key=randomUUID()){const r=await request('a
  assert.equal((await post(a,csrfA,{...offlineLoad,offline_revision:offlineBase-1})).status,409);
  const offlineKey=randomUUID(),offlineSaved=await post(a,csrfA,offlineLoad,offlineKey);assert.equal(offlineSaved.status,200,offlineSaved.text);assert.equal(offlineSaved.json().pallet_revision,offlineBase+1);
  assert.equal((await post(a,csrfA,offlineLoad,offlineKey)).status,200);
+ assert.equal((await post(a,csrfA,{...offlineLoad,amount:2},offlineKey)).status,409);
+ assert.equal((await post(a,csrfA,{action:'delete',pallet_id:id,offline_owner:1,offline_revision:offlineBase})).status,422);
+ assert.equal(offlineSaved.json()._offline_payload,undefined);
  assert.equal((await a('api/stock.php?code='+code)).json().pallet.products[0].units,41);
  assert.equal((await post(a,csrfA,offlineLoad)).status,409);
  const raced=await post(b,csrfB,{...product,pallet_id:0,code});assert.equal(raced.status,200,raced.text);assert.equal(raced.json().relocated,true);assert.notEqual(raced.json().code,code);assert.equal((await b('api/stock.php?code='+raced.json().code)).json().pallet.products[0].units,40);

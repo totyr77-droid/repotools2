@@ -12,7 +12,8 @@
    function reveal(node){
      if(node.classList.contains('motion-field')&&CSS.supports('interpolate-size','allow-keywords')||/ScannerStatus|mainScannerStatus/.test(node.id)||node.closest('.repotools-send-toast')||disposed||reduced.matches||!node.isConnected||!node.getClientRects().length||node.closest(ignored)||node.getAttribute('aria-busy')==='true'||typeof node.animate!=='function')return;
      const now=performance.now();if(now-(lastReveal.get(node)||-1000)<300)return;lastReveal.set(node,now);
-     const animation=node.animate([{opacity:.65,translate:'0 4px'},{opacity:1,translate:'0 0'}],{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});animations.add(animation);animation.finished.catch(()=>{}).finally(()=>animations.delete(animation));
+     const frames=node.id==='offlineContent'?[{opacity:.65},{opacity:1}]:[{opacity:.65,translate:'0 4px'},{opacity:1,translate:'0 0'}];
+     const animation=node.animate(frames,{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});animations.add(animation);animation.finished.catch(()=>{}).finally(()=>animations.delete(animation));
    }
    function selected(group){
      return [...group.children].find(node=>node.matches('[aria-selected=true],[aria-pressed=true],[aria-current=page]')||node.matches('label')&&node.querySelector('input:checked'));

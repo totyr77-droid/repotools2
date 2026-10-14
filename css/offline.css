@@ -9,3 +9,12 @@ nav button{display:flex;align-items:center;justify-content:center;gap:8px}nav sv
 .offline-result-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}#offlineBarcode{width:100%;height:auto;max-height:180px;fill:#111;stroke:none;background:white}.offline-result-actions button{min-height:44px}nav{gap:6px}nav button{min-width:0;padding:10px 6px}@media(max-width:480px){nav button{flex-direction:column;font-size:.85rem}.offline-actions{flex-wrap:wrap}}
 
 @media(min-width:1024px){#offlineProduct{width:min(760px,calc(100% - 64px))}#offlineStockFields:not([hidden]){grid-template-columns:1fr 1fr;gap:14px 24px}#offlineStockFields>.offline-form-row,#offlineCalculatorToggle{grid-column:1/-1}#offlineAmountResult{align-self:end}#offlineResults{width:min(760px,calc(100% - 64px))}}
+
+#offlineQueueSummary{margin:12px 0}#offlineQueueSummary>summary{min-height:44px;padding:10px;background:#f4ecce;color:#705315;border-radius:10px;cursor:pointer}#offlineQueueSummary .row small{display:block;margin:4px 0}#offlineQueueSummary [data-state=completed]>small:first-of-type{color:#247247}#offlineQueueSummary :is([data-state=rejected],[data-state=conflict])>small:first-of-type{color:#b62336}
+
+main>header .repo-connection-badge{background:#fff1cf;color:#8a6520;font-size:11px}main>header .repo-connection-badge[data-state=syncing]{background:#e7f6ed;color:#247247}
+button{min-height:44px}
+/* Hand off between offline forms without retaining a closed modal in the top layer. */
+.library-dialog,.library-dialog::backdrop{transition:opacity var(--motion-panel) var(--motion-ease),translate var(--motion-panel) var(--motion-ease)}
+.offline-shell .app-page-enter{animation:offline-page-enter var(--motion-page) var(--motion-ease)}
+@keyframes offline-page-enter{from{opacity:.65}to{opacity:1}}
