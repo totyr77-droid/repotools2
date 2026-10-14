@@ -77,8 +77,13 @@ function branch_assign(PDO $db,int $user,array $input): void {
     if ((int)$p['owner_id']!==$user) throw new CatalogException('Solo el propietario puede asignar la sucursal.',403);
     $branchId=(int)($input['branch_id']??0);
     if ($branchId) branch_owned($db,$branchId,$user);
+    $shares=$branchId ? stock_query($db,'SELECT id FROM stock_shares WHERE owner_id=? AND branch_id=? AND active=1',[$user,$branchId])->fetchAll(PDO::FETCH_COLUMN) : [];
+    $changing=(int)($p['branch_id']??0)!==$branchId;
+    if(isset($input['share_pallet'])&&!in_array((string)$input['share_pallet'],['0','1'],true))throw new CatalogException('Elegí si querés compartir este palet.',422);
+    if($changing&&$shares&&!isset($input['share_pallet']))throw new CatalogException('Esta sucursal tiene un enlace compartido. Volvé a guardar para elegir si mostrar este palet.',409);
     $changed=stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=? AND revision=?',[$branchId?:null,$id,(int)($input['revision']??0)])->rowCount();
     if (!$changed) throw new CatalogException('El palet cambió. Vuelve a abrirlo antes de guardar.',409);
+    if($changing&&$shares){foreach($shares as $share){stock_query($db,'DELETE FROM stock_share_exclusions WHERE share_id=? AND pallet_id=?',[$share,$id]);if((string)$input['share_pallet']==='0')stock_query($db,'INSERT INTO stock_share_exclusions(share_id,pallet_id) VALUES(?,?)',[$share,$id]);}}
     stock_touch($db,$id,$user);
     if ($branchId) branch_recent($db,$user,$branchId);
 }

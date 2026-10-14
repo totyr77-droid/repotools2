@@ -23,7 +23,7 @@ try {
     else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
     stock_expire($db); $result=[];
     if ($method==='POST') {
-        foreach (['action','id','revision','pallet_id','branch_id','title','pallet_ids','latitude','longitude','favorite','excluded_ids'] as $field) {
+        foreach (['action','id','revision','pallet_id','branch_id','title','pallet_ids','latitude','longitude','favorite','excluded_ids','share_pallet'] as $field) {
             if (isset($_POST[$field])&&!is_string($_POST[$field])) throw new CatalogException('El formulario no es válido.',422);
         }
         foreach (['id','revision','pallet_id','branch_id'] as $field) {
@@ -32,15 +32,16 @@ try {
         $key=$_POST['operation_key']??'';
         if (!is_string($key)||!preg_match('/^[a-f0-9-]{36}$/D',$key)) throw new CatalogException('Recarga el formulario e intenta nuevamente.',422);
         $key='branches:'.$key;
+        $assignmentHash=in_array($_POST['action']??'',['assign','prepare'],true)?hash('sha256',json_encode(array_map(fn($field)=>(string)($_POST[$field]??''),['action','code','pallet_id','revision','branch_id','share_pallet']))):null;
         $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
-        if ($cached!==false) { $db->commit(); branch_response(200,json_decode($cached,true)); }
+        if ($cached!==false) { $result=json_decode($cached,true);if($assignmentHash&&($result['_assignment_hash']??null)!==$assignmentHash)throw new CatalogException('La selección cambió. Volvé a abrir la sucursal antes de guardar.',409);if($assignmentHash){$assigned=stock_editable($db,(int)($result['id']??$_POST['pallet_id']??0),$uid,true);if((int)$assigned['owner_id']!==$uid)throw new CatalogException('Solo el propietario puede asignar la sucursal.',403);}unset($result['_assignment_hash']);$db->commit(); branch_response(200,$result); }
         switch ($_POST['action']??'') {
             case 'prepare':
                 $branchId=(int)($_POST['branch_id']??0);
                 if ($branchId) branch_owned($db,$branchId,$uid);
                 $result=stock_claim($db,is_string($_POST['code']??null)?$_POST['code']:'',$uid);
                 $revision=(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$result['id']])->fetchColumn();
-                branch_assign($db,$uid,['pallet_id'=>$result['id'],'revision'=>$revision,'branch_id'=>$branchId]);
+                branch_assign($db,$uid,['pallet_id'=>$result['id'],'revision'=>$revision,'branch_id'=>$branchId]+array_intersect_key($_POST,array_flip(['share_pallet'])));
                 break;
             case 'favorite': branch_favorite($db,$uid,$_POST); break;
             case 'save': $result=branch_save($db,$uid,$_POST); break;
@@ -55,7 +56,7 @@ try {
         }
         if(isset($result['branch'])) $result['branch']=array_intersect_key($result['branch'],array_flip(['id','name','address','locality','province','description','revision','latitude','longitude']));
         $result['ok']=true; $result['csrf']=$csrf;
-        stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
+        stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($assignmentHash?$result+['_assignment_hash'=>$assignmentHash]:$result,JSON_UNESCAPED_UNICODE)]);
     } elseif (isset($_GET['manage'])) {
         $result=branch_management($db,$uid,$_GET);$result['csrf']=$csrf;
     } else {

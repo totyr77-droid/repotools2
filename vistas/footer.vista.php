@@ -58,11 +58,11 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261013-portrait1"></script>
 
-<script src="js/stock.js?v=20261014-pallet2"></script>
+<script src="js/stock.js?v=20261014-branch-choice"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261013-loading1"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
-<script src="js/stock-branches.js?v=20261014-pallet2"></script>
+<script src="js/stock-branches.js?v=20261014-branch-choice"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
@@ -79,7 +79,7 @@
 <script src="js/dialog-scroll.js?v=20261014-offline1"></script>
 <script src="js/title-icons.js?v=20261011-icons1"></script>
 
-<script src="js/botones.js?v=20261013-motion2"></script>
+<script src="js/botones.js?v=20261014-branch-choice"></script>
 <script src="js/report-notifications.js?v=20261011-pendingcounts1"></script>
 <script src="js/notifications.js?v=20261011-compactpalets17"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=20261013-zoom2"></script><script src="js/public-name.js?v=20261013-public1"></script><script src="js/account-edit.js?v=20261011-dialog2"></script><script src="js/account-security.js?v=20261011-security2"></script><?php endif; ?>

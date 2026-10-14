@@ -11,7 +11,7 @@ document.addEventListener('touchmove', event => {
 }, { passive: false });
 
 let confirmationOpen = false;
-window.RepoConfirm = ({ title, message, confirmLabel = 'Eliminar' }) => {
+window.RepoConfirm = ({ title, message, confirmLabel = 'Eliminar', cancelLabel = 'Cancelar', choice = false }) => {
   if (confirmationOpen) return Promise.resolve(false);
   confirmationOpen = true;
   return new Promise(resolve => {
@@ -20,12 +20,12 @@ window.RepoConfirm = ({ title, message, confirmLabel = 'Eliminar' }) => {
     const heading = document.createElement('h2'); heading.id = 'deleteConfirmTitle'; heading.textContent = title;
     const description = document.createElement('p'); description.id = 'deleteConfirmMessage'; description.textContent = message;
     const actions = document.createElement('div'); actions.className = 'library-dialog-actions';
-    const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'library-secondary'; cancel.textContent = 'Cancelar';
-    const accept = document.createElement('button'); accept.type = 'button'; accept.className = 'library-danger library-confirm-delete'; accept.textContent = confirmLabel;
-    cancel.addEventListener('click', () => dialog.close());
+    const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'library-secondary'; cancel.textContent = cancelLabel;
+    const accept = document.createElement('button'); accept.type = 'button'; accept.className = choice ? 'library-primary' : 'library-danger library-confirm-delete'; accept.textContent = confirmLabel;
+    cancel.addEventListener('click', () => dialog.close('declined'));
     accept.addEventListener('click', () => dialog.close('confirmed'));
     dialog.addEventListener('close', () => {
-      const confirmed = dialog.returnValue === 'confirmed'; if(window.RepoMotion?.retire)window.RepoMotion.retire(dialog);else dialog.remove(); confirmationOpen = false; resolve(confirmed);
+      const confirmed = dialog.returnValue === 'confirmed'; if(window.RepoMotion?.retire)window.RepoMotion.retire(dialog);else dialog.remove(); confirmationOpen = false; resolve(choice && !['confirmed','declined'].includes(dialog.returnValue) ? null : confirmed);
     }, { once: true });
     actions.append(cancel, accept); dialog.append(heading, description, actions); document.body.append(dialog);
     dialog.showModal(); cancel.focus();
