@@ -13,3 +13,7 @@
 .ux-stock-floating{position:fixed;bottom:calc(144px + env(safe-area-inset-bottom) + var(--ux-subnav-offset,0px));right:76px;left:auto;z-index:99;margin:0;gap:8px}body[data-hand=left] .ux-stock-floating{left:76px;right:auto}.ux-stock-floating button{width:44px;min-width:44px}
 }
 @media(max-width:768px){body[data-one-hand='1'] .one-hand-library-fabs #scanLibraryProduct{order:0!important}body[data-one-hand='1'] .one-hand-library-fabs #collectionSettings{order:1!important}body[data-one-hand='1'] .one-hand-library-fabs #shareLibrary{order:2!important}body[data-one-hand='1'] .one-hand-library-fabs #newCollection{order:3!important}}
+
+#openStockHistory.ux-icon-only{background:#eeebf7;color:#27187e;margin-left:0;text-align:center}
+
+@media(max-width:768px){.repo-mobile-nav,body[data-one-hand='1'] .repo-mobile-nav{--nav-selected:#302080}.stock-primary-actions #openStockHistory{order:99;margin-left:auto;background:#eeebf7!important;color:#27187e;border-radius:9px}.ux-stock-floating #openStockHistory{order:99}}
