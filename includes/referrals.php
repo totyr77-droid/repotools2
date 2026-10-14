@@ -114,8 +114,10 @@ function referral_period(string $period,string $date=''): array {
     $day=new DateTimeImmutable($date?:'today',$zone);if($day>new DateTimeImmutable('today',$zone))throw new ReferralError('Elegí un período actual o anterior.');
     if($period==='historico')return [0,PHP_INT_MAX,'Histórico'];$start=$period==='mes'?$day->modify('first day of this month'):$day->modify('monday this week');$start=$start->setTime(0,0);$end=$start->modify($period==='mes'?'+1 month':'+1 week');return [$start->getTimestamp(),$end->getTimestamp(),$start->format('d/m/Y').' – '.$end->modify('-1 day')->format('d/m/Y')];
 }
+function referral_rank_sql(): string {return "WITH scores AS (SELECT referrer_id,COUNT(*) AS total,MAX(validated_at) AS achieved FROM referrals WHERE state='validated' AND validated_at>=? AND validated_at<? GROUP BY referrer_id),ranked AS (SELECT referrer_id,total,ROW_NUMBER() OVER(ORDER BY total DESC,achieved ASC,referrer_id ASC) AS position FROM scores) ";}
+function referral_position(PDO $db,string $period,int $user): ?array {[$start,$end]=referral_period($period);return referral_q($db,referral_rank_sql().'SELECT position,total FROM ranked WHERE referrer_id=?',[$start,$end,$user])->fetch()?:null;}
 function referral_ranking(PDO $db,string $period,string $date,int $user,int $page): array {
-    [$start,$end,$label]=referral_period($period,$date);$cte="WITH scores AS (SELECT referrer_id,COUNT(*) AS total,MAX(validated_at) AS achieved FROM referrals WHERE state='validated' AND validated_at>=? AND validated_at<? GROUP BY referrer_id),ranked AS (SELECT referrer_id,total,ROW_NUMBER() OVER(ORDER BY total DESC,achieved ASC,referrer_id ASC) AS position FROM scores) ";
+    [$start,$end,$label]=referral_period($period,$date);$cte=referral_rank_sql();
     $rows=referral_q($db,$cte.'SELECT r.position,r.total,u.public_name,u.name,u.id FROM ranked r JOIN users u ON u.id=r.referrer_id ORDER BY r.position LIMIT 51 OFFSET '.(($page-1)*50),[$start,$end])->fetchAll();$more=count($rows)>50;$rows=array_slice($rows,0,50);
     foreach($rows as &$row){$row['name']=get_public_user_name($row);unset($row['id'],$row['public_name']);}unset($row);
     $own=$user?referral_q($db,$cte.'SELECT position,total FROM ranked WHERE referrer_id=?',[$start,$end,$user])->fetch():null;
@@ -123,7 +125,7 @@ function referral_ranking(PDO $db,string $period,string $date,int $user,int $pag
 }
 function referral_stats(PDO $db,int $user): array {
     $counts=['pending'=>0,'validated'=>0,'review'=>0,'rejected'=>0];foreach(referral_q($db,'SELECT state,COUNT(*) AS total FROM referrals WHERE referrer_id=? GROUP BY state',[$user])->fetchAll() as $row)$counts[$row['state']]=(int)$row['total'];
-    $code=referral_code($db,$user);$positions=[];foreach(['semana','mes','historico'] as $period)$positions[$period]=referral_ranking($db,$period,'',$user,1)['own'];
+    $code=referral_code($db,$user);$positions=[];foreach(['semana','mes','historico'] as $period)$positions[$period]=referral_position($db,$period,$user);
     return ['code'=>$code,'link'=>referral_origin().'/r/'.$code,'counts'=>$counts,'positions'=>$positions,'verification_needed'=>(bool)referral_q($db,'SELECT id FROM referrals WHERE invitee_id=? AND email_verified_at IS NULL',[$user])->fetchColumn()];
 }
 
