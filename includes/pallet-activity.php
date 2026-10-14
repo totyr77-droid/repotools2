@@ -5,6 +5,7 @@ function pallet_activity_snapshot(PDO $db,int $id): ?array {
     $p=stock_query($db,'SELECT id,description,released FROM pallets WHERE id=?',[$id])->fetch();if(!$p)return null;
     $p['products']=stock_query($db,'SELECT id,ean,name,units,expires FROM pallet_products WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
     $p['members']=stock_query($db,"SELECT user_id FROM pallet_access WHERE pallet_id=? AND status='accepted'",[$id])->fetchAll(PDO::FETCH_COLUMN);
+    $p['accesses']=stock_query($db,'SELECT user_id,status FROM pallet_access WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_KEY_PAIR);
     return $p;
 }
 function pallet_activity_record(PDO $db,int $user,int $id,?array $before,?array $after): void {
@@ -27,6 +28,8 @@ function pallet_activity_record(PDO $db,int $user,int $id,?array $before,?array 
         $emit($merged?'product_merged':'product_removed',['ean'=>$product['ean'],'reference'=>$product['name'],'units'=>(int)$product['units']]);
         if($merged&&$merged['expires']!==$product['expires'])$emit('expiry_updated',['ean'=>$product['ean'],'reference'=>$product['name'],'old'=>$product['expires'],'new'=>$merged['expires']]);
     }
+    foreach($after['accesses']??[] as $member=>$status)if($status==='pending'&&($before['accesses'][$member]??null)!=='pending')$emit('member_invited',['member_id'=>(int)$member]);
+    foreach($before['accesses']??[] as $member=>$status)if($status==='pending'&&!isset($after['accesses'][$member]))$emit((int)$member===$user?'invitation_declined':'invitation_cancelled',['member_id'=>(int)$member]);
     foreach(array_diff($after['members'],$before['members']??[]) as $member)$emit('member_added',['member_id'=>(int)$member]);
     foreach(array_diff($before['members']??[],$after['members']) as $member)$emit('member_removed',['member_id'=>(int)$member]);
 }
@@ -42,18 +45,18 @@ function pallet_activity_list(PDO $db,int $user,int $id,int $cursor=0,int $limit
     if(!$p)throw new CatalogException('No encontramos este palet.',404);
     if((int)$p['owner_id']!==$user&&!stock_is_admin($db,$user)&&stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted')throw new CatalogException('No tenés acceso a la actividad de este palet.',403);
     $limit=max(1,min(30,$limit));$args=[$id];$filter='';if($event){$filter=' AND a.id=?';$args[]=$event;}elseif($cursor>0){$filter=' AND a.id<?';$args[]=$cursor;}
-    $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,u.public_name,initial_expiry.metadata AS initial_expiry FROM pallet_activity a LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND a.pallet_id=?{$filter} ORDER BY a.id DESC LIMIT ".($event?1:$limit+1),$args)->fetchAll();
+    $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,a.user_id AS actor_id,u.public_name,initial_expiry.metadata AS initial_expiry FROM pallet_activity a LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND a.pallet_id=?{$filter} ORDER BY a.id DESC LIMIT ".($event?1:$limit+1),$args)->fetchAll();
     if($event&&!$rows)throw new CatalogException('Este movimiento no está disponible.',404);
     $more=count($rows)>$limit;$rows=array_slice($rows,0,$limit);$items=pallet_activity_present($db,$rows);foreach($items as &$item){$item['pallet_id']=$id;$item['code']=$p['code'];}unset($item);
     return $event?['item'=>$items[0]]:['items'=>$items,'next_cursor'=>$more?(int)end($rows)['id']:null];
 }
 function pallet_activity_recent(PDO $db,int $user): array {
-    $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,u.public_name,p.code,initial_expiry.metadata AS initial_expiry FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND p.released=0 AND p.activated=1 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access v WHERE v.pallet_id=p.id AND v.user_id=? AND v.status='accepted')) ORDER BY a.id DESC LIMIT 5",[$user,$user])->fetchAll();
+    $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,a.user_id AS actor_id,u.public_name,p.code,initial_expiry.metadata AS initial_expiry FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND p.released=0 AND p.activated=1 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access v WHERE v.pallet_id=p.id AND v.user_id=? AND v.status='accepted')) ORDER BY a.id DESC LIMIT 5",[$user,$user])->fetchAll();
     $items=pallet_activity_present($db,$rows);foreach($items as $i=>&$item)$item['code']=$rows[$i]['code'];unset($item);return $items;
 }
 function pallet_activity_feed(PDO $db,int $user,int $cursor=0,int $event=0): array {
     $args=[$user,$user];$filter='';if($event){$filter=' AND a.id=?';$args[]=$event;}elseif($cursor){$filter=' AND a.id<?';$args[]=$cursor;}
-    $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,u.public_name,p.id AS pallet_id,p.code,initial_expiry.metadata AS initial_expiry FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access v WHERE v.pallet_id=p.id AND v.user_id=? AND v.status='accepted')){$filter} ORDER BY a.id DESC LIMIT ".($event?1:26),$args)->fetchAll();
+    $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,a.user_id AS actor_id,u.public_name,p.id AS pallet_id,p.code,initial_expiry.metadata AS initial_expiry FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access v WHERE v.pallet_id=p.id AND v.user_id=? AND v.status='accepted')){$filter} ORDER BY a.id DESC LIMIT ".($event?1:26),$args)->fetchAll();
     if($event&&!$rows)throw new CatalogException('Este movimiento no está disponible.',404);
     $more=count($rows)>25;$rows=array_slice($rows,0,25);$items=pallet_activity_present($db,$rows);foreach($items as $i=>&$item){$item['pallet_id']=(int)$rows[$i]['pallet_id'];$item['code']=$rows[$i]['code'];}unset($item);
     return $event?['item'=>$items[0]]:['items'=>$items,'next_cursor'=>$more?(int)end($rows)['id']:null];
@@ -62,6 +65,6 @@ function pallet_activity_present(PDO $db,array $rows): array {
     $memberIds=[];
     foreach($rows as &$row){$row['metadata']=json_decode($row['metadata'],true)??[];if(isset($row['metadata']['member_id']))$memberIds[]=(int)$row['metadata']['member_id'];}unset($row);
     $members=[];if($memberIds){$ids=array_values(array_unique($memberIds));foreach(stock_query($db,'SELECT id,public_name FROM users WHERE id IN ('.implode(',',array_fill(0,count($ids),'?')).')',$ids)->fetchAll() as $member)$members[(int)$member['id']]=$member['public_name'];}
-    $items=[];foreach($rows as $row){$meta=$row['metadata'];if($row['action']==='product_added'&&!empty($row['initial_expiry']))$meta['expires']=(json_decode($row['initial_expiry'],true)??[])['new']??'';if(isset($meta['member_id'])){$meta['member']=get_public_user_name(['public_name'=>$members[$meta['member_id']]??'','name'=>'Usuario']);unset($meta['member_id']);}$items[]=['id'=>(int)$row['id'],'action'=>$row['action'],'metadata'=>$meta,'actor'=>get_public_user_name(['public_name'=>$row['public_name'],'name'=>'Usuario']),'created_at'=>$row['created_at']];}
+    $items=[];foreach($rows as $row){$meta=$row['metadata'];if($row['action']==='product_added'&&!empty($row['initial_expiry']))$meta['expires']=(json_decode($row['initial_expiry'],true)??[])['new']??'';if(isset($meta['member_id'])){$meta['member']=get_public_user_name(['public_name'=>$members[$meta['member_id']]??'','id'=>$meta['member_id']]);unset($meta['member_id']);}$items[]=['id'=>(int)$row['id'],'action'=>$row['action'],'metadata'=>$meta,'actor'=>get_public_user_name(['public_name'=>$row['public_name'],'id'=>$row['actor_id']??0]),'created_at'=>$row['created_at']];}
     return $items;
 }

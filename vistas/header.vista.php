@@ -77,7 +77,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=20261013-public1" rel="stylesheet"><?php endif; ?>
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=20261012-exclusions" rel="stylesheet" type="text/css"><link href="css/stock.css?v=20261014-toolbar" rel="stylesheet" type="text/css"><?php endif; ?>
-    <link href="css/action-notices.css?v=20261013-settings1" rel="stylesheet" type="text/css">
+    <link href="css/action-notices.css?v=20261014-toasts" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261013-loading1" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261013-tops2" rel="stylesheet" type="text/css"><?php endif; ?>
@@ -118,7 +118,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
         </nav>
 
         <?php if (current_user()): ?>
-        <div class="notification-control">
+        <div class="notification-control"><button id="openOfflineSent" class="sync-receipt-button" type="button" data-available="false" tabindex="-1" aria-hidden="true" aria-label="Cargas enviadas al reconectar" title="Cargas enviadas al reconectar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"/></svg></button>
           <button id="openNotifications" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="notificationPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM9 21h6"/></svg><span id="notificationBadge" hidden></span></button>
           <section id="notificationPanel" class="notification-panel" aria-label="Notificaciones" hidden>
             <div class="notification-heading"><h2>Notificaciones</h2><button id="closeNotifications" class="app-close" type="button" aria-label="Cerrar notificaciones" title="Cerrar notificaciones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>

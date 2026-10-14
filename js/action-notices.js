@@ -1,30 +1,24 @@
 (() => {
   const page=window.RepoNavigation?.page,doc=page?.document||document;
-  let toast, toastTimer;
-  window.RepoToast = (message,{kind='success'}={}) => {
-    clearTimeout(toastTimer); toast?.remove();
-    toast=doc.createElement('p');toast.className='repotools-send-toast';toast.setAttribute('role','status');
-    toast.dataset.kind=kind;
-    toast.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="'+(kind==='error'?'M12 7v6m0 3h.01':'m7 12 3 3 7-7')+'"/></svg>';
-    const label=doc.createElement('span');label.textContent=message;toast.append(label);
-    if(typeof toast.showPopover==='function'){
-      toast.setAttribute('popover','manual');doc.body.append(toast);toast.showPopover();
-    }else{
-      const dialogs=[...doc.querySelectorAll('dialog[open]')];(doc.activeElement?.closest('dialog[open]')||dialogs.at(-1)||doc.body).append(toast);
+  if(!window.RepoToast?.manager){
+    const root=globalThis.document,queue=[],recent=new Map();let active,timer,exitTimer;
+    const durations={success:3000,info:4000,warning:5000,error:6000};
+    function advance(){if(active||!queue.length)return;const item=queue.shift(),toast=root.createElement('section');active=toast;toast.className='repotools-send-toast repo-toast';toast.dataset.kind=item.kind;toast.setAttribute('role',item.kind==='error'?'alert':'status');
+      const symbol=root.createElementNS('http://www.w3.org/2000/svg','svg');symbol.setAttribute('viewBox','0 0 24 24');symbol.setAttribute('fill','none');symbol.setAttribute('stroke','currentColor');symbol.setAttribute('stroke-width','1.8');symbol.setAttribute('aria-hidden','true');symbol.innerHTML=item.kind==='warning'?'<path d="M12 3 22 21H2ZM12 9v5m0 3h.01"/>':'<circle cx="12" cy="12" r="9"/><path d="'+(item.kind==='success'?'m7 12 3 3 7-7':item.kind==='info'?'M12 11v6m0-10h.01':'M12 7v6m0 3h.01')+'"/>';const body=root.createElement('div'),title=root.createElement('strong');title.textContent=item.title||item.message;body.append(title);if(item.description){const p=root.createElement('p');p.textContent=item.description;body.append(p);}const close=root.createElement('button');close.type='button';close.className='repo-toast-close';close.setAttribute('aria-label','Cerrar aviso');close.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';close.addEventListener('click',dismiss);toast.append(symbol,body,close);
+      if(typeof toast.showPopover==='function'){toast.setAttribute('popover','manual');root.body.append(toast);toast.showPopover();}else (root.activeElement?.closest('dialog[open]')||root.querySelector('dialog[open]')||root.body).append(toast);
+      timer=setTimeout(dismiss,item.duration??durations[item.kind]);
     }
-    toastTimer=setTimeout(()=>toast?.remove(),2400);
-  };
-  page?.onLeave(()=>{clearTimeout(toastTimer);toast?.remove();});
-  const selector='[role="status"],.library-status,.library-form-status,.account-error';
-  function decorate(el){
-    const text=el.textContent.trim();
-    const success=/^(?:Producto (?:guardado|eliminado|actualizado)|Colección (?:guardada|creada|eliminada|renombrada)|Sucursal (?:guardada|eliminada|seleccionada)|Enlace (?:copiado|desactivado|listo)|Contraseña actualizada|Las otras sesiones se cerraron|Preferencia guardada|Rango actualizado|Datos de cuenta actualizados|Invitación enviada|Descripción guardada|Acceso eliminado|Palet (?:eliminado|guardado|disponible|listo)|Etiquetas listas|Reporte (?:#\d+ )?enviado|Imagen (?:descargada|compartida)|Dejaste de participar|Solicitud enviada|Aprobado\.|Reporte rechazado\.|Guardado en|Se guardó|Se agregó|Carga el primer producto antes del)/i.test(text);
-    const error=el.classList.contains('account-error')||/^(?:No pudimos|No puedes|Error|La sesión venció|Revisa |Ingresa .*válido)/i.test(text);
-    if(success||error)el.dataset.notice=error?'error':'success';else delete el.dataset.notice;
+    function dismiss(){if(!active||active.dataset.leaving)return;clearTimeout(timer);const current=active;current.dataset.leaving='true';exitTimer=setTimeout(()=>{current.remove();if(active===current)active=null;advance();},matchMedia('(prefers-reduced-motion: reduce)').matches?0:200);}
+    function send(message,options={}){if(!message)return;const kind=durations[options.kind]?options.kind:'success',key=kind+':'+message+':'+(options.description||''),now=Date.now();for(const [k,at] of recent)if(now-at>5000)recent.delete(k);if(recent.has(key))return;recent.set(key,now);const item={...options,message:String(message),kind};if(kind==='error'){const index=queue.findIndex(row=>row.kind!=='error');queue.splice(index<0?queue.length:index,0,item);if(active&&active.dataset.kind!=='error')dismiss();}else if(queue.length<30)queue.push(item);advance();}
+    send.manager=true;send.clear=()=>{clearTimeout(timer);clearTimeout(exitTimer);active?.remove();active=null;queue.length=0;recent.clear();};window.RepoToast=send;
+    window.addEventListener('pagehide',send.clear);root.addEventListener('toggle',event=>{if(event.target.matches?.('dialog[open]')&&active?.matches(':popover-open')){active.hidePopover();active.showPopover();}},true);
   }
-  function refresh(){doc.querySelectorAll(selector).forEach(decorate);}
-  refresh();
-  const observer=new MutationObserver(refresh);
-  observer.observe(doc.body,{childList:true,subtree:true,characterData:true});
-  page?.onLeave(()=>observer.disconnect());
+  const selector='.library-status,.library-form-status,.account-error,[role="status"],[aria-live="polite"]',seen=new WeakMap();
+  function decorate(el){if(el.hidden||el.closest('[hidden]')||(el.closest('dialog')&&!el.closest('dialog').open))return;if(el.closest('.repo-toast,.notification-panel,.offline-sync-dialog,.repo-sync-status,.repo-connection-badge')||el.classList.contains('scanner-status'))return;const text=el.textContent.trim();if(!text){seen.delete(el);delete el.dataset.toastMessage;return;}if(seen.get(el)===text)return;seen.set(el,text);
+    const success=/^(?:Producto (?:guardado|eliminado|actualizado|agregado)|Colección (?:guardada|creada|eliminada|renombrada)|Sucursal (?:guardada|eliminada)|Enlace (?:copiado|desactivado|listo)|Contraseña actualizada|Las otras sesiones se cerraron|Preferencia guardada|Rango actualizado|Datos de cuenta actualizados|Invitación enviada|Descripción guardada|Acceso eliminado|Palet (?:eliminado|guardado|listo)|Etiquetas listas|Reporte (?:#\d+ )?enviado|Imagen (?:descargada|compartida)|Dejaste de participar|Solicitud enviada|Aprobado\.|Reporte rechazado\.|Se guardó|Se agregó)/i.test(text);
+    const local=/^(?:Guardado en este dispositivo|Guardado sin conexión|Carga pendiente)/i.test(text),warning=/^(?:Producto duplicado|Código .*ya|Ya (?:tenés|tienes|está)|Información incompleta)/i.test(text),error=/^(?:No pudimos|No puedes|Error al|La sesión venció)/i.test(text);
+    if(success||local||warning||error){const kind=error?'error':warning?'warning':local?'info':'success';window.RepoToast(text,{kind});if(!el.classList.contains('account-error')){el.dataset.toastMessage='true';delete el.dataset.notice;}}
+    else{delete el.dataset.toastMessage;if(/^(?:Revisa |Revisá |Ingresa .*válido|Ingresá .*válido)/i.test(text))el.dataset.notice='error';else delete el.dataset.notice;}
+  }
+  let scheduled=false;function refresh(){scheduled=false;doc.querySelectorAll(selector).forEach(decorate)}refresh();const observer=new MutationObserver(()=>{if(!scheduled){scheduled=true;queueMicrotask(refresh)}});observer.observe(doc.body,{childList:true,subtree:true,characterData:true});page?.onLeave(()=>observer.disconnect());
 })();

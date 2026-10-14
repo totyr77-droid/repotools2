@@ -8,7 +8,7 @@
   async function request(url,options={}) {const control=new AbortController(),timer=setTimeout(()=>control.abort(),12000);controllers.add(control);try{const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,signal:control.signal});const value=await response.json();if(!response.ok){const error=Error(value.error||'No pudimos enviar la carga.');error.status=response.status;throw error;}return value;}finally{clearTimeout(timer);controllers.delete(control);}}
   function saveView(kind,data){if(left)return;if(window.RepoOfflineView){RepoOfflineView.save(kind,data);return;}try{const value=JSON.parse(localStorage.getItem('repotools-offline-view')||'null');if(value?.user===user){value[kind]={at:Date.now(),data:RepoOfflineStorage.clean(data)};localStorage.setItem('repotools-offline-view',JSON.stringify(value));}}catch{}}
   async function flush(type,force=false){if(left||running.has(type))return 0;const store=type==='stock'?RepoStockOffline(user):RepoLibraryOffline(user);running.add(type);let count=0,error=false;
-    try{if(!(await store.list()).length)return 0;if(window.RepoConnectivity&&(await RepoConnectivity.check()).kind!=='online')return 0;
+    try{if(!(await store.list()).length)return 0;if(window.RepoConnectivity){const connection=await RepoConnectivity.check();if(connection.kind!=='online'){if(['offline','server'].includes(connection.kind))for(const row of await store.list()){row.deferred=true;await store.put(row);}return 0;}}
       events('repotools:sync-state',{engine:type,busy:true});
       await RepoOfflineStorage.runExclusive('repotools-'+type+'-sync-'+user,async()=>{
         const url=type==='stock'?'api/stock.php':'api/biblioteca.php';const identity=await request(url);if(Number(identity.user_id)!==user){const e=Error('Iniciá sesión con la cuenta original.');e.status=401;throw e;}
@@ -21,11 +21,11 @@
             if(left)break;
             if(type==='stock'&&!data.ok||type==='library'&&!Array.isArray(data.libraries))throw Error('No recibimos la confirmación. La carga sigue guardada.');
             if(type==='stock')await store.advance(row.data.code,row.data.offline_revision,data.pallet_revision);
-            await RepoOfflineSent.put(user,{key:row.key,state:'completed',name:row.data.name,ean:row.data.ean,destination:type==='stock'?'Palet '+row.data.code:'Biblioteca '+row.libraryName,units:type==='stock'?Number(row.data.amount)*(row.data.kind==='units'?1:Number(row.data.pack_size)):0});
+            await RepoOfflineSent.put(user,{key:row.key,recovered:row.deferred===true||row.offline_wait===true||navigator.onLine===false,engine:type,state:'completed',name:row.data.name,ean:row.data.ean,destination:type==='stock'?'Palet '+row.data.code:'Biblioteca '+row.libraryName,units:type==='stock'?Number(row.data.amount)*(row.data.kind==='units'?1:Number(row.data.pack_size)):0});
             await store.remove(row.key);count++;
             if(type==='library')saveView('libraries',data.libraries);
             else try{const updated=await request('api/stock.php?code='+encodeURIComponent(row.data.code));if(!left&&Number(updated.user_id)===user)await store.cache(updated.pallet);}catch{}
-          }catch(e){error=true;RepoOfflineStorage.retry(row,e.status,e.message);await store.put(row);if(e.status===401)window.RepoConnectivity?.report('auth');else if(e.status>=500)window.RepoConnectivity?.report('server');else if(!e.status)window.RepoConnectivity?.report(navigator.onLine===false?'offline':'server');break;}
+          }catch(e){error=true;if(!e.status||e.status>=500)row.deferred=true;RepoOfflineStorage.retry(row,e.status,e.message);await store.put(row);if(e.status===401)window.RepoConnectivity?.report('auth');else if(e.status>=500)window.RepoConnectivity?.report('server');else if(!e.status)window.RepoConnectivity?.report(navigator.onLine===false?'offline':'server');break;}
         }
       });
       if(count&&!left){events('repotools:'+type+'-synced',{count,user});window.RepoToast?.(count===1?'Carga sincronizada correctamente.':count+' cargas sincronizadas correctamente.');}

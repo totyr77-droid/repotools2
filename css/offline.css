@@ -18,3 +18,5 @@ button{min-height:44px}
 .library-dialog,.library-dialog::backdrop{transition:opacity var(--motion-panel) var(--motion-ease),translate var(--motion-panel) var(--motion-ease)}
 .offline-shell .app-page-enter{animation:offline-page-enter var(--motion-page) var(--motion-ease)}
 @keyframes offline-page-enter{from{opacity:.65}to{opacity:1}}
+/* Offline shell: avoid a persistent compositing layer over dialog controls. */
+body.offline-shell main.app-page-enter{animation:none!important;transform:none!important;opacity:1!important}

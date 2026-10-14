@@ -26,12 +26,12 @@
 <!-- SCRIPTS -->
 <?php if(!empty($paginaDemo)): ?><script src="js/guest-demo.js?v=20261013-demo1"></script><?php endif; ?>
 <script src="js/loading.js?v=20261013-loading1"></script>
-<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=20261014-silent1"></script><script src="js/connectivity.js?v=20261014-silent1"></script><script src="js/offline-cache.js?v=20261014-silent1"></script><script src="js/offline-sync.js?v=20261014-confirm1"></script>
-<?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=20261014-silent1"><script src="js/sync-status.js?v=20261014-silent1"></script><script src="js/library-offline.js?v=20261014-silent1"></script><?php endif; ?>
+<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=20261014-toasts"></script><script src="js/connectivity.js?v=20261014-silent1"></script><script src="js/offline-cache.js?v=20261014-silent1"></script><script src="js/offline-sync.js?v=20261014-toasts"></script>
+<?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=20261014-silent1"><script src="js/sync-status.js?v=20261014-silent1"></script><script src="js/library-offline.js?v=20261014-toasts"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261013-motion1"></script>
 <script src="js/device-connection.js?v=20261013-identification1"></script>
-<script src="js/action-notices.js?v=20261013-zoom2"></script>
+<script src="js/action-notices.js?v=20261014-toasts"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
@@ -58,7 +58,7 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261013-portrait1"></script>
 
-<script src="js/stock.js?v=20261014-toolbar"></script>
+<script src="js/stock.js?v=20261014-toasts"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261013-loading1"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
@@ -89,7 +89,7 @@
 <script src="js/onboarding.js?v=20261013-transition1"></script>
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
-<?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261014-pallet2"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261014-pallet2"><script src="js/stock-overview.js?v=20261014-pallet2"></script><?php endif; ?>
+<?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261014-toasts"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261014-toasts"><script src="js/stock-overview.js?v=20261014-pallet2"></script><?php endif; ?>
 <script src="js/motion.js?v=20261014-offline1"></script>
 </body>
 </html>

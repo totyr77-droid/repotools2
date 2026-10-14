@@ -1,0 +1,13 @@
+<?php
+require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../includes/pallet-activity.php';require_once __DIR__.'/../includes/stock-branches.php';
+$db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($db);
+function history_check($ok,$message){if(!$ok)throw new RuntimeException($message);}
+$db->exec("INSERT INTO users(id,name,public_name,email,password_hash) VALUES(1,'Owner','Owner','a@example.invalid','x'),(2,'Member','Member','b@example.invalid','x'),(3,'Other','Other','c@example.invalid','x');INSERT INTO pallets(id,code,owner_id,updated_by,activated,prepared_until) VALUES(1,'12345678',1,1,1,0)");
+$before=pallet_activity_snapshot($db,1);$db->exec("INSERT INTO pallet_access(pallet_id,user_id,status) VALUES(1,2,'pending')");pallet_activity_record($db,1,1,$before,pallet_activity_snapshot($db,1));
+$before=pallet_activity_snapshot($db,1);$db->exec("UPDATE pallet_access SET status='accepted' WHERE pallet_id=1 AND user_id=2");pallet_activity_record($db,2,1,$before,pallet_activity_snapshot($db,1));
+$before=pallet_activity_snapshot($db,1);$db->exec("INSERT INTO pallet_products(pallet_id,ean,name,units) VALUES(1,'96385074','Agua',8)");pallet_activity_record($db,1,1,$before,pallet_activity_snapshot($db,1));
+$before=pallet_activity_snapshot($db,1);$db->exec('DELETE FROM pallet_products WHERE pallet_id=1');pallet_activity_record($db,2,1,$before,pallet_activity_snapshot($db,1));
+$branch=branch_save($db,1,['name'=>'Local','address'=>'Calle 123','locality'=>'Ciudad','province'=>'Provincia'])['branch'];branch_assign($db,1,['pallet_id'=>1,'revision'=>1,'branch_id'=>$branch['id']]);
+foreach([1,2] as $viewer){$items=pallet_activity_list($db,$viewer,1)['items'];history_check(count($items)===5,'All actors and actions visible');history_check(in_array('member_invited',array_column($items,'action'),true),'Pending invite recorded');history_check(in_array('branch_updated',array_column($items,'action'),true),'Branch movement recorded');$removed=array_values(array_filter($items,fn($item)=>$item['action']==='product_removed'))[0];history_check($removed['actor']==='Member','Collaborator identified');history_check($removed['metadata']['ean']==='96385074','Deletion detail retained');}
+try{pallet_activity_list($db,3,1);throw new RuntimeException('Foreign access allowed');}catch(CatalogException $e){history_check($e->status===403,'Access protected');}
+echo "OK: owner/member see all actors, deletion details, pending invite, accepted access and branch change; unrelated viewer403.\n";
