@@ -46,7 +46,7 @@
   const camera = document.getElementById('reportCameraDialog'), video = document.getElementById('reportCameraVideo');
   const cameraStatus = document.getElementById('reportCameraStatus'), capture = document.getElementById('captureReportPhoto'), retryCamera = document.getElementById('retryReportCamera');
   const flash=document.getElementById('reportCameraFlash');let lightOn=false;
-  const capturedPhotos = new Map(), previews = new Map();
+  const capturedPhotos = new Map(), previews = new Map();let cropSession;const cropButton=document.createElement('button');cropButton.type='button';cropButton.className='library-secondary product-crop-adjust';cropButton.hidden=true;cropButton.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3v14h14M3 7h14v14"/></svg>Ajustar encuadre';form.querySelector('[data-report-camera="product"]').after(cropButton);cropButton.addEventListener('click',()=>{if(!busy)cropSession?.edit();});
   let cameraVersion = 0, cameraKind, stream, remoteCapture=null, cancelRemotePhoto=null, remoteRequestVersion=0;
   let revision = 0, active, busy = false, catalogPhoto='';
   function showProductPhoto(){const preview=document.getElementById('reportPreviewProduct'),fresh=capturedPhotos.has('product');const src=fresh?previews.get('product'):catalogPhoto;preview.hidden=!src;if(src)preview.src=src;else preview.removeAttribute('src');const note=document.getElementById('reportProductPhotoNote');note.textContent=fresh?'Foto nueva para este reporte.':src?'Foto actual del producto.':'';form.querySelector('[data-report-camera="product"]').textContent=fresh?'Volver a tomar':src?'Cambiar foto':'Tomar foto del producto';form.querySelector('[data-report-remove="product"]').hidden=!fresh;}
@@ -55,12 +55,13 @@
     stream?.getTracks().forEach(track => track.stop()); stream = null; video.srcObject = null;
   }
   function removePhoto(kind) {
+    if(kind==='product'){cropSession?.dispose();cropSession=null;cropButton.hidden=true;delete document.getElementById('reportPreviewProduct').dataset.cropUpload;}
     if (previews.has(kind)) URL.revokeObjectURL(previews.get(kind)); previews.delete(kind); capturedPhotos.delete(kind);
     const preview = document.getElementById(kind === 'ean' ? 'reportPreviewEan' : 'reportPreviewProduct'); preview.removeAttribute('src'); preview.hidden = true;
     form.querySelector(`[data-report-remove="${kind}"]`).hidden = true;
     form.querySelector(`[data-report-camera="${kind}"]`).textContent = kind === 'ean' ? 'Tomar foto del EAN' : 'Tomar foto del producto';if(kind==='product')showProductPhoto();
   }
-  function setPhoto(kind,blob){removePhoto(kind);capturedPhotos.set(kind,blob);const url=URL.createObjectURL(blob);previews.set(kind,url);const preview=document.getElementById(kind==='ean'?'reportPreviewEan':'reportPreviewProduct');preview.src=url;preview.hidden=false;form.querySelector('[data-report-remove="'+kind+'"]').hidden=false;form.querySelector('[data-report-camera="'+kind+'"]').textContent='Volver a tomar';if(kind==='product')showProductPhoto();}
+  function setPhoto(kind,blob){removePhoto(kind);capturedPhotos.set(kind,blob);const url=URL.createObjectURL(blob);previews.set(kind,url);const preview=document.getElementById(kind==='ean'?'reportPreviewEan':'reportPreviewProduct');preview.src=url;preview.hidden=false;form.querySelector('[data-report-remove="'+kind+'"]').hidden=false;form.querySelector('[data-report-camera="'+kind+'"]').textContent='Volver a tomar';if(kind==='product'){preview.dataset.cropUpload='1';showProductPhoto();cropButton.hidden=false;const reportVersion=revision;const session=window.RepoProductCrop?.create(blob,result=>{if(reportVersion!==revision||cropSession!==session)return;capturedPhotos.set('product',result);const old=previews.get('product'),next=URL.createObjectURL(result);previews.set('product',next);preview.src=next;if(old)URL.revokeObjectURL(old);});cropSession=session;}}
   const cancelPhotoButton=document.createElement('button');cancelPhotoButton.type='button';cancelPhotoButton.className='library-secondary report-photo-cancel';cancelPhotoButton.hidden=true;cancelPhotoButton.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>Cancelar foto';status.after(cancelPhotoButton);
   const photoRequestNotice=document.createElement('div');photoRequestNotice.className='report-photo-request';photoRequestNotice.hidden=true;photoRequestNotice.setAttribute('role','status');
   photoRequestNotice.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg><p>Enviamos una solicitud a tu celular para tomar la foto.</p>';
@@ -135,15 +136,12 @@
       if (attempt !== cameraVersion || reportVersion !== revision || !camera.open || (!remoteCapture&&!dialog.open)) return;
       if (!blob || blob.size > 1024 * 1024) throw new Error('No pudimos guardar la foto. Intenta otra vez.');
       if(remoteCapture){const pending=remoteCapture;remoteCapture=null;stopCamera();camera.close();pending.resolve(blob);return;}
-      removePhoto(kind); capturedPhotos.set(kind, blob); const url = URL.createObjectURL(blob); previews.set(kind, url);
-      const preview = document.getElementById(kind === 'ean' ? 'reportPreviewEan' : 'reportPreviewProduct'); preview.src = url; preview.hidden = false;
-      form.querySelector(`[data-report-remove="${kind}"]`).hidden = false; form.querySelector(`[data-report-camera="${kind}"]`).textContent = 'Volver a tomar';
-      if(kind==='product')showProductPhoto();stopCamera(); camera.close();
+      setPhoto(kind,blob);stopCamera(); camera.close();
     } catch (error) { if (attempt === cameraVersion && camera.open) { cameraStatus.textContent = error.message; capture.disabled = false; } }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { stopCamera(); if (camera.open) camera.close(); } });
   (page ? page.listen : window.addEventListener.bind(window))('pagehide', stopCamera);
-  page?.onLeave(()=>{finishPhotoRequest();cancelRemoteCapture();stopCamera();});
+  page?.onLeave(()=>{cropSession?.dispose();finishPhotoRequest();cancelRemoteCapture();stopCamera();});
   page?.onLeave(() => { revision++; previews.forEach(url => URL.revokeObjectURL(url)); previews.clear(); capturedPhotos.clear(); });
   async function open(ean) {
     if (busy) return;
@@ -183,14 +181,13 @@
     event.preventDefault(); if (!active || busy) return;
     busy = true; send.disabled = true; close.disabled = true; status.textContent = 'Enviando…';
     try {
-      const body = new FormData(form); body.set('csrf', active.csrf); body.set('ean', active.ean); body.set('submission_key', active.key); body.set('owner_token', ownerToken());
+      await cropSession?.wait();const body = new FormData(form); body.set('csrf', active.csrf); body.set('ean', active.ean); body.set('submission_key', active.key); body.set('owner_token', ownerToken());
       for (const kind of ['ean', 'product']) {
         const file = capturedPhotos.get(kind); body.delete('photo_' + kind);
         if (file && !document.getElementById('reportPhotos').disabled) body.set('photo_' + kind, await compress(file), kind + '.jpg');
       }
       const result = await request('', body); form.hidden = true; ['ean', 'product'].forEach(removePhoto);
-      status.replaceChildren(document.createTextNode(result.report ? `Reporte #${result.report.id} enviado. ` : 'Reporte enviado. '));
-      const link = document.createElement('a'); link.href = 'reportes.php'; link.textContent = 'Ver mis reportes'; status.append(link);
+      status.replaceChildren();busy=false;dialog.close();window.RepoToast?.(result.report?`Reporte #${result.report.id} enviado.`:'Reporte enviado.');
     } catch (error) { status.textContent = error.message; }
     finally { busy = false; send.disabled = false; close.disabled = false; }
   });
