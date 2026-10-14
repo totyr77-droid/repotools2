@@ -28,7 +28,7 @@
           }catch(e){error=true;RepoOfflineStorage.retry(row,e.status,e.message);await store.put(row);if(e.status===401)window.RepoConnectivity?.report('auth');else if(e.status>=500)window.RepoConnectivity?.report('server');else if(!e.status)window.RepoConnectivity?.report(navigator.onLine===false?'offline':'server');break;}
         }
       });
-      if(count&&!left){events('repotools:'+type+'-synced',{count,user});}
+      if(count&&!left){events('repotools:'+type+'-synced',{count,user});window.RepoToast?.(count===1?'Carga sincronizada correctamente.':count+' cargas sincronizadas correctamente.');}
     }catch(e){error=true;if(e.status===401){window.RepoConnectivity?.report('auth');for(const row of await store.list()){if(['conflict','rejected'].includes(row.state))continue;row.state='auth';row.error='Iniciá sesión para enviar esta carga.';await store.put(row);}}else window.RepoConnectivity?.report(navigator.onLine===false?'offline':'server');}
     finally{running.delete(type);if(!left)events('repotools:sync-state',{engine:type,busy:false,error});}return count;
   }

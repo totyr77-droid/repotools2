@@ -99,3 +99,5 @@ Entrega offline verificada en beta el2026-10-14:1392b3d + ff6592d, hashes públi
 Sincronización silenciosa (beta,2026-10-14): carga/comprobación normal sin avisos; éxito automático sin toast; historial consultable con botón neutro; estado sincronizando solo con pendientes procesables. Colas y servidor intactos. Pruebas y reversión en docs/OFFLINE-INTELIGENTE.md. Mantener pruebas físicas Safari pendientes.
 
 Historial general Stock (beta,2026-10-14): resumen encima de Escanear palet; Últimos movimientos abre ventana paginada25con ficha individual Antes/Después. Alcance propio/compartido aceptado, incluyendo eliminados, sin listado indiscriminado admin. Permisos revalidados en cada ficha; misma tabla, sin migración. Validación/reversión: docs/HISTORIAL-STOCK.md. Safari físico pendiente.
+
+Confirmaciones reales refinadas (beta,2026-10-14): toast verde de2,4s únicamente tras cargas confirmadas Stock/Biblioteca, también al reconectar; no se repite al cargar/navegar ni por historial. Sustituye el silencio de éxito de la entrega anterior por pedido del usuario. Pruebas/reversión en docs/OFFLINE-INTELIGENTE.md; colas/servidor intactos.
