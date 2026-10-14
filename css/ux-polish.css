@@ -4,3 +4,5 @@
 .library-product-description{min-height:44px}
 @media(max-width:768px){.ux-stock-access{flex-wrap:nowrap}.ux-stock-access button{min-width:0}.ux-home-actions #ver{position:relative}.ux-home-actions #cantidad{position:absolute;top:-3px;right:-3px;background:#584b94;color:white;font-size:11px;border-radius:20px;padding:2px 5px;min-width:18px;line-height:1.2}}
 .ux-stock-access[hidden],.ux-stock-access [hidden],.reports-main .library-heading[hidden],.one-hand-filter-actions [hidden]{display:none!important}
+
+.ux-icon-only{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 44px!important;width:44px!important;min-width:44px!important;height:44px;min-height:44px;padding:8px!important;border:0;border-radius:9px;background:#eeebf7;color:#27187e}.ux-icon-only>span{display:none}.ux-icon-only>svg{width:22px;height:22px;flex:none}#scanLibraryProduct.ux-icon-only{background:#27187e;color:white}
