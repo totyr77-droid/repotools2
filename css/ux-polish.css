@@ -17,3 +17,15 @@
 #openStockHistory.ux-icon-only{background:#eeebf7;color:#27187e;margin-left:0;text-align:center}
 
 @media(max-width:768px){.repo-mobile-nav,body[data-one-hand='1'] .repo-mobile-nav{--nav-selected:#302080}.stock-primary-actions #openStockHistory{order:99;margin-left:auto;background:#eeebf7!important;color:#27187e;border-radius:9px}.ux-stock-floating #openStockHistory{order:99}}
+
+@media(max-width:768px){
+body[data-one-hand='1'] .one-hand-library-fabs{background:transparent!important;box-shadow:none;padding:0;gap:6px;max-width:calc(100vw - 24px);flex-direction:row!important}
+body[data-one-hand='1'] .one-hand-library-fabs>.one-hand-fab{background:#27187e!important;min-width:44px!important;width:44px!important;height:44px;min-height:44px;padding:10px!important}
+body[data-one-hand='1'] .one-hand-library-fabs #collectionSettings>summary{width:44px;height:44px;position:relative}
+body[data-one-hand='1'] .one-hand-library-fabs #collectionSettings .library-chevron{position:absolute;width:12px;height:12px;right:2px;top:2px;transform:rotate(180deg)}
+body[data-one-hand='1'] .one-hand-library-fabs #collectionSettings[open] .library-chevron{transform:rotate(0deg)}
+body[data-one-hand='1'] .one-hand-library-fabs #collectionSettings .library-settings-menu{top:auto!important;bottom:calc(100% + 8px)!important;right:0;left:auto;max-width:calc(100vw - 24px)}
+body[data-one-hand='1'][data-hand=left] .one-hand-library-fabs #collectionSettings .library-settings-menu{left:0;right:auto}
+body[data-one-hand='1'] .one-hand-library-fabs #newCollection{display:inline-flex!important;align-items:center;gap:4px;width:auto!important;min-width:0!important;max-width:154px;font-size:12px!important;white-space:nowrap;padding:10px 8px!important;margin:0 0 0 10px!important;border-radius:12px}
+body[data-one-hand='1'] .one-hand-library-fabs #newCollection svg{width:18px;height:18px;flex:none}
+}
