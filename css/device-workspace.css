@@ -218,3 +218,5 @@ body[data-hand=left] #contenedormax[data-scan-mode=rapid] .main-rapid-ean{grid-c
 @media(max-width:600px){#stockShareList .branch-row>div:first-child{flex:1 1 100%}#stockShareList .branch-actions{width:100%;justify-content:flex-end}}
 @media(max-width:600px) and (pointer:coarse){body[data-hand=left] #stockShareList .branch-actions{justify-content:flex-start}}
 .repotools-send-toast[popover]{right:auto;bottom:auto;margin:0}
+
+.offline-sync-history{margin-top:8px;padding:0;border:0;background:transparent;color:inherit}.offline-sync-history .offline-sync-view{border-color:#e1deed;background:#f3f1f9;color:#27187e;font-size:.85rem}
