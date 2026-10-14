@@ -154,3 +154,7 @@ Metadatos en misma línea (beta,2026-10-14, reemplaza distribución vertical pre
 
 ## Auditoría crítica de mercadería offline — beta, 2026-10-14
 Confirmación verificada UUID/cuenta/acción/ID+código y snapshot en transacción servidor; cola/recibo/caché en una transacción IndexedDBv3. Caché no retrocede revisiones, retryable guarda error, identidad etiqueta validada. Dos productos84 aislados/lost-ack/reload/200 incompleto/500/429 pasan sin duplicar. Sin tocar palet real/DBcompartida/Main. docs/SYNC-INVENTARIO-CRITICA.md detalla tests/reversión/iPhone. Pendiente suite offline-intelligent: Buscar palet cubierto por main.app-page-enter, no aprobado; Safari/PWA/PostgreSQL físicos pendientes. No afirmar causa histórica del incidente ni alcance offline total.
+
+
+## Offline visual y EAN — beta,2026-10-14
+Inicio/Stock/Biblioteca shell compacto, acciones claras44px según mano, modo una mano con acciones abajo, nav inferior safearea/PCarriba. Biblioteca productos/pendientes muestran barrasEAN13/EAN8 usando JsBarcode3.11.6 local compartido con online; SWv32. Sin cambios cola/DB/cámara/permisos. offline-library-visual, stock-sync-integrity y offline-intelligent completo aprobados; bloqueo previo de Buscar palet no reproducido tras cierre modal sin transición discreta y repetición. Docs/reversión/pruebas físicas: docs/OFFLINE-UX-Y-EAN.md. Safari/PWA/lector físico pendientes. Main intacto.
