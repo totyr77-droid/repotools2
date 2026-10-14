@@ -43,4 +43,6 @@ Revertir el commit de esta entrega exclusivamente en desarrollo. MantenerMain y 
 
 Documentación del proveedor: https://github.com/naptha/tesseract.js/blob/master/docs/api.md y https://github.com/tesseract-ocr/tessdata_fast.
 
-Resultado de regresión:56 pruebasCJS ejecutadas;55 pasaron en la ejecución conjunta. Ajustes falló por bienvenida automática superpuesta en la preparación del usuarioexistente. Se agregó seen+version del onboarding al fixture (sin cambiar producción) y pasó su repetición completa. Lint PHP header/footer y git diff --check correctos.
+Resultado de regresión:56 pruebasCJS ejecutadas;55 pasaron en la ejecución conjunta. Ajustes falló por bienvenida automática superpuesta en la preparación del usuarioexistente. Se agregó seen+version del onboarding al fixture (sin cambiar producción) y pasó su repetición completa. Lint PHP header/footer correcto.
+
+Despliegue funcionalfd68948 confirmado en https://repotools-desarrollo.onrender.com/: portada y11 recursos públicosHTTP200, SHA256 iguales a los archivos publicados (incluido modelo gzip sin Content-Encoding). El mismo test de OCR real pasó usando JS/core/modelo de la beta, con página e imágenes sintéticas y sin acceder a cuentas ni modificar datos. Main sigue en f7c6003e7dcec8a38ec640c068260107538b769d.
