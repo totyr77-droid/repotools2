@@ -19,7 +19,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 ?>
 <!DOCTYPE html>
 <html lang="es" class="is-loading">
-  <head>
+  <head><?php require_once __DIR__.'/../includes/app-release.php'; ?>
     <meta charset="utf-8">
     <?php include __DIR__ . '/page-loader-head.vista.php'; ?>
     <?php if(isset($publicShareBase)): ?><base href="<?= escape($publicShareBase) ?>"><?php endif; ?>
@@ -57,44 +57,44 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link rel="stylesheet" href="css/vendor/fontawesome-6.7.2/css/solid.min.css">
     <link rel="stylesheet" href="css/vendor/fontawesome-6.7.2/css/brands.min.css">
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
-    <link href="css/loading.css?v=20261013-loading1" rel="stylesheet" type="text/css">
-    <?php if(!empty($paginaDemo)): ?><link href="css/guest-demo.css?v=20261013-demo3" rel="stylesheet"><?php endif; ?>
-    <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=20261013-intro1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <link href="css/loading.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+    <?php if(!empty($paginaDemo)): ?><link href="css/guest-demo.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+    <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <link href="css/contador.css" rel="stylesheet" type="text/css">
     <link href="css/mobile.css" rel="stylesheet" type="text/css">
     <link href="css/footer.css" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=20261011-reportphotofallback10" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261013-settings1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261014-single-guide" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261014-single-guide" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($paginaReportes)): ?><link href="css/reports.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
 
 
-    <link href="css/notifications.css?v=20261012-desktop-status" rel="stylesheet" type="text/css">
-    <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=20261013-public1" rel="stylesheet"><?php endif; ?>
-    <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=20261012-exclusions" rel="stylesheet" type="text/css"><link href="css/stock.css?v=20261014-compact-metadata" rel="stylesheet" type="text/css"><?php endif; ?>
-    <link href="css/action-notices.css?v=20261014-auto-add" rel="stylesheet" type="text/css">
-    <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
-    <link href="css/navigation.css?v=20261013-loading1" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261013-tops2" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=20261013-pwa" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><?php endif; ?>
-  <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-directory7" rel="stylesheet"><?php endif; ?>
-<?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261014-single-guide" rel="stylesheet"><?php endif; ?>
-<link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
-<link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
-<link href="css/device-workspace.css?v=20261014-shared-camera" rel="stylesheet" type="text/css">
-<?php if (!empty($paginaCuenta) && current_user()): ?><link href="css/settings.css?v=20261013-settings1" rel="stylesheet"><?php endif; ?>
-<?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
-<?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261014-pallet2" rel="stylesheet"><?php endif; ?>
-<link href="css/connectivity.css?v=20261014-silent1" rel="stylesheet"><link href="css/responsive.css?v=20261013-workspaces2" rel="stylesheet" type="text/css">
-<link href="css/motion.css?v=20261013-global2" rel="stylesheet">
-<link href="css/mobile-navigation.css?v=20261014-compact1" rel="stylesheet"><link href="css/one-hand-mode.css?v=20261014-compact1" rel="stylesheet"><link href="css/ux-polish.css?v=20261014-stable-hand" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=20261014-stable-hand" as="script"><link rel="preload" href="js/ux-polish.js?v=20261014-stable-hand" as="script"></head>
-  <body data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
+    <link href="css/notifications.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+    <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+    <link href="css/account-bar.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/stock.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <link href="css/action-notices.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+    <link href="css/close-buttons.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+    <link href="css/navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+  <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+<link href="css/hand-preferences.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
+<link href="css/title-icons.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
+<link href="css/device-workspace.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+<?php if (!empty($paginaCuenta) && current_user()): ?><link href="css/settings.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+<link href="css/connectivity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/responsive.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+<link href="css/motion.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
+<link href="css/mobile-navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/one-hand-mode.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/ux-polish.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>" as="script"><link rel="preload" href="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>" as="script"></head>
+  <?php require_once __DIR__.'/../includes/app-release.php'; ?><body data-app-version="<?= (int)app_release()['version'] ?>" data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
       <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <div class="header-contenedor">

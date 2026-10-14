@@ -1,0 +1,2 @@
+<?php require_once __DIR__.'/../includes/app-release.php'; $release=app_release(); ?>
+<details class="app-updates"><summary>Actualizaciones · v<?= (int)$release['version'] ?></summary><ol><?php foreach(array_slice($release['changes'],0,10) as $change): ?><li><strong>v<?= (int)$change['version'] ?></strong> <small><?= htmlspecialchars($change['date'],ENT_QUOTES,'UTF-8') ?></small><p><?= htmlspecialchars($change['summary'],ENT_QUOTES,'UTF-8') ?></p></li><?php endforeach; ?></ol></details>

@@ -1,0 +1,2 @@
+#!/bin/sh
+node scripts/bump-release.cjs --git || exit 1
