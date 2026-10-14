@@ -44,6 +44,18 @@ function pallet_activity_recent(PDO $db,int $user): array {
     $rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,u.public_name,p.code FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id WHERE p.released=0 AND p.activated=1 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access v WHERE v.pallet_id=p.id AND v.user_id=? AND v.status='accepted')) ORDER BY a.id DESC LIMIT 5",[$user,$user])->fetchAll();
     $items=pallet_activity_present($db,$rows);foreach($items as $i=>&$item)$item['code']=$rows[$i]['code'];unset($item);return $items;
 }
+function pallet_activity_feed(PDO $db,int $user,int $cursor=0,int $event=0): array {
+    // Same personal Stock scope: owned pallets and currently accepted collaborations.
+    // Released pallets stay in history; current permissions are checked on every read.
+    $args=[$user,$user];$filter='';
+    if($event){$filter=' AND a.id=?';$args[]=$event;}
+    elseif($cursor){$filter=' AND a.id<?';$args[]=$cursor;}
+    $rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,u.public_name,p.id AS pallet_id,p.code FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id WHERE (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access v WHERE v.pallet_id=p.id AND v.user_id=? AND v.status='accepted')){$filter} ORDER BY a.id DESC LIMIT ".($event?1:26),$args)->fetchAll();
+    if($event&&!$rows)throw new CatalogException('Este movimiento no está disponible.',404);
+    $more=count($rows)>25;$rows=array_slice($rows,0,25);$items=pallet_activity_present($db,$rows);
+    foreach($items as $i=>&$item){$item['id']=(int)$rows[$i]['id'];$item['pallet_id']=(int)$rows[$i]['pallet_id'];$item['code']=$rows[$i]['code'];}unset($item);
+    return $event?['item'=>$items[0]]:['items'=>$items,'next_cursor'=>$more?(int)end($rows)['id']:null];
+}
 function pallet_activity_present(PDO $db,array $rows): array {
     $memberIds=[];
     foreach($rows as &$row){$row['metadata']=json_decode($row['metadata'],true)??[];if(isset($row['metadata']['member_id']))$memberIds[]=(int)$row['metadata']['member_id'];}unset($row);

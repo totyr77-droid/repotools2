@@ -5,6 +5,12 @@ $user=current_user();
 try{
     if($_SERVER['REQUEST_METHOD']!=='GET')throw new CatalogException('Solicitud no válida.',405);
     if(!$user)throw new CatalogException('Ingresá para ver la actividad.',401);
+    if(($_GET['scope']??'')==='stock'){
+        $cursor=filter_var($_GET['cursor']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0]]);
+        $event=filter_var($_GET['event_id']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0]]);
+        if($cursor===false||$event===false)throw new CatalogException('Movimiento no válido.',422);
+        session_write_close();echo json_encode(pallet_activity_feed(database(),(int)$user['id'],$cursor,$event),JSON_UNESCAPED_UNICODE);exit;
+    }
     $id=filter_var($_GET['pallet_id']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);$cursor=filter_var($_GET['cursor']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0]]);
     if(!$id||$cursor===false)throw new CatalogException('Palet no válido.',422);
     session_write_close();echo json_encode(pallet_activity_list(database(),(int)$user['id'],$id,$cursor),JSON_UNESCAPED_UNICODE);

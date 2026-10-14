@@ -92,7 +92,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
 <!-- Development-only marker: exclude this integration when publishing to main. -->
 <link href="css/development.css?v=20261013-beta1" rel="stylesheet">
-<?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261013-activity1" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261014-history1" rel="stylesheet"><?php endif; ?>
 <link href="css/connectivity.css?v=20261014-silent1" rel="stylesheet"><link href="css/responsive.css?v=20261013-workspaces2" rel="stylesheet" type="text/css">
 <link href="css/motion.css?v=20261013-global2" rel="stylesheet">
 </head>
