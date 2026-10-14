@@ -15,3 +15,5 @@ Archivos: js/one-hand-mode.js, css/one-hand-mode.css, js/mobile-navigation.js, c
 Pruebas: reporte éxito/error; una mano default/restore/persistencia/browser user isolation, búsqueda retenida, callbacks reales, colecciones y filtros, menú reportes; nav4s/92% componente base y100% modo; ajustes/reload/cambio página/otra cuenta; acciones palet ambos lados360 sin solaparse; modo tradicional7páginas10 tamaños320–1920; modo activo5páginas320/390/1366 con colecciones reales en SQLite temporal; PHP/JS sintaxis. No se probó iPhone físico: Safari/PWA/teclado/VoiceOver/alcance pulgar pendientes.
 
 Revertir commit del modo en desarrollo; no borrar IndexedDB ni datos. No hace falta revertir esquema porque no hay migraciones. Main/producción intactos.
+
+Ajuste de integración: js/biblioteca.js conserva el bloqueo de +Crear durante operaciones aunque el botón esté en la capa flotante.

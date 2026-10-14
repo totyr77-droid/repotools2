@@ -40,7 +40,7 @@
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
 <script src="js/product-reports.js?v=20261014-close-sent"></script>
-<script src="js/biblioteca.js?v=20261013-loading1"></script>
+<script src="js/biblioteca.js?v=20261014-one-hand-lock"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
 <script src="js/product-reports.js?v=20261014-close-sent"></script>
