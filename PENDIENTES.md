@@ -166,3 +166,8 @@ Ajustes→Referidos, enlace/código permanente, atribución atómica solo nuevas
 Ajuste final de referidos: posiciones propias sin descargar líderes; toast único después del registro con verificación pendiente o ruta de reenvío, sin afirmar entrega si Resend falla. Misma sesión/tostadas/privacidad, sin cambios al registro cuando está desactivado.
 
 Validación final: claves foráneas activas en SQLite de referidos y copia real del enlace al portapapeles de Chrome aprobadas; UI repetida ambos modos/manos. Captura del usuario indica mantenimiento Render postergado, no ejecutado; recursos/APIreferidos siguen404 en comprobación pública. No atribuir el despliegue pendiente al mantenimiento. Revisar rama desarrollo/Manual Deploy/logs del servicio beta; sin sesión Render autenticada del agente. Main intacto.
+
+
+Pulido UX solicitado directamente a Main: preparado en tmp/release-main con integración selectiva de dependencias visuales, preservando lógicaMain y excluyendo Referidos/DB/sincronización nueva de beta. Pruebas locales Main6 suites aprobadas; docs/PULIDO-UX-MAIN.md. Desarrollo conserva cambios equivalentes. No se cambió hosting ni se asumió causa de incidentesFree.
+
+Publicación Main confirmada: b447a20a82afa41e59688295aa87261cbb1973fb, push HEAD:main desde tmp/release-main. ProducciónHTTP200/5assets coinciden (ux-polish JS/CSS, one-hand, mobile-nav, SW)/plantilla sinBETA e incluye pulido. ÚnicamenteUI/deps visuales; Referidos/SQL/sync nueva siguen fuera deMain. Safari/PWA/teclado físicos pendientes.

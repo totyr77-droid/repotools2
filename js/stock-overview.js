@@ -7,6 +7,7 @@
   async function load(){if(left)return;controller?.abort();const current=controller=new AbortController();status.textContent='';retry.hidden=true;
     const stop=window.RepotoolsLoader?.start(host.querySelector('.stock-overview-metrics'),{type:'skeleton',label:'Cargando resumen…'});
     try{if(!navigator.onLine)throw Error('El resumen se actualiza al conectar.');const response=await fetch('api/stock-overview.php',{cache:'no-store',signal:current.signal}),data=await response.json();if(!response.ok)throw Error(data.error);if(left||controller!==current)return;
+      $('openStockHistory').hidden=!data.activity?.length;
       for(const [key,count] of Object.entries(data.counts))host.querySelector('[data-overview='+key+']').textContent=count;
       host.querySelector('[data-overview=products]').parentElement.title='Lotes de productos: cada EAN y vencimiento cuenta una vez';host.querySelector('[data-overview=upcoming]').parentElement.title='Vencen hoy o dentro de '+data.warning_days+' días';
     }catch(error){if(error.name!=='AbortError'&&!left&&controller===current){status.textContent=navigator.onLine?'No pudimos cargar el resumen':'El resumen se actualiza al conectar.';retry.hidden=!navigator.onLine;}}finally{stop?.();}

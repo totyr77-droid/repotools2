@@ -94,5 +94,5 @@
 <script src="js/motion.js?v=20261014-offline1"></script>
 <script src="js/one-hand-mode.js?v=20261014-one-hand1"></script>
 <script src="js/mobile-navigation.js?v=20261014-one-hand1"></script>
-</body>
+<script src="js/ux-polish.js?v=20261014-compact1"></script></body>
 </html>
