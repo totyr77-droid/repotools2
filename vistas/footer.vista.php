@@ -31,7 +31,7 @@
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261013-motion1"></script>
 <script src="js/device-connection.js?v=20261013-identification1"></script>
-<script src="js/action-notices.js?v=20261014-toasts"></script>
+<script src="js/action-notices.js?v=20261014-entry-details"></script>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
@@ -58,7 +58,7 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261013-portrait1"></script>
 
-<script src="js/stock.js?v=20261014-toasts"></script>
+<script src="js/stock.js?v=20261014-entry-details"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261013-loading1"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
