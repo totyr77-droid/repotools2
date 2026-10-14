@@ -39,11 +39,11 @@
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
-<script src="js/product-reports.js?v=20261013-access1"></script>
+<script src="js/product-reports.js?v=20261014-close-sent"></script>
 <script src="js/biblioteca.js?v=20261013-loading1"></script>
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
-<script src="js/product-reports.js?v=20261013-access1"></script>
+<script src="js/product-reports.js?v=20261014-close-sent"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/ean-scanner.js?v=20261014-single-guide"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
@@ -69,7 +69,7 @@
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/product-editor.js?v=20261010-ajax1"></script>
-<script src="js/product-reports.js?v=20261013-access1"></script>
+<script src="js/product-reports.js?v=20261014-close-sent"></script>
 <script src="js/ean-scanner.js?v=20261014-single-guide"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/script.js?v=20261013-zoom2"></script>
