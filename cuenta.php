@@ -111,7 +111,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <label class="settings-toggle"><span class="settings-toggle-name"><i class="fa-solid <?= $setting[1] ?>" aria-hidden="true"></i><?= $setting[0] ?></span><span class="settings-toggle-control"><small data-preference-state="<?= $key ?>"><?= ($accountPreferences[$key]??true)?'Activado':'Desactivado' ?></small><input id="preference-<?= $key ?>" type="checkbox" role="switch" name="<?= $key ?>" aria-label="<?= $setting[0] ?>"<?= ($accountPreferences[$key]??true)?' checked':'' ?>><span class="settings-toggle-track" aria-hidden="true"></span></span></label>
     <?php endforeach; ?>
     </fieldset>
-    <?php include __DIR__ . '/includes/hand-preference-view.php'; ?>
+    <?php include __DIR__ . '/includes/hand-preference-view.php'; ?><label class="settings-toggle"><span class="settings-toggle-name"><?= stock_icon('settings') ?>Modo de una mano</span><span class="settings-toggle-control"><input id="oneHandMode" type="checkbox" role="switch" aria-label="Modo de una mano"><span class="settings-toggle-track" aria-hidden="true"></span></span></label><p class="settings-hint">Guardado para tu cuenta en este navegador.</p>
     </section>
     <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2>
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>

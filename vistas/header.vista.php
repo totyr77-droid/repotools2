@@ -93,10 +93,11 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261014-pallet2" rel="stylesheet"><?php endif; ?>
 <link href="css/connectivity.css?v=20261014-silent1" rel="stylesheet"><link href="css/responsive.css?v=20261013-workspaces2" rel="stylesheet" type="text/css">
 <link href="css/motion.css?v=20261013-global2" rel="stylesheet">
-</head>
+<link href="css/mobile-navigation.css?v=20261014-compact1" rel="stylesheet"><link href="css/one-hand-mode.css?v=20261014-compact1" rel="stylesheet"><link href="css/ux-polish.css?v=20261014-compact1" rel="stylesheet"></head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
-      <div class="header-contenedor">
+      <script>try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
+    <div class="header-contenedor">
         <a class="logo" href="./" aria-label="Inicio Repotools"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"></a>
 
         <nav class="nav" aria-label="Navegacion principal">
