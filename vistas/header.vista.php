@@ -69,27 +69,30 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?><link href="css/product-info.css?v=20261011-summary1" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=20261013-settings1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261014-single-guide" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=20261011-reference4" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=20261014-single-guide" rel="stylesheet" type="text/css"><?php endif; ?>
 
-    <link href="css/responsive.css" rel="stylesheet" type="text/css">
+
     <link href="css/notifications.css?v=20261012-desktop-status" rel="stylesheet" type="text/css">
     <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=20261013-public1" rel="stylesheet"><?php endif; ?>
     <link href="css/account-bar.css?v=20261010" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=20261012-exclusions" rel="stylesheet" type="text/css"><link href="css/stock.css?v=20261013-batch1" rel="stylesheet" type="text/css"><?php endif; ?>
-    <link href="css/action-notices.css?v=20261013-settings1" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaStock) || !empty($paginaCuenta)): ?><link href="css/stock-branches.css?v=20261012-exclusions" rel="stylesheet" type="text/css"><link href="css/stock.css?v=20261014-toolbar" rel="stylesheet" type="text/css"><?php endif; ?>
+    <link href="css/action-notices.css?v=20261014-toasts" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=20261010-scroll1" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=20261013-loading1" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261010" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=20261013-tops2" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=20261013-pwa" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=20261011-shareone3" rel="stylesheet" type="text/css"><?php endif; ?>
   <?php if (!empty($paginaCuenta)): ?><link href="css/user-profiles.css?v=20261011-directory7" rel="stylesheet"><?php endif; ?>
-<?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261011-lock1" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaReportes)): ?><link href="css/ean-scanner.css?v=20261014-single-guide" rel="stylesheet"><?php endif; ?>
 <link href="css/hand-preferences.css?v=20261011-title-alert9" rel="stylesheet">
 <link href="css/title-icons.css?v=20261011-icons2" rel="stylesheet">
-<link href="css/device-workspace.css?v=20261013-settings1" rel="stylesheet" type="text/css">
+<link href="css/device-workspace.css?v=20261014-shared-camera" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaCuenta) && current_user()): ?><link href="css/settings.css?v=20261013-settings1" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=20261012-branch-refresh" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261014-pallet2" rel="stylesheet"><?php endif; ?>
+<link href="css/connectivity.css?v=20261014-silent1" rel="stylesheet"><link href="css/responsive.css?v=20261013-workspaces2" rel="stylesheet" type="text/css">
+<link href="css/motion.css?v=20261013-global2" rel="stylesheet">
 </head>
   <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
@@ -113,7 +116,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
         </nav>
 
         <?php if (current_user()): ?>
-        <div class="notification-control">
+        <div class="notification-control"><button id="openOfflineSent" class="sync-receipt-button" type="button" data-available="false" tabindex="-1" aria-hidden="true" aria-label="Cargas enviadas al reconectar" title="Cargas enviadas al reconectar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"/></svg></button>
           <button id="openNotifications" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="notificationPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM9 21h6"/></svg><span id="notificationBadge" hidden></span></button>
           <section id="notificationPanel" class="notification-panel" aria-label="Notificaciones" hidden>
             <div class="notification-heading"><h2>Notificaciones</h2><button id="closeNotifications" class="app-close" type="button" aria-label="Cerrar notificaciones" title="Cerrar notificaciones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>

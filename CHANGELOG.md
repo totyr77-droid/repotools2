@@ -1,8 +1,16 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Etiquetas verticales grandes (desarrollo)
+
+A4 vertical nuevamente, logo negro a todo el ancho, QR central y número500px natural. PDF/PNG/SVG e impresión1/2/6 consistentes; QR/ceros/avisos y permisos conservados. Detalle y reversión docs/ETIQUETAS-VERTICAL.md; impresora/iPhone físicos pendientes.
+
+## 13/10/2026 — Motor QR/OCR compartido (desarrollo)
+
+OCR local para palets en Stock y celular-PC, tres frames y validación contextual; perfiles/EAN separados. Reutiliza zoom, mano y feedback. Licencias locales, cache bajo demanda, cierre seguro y regresiones documentadas en docs/ESCANER-INTELIGENTE.md. Sin cambiosMain/permisos/datos; cámara física pendiente.
+
 ## 13/10/2026 — Número de etiqueta al ancho disponible (desarrollo)
 
-Código del palet a2040px de ancho, fuente360px y posición reservada bajo el QR; márgenes A4 y texto inferior intactos. Prueba de límites geométricos, PDF1/2/5 páginas, QR y selección múltiple pasan; revisión visual PNG. Cambio autorizado para main13/10, pendiente impresora real. Revertir el commit de esta entrega para volver al código anterior.
+Código del palet a2040px de ancho, fuente360px y posición reservada bajo el QR; márgenes A4 y texto inferior intactos. Prueba de límites geométricos, PDF1/2/5 páginas, QR y selección múltiple pasan; revisión visual PNG. Cambio exclusivo desarrollo, pendiente impresora real. Revertir el commit de esta entrega para volver al código anterior.
 
 ## 13/10/2026 — Resumen de demo Stock compacto
 
@@ -135,3 +143,37 @@ Campo users.public_name y migración 24 con generación UTF-8 sin sobrescribir v
 # Acceso, demo y capa de avisos — 13/10/2026
 
 Reportes exige sesión, queue exige rol y API deniega consultas anónimas; mantiene envío anónimo con config seguro y recibo simple. Stock/Biblioteca sin sesión tienen demo ficticia separada. Toasts usan top layer y PC confirma EAN/QR. Pruebas específicas de acceso/demo/capa, reports.php unitario y conexiones/fotos pasan. Ver docs/ACCESO-REPORTES.md y docs/DEMO-Y-AVISOS.md para matriz, límites y reversión.
+
+## 13/10/2026 — Desarrollo: sincronización, CSV y resumen
+
+Puntos4/5/6 publicados por separado383453d/fa06e57/ec57fb9. Indicador reutiliza IndexedDB; CSV3 privado con BOM/semicolon; resumen compacto y actividad reciente común. Auditoría: loader exteriorcdf70e6, consultas de versiones27→1 en5ba72e2 con comparación remota.49JS+20PHP+PostgreSQL temporal pasan; fixtures actualizados sin relajar permisos. Mobile/PC/mano izquierda y errores/retry verificados. Archivos, mediciones, reversión y pruebas físicas pendientes en docs/AUDITORIA-2026-10-13.md. Main intacto; beta Live no confirmado sin URL.
+
+## 13/10/2026 — Distribución responsive (desarrollo)
+
+Capa responsive final con títulos/espacios compactos, Inicio arriba y dos columnas en PC, Biblioteca adaptable, Ajustes hasta tres columnas, modales limitados al viewport y formularios de acceso contenidos. Navegación existente conservada; acciones de cámara según mano en móvil y palet público con acción compacta. Sin cambios de negocio ni permisos. Validación y reversión: docs/RESPONSIVE-2026-10-13.md.
+
+## 13/10/2026 — Zoom continuo (desarrollo)
+
+Control existente ahora responde al arrastre, toma rango/paso real, muestra nivel y agrupa ajustes pendientes sin reiniciar cámara. Hasta tres accesos compatibles, mínimo1× conservado, mano móvil existente, sin cambios de lector/audio/vibración. Pruebas y reversión: docs/ZOOM-DESLIZANTE.md.
+
+## 13/10/2026 — Etiquetas horizontales y PDF iPhone (desarrollo)
+
+Una etiqueta por A4 horizontal, QR grande con quiet zone, logo negro, número y aviso en la misma composición. Impresión HTML corregida y PDF directo con tamaño fijo para iPhone/iPad, disponible en todos los navegadores. Pruebas HTML/PDF1/2/6 páginas, seis QR decodificados, selección y permisos pasan. Safari/AirPrint físicos pendientes. Detalle y reversión: docs/ETIQUETAS-HORIZONTAL.md.
+
+## 13/10/2026 — Sistema global de movimiento (desarrollo)
+
+Selectores con un fondo deslizante, microinteracciones y transiciones de paneles/menús/diálogos/navegación; movimiento reducido, cleanup AJAX y exclusión de cámara/mapas. Incluye offline sin librerías nuevas ni cambios de negocio. Navegación liberada al iniciar el fundido. Pruebas, compatibilidad y reversión en docs/MOVIMIENTO-GLOBAL.md.
+
+## 13/10/2026 — Completar transiciones
+
+Salida de flyouts/notificaciones, campos condicionales pequeños y confirmaciones dinámicas sin demorar la decisión. FormData/estados/permisos intactos; fallback inmediato, reduced motion y scanner excluido. Pruebas específicas y reversión en docs/MOVIMIENTO-GLOBAL.md. Safari físico pendiente.
+
+## 13/10/2026 — Refinar etiquetas beta
+
+Conserva A4 horizontal y PDF, adapta quiet zone del QR según módulos, elimina compresión de números para lectura/OCR y refuerza CSS de impresión. Pruebas1/2/6 páginas y QR de producción/beta/subcarpeta pasan. Solo desarrollo; Safari físico y lectura lejana pendientes. Detalle/archivos/reversión: docs/ETIQUETAS-HORIZONTAL.md.
+
+## 2026-10-13 — Offline inteligente (desarrollo)
+Conectividad comprobada, indicador compacto, sincronizador reutilizado en todas las secciones, reintentos y mutex entre pestañas. Biblioteca gana ledger idempotente y revisión explícita de referencias; Stock protege cargas offline y contenido de claves repetidas. Copias sanitizadas, aislamiento al cambiar cuenta, shell y OCR preparado. Alcance/pruebas/reversión: docs/OFFLINE-INTELIGENTE.md; validación física Safari pendiente.
+
+
+Entrega pública autorizada — 2026-10-14: se integra desarrollo completo en main, conservando etiquetas A4 vertical de la última entrega y las mejoras QR/EAN/offline/Stock/avisos. La etiqueta BETA y su CSS se excluyen de main; desarrollo los conserva. Conflictos con la publicación anterior f7c6003 resueltos con la versión funcional más reciente; documentación de impresión previa conservada. Pruebas y reversión en docs/INTEGRACION-MAIN-2026-10-14.md.

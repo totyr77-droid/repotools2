@@ -1,0 +1,8 @@
+.repo-sync-status{display:flex;align-items:center;gap:7px;min-height:38px;margin:0 0 6px;font-size:13px;color:var(--text-muted,#62677b)}
+.repo-sync-status i{width:16px;text-align:center;flex:none}.repo-sync-status span{flex:1;min-width:0}.repo-sync-status button{border:0;background:transparent;color:var(--primary,#27187e);font:inherit;text-decoration:underline;padding:8px;min-height:36px;cursor:pointer}.repo-sync-status button[hidden]{display:none}
+.repo-sync-status[data-state=ready]{color:#357354}.repo-sync-status[data-state=error],.repo-sync-status[data-state=offline]{color:#8a6520}.repo-sync-status[data-state=syncing] i{animation:repo-sync-turn 1.4s linear infinite}@keyframes repo-sync-turn{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.repo-sync-status[data-state=syncing] i{animation:none}}
+@media(max-width:767px) and (pointer:coarse){body[data-hand=left] .repo-sync-status{flex-direction:row-reverse;text-align:right}}
+
+.repo-sync-status[hidden]{display:none}
+
+.offline-library-queue button{display:inline-flex;align-items:center;gap:6px;margin:4px 6px 4px 0;min-height:44px}.offline-library-queue button svg{width:20px;height:20px;flex:none}

@@ -32,6 +32,16 @@
 .tops-position-3 { background: #f7e6d9; color: #925a32; }
 .tops-you { display: inline-block; padding: 3px 6px; border-radius: 6px; background: #e5defb; color: #27187e; font-size: .75rem; }
 .tops-empty { background: #f7f8fb; text-align: center; padding: 32px 16px; }
+.tops-periods{display:flex;gap:4px;padding:4px;background:#f3f2f8;border-radius:10px}
+.tops-periods label{flex:1;margin:0;position:relative;text-align:center;cursor:pointer}
+.tops-periods input{position:absolute;opacity:0;width:1px;height:1px}
+.tops-periods span{display:flex;align-items:center;justify-content:center;min-height:44px;padding:6px;border-radius:8px;font-size:.9rem;color:#626b7a}
+.tops-periods input:checked+span{background:#27187e;color:white}
+.tops-periods input:focus-visible+span{outline:2px solid #758bfd;outline-offset:2px}
+.tops-category{display:flex;align-items:center;gap:12px;margin:12px 0;color:#626b7a;font-size:.9rem}
+.tops-category select{width:auto;flex:1;margin:0;min-height:44px}
+.tops-position{width:auto;min-width:32px;padding:4px;gap:4px;border-radius:8px}
+.tops-table tbody th{overflow-wrap:anywhere}.tops-own{padding:12px 0}
 @media (max-width: 540px) {
   .tops-main { padding: 18px 12px; }
   .tops-categories a { padding: 10px 8px; font-size: .85rem; }

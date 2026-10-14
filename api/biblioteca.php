@@ -39,7 +39,13 @@ try {
         } elseif (in_array($action, ['rename', 'delete', 'add_product', 'offline_add', 'delete_product'], true)) {
             $id = filter_var($_POST['library_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
             if (!$id) library_response(422, ['error' => 'Colección no válida.']);
+            $offlineOperation = $action === 'offline_add' ? ($_POST['operation_key'] ?? '') : '';
+            if ($offlineOperation !== '' && (!is_string($offlineOperation) || !preg_match('/^[A-Za-z0-9_-]{8,100}$/D', $offlineOperation))) library_response(422, ['error'=>'Identificador de operación no válido.']);
             $db->beginTransaction();
+            if ($offlineOperation !== '') {
+                if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') $db->query('SELECT pg_advisory_xact_lock(72684624)');
+                else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
+            }
             $stmt = $db->prepare('SELECT id FROM libraries WHERE id = ? AND user_id = ?');
             $stmt->execute([$id, $userId]);
             if (!$stmt->fetchColumn()) {
@@ -71,7 +77,21 @@ try {
                     }
                 }
                 if (in_array($action,['add_product','offline_add'],true)) {
-                    $db->prepare($action==='offline_add'?"INSERT INTO library_products (library_id,ean,name) VALUES(?,?,?) ON CONFLICT(library_id,ean) DO NOTHING":"INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO UPDATE SET name = CASE WHEN excluded.name != '' THEN excluded.name ELSE library_products.name END")->execute([$id, $ean, $name]);
+                    $alreadyApplied=false;
+                    if ($offlineOperation !== '') {
+                        $fingerprint=hash('sha256',json_encode([$id,$ean,$name]));
+                        $query=$db->prepare('SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?');
+                        $query->execute([$userId,'library:'.$offlineOperation]);$previous=$query->fetchColumn();
+                        if ($previous!==false) {
+                            if ((json_decode($previous,true)['fingerprint']??'')!==$fingerprint) { $db->rollBack(); library_response(409,['error'=>'La operación ya fue enviada con otros datos. Conservamos tu carga.']); }
+                            $alreadyApplied=true;
+                        } else $db->prepare('INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)')->execute([$userId,'library:'.$offlineOperation,json_encode(['fingerprint'=>$fingerprint])]);
+                    }
+                    if (!$alreadyApplied && $offlineOperation !== '' && $name !== '') {
+                        $query=$db->prepare('SELECT name FROM library_products WHERE library_id=? AND ean=?');$query->execute([$id,$ean]);$existingReference=$query->fetchColumn();
+                        if ($existingReference!==false && trim((string)$existingReference)!==$name) { $db->rollBack(); library_response(409,['error'=>'Este EAN ya está guardado con otra referencia. Tu carga queda pendiente para revisar.']); }
+                    }
+                    if (!$alreadyApplied) $db->prepare($action==='offline_add'?"INSERT INTO library_products (library_id,ean,name) VALUES(?,?,?) ON CONFLICT(library_id,ean) DO NOTHING":"INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO UPDATE SET name = CASE WHEN excluded.name != '' THEN excluded.name ELSE library_products.name END")->execute([$id, $ean, $name]);
                 } else {
                     $db->prepare('DELETE FROM library_products WHERE library_id = ? AND ean = ?')->execute([$id, $ean]);
                 }

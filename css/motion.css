@@ -1,0 +1,61 @@
+/* Shared motion tokens: presentation only; selected states/operations stay native. */
+:root { --motion-micro:130ms; --motion-select:230ms; --motion-panel:220ms; --motion-page:260ms; --motion-ease:cubic-bezier(.2,.7,.2,1); }
+.motion-selector { isolation:isolate; }
+.motion-selector::before { content:''; position:absolute; left:0; top:0; width:var(--motion-width,0px); height:var(--motion-height,0px); transform:translate(var(--motion-x,0px),var(--motion-y,0px)); border-radius:9px; background:var(--motion-selected-bg,#27187e); z-index:-1; pointer-events:none; }
+.motion-selector.motion-ready::before { transition:transform var(--motion-select) var(--motion-ease),width var(--motion-select) var(--motion-ease),height var(--motion-select) var(--motion-ease),background-color var(--motion-micro) ease; }
+.motion-selector>button,.motion-selector>a,.motion-selector>label { position:relative; z-index:0; }
+.motion-selector>button,.motion-selector>a,.motion-selector>label>span { background:transparent!important; box-shadow:none!important; transition:color var(--motion-micro) ease,border-color var(--motion-micro) ease; }
+.motion-selector>button:active,.motion-selector>a:active { transform:none; }
+:is(.library-primary,.library-secondary,.library-icon-button,.stock-card,.app-close,.account-shortcuts a,.product-report-button,.stock-product-actions button,.library-product-actions button,.scan-product-actions button,.notification-control button) { transition:background-color var(--motion-micro) ease,color var(--motion-micro) ease,border-color var(--motion-micro) ease,box-shadow var(--motion-micro) ease,transform var(--motion-micro) var(--motion-ease); }
+:is(.library-primary,.library-secondary,.stock-card,.app-close,.account-shortcuts a):active:not(:disabled):not([aria-disabled=true]) { transform:scale(.98); }
+:is(input:not([type=range]),textarea,select) { transition:border-color var(--motion-micro) ease,box-shadow var(--motion-micro) ease,background-color var(--motion-micro) ease; }
+:is(input[type=checkbox],input[type=radio]) { accent-color:var(--color1,#27187e); }
+.settings-toggle-track,.settings-toggle-track::after { transition:background-color var(--motion-micro) ease,transform var(--motion-select) var(--motion-ease); }
+.library-chevron { transition:transform var(--motion-select) var(--motion-ease); }
+:is(.library-settings[open]>.library-settings-menu,.stock-export[open]>.stock-export-menu,.notification-panel:not([hidden])) { animation:motion-menu-enter var(--motion-panel) var(--motion-ease); }
+@keyframes motion-menu-enter { from { opacity:0; translate:0 -5px; } to { opacity:1; translate:0 0; } }
+.app-page-enter { animation:section-enter var(--motion-page) var(--motion-ease); }
+/* Native discrete transitions keep closing dialogs in the top layer where supported. */
+@supports (transition-behavior:allow-discrete) {
+ dialog { opacity:0; translate:0 8px; transition:opacity var(--motion-panel) var(--motion-ease),translate var(--motion-panel) var(--motion-ease),display var(--motion-panel) allow-discrete,overlay var(--motion-panel) allow-discrete; }
+ dialog[open],dialog:is(#contenedormax,#verb)[open] { opacity:1; translate:0 0; animation:none; }
+ dialog::backdrop { opacity:0; transition:opacity var(--motion-panel) ease,display var(--motion-panel) allow-discrete,overlay var(--motion-panel) allow-discrete; }
+ dialog[open]::backdrop { opacity:1; animation:none; }
+ @starting-style { dialog[open],dialog:is(#contenedormax,#verb)[open] { opacity:0; translate:0 8px; } dialog[open]::backdrop { opacity:0; } }
+}
+/* Expand native disclosures without wrappers or waiting before open/close. */
+@supports (interpolate-size:allow-keywords) and selector(details::details-content) {
+ :is(.settings-group details,.library-disclosure,.report-more-data,.report-unchanged,.stock-overview details,.pallet-activity)::details-content { interpolate-size:allow-keywords; block-size:0; opacity:0; overflow:clip; transition:block-size var(--motion-panel) var(--motion-ease),opacity var(--motion-panel) ease,content-visibility var(--motion-panel) allow-discrete; }
+ :is(.settings-group details,.library-disclosure,.report-more-data,.report-unchanged,.stock-overview details,.pallet-activity)[open]::details-content { block-size:auto; opacity:1; }
+}
+@media(prefers-reduced-motion:reduce) {
+ :root { --motion-micro:0ms; --motion-select:0ms; --motion-panel:0ms; --motion-page:0ms; }
+ .motion-selector::before,.motion-selector>button,.motion-selector>a,.motion-selector>label>span,dialog,dialog::backdrop { transition:none!important; }
+ .app-page-enter,dialog[open],dialog[open]::backdrop,.library-settings-menu,.stock-export-menu,.notification-panel { animation:none!important; }
+}
+@media print { .motion-selector::before { display:none; } }
+.motion-selector>button:active,.motion-selector>a:active { transform:none!important; }
+@keyframes section-enter { from { opacity:.65; transform:translateX(clamp(-18px,var(--page-shift,18px),18px)); } to { opacity:1; transform:translateX(0); } }
+dialog:not([open]),dialog:not([open])::backdrop { pointer-events:none; }
+.offline-tabs button { min-height:44px; }
+:where(.offline-tabs button,.offline-actions button,.library-dialog button) { transition:background-color var(--motion-micro) ease,color var(--motion-micro) ease,border-color var(--motion-micro) ease; }
+/* Entrance transforms must never create a sideways scroll, including offline. */
+html,body { overflow-x:clip; }
+.offline-tabs { overflow:hidden; border-radius:12px; }
+/* Complete entry/exit for small fields and flyouts, without postponing state changes. */
+@supports (transition-behavior:allow-discrete) {
+ :is(.library-settings-menu,.stock-export-menu,.notification-panel) { opacity:0; translate:0 -5px; transition:opacity var(--motion-panel) ease,translate var(--motion-panel) var(--motion-ease),display var(--motion-panel) allow-discrete; animation:none!important; }
+ :is(.library-settings,.stock-export)::details-content { transition:content-visibility var(--motion-panel) allow-discrete; }
+ :is(.library-settings,.stock-export)[open]>:is(.library-settings-menu,.stock-export-menu),.notification-panel:not([hidden]) { opacity:1; translate:0 0; }
+ :is(.library-settings,.stock-export):not([open])>:is(.library-settings-menu,.stock-export-menu),.notification-panel[hidden] { pointer-events:none; }
+ @starting-style { :is(.library-settings,.stock-export)[open]>:is(.library-settings-menu,.stock-export-menu),.notification-panel:not([hidden]) { opacity:0; translate:0 -5px; } }
+}
+@supports (interpolate-size:allow-keywords) and (transition-behavior:allow-discrete) {
+ .motion-field { interpolate-size:allow-keywords; height:auto; overflow:clip; transition:height var(--motion-panel) var(--motion-ease),opacity var(--motion-panel) ease,display var(--motion-panel) allow-discrete; }
+ .motion-field[hidden],.library-status.motion-field:empty { height:0; min-height:0; opacity:0; pointer-events:none; }
+ @starting-style { .motion-field:not([hidden]):not(:empty) { height:0; opacity:0; } }
+}
+@media(prefers-reduced-motion:reduce) {
+ .motion-field,.library-settings-menu,.stock-export-menu,.notification-panel { transition:none!important; }
+}
+.motion-field[hidden] { display:none!important; }

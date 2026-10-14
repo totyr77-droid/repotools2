@@ -2,6 +2,29 @@
   'use strict';
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
+  // One camera lease and viewport implementation for every recognition mode.
+  let cameraQueue = Promise.resolve(), cameraOwner = null;
+  function cameraTask(task) { const next = cameraQueue.then(task); cameraQueue = next.catch(() => {}); return next; }
+  function cameraViewport(element, isQR) {
+    if (!document.createElement || !element.append) return { track() {}, reset() {}, dispose() {} };
+    element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean';
+    const guide = document.createElement('div'); guide.className = 'repo-camera-guide'; guide.setAttribute('aria-hidden','true');
+    const marker = document.createElement('div'); marker.className = 'ean-identification-track'; marker.hidden = true; marker.setAttribute('aria-hidden','true');
+    element.append(guide,marker); let timer;
+    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=Math.min(width,height)*.85;guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
+    layout(); const observer=typeof ResizeObserver==='function'?new ResizeObserver(layout):null;observer?.observe(element);
+    function reset() { clearTimeout(timer); marker.hidden = true; guide.hidden = false; }
+    return {
+      track(box, width, height) {
+        reset(); if (!box || !width || !height || ![box.x0,box.y0,box.x1,box.y1].every(Number.isFinite)) return;
+        const x0=Math.max(0,box.x0), y0=Math.max(0,box.y0), x1=Math.min(width,box.x1), y1=Math.min(height,box.y1);
+        if(x1<=x0||y1<=y0)return;
+        Object.assign(marker.style,{left:x0/width*100+'%',top:y0/height*100+'%',width:(x1-x0)/width*100+'%',height:(y1-y0)/height*100+'%'});
+        marker.hidden=false; guide.hidden = !isQR; timer=setTimeout(reset,700);
+      }, reset,
+      dispose() { observer?.disconnect(); reset(); guide.remove(); marker.remove(); element.classList.remove('repo-camera-viewport'); delete element.dataset.recognition; }
+    };
+  }
   let scanPhoto = null, photoTimer, photoVersion = 0;
   function clearScanPhoto() { ++photoVersion; scanPhoto = null; clearTimeout(photoTimer); }
   function takeScanPhoto(ean) {
@@ -109,14 +132,89 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, feedbackPreferences = () => ({}), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
-    const element = document.getElementById(elementId);
-    let revision = 0, session = null, queue = Promise.resolve();
-    const enqueue = task => {
-      const operation = queue.then(task);
-      queue = operation.catch(() => {});
-      return operation;
+  // Shared identification engine. Camera/QR decoder and feedback remain in create().
+  const ocrBase = (() => { try { return new URL('vendor/ocr/', document.currentScript?.src || new URL('js/ean-scanner.js', window.location.href)).href; } catch { return 'js/vendor/ocr/'; } })();
+  let ocrLibrary;
+  function loadOCR() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+    if (!ocrLibrary) ocrLibrary = new Promise((resolve, reject) => {
+      const script = document.createElement('script'); script.src = ocrBase + 'tesseract.min.js';
+      script.onload = () => resolve(window.Tesseract); script.onerror = () => { script.remove(); ocrLibrary = null; reject(Error('OCR unavailable')); };
+      document.head.append(script);
+    });
+    return ocrLibrary;
+  }
+  function palletIdentifier(value) {
+    const text = String(value ?? '').trim(); if (/^\d{8}$/.test(text)) return text;
+    try {
+      const url = new URL(text), here = new URL(window.location.href);
+      const production = ['repotools.online', 'www.repotools.online', 'repotools2.onrender.com'];
+      const trusted = url.origin === here.origin || (production.includes(url.hostname) && !url.port);
+      if (!trusted || !['http:', 'https:'].includes(url.protocol) || url.username || url.password || !url.pathname.endsWith('/palet.php')) return null;
+      const code = url.searchParams.get('codigo'); return /^\d{8}$/.test(code || '') ? code : null;
+    } catch { return null; }
+  }
+  function ocrConsensus() {
+    let code = '', count = 0, lastFrame = null, lastTime = 0;
+    return (value, frame, now = performance.now()) => {
+      if (!/^\d{8}$/.test(value || '')) { code = ''; count = 0; return false; }
+      if (frame === lastFrame) return false;
+      lastFrame = frame;
+      if (value !== code || now - lastTime > 12000) { code = value; count = 0; }
+      lastTime = now; return ++count === 3;
     };
+  }
+  function ocrCandidate(data) {
+    const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
+    const rows = lines.length ? lines : [{ text: data.text, confidence: data.confidence }];
+    const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
+    return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
+  }
+  function palletOCR(element, active, accept, status, viewport) {
+    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus();
+    const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
+    if (!context) return { dispose() {}, resume() {}, reset() {} };
+
+    function schedule() { if (!disposed) timer = setTimeout(read, 550); }
+    async function read() {
+      if (disposed || busy) return; if (!active()) { schedule(); return; }
+      const video = element.querySelector('video');
+      if (!video?.videoWidth || video.readyState < 2 || video.currentTime === lastFrame) { schedule(); return; }
+      busy = true;
+      try {
+        if (!worker) {
+          const library = await loadOCR(); if (disposed || !active()) return;
+          creating = library.createWorker('eng', 1, { workerPath: ocrBase + 'worker.min.js', corePath: ocrBase, langPath: ocrBase.replace(/\/$/, ''), workerBlobURL: false, errorHandler: () => {} });
+          worker = await creating;
+          if (disposed) { await worker.terminate(); worker = null; return; }
+          await worker.setParameters({ tessedit_char_whitelist: '0123456789', tessedit_pageseg_mode: '11' });
+        }
+        if (!active() || disposed) return;
+        const frame = visibleFrame(video), scale = Math.min(1, 1280 / frame.width);
+        const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
+        canvas.width = Math.round(frame.width * scale); canvas.height = Math.round(frame.height * scale);
+        context.drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
+        const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
+        if (disposed || !active()) return;
+        const candidate = ocrCandidate(result.data);
+        viewport?.track(candidate?.box, canvas.width, canvas.height);
+        if (candidate) { status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
+        else confirm(null, stamp);
+      } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
+      finally { busy = false; if (disposed) { canvas.width = canvas.height = 0; } else schedule(); }
+    }
+    schedule();
+    return {
+      reset() { confirm = ocrConsensus(); viewport?.reset(); },
+      resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
+      dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { canvas.width = canvas.height = 0; try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
+    };
+  }
+
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
+    const element = document.getElementById(elementId);
+    let revision = 0, session = null;
+    const enqueue = cameraTask;
     function cameraControls(current) {
       const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
       if (!document.createElement) return;
@@ -137,7 +235,7 @@
           await track.applyConstraints({ ...constraints, advanced: [advanced] });
           if (!active()) return false;
           const actual = track.getSettings()[name];
-          if (name === 'torch' ? actual !== value : !Number.isFinite(actual) || Math.abs(actual - value) > .1) throw new Error('Control no disponible');
+          if (name === 'torch' ? actual !== value : !Number.isFinite(actual) || Math.abs(actual - value) > Math.max(.1, (zoom?.step || 0) / 2)) throw new Error('Control no disponible');
           return true;
         });
         updates = operation;
@@ -149,20 +247,62 @@
         text.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg>';
         const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
         input.setAttribute('aria-orientation', 'vertical');
-        input.min = minZoom; input.max = current.isQR ? zoom.max : Math.max(minZoom, Math.min(zoom.max, Math.max(3, minZoom + (zoom.step || .1)))); input.step = zoom.step > 0 ? zoom.step : .1;
-        let applied = Math.max(Number(input.min), Math.min(Number(input.max), settings.zoom ?? zoom.min));
-        input.value = applied;
-        const output = document.createElement('span'); output.className = 'ean-camera-zoom-value'; output.textContent = `${applied.toFixed(1)}×`;
-        const updateZoom = async () => {
-          if (!active()) return;
-          input.disabled = true;
-          try { if (await apply('zoom', Math.max(minZoom, Number(input.value)))) { applied = track.getSettings().zoom; output.textContent = `${applied.toFixed(1)}×`; } }
-          catch { if (active()) { input.value = applied; onStatus('No pudimos ajustar el zoom. Puedes seguir escaneando.'); } }
-          finally { input.disabled = false; }
+        const step = Number.isFinite(zoom.step) && zoom.step > 0 ? zoom.step : .1;
+        const snap = value => Math.max(Number(input.min), Math.min(Number(input.max), Number((zoom.min + Math.round((value - zoom.min) / step) * step).toFixed(6))));
+        input.min = Math.max(minZoom, Number((zoom.min + Math.ceil((minZoom - zoom.min) / step) * step).toFixed(6)));
+        input.max = Number((zoom.min + Math.floor((zoom.max - zoom.min) / step) * step).toFixed(6)); input.step = step;
+        let applied = snap(Number.isFinite(settings.zoom) ? settings.zoom : Number(input.min));
+        let pending = null, running = false, timer = null, disposed = false;
+        const output = document.createElement('span'); output.className = 'ean-camera-zoom-value';
+        const shortcuts = document.createElement('div'); shortcuts.className = 'ean-camera-zoom-shortcuts';
+        shortcuts.setAttribute('role', 'group'); shortcuts.setAttribute('aria-label', 'Zoom rápido');
+        const render = value => {
+          input.value = value;
+          const display = Number(value.toFixed(2)).toString();
+          output.textContent = display + '×';
+          input.setAttribute('aria-valuetext', display + ' aumentos');
+          shortcuts.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(Math.abs(Number(button.dataset.zoom) - value) < .001)));
         };
+        const flush = async () => {
+          timer = null;
+          if (disposed || !active() || running || pending === null) return;
+          running = true;
+          const value = pending; pending = null;
+          try {
+            if (Math.abs(value - applied) > .000001 && await apply('zoom', value)) applied = track.getSettings().zoom;
+          } catch {
+            if (!disposed && active() && pending === null) {
+              render(applied);
+              onStatus('No pudimos ajustar el zoom. Podés seguir escaneando.');
+            }
+          } finally {
+            running = false;
+            if (!disposed && active()) {
+              if (pending !== null) timer = setTimeout(flush, 60);
+              else render(applied);
+            }
+          }
+        };
+        const updateZoom = () => {
+          if (disposed || !active()) return;
+          pending = snap(Number(input.value));
+          render(pending);
+          if (!running && timer === null) timer = setTimeout(flush, 60);
+        };
+        input.addEventListener('input', updateZoom);
         input.addEventListener('change', updateZoom);
-        if (Number.isFinite(settings.zoom) && settings.zoom < minZoom) void updateZoom();
+        label.addEventListener('touchmove', event => event.stopPropagation(), { passive: true });
+        for (const value of (Number(input.max) >= 5 ? [1, 2, 5] : [1, 2, 3])) {
+          if (value < Number(input.min) || value > zoom.max || Math.abs(snap(value) - value) > .001) continue;
+          const button = document.createElement('button'); button.type = 'button'; button.dataset.zoom = value;
+          button.textContent = value + '×'; button.setAttribute('aria-label', 'Zoom ' + value + ' aumentos');
+          button.addEventListener('click', () => { input.value = value; updateZoom(); }); shortcuts.append(button);
+        }
+        render(applied);
+        if (Number.isFinite(settings.zoom) && settings.zoom < Number(input.min)) updateZoom();
         label.append(text, input, output); controls.append(label);
+        if (shortcuts.childElementCount > 1) controls.append(shortcuts);
+        current.cancelZoom = () => { disposed = true; pending = null; if (timer !== null) clearTimeout(timer); };
       }
       if (capabilities.torch === true) {
         const button = document.createElement('button'); button.type = 'button'; button.className = 'ean-camera-light';
@@ -180,7 +320,7 @@
         controls.append(button);
       }
       if(onManual){const manual=document.createElement('button');manual.type='button';manual.className='ean-camera-manual';if(capabilities.torch!==true)manual.classList.add('ean-camera-manual-only');manual.setAttribute('aria-label',current.isQR?'Ingresar código del palet':'Ingresar EAN');manual.title=manual.getAttribute('aria-label');manual.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M7 16h10"/></svg>';manual.addEventListener('click',()=>{if(active())Promise.resolve(onManual()).catch(onError);});controls.append(manual);}
-      current.disposeControls = () => controls.remove();
+      current.disposeControls = () => { current.cancelZoom?.(); controls.remove(); };
       element.append(controls);
     }
     function background(current, accept) {
@@ -236,6 +376,9 @@
                 result = await window.Quagga.decodeSingle({ src: canvas.toDataURL('image/jpeg', .92), inputStream: { size: 0 }, locate: true, locator: { halfSample: false, patchSize: 'small' }, decoder: { readers: ['ean_reader', 'ean_8_reader'] }, numOfWorkers: 0 });
               } catch { /* El decodificador alternativo sigue disponible. */ }
               if (validEAN(result?.codeResult?.code)) {
+                if (Array.isArray(result.box) && result.box.length >= 4 && result.box.every(p=>Array.isArray(p)&&p.length>=2&&p.every(Number.isFinite))) {
+                  current.viewport?.track({x0:Math.min(...result.box.map(p=>p[0])),y0:Math.min(...result.box.map(p=>p[1])),x1:Math.max(...result.box.map(p=>p[0])),y1:Math.max(...result.box.map(p=>p[1]))},canvas.width,canvas.height);
+                }
                 accept(result.codeResult.code, 'background');
                 return;
               }
@@ -279,10 +422,14 @@
     async function release(current) {
       if (!current) return;
       if (!current.cleanup) current.cleanup = (async () => {
-        current.accepting = false; current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
+        current.accepting = false; current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
-        if (current.reader.isScanning) await current.reader.stop();
-        current.reader.clear();
+        try { if (current.reader.isScanning) await current.reader.stop(); }
+        finally {
+          element.querySelector?.('video')?.srcObject?.getTracks?.().forEach(track=>track.stop());
+          current.viewport?.dispose(); element.classList.remove('repo-camera-viewport'); if(element.dataset)delete element.dataset.recognition;
+          try { current.reader.clear(); } finally { if (cameraOwner?.current === current) cameraOwner = null; }
+        }
         element.classList.remove('ean-confirmed');
         element.classList.remove('ean-detecting');
         if (session === current) session = null;
@@ -302,6 +449,7 @@
       const token = ++revision;
       if (session) session.accepting = false;
       return enqueue(async () => {
+        await cameraOwner?.release();
         await release(session);
         if (token !== revision) return false;
         element.classList.remove('ean-confirmed');
@@ -309,11 +457,17 @@
         if (!window.Html5Qrcode || !window.Html5QrcodeSupportedFormats) throw new Error('No se pudo cargar el lector. Intenta nuevamente.');
         const formats = window.Html5QrcodeSupportedFormats;
         const isQR = format === 'qr';
-        const validate = isQR ? code => typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
+        const kind = typeof identification === 'function' ? identification() : identification;
+        const normalize = isQR && kind === 'pallet' ? palletIdentifier : value => value;
+        const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
+        if (element.dataset) { element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean'; }
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
         const current = { reader, accepting: true, token, isQR, validate, confirm: confirmation(validate) };
-        session = current;
+        session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera') => {
+          code = normalize(code);
+          if (code === null) { if (current.accepting && session === current && token === revision && canAccept()) { current.confirm(null); current.ocr?.reset(); onStatus('Este QR no corresponde a un palet de Repotools.'); } return; }
+          if (isQR && kind === 'pallet' && current.lastDelivered === code) return;
           if(current.lastDelivered===code){const elapsed=Date.now()-current.lastDeliveredSeen;current.lastDeliveredSeen=Date.now();if(elapsed<repeatCooldown)return;if(rearmRepeated)current.lastDelivered='';}
           if (!current.accepting || session !== current || token !== revision || !canAccept()) return;
           // Con object-fit: cover se confirma únicamente la zona que el usuario
@@ -325,21 +479,21 @@
           }
           if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();
-          const confirmed = current.confirm(code);
+          const confirmed = source === 'ocr' || current.confirm(code);
           if (!confirmed) {
             element.classList.add('ean-detecting'); onStatus('Detectando código…'); clearTimeout(current.progressTimer);
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
           if (!isQR) rememberScanPhoto(code, element);
-          current.accepting = false; clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
+          current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
             Promise.resolve().then(()=>{beep(feedbackPreferences());return onCode(code);}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
               if(token!==revision||session!==current)return;
               current.confirm=confirmation(validate);current.accepting=true;element.classList.remove('ean-confirmed');
-              try{background(current,accept);}catch{}
+              try{background(current,accept);current.ocr?.resume();}catch{}
             }).catch(error=>{if(token===revision)onError(error);});
             return;
           }
@@ -366,9 +520,11 @@
               current.cameraUpdates = track.applyConstraints({ ...track.getConstraints(), advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
             }
           } catch {}
+          current.viewport = cameraViewport(element, isQR);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          onStatus('Centra un solo código dentro del recuadro.');
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport);
+          onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
           current.accepting = false;
@@ -382,5 +538,5 @@
     const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
-  window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, takeScanPhoto, clearScanPhoto };
+  window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, palletIdentifier, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
 })();

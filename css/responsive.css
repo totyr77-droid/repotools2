@@ -1,41 +1,101 @@
-/* Pantallas amplias: conserva los controles táctiles y amplía el área de trabajo. */
-@media (min-width: 769px) {
-  .header-contenedor { max-width: 1440px; margin: auto; }
-  .nav { width: auto; max-width: none; flex-shrink: 0; gap: 8px; }
-  .nav a { padding: 12px 14px; white-space: nowrap; }
-  .home-page > main { padding: 48px clamp(24px, 4vw, 64px); justify-content: flex-start; align-items: stretch; }
-  .home-page .contenedor-main { width: 100%; max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: stretch; }
-  .home-page .app-resumen { grid-column: 1 / -1; margin: 0 0 16px; }
-  .home-page .app-resumen h1 { font-size: clamp(2rem, 3vw, 3rem); }
-  .home-page #boton { grid-column: 1; grid-row: 2 / 4; min-height: 160px; height: 100%; font-size: 1.4rem; }
-  .home-page .box-tools { grid-column: 2; width: 100%; margin: 0; }
-  .home-page .resultados-box { flex-direction: column; gap: 4px; background: white; color: #27187e; border: 1px solid #dce1ec; }
-  .home-page .resultados-box::after { content: 'Códigos guardados'; font-size: .85rem; color: #626b7a; }
-  .home-page .borrar-box { grid-column: 2; margin: 0; background: transparent; color: #a32d2d; border: 1px solid #e8cbd0; box-shadow: none; }
-  .library-app, .stock-app, .tops-panel { width: 100%; max-width: 1440px; margin: 0 auto; }
-  .library-main, .stock-main, .tops-main { padding: 40px clamp(24px, 4vw, 64px); justify-content: flex-start; align-items: stretch; }
-  .library-products, .reports-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-  .library-product, .report-card { min-width: 0; }
-  .library-scan { width: auto; min-width: 260px; margin-right: 12px; }
-  .reports-main { width: 100%; padding: 40px clamp(24px, 4vw, 64px); justify-content: flex-start; align-items: stretch; }
-  .reports-panel { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0; border: 0; }
-  .reports-list { display: grid; grid-template-columns: 1fr; }
-  .report-card { display: grid; grid-template-columns: 170px 150px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 20px; }
-  .report-card h2, .report-card p, .report-card button { margin: 0; }
-  .library-dialog { width: min(680px, calc(100% - 64px)); padding: 32px; }
-  #contenedormax.library-dialog { width: min(680px, calc(100% - 64px)); }
-  .product-edit-dialog { width: min(760px, calc(100% - 64px)); }
-  .account-panel { width: min(560px, 100%); max-width: 560px; }
-  .tops-table th, .tops-table td { padding: 18px 20px; }
+﻿/* Shared responsive layer. Keep component behavior and reading order intact. */
+:root { --workspace-width: 1440px; --workspace-gutter: clamp(16px, 3vw, 40px); --touch-target: 44px; }
+:is(.library-app,.stock-workspace,.reports-panel,.tops-panel) { width:100%; max-width:var(--workspace-width); min-width:0; }
+:is(.library-main,.stock-main,.reports-main,.tops-main) { padding:24px var(--workspace-gutter); }
+:is(.library-heading,.stock-workspace,.reports-panel,.app-resumen)>h1 { font-size:clamp(1.35rem,2vw,1.8rem); line-height:1.25; }
+:is(.library-dialog,.product-edit-dialog) { max-height:calc(100dvh - 32px); overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; }
+:is(.library-dialog,.product-edit-dialog) :is(input,textarea,select) { max-width:100%; min-width:0; }
+:is(.library-heading,.library-collection-header,.stock-toolbar) { min-width:0; }
+#publicPallet { max-width:1200px; }
+#publicPallet>h1 { display:flex; align-items:center; gap:8px; font-size:clamp(1.35rem,2vw,1.8rem); }
+#publicPalletStock { align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 14px; text-decoration:none; font-size:.95rem; }
+#publicPalletStock svg { width:20px; height:20px; }
+#publicPalletDescription:empty { display:none; }
+@media(min-width:769px) {
+ .header-contenedor { max-width:1600px; margin:auto; align-items:center; }
+ .nav { width:auto; max-width:none; gap:4px; flex-shrink:1; }
+ .nav a { min-height:44px; padding:10px 12px; white-space:nowrap; }
+ .home-page>main { padding:28px var(--workspace-gutter); justify-content:flex-start; align-items:stretch; }
+ .home-page .contenedor-main { width:100%; max-width:1120px; margin:auto; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; align-items:start; }
+ .home-page .app-resumen { grid-column:1/-1; margin:0; }
+ .home-page #boton { min-height:132px; height:auto; font-size:1.2rem; }
+ .home-list { min-height:132px; margin:0; }
+ .library-products { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); align-items:stretch; gap:12px; }
+ .library-product { min-width:0; height:100%; }
+ .reports-list { display:grid; grid-template-columns:1fr; }
+ .report-card { min-width:0; padding:14px 18px; }
+ .library-dialog { width:min(960px,calc(100% - 48px)); padding:24px; }
+ #contenedormax.library-dialog { width:min(800px,calc(100% - 48px)); }
+ .library-scanner-dialog { width:min(680px,calc(100% - 48px)); }
+ .product-edit-dialog { width:min(1040px,calc(100% - 48px)); }
+ .account-panel { width:min(560px,100%); max-width:560px; }
+ .account-panel-profile { width:min(1120px,100%); max-width:1120px; }
+ .account-panel-profile .settings-layout { grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+ .stock-metadata { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
-@media (min-width: 1100px) {
-  .library-products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media(min-width:769px) and (max-width:1100px) {
+ .nav a { padding:10px 7px; font-size:.8rem; gap:5px; }
+ .logo { padding-inline:12px; }
+ .account-panel-profile .settings-layout { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
-@media (min-width: 769px) and (max-width: 1000px) {
-  .nav { gap: 2px; }
-  .nav a { padding: 12px 8px; font-size: .8rem; }
-  .logo { font-size: 1.2rem; }
-  .report-card { grid-template-columns: 1fr auto; }
-  .report-card p:nth-of-type(2) { grid-column: 1; }
-  .report-card button { grid-column: 2; grid-row: 1 / 4; }
+@media(max-width:768px) {
+ :root { --workspace-gutter: max(12px,env(safe-area-inset-left,0px),env(safe-area-inset-right,0px)); }
+ :is(.library-main,.stock-main,.reports-main,.tops-main,.account-main),.home-page>main { padding:18px var(--workspace-gutter); }
+ .library-heading { margin-bottom:12px; gap:8px; }
+ #collectionPanel { padding:14px; }
+ .library-collection-header { gap:8px; padding-bottom:12px; }
+ .library-collection-name h2 { font-size:1.08rem; }
+ .library-add-actions { gap:5px; }
+ .library-icon-button { width:44px; min-height:44px; padding:10px; }
+ .library-settings summary { min-width:44px; min-height:44px; }
+ .library-collections { margin-bottom:14px; padding:8px; }
+ .stock-workspace>section { margin-top:16px; }
+ .stock-card { padding:12px; min-height:76px; }
+ .stock-product { padding:12px 0; }
+ .stock-metadata { margin-top:16px; padding:12px; gap:10px; }
+ .library-dialog,.product-edit-dialog { width:calc(100% - 24px); max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)); padding:16px; }
+ .account-panel { padding:18px 14px; }
+ .account-panel-profile .settings-layout { gap:18px; margin-top:16px; }
+ .account-panel-profile .settings-group summary { min-height:44px; display:flex; align-items:center; }
+ .home-page .contenedor-main { gap:14px; }
+ .home-list { padding:14px; }
+ .public-stock-summary { margin:16px 0; padding:14px; }
+ #publicPalletProducts .stock-product { padding:12px; }
+ .reports-tabs { gap:4px; }
+ .reports-tabs button { min-height:44px; min-width:0; }
+ .nav-celular { z-index:100; }
+}
+@media(max-width:768px) and (pointer:coarse) {
+ body[data-hand=left] .report-camera-flash { right:auto; left:12px; }
+ body[data-hand=left] #publicPalletStock { margin-inline-end:auto; }
+}
+@media(max-height:500px) and (max-width:1000px) {
+ .library-dialog,.product-edit-dialog { max-height:calc(100dvh - 16px); margin:8px auto; }
+ .library-scanner-dialog .ean-reader video { min-height:160px; max-height:48dvh; }
+}
+/* Prevent form min-content widths from overflowing compact dialogs. */
+:is(.library-dialog,.product-edit-dialog) :is(form,fieldset,label) { min-width:0; }
+:is(.library-heading,.app-resumen) h1 { font-size:clamp(1.35rem,2vw,1.8rem); line-height:1.25; }
+#stockShareForm { width:100%; overflow-wrap:anywhere; }
+@media(min-width:769px) {
+ .stock-workspace>.stock-overview { margin-top:12px; }
+ .stock-workspace>.stock-find { margin-top:16px; }
+ .stock-workspace>.stock-palets-block { margin-top:20px; }
+}
+.library-dialog { padding:var(--dialog-padding-y) var(--dialog-padding-x); --dialog-padding-x:24px; --dialog-padding-y:24px; }
+@media(max-width:768px) { .library-dialog { --dialog-padding-x:16px; --dialog-padding-y:16px; } }
+@media(min-width:769px) { .home-page .contenedor-main { margin:0 auto; } }
+@media(min-width:769px) and (max-width:1000px) {
+ .nav a { display:flex; flex-direction:column; justify-content:center; gap:4px; padding:8px; font-size:.72rem; }
+ .header-contenedor .logo img { width:140px; }
+}
+@media(min-width:1101px) {
+ .account-panel-profile .settings-preferences { grid-column:2; grid-row:1; }
+ .account-panel-profile .settings-access { grid-column:3; grid-row:1; }
+}
+
+/* Camera hand preference also applies to phones in landscape. */
+@media (pointer:coarse) {
+ body[data-hand=left] .ean-camera-controls .ean-camera-zoom { left:0; right:auto; }
+ body[data-hand=left] .ean-camera-controls :is(.ean-camera-light,.ean-camera-manual) { right:0; left:auto; }
 }

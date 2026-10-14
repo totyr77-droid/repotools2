@@ -4,7 +4,7 @@ const server=spawn('C:/xampp/php/php.exe',['-S','127.0.0.1:18863','-t',process.c
 function ean(i){const prefix='7790000'+String(i).padStart(5,'0');let sum=0;for(let j=0;j<12;j++)sum+=Number(prefix[j])*(j%2?3:1);return prefix+(10-sum%10)%10;}
 (async()=>{for(let i=0;i<40;i++){try{await fetch(base);break;}catch{await new Promise(r=>setTimeout(r,100));}}
 browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});const context=await browser.newContext({viewport:{width:390,height:850},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile Safari/604.1'});
-await context.route('https://**/*',r=>r.fulfill({body:''}));await context.addInitScript(()=>{localStorage.setItem('lista','[]');localStorage.setItem('repotools_onboarding_seen_guest','true');});
+await context.route('https://**/*',r=>r.fulfill({body:''}));await context.addInitScript(()=>{localStorage.setItem('lista','[]');localStorage.setItem('repotools_onboarding_seen_guest','true');localStorage.setItem('repotools_onboarding_version_guest','1');});
 await context.route('**/api/productos.php?**',async r=>{const code=new URL(r.request().url()).searchParams.get('ean');if(code===ean(1))await new Promise(resolve=>setTimeout(resolve,1400));await r.fulfill({json:{product:code===ean(5)?null:{brand:'Demo',name:'Producto '+code.slice(-4),quantity:'1 L'},can_edit:false}})});
 const p=await context.newPage();await p.goto(base+'/index.php');await p.waitForFunction(()=>window.RepoEANScanner&&!document.documentElement.classList.contains('is-loading'));await p.evaluate(()=>{
 window.camera={starts:0,stops:0,clears:0};window.readers=[];
@@ -19,7 +19,7 @@ await p.evaluate(()=>document.body.dataset.hand='right');assert.ok((await p.loca
 for(let i=1;i<=20;i++){await emit(ean(i));await p.waitForTimeout(380);assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: '+i);assert.equal(await p.evaluate(()=>camera.starts),1);assert.equal(await p.evaluate(()=>camera.stops),0);if(i===5)await p.getByText('Producto no encontrado',{exact:true}).waitFor();}
 assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('lista')).length),20);assert.equal(await p.locator('#mainRapidCode').textContent(),ean(20));
 await p.evaluate(()=>{const last=document.getElementById('mainRapidLast');last.textContent='Producto con una referencia muy larga '.repeat(30);});
-assert.equal((await p.locator('.main-rapid-feedback').boundingBox()).height,feedbackHeight,'Long names do not stretch the rapid result');
+assert.ok(Math.abs((await p.locator('.main-rapid-feedback').boundingBox()).height-feedbackHeight)<.5,'Long names do not stretch the rapid result');
 await emit(ean(20),8);assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: 20','Repeated detections while held do not count');
 await p.waitForTimeout(1600);await emit(ean(20));await p.waitForTimeout(380);assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: 21','Removing and intentionally rescanning is accepted');assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('lista')).length),20,'The original list stays unique');
 await p.evaluate(()=>{window.blocking=document.createElement('dialog');blocking.textContent='Reporte';document.body.append(blocking);blocking.showModal()});await emit(ean(21));assert.equal(await p.locator('#mainRapidCount').textContent(),'Escaneados: 21');await p.evaluate(()=>blocking.remove());

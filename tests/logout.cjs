@@ -23,7 +23,7 @@ const token = html => html.match(/name="csrf" value="([^"]+)"/)[1];
  for(let i=0;i<30;i++){try{await request('index.php');break;}catch{await new Promise(r=>setTimeout(r,100));}}
  assert.equal((await request('salir.php')).location,'index.php');
  const form=await request('cuenta.php?mode=registro');
- assert.equal((await request('cuenta.php?mode=registro',{csrf:token(form.text),name:'Prueba',email:'logout@example.invalid',password:'test-password-logout'})).status,302);
+ assert.equal((await request('cuenta.php?mode=registro',{csrf:token(form.text),name:'Prueba Apellido',email:'logout@example.invalid',password:'test-password-logout'})).status,302);
  const home=await request('index.php');
  assert.equal((await request('salir.php')).location,'cuenta.php');
  assert.equal((await request('biblioteca.php')).status,200);
@@ -31,7 +31,7 @@ const token = html => html.match(/name="csrf" value="([^"]+)"/)[1];
  const retry=await request('cuenta.php');assert.match(retry.text,/Pulsa Salir nuevamente/);
  assert.ok(!(await request('cuenta.php')).text.includes('Pulsa Salir nuevamente'));
  const logout=await request('salir.php',{csrf:token(retry.text)});assert.equal(logout.status,303);assert.equal(logout.location,'index.php');
- assert.equal((await request('biblioteca.php')).location,'cuenta.php?next=biblioteca');
+ assert.equal((await request('biblioteca.php')).status,200);assert.match((await request('biblioteca.php')).text,/DEMO/);
  assert.equal((await request('salir.php',{csrf:token(home.text)})).location,'index.php');
  console.log('OK: direct logout links, invalid CSRF, retry, valid logout and repeated logout.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>server.kill());

@@ -1,0 +1,19 @@
+# Test service only. Production remains on main and uses its existing service.
+services:
+  - type: web
+    name: repotools-desarrollo
+    runtime: docker
+    repo: https://github.com/totyr77-droid/repotools2
+    branch: desarrollo
+    plan: free
+    region: ohio
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: commit
+    envVars:
+      - key: PORT
+        value: "80"
+      - key: REPOTOOLS_REQUIRE_DATABASE_URL
+        value: "1"
+      - key: DATABASE_URL
+        sync: false

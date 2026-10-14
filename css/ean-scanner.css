@@ -36,3 +36,37 @@
 #verc { z-index: 4; }
 
 .ean-camera-controls .ean-camera-zoom{touch-action:none;overscroll-behavior:none}
+/* Native range: dragging updates the live track without restarting it. */
+.ean-camera-controls .ean-camera-zoom { touch-action:none; }
+.ean-camera-zoom-value { min-width:38px; text-align:center; }
+.ean-camera-zoom-shortcuts { position:absolute; bottom:0; left:50%; transform:translateX(-50%); display:flex; gap:4px; pointer-events:auto; }
+.ean-camera-zoom-shortcuts button { width:44px; min-height:44px; padding:4px; border:1px solid #ffffff59; border-radius:50%; background:#f5f8ff29; color:white; font-size:.75rem; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); touch-action:manipulation; cursor:pointer; }
+.ean-camera-zoom-shortcuts button[aria-pressed=true] { background:#fff; color:#27187e; }
+@media(max-width:360px) { .ean-camera-zoom-shortcuts { gap:2px; } .ean-camera-zoom-shortcuts button { width:44px; } }
+
+/* Thumb controls: zoom follows the dominant hand; secondary tools stay opposite. */
+.ean-camera-controls .ean-camera-zoom { left:auto; right:0; top:auto; bottom:0; transform:none; box-sizing:border-box; }
+.ean-camera-controls .ean-camera-light { left:0; right:auto; top:auto; bottom:56px; transform:none; box-sizing:border-box; }
+.ean-camera-controls .ean-camera-manual { left:0; right:auto; top:auto; bottom:0; transform:none; box-sizing:border-box; }
+.ean-camera-controls .ean-camera-manual-only { top:auto; bottom:0; transform:none; }
+@media(max-width:360px) { .ean-camera-zoom-shortcuts button:not([data-zoom="1"]) { display:none; } }
+
+.ean-identification-track { position:absolute; z-index:2; border:2px solid #facc15; border-radius:4px; pointer-events:none; box-sizing:border-box; }
+.ean-identification-track[hidden] { display:none; }
+
+/* Shared viewport mounted by the camera component, independent of page/mode. */
+.repo-camera-viewport.repo-camera-viewport{position:relative!important;width:100%!important;height:clamp(260px,48dvh,420px)!important;min-height:0!important;max-height:55dvh!important;border-radius:12px;overflow:hidden;background:#10121a}
+.repo-camera-viewport.repo-camera-viewport video{position:static!important;display:block;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;object-fit:cover!important;margin:0!important}
+.repo-camera-viewport #qr-shaded-region{display:none!important}
+.repo-camera-viewport canvas{display:none!important}
+.repo-camera-guide{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:85%;aspect-ratio:1;max-height:85%;border:2px solid #fff;border-radius:6px;box-sizing:border-box;pointer-events:none;z-index:2;transition:border-color 120ms ease}
+.repo-camera-viewport[data-recognition=ean] .repo-camera-guide{width:86%;aspect-ratio:2.5;max-height:65%}
+.repo-camera-viewport.ean-detecting :is(.repo-camera-guide,.ean-identification-track){border-color:#facc15}
+.repo-camera-viewport.ean-confirmed :is(.repo-camera-guide,.ean-identification-track){border-color:#23c55e}
+.repo-camera-viewport .ean-camera-controls{inset:12px;inset-inline-start:max(12px,env(safe-area-inset-left));inset-inline-end:max(12px,env(safe-area-inset-right))}
+@media(max-height:500px){.repo-camera-viewport.repo-camera-viewport{height:48dvh!important}}
+@media(prefers-reduced-motion:reduce){.repo-camera-guide{transition:none}}
+
+.relay-scanner-dialog[data-ready=false] .repo-camera-guide{border-color:#c52a3c;z-index:7}
+
+.repo-camera-guide[hidden]{display:none!important}

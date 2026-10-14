@@ -146,7 +146,7 @@ function stock_save_product(PDO $db,int $user,array $input): array {
     } else stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size) VALUES(?,?,?,?,?,?,?)',[$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size']]);
     if ($v['kind']!=='units') stock_query($db,'INSERT INTO stock_product_references(ean,kind,pack_size,updated_by) VALUES(?,?,?,?) ON CONFLICT(ean,kind) DO UPDATE SET pack_size=excluded.pack_size,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP',[$v['ean'],$v['kind'],$v['pack_size'],$user]);
     stock_query($db,'UPDATE pallets SET activated=1 WHERE id=?',[$id]); stock_touch($db,$id,$user);
-    return ['code'=>$p['code'],'relocated'=>$relocated];
+    return ['code'=>$p['code'],'id'=>$id,'relocated'=>$relocated];
 }
 function stock_warning_days(PDO $db,int $user): int {
     $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
@@ -157,6 +157,12 @@ function stock_list(PDO $db,int $user,bool $all=false): array {
     $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
     return array_map('stock_public_identity',stock_query($db,"SELECT p.id,p.code,p.description,p.owner_id,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC",[$limit,(int)$all,$user,$user])->fetchAll());
 }
+function stock_expiry_state(string $date,int $warningDays,?DateTimeImmutable $today=null): array {
+    $today=$today??new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
+    $days=(int)$today->diff(new DateTimeImmutable($date,new DateTimeZone('America/Buenos_Aires')))->format('%r%a');
+    $state=$days<0?'expired':($days===0?'today':($days<=$warningDays?'warning':'normal'));
+    return ['days'=>$days,'state'=>$state,'label'=>['expired'=>'Vencido','today'=>'Hoy','warning'=>'Próximo','normal'=>'Normal'][$state]];
+}
 function stock_notify(PDO $db,int $user): array {
     $days=stock_warning_days($db,$user);
     $today=new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
@@ -164,8 +170,7 @@ function stock_notify(PDO $db,int $user): array {
     $items=stock_query($db,"SELECT b.id,b.name,b.ean,b.expires,p.code FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND b.expires<>'' AND b.expires<=? AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$limit,$user,$user])->fetchAll();
     $current=[];
     foreach($items as $item) {
-        $remaining=(int)$today->diff(new DateTimeImmutable($item['expires'],new DateTimeZone('America/Buenos_Aires')))->format('%r%a');
-        $state=$remaining<0?'expired':($remaining===0?'today':'warning');
+        $expiry=stock_expiry_state($item['expires'],$days,$today);$remaining=$expiry['days'];$state=$expiry['state'];
         $title=$remaining<0?'Mercadería vencida':($remaining===0?'Mercadería que vence hoy':'Mercadería próxima a vencer');
         $label=$remaining<0?'Vencido hace '.(-$remaining).' día'.($remaining===-1?'':'s'):($remaining===0?'Vence hoy':'Vence en '.$remaining.' día'.($remaining===1?'':'s'));
         $key='expiry:'.$user.':'.$item['id'].':'.$item['expires'];
@@ -177,4 +182,16 @@ function stock_notify(PDO $db,int $user): array {
         if(!isset($current[$old['event_key']]))stock_query($db,'DELETE FROM notifications WHERE user_id=? AND id=?',[$user,$old['id']]);
     }
     return $current;
+}
+
+function stock_deduct_product(PDO $db,int $user,array $input): array {
+    $id=(int)($input['pallet_id']??0);stock_editable($db,$id,$user);
+    $product=stock_query($db,'SELECT * FROM pallet_products WHERE id=? AND pallet_id=?',[(int)($input['product_id']??0),$id])->fetch();
+    if(!$product||(int)$product['revision']!==(int)($input['revision']??-1))throw new CatalogException('El producto cambió. Revisá la cantidad actual antes de restar.',409);
+    $quantity=stock_product_input([...$input,'ean'=>$product['ean'],'expires'=>$product['expires'],'name'=>$product['name']])['units'];
+    $remaining=(int)$product['units']-$quantity;if($remaining<0)throw new CatalogException('No podés restar más mercadería de la disponible.',422);
+    $changed=$remaining?stock_query($db,'UPDATE pallet_products SET units=?,revision=revision+1 WHERE id=? AND pallet_id=? AND revision=?',[$remaining,$product['id'],$id,$product['revision']])->rowCount():stock_query($db,'DELETE FROM pallet_products WHERE id=? AND pallet_id=? AND revision=?',[$product['id'],$id,$product['revision']])->rowCount();
+    if(!$changed)throw new CatalogException('El producto cambió. Revisá la cantidad actual antes de restar.',409);
+    stock_touch($db,$id,$user);
+    return ['id'=>$id,'code'=>stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn(),'remaining'=>$remaining,'removed'=>$quantity,'pallet_revision'=>(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$id])->fetchColumn(),'_movement'=>['ean'=>$product['ean'],'reference'=>$product['name'],'expires'=>$product['expires'],'removed_units'=>$quantity,'old'=>(int)$product['units'],'new'=>$remaining]];
 }

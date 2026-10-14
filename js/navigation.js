@@ -90,7 +90,6 @@
   async function navigate(href, { historyMode = 'push', scroll = [0, 0] } = {}) {
     href = new URL(href, location.href).href;
     if (new URL(href).origin !== location.origin) { location.assign(href); return; }
-    if (window.RepotoolsPageLoader?.visible && pending) return;
     window.RepotoolsPageLoader?.mark('NAVIGATION_CLICK_MS');
     const loaderTicket = window.RepotoolsPageLoader?.show(true);
     const token = ++version;
