@@ -5,13 +5,15 @@
   // One camera lease and viewport implementation for every recognition mode.
   let cameraQueue = Promise.resolve(), cameraOwner = null;
   function cameraTask(task) { const next = cameraQueue.then(task); cameraQueue = next.catch(() => {}); return next; }
-  function cameraViewport(element, isQR) {
+  function cameraViewport(element, isQR, pallet = false) {
     if (!document.createElement || !element.append) return { track() {}, reset() {}, dispose() {} };
     element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean';
     const guide = document.createElement('div'); guide.className = 'repo-camera-guide'; guide.setAttribute('aria-hidden','true');
     const marker = document.createElement('div'); marker.className = 'ean-identification-track'; marker.hidden = true; marker.setAttribute('aria-hidden','true');
+    let numberGuide;
+    if(isQR&&pallet){guide.classList.add('repo-pallet-qr-guide');guide.innerHTML='<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M3 24V3h21M76 3h21v21M3 76v21h21M76 97h21V76"/><path d="M12 12h14v14H12ZM74 12h14v14H74ZM12 74h14v14H12Z"/></svg>';numberGuide=document.createElement('div');numberGuide.className='repo-pallet-number-guide';numberGuide.setAttribute('aria-hidden','true');numberGuide.innerHTML='<span>········</span><small>Número de palet</small>';element.append(numberGuide);}
     element.append(guide,marker); let timer;
-    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=Math.min(width,height)*.85;guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
+    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=pallet&&isQR?Math.min(width*.62,height*.58):Math.min(width,height)*.85;if(numberGuide){guide.style.top=height*.40+'px';numberGuide.style.width=Math.min(width*.72,300)+'px';numberGuide.style.top=(height*.40+side/2+12)+'px';}guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
     layout(); const observer=typeof ResizeObserver==='function'?new ResizeObserver(layout):null;observer?.observe(element);
     function reset() { clearTimeout(timer); marker.hidden = true; guide.hidden = false; }
     return {
@@ -22,7 +24,7 @@
         Object.assign(marker.style,{left:x0/width*100+'%',top:y0/height*100+'%',width:(x1-x0)/width*100+'%',height:(y1-y0)/height*100+'%'});
         marker.hidden=false; guide.hidden = !isQR; timer=setTimeout(reset,700);
       }, reset,
-      dispose() { observer?.disconnect(); reset(); guide.remove(); marker.remove(); element.classList.remove('repo-camera-viewport'); delete element.dataset.recognition; }
+      dispose() { observer?.disconnect(); reset(); guide.remove(); numberGuide?.remove(); marker.remove(); element.classList.remove('repo-camera-viewport'); delete element.dataset.recognition; }
     };
   }
   let scanPhoto = null, photoTimer, photoVersion = 0;
@@ -520,7 +522,7 @@
               current.cameraUpdates = track.applyConstraints({ ...track.getConstraints(), advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
             }
           } catch {}
-          current.viewport = cameraViewport(element, isQR);
+          current.viewport = cameraViewport(element, isQR, kind === 'pallet');
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
           if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport);

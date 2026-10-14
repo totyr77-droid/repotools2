@@ -1,6 +1,11 @@
 {
-  "version": 1,
+  "version": 2,
   "changes": [
+    {
+      "version": 2,
+      "date": "2026-10-14",
+      "summary": "Guías de QR y número de palet en la cámara de Stock."
+    },
     {
       "version": 1,
       "date": "2026-10-14",
