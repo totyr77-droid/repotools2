@@ -9,3 +9,7 @@
 
 [data-notice=error]:not([data-toast-message]){color:#a22432}
 .repotools-send-toast.repo-toast{translate:none!important;max-width:calc(100vw - 24px)}
+.repo-ean-label{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}.repo-ean-icon{width:19px;height:19px;flex:none}.repo-ean-prefix{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* The bell is closest to the dominant hand; desktop keeps its usual order. */
+@media(max-width:768px) and (pointer:coarse){body[data-hand=left] .notification-control>#openNotifications{order:-1}body[data-hand=right] .notification-control>#openNotifications{order:1}}
