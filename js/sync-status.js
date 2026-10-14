@@ -8,7 +8,7 @@
   const running=new Set(),failures=new Set();let left=false,version=0;
   async function render(){const current=++version;try{
     const [stock,library]=await Promise.all([RepoStockOffline(user).list(),RepoLibraryOffline(user).list()]);if(left||current!==version)return;
-    const rows=[...stock,...library],count=rows.length,online=window.RepoConnectivity?RepoConnectivity.state.kind==='online':navigator.onLine,error=online&&count&&(failures.size||rows.some(row=>row.error));
+    const rows=[...stock,...library],count=rows.length,online=window.RepoConnectivity?RepoConnectivity.state.kind==='online':navigator.onLine,error=online&&count&&(failures.size||rows.some(row=>row.error||row.state==='retryable'));
     const state=!online?'offline':running.size&&rows.some(row=>!['conflict','rejected'].includes(row.state))?'syncing':error?'error':count?'pending':'ready';box.dataset.state=state;box.hidden=count===0;
     icon.className='fa-solid '+({offline:'fa-wifi',syncing:'fa-arrows-rotate',error:'fa-triangle-exclamation',pending:'fa-clock',ready:'fa-check'}[state]);
     label.textContent=state==='offline'?'Sin conexión'+(count?' · '+count+' pendientes':''):state==='syncing'?'Sincronizando…':state==='error'?'No pudimos sincronizar algunos cambios':count?count+' cambio'+(count===1?' pendiente':'s pendientes'):'';
