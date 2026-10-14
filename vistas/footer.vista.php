@@ -31,7 +31,7 @@
 <script src="js/date-time.js?v=20261011-dates1"></script>
 <script src="js/navigation.js?v=20261013-motion1"></script>
 <script src="js/device-connection.js?v=20261013-identification1"></script>
-<script src="js/action-notices.js?v=20261014-scanner-notice"></script>
+<script src="js/action-notices.js?v=20261014-device-notice"></script>
 <?php $referralNotice=$_SESSION['referral_registration_notice']??null;if($referralNotice&&current_user()&&(int)$referralNotice['user_id']===(int)current_user()['id']){unset($_SESSION['referral_registration_notice']);if((int)$referralNotice['at']>time()-900): ?><script>window.RepoToast?.(<?= json_encode($referralNotice['message'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>,{kind:'info'});</script><?php endif;} ?>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
