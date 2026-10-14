@@ -5,3 +5,5 @@
 .stock-overview-metrics{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px;min-height:52px}.stock-overview-metrics>div{padding:7px 5px;gap:2px}.stock-overview-metrics strong{font-size:18px}.stock-overview-metrics span{font-size:clamp(10px,2.6vw,13px);white-space:nowrap}.stock-overview-metrics i{margin-inline-end:3px;font-size:10px}#openStockHistory{padding:8px 12px;background:#efedf7;border-radius:10px;color:#27187e;gap:8px;font-size:.85rem}#openStockHistory .fa-chevron-right{margin-inline-start:auto}
 
 .stock-overview-metrics span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+#openStockHistory{width:auto;min-height:44px;padding:6px 10px;background:transparent;color:#68627c;font-weight:400}#openStockHistory:hover{background:#efedf7;color:#27187e}
