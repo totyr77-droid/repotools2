@@ -11,11 +11,12 @@ function referrals_enabled(): bool {
     $url=getenv('DATABASE_URL')?:'';
     return $url===''?getenv('REPOTOOLS_REQUIRE_DATABASE_URL')!=='1':(str_replace('-pooler.','.',(string)parse_url($url,PHP_URL_HOST))===str_replace('-pooler.','.',getenv('REFERRALS_DB_HOST')?:'') && getenv('REFERRALS_DB_HOST')!=='');
 }
-function referral_q(PDO $db,string $sql,array $params=[]): PDOStatement {$q=$db->prepare($sql);$q->execute($params);return $q;}
+function referral_q(PDO $db,string $sql,array $params=[]): PDOStatement {if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'&&!$db->inTransaction())$db->exec('PRAGMA foreign_keys=ON');$q=$db->prepare($sql);$q->execute($params);return $q;}
 function referral_lock(PDO $db): void {if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684639)');else $db->exec('UPDATE referral_mutex SET revision=revision+1 WHERE id=1');}
 function referral_schema(PDO $db): void {
     if(!referrals_enabled())throw new ReferralError('Referidos requiere una base aislada de beta.',503);
     $pg=$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql';$id=$pg?'BIGSERIAL PRIMARY KEY':'INTEGER PRIMARY KEY AUTOINCREMENT';$ref=$pg?'BIGINT':'INTEGER';
+    if(!$pg)$db->exec('PRAGMA foreign_keys=ON');
     $db->beginTransaction();try{
         if($pg)$db->query('SELECT pg_advisory_xact_lock(72684639)');
         $db->exec('CREATE TABLE IF NOT EXISTS referral_mutex(id INTEGER PRIMARY KEY,revision INTEGER NOT NULL DEFAULT 0)');$db->exec('INSERT INTO referral_mutex(id) VALUES(1) ON CONFLICT(id) DO NOTHING');

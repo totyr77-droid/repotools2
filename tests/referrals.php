@@ -9,6 +9,7 @@ function user(PDO $db,string $name,string $role='usuario'): int {$q=referral_q($
 function attach(PDO $db,int $user,string $code,string $ip='203.0.113.10'): int {return referral_attach($db,$user,'user'.$user.'@example.invalid',$code,['REMOTE_ADDR'=>$ip],time());}
 function proof(PDO $db,int $id): string {$row=referral_q($db,'SELECT u.email FROM users u JOIN referrals r ON r.invitee_id=u.id WHERE r.id=?',[$id])->fetch();$token=bin2hex(random_bytes(32));referral_q($db,'INSERT INTO referral_verifications VALUES(?,?,?,?)',[hash('sha256',$token),$id,hash('sha256',strtolower($row['email'])),time()+86400]);return $token;}
 try{
+ check((int)$db->query('PRAGMA foreign_keys')->fetchColumn()===1,'foreign keys enforced');
  $a=user($db,'Inviter');$b=user($db,'Other');$admin=user($db,'Admin','administrador');$manager=user($db,'Manager','manager');$code=referral_code($db,$a);check(strlen($code)===12,'code format');check(referral_code($db,$a)===$code,'permanent code');check(referral_code($db,$b)!==$code,'unique code');
  $normal=user($db,'Normal');check(referral_attach($db,$normal,'normal@example.invalid','INVALID',[],time())===null,'invalid normal registration');check(!referral_q($db,'SELECT id FROM referrals WHERE invitee_id=?',[$normal])->fetchColumn(),'normal unassigned');
  rejects(fn()=>attach($db,$a,$code));$old=user($db,'Old');referral_q($db,"UPDATE users SET created_at='2000-01-01 00:00:00' WHERE id=?",[$old]);rejects(fn()=>attach($db,$old,$code));
