@@ -311,6 +311,8 @@ async function iniciarScanner() {
   els.copy.disabled = true;
   document.getElementById('mainScannerTitle').textContent = rapidActive ? 'Escaneo rápido' : 'Escanea el producto';
   document.getElementById('scanProductActions')?.replaceChildren();
+  els.cartelScaner.hidden = true;
+  document.getElementById('scanResultHeading').textContent = '';
   els.cartelScaner.style.display = 'none';
   els.contenedor.hidden = false;
   document.getElementById('mainScannerStatus').hidden = false;
@@ -373,6 +375,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   els.contenedor.hidden = true;
   document.getElementById('mainScannerStatus').hidden = true;
   els.copy.disabled = false;
+  els.cartelScaner.hidden = false;
   els.cartelScaner.style.display = 'flex';
   els.resultado.textContent = codigo;
   const heading = document.getElementById("scanResultHeading");
