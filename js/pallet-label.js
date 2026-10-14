@@ -9,8 +9,8 @@
     const deadline=Number(label.reserved_until||label.prepared_until);
     if(!Number(label.activated)&&deadline)footer.push('Reservado hasta '+new Date(deadline*1000).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short',hour12:false,timeZone:'America/Argentina/Buenos_Aires'}));
     // Reserve four light modules on every side, independent of the URL length.
-    const qrSize=Math.min(1800,2100/(1+8/n)),quiet=4*qrSize/n;
-    return {width:3508,height:2480,logo,matrix,n,qr:{x:quiet+10,y:Math.max(480,quiet+300),size:qrSize},brand:{x:2170,y:360,width:1200,height:206},code:{x:2780,y:1200,size:280,width:8*280*.556},footer};
+    const qrSize=n*2*Math.floor(2140/(2*(n+8))),quiet=4*qrSize/n;
+    return {width:2480,height:3508,logo,matrix,n,qr:{x:1240-qrSize/2,y:540+quiet,size:qrSize},brand:{x:80,y:40,width:2320,height:398},caption:{x:1240,y:515,size:64},code:{x:1240,y:3160,size:500,width:8*500*.556},footerPosition:{x:1240,y:3320,size:48,step:54},footer};
   }
   function vector(label) {
     const l=layout(label),cell=l.qr.size/l.n;
@@ -18,15 +18,15 @@
     const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
     const text=(x,y,size,value,bold=false)=>`<text x="${x}" y="${y}" font-size="${size}"${bold?' font-weight="bold"':''}>${escape(value)}</text>`;
     const code=`<text id="pallet-label-code" x="${l.code.x}" y="${l.code.y}" font-size="${l.code.size}" font-weight="bold">${escape(label.code)}</text>`;
-    const footer=l.footer.map((line,i)=>text(l.code.x,1570+i*90,48,line)).join('');
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="3508" height="2480" viewBox="0 0 3508 2480"><defs><filter id="black-logo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/></filter></defs><rect width="3508" height="2480" fill="white"/><image href="${logo}" x="${l.brand.x}" y="${l.brand.y}" width="${l.brand.width}" height="${l.brand.height}" preserveAspectRatio="xMidYMid meet" filter="url(#black-logo)"/><g fill="black" font-family="Arial,sans-serif" text-anchor="middle">${text(l.qr.x+l.qr.size/2,250,64,'Escaneá para consultar este palet')}<path d="${path}" transform="translate(${l.qr.x} ${l.qr.y}) scale(${cell})" shape-rendering="crispEdges"/>${text(l.code.x,820,56,'CÓDIGO DEL PALET')}${code}${footer}</g></svg>`;
+    const footer=l.footer.map((line,i)=>text(l.footerPosition.x,l.footerPosition.y+i*l.footerPosition.step,l.footerPosition.size,line)).join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="2480" height="3508" viewBox="0 0 2480 3508"><defs><filter id="black-logo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/></filter></defs><rect width="2480" height="3508" fill="white"/><image href="${logo}" x="${l.brand.x}" y="${l.brand.y}" width="${l.brand.width}" height="${l.brand.height}" preserveAspectRatio="xMidYMid meet" filter="url(#black-logo)"/><g fill="black" font-family="Arial,sans-serif" text-anchor="middle">${text(l.caption.x,l.caption.y,l.caption.size,'Escaneá para consultar este palet')}<path d="${path}" transform="translate(${l.qr.x} ${l.qr.y}) scale(${cell})" shape-rendering="crispEdges"/>${code}${footer}</g></svg>`;
   }
   async function image(label) {
     const key=label.code+':'+(label.activated?'active':label.reserved_until||label.prepared_until||0);
     if(cache.has(key))return cache.get(key);
-    const canvas=document.createElement('canvas');canvas.width=3508;canvas.height=2480;
+    const canvas=document.createElement('canvas');canvas.width=2480;canvas.height=3508;
     const ctx=canvas.getContext('2d'),source=URL.createObjectURL(new Blob([vector(label)],{type:'image/svg+xml'})),preview=new Image();
-    try{preview.src=source;await preview.decode();ctx.drawImage(preview,0,0,3508,2480);}finally{URL.revokeObjectURL(source);}
+    try{preview.src=source;await preview.decode();ctx.drawImage(preview,0,0,2480,3508);}finally{URL.revokeObjectURL(source);}
     const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw Error('No pudimos generar la etiqueta.');const result={blob,dataURL:canvas.toDataURL('image/png')};cache.set(key,result);return result;
   }
   async function share(label){const result=await image(label),file=new File([result.blob],`Repotools-palet-${label.code}.png`,{type:'image/png'});if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:`Palet ${label.code}`});return 'Etiqueta compartida.';}const link=document.createElement('a');link.href=result.dataURL;link.download=file.name;link.click();return 'Etiqueta descargada. Puedes enviarla como imagen.';}

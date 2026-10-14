@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Etiquetas verticales grandes (desarrollo)
+
+A4 vertical nuevamente, logo negro a todo el ancho, QR central y número500px natural. PDF/PNG/SVG e impresión1/2/6 consistentes; QR/ceros/avisos y permisos conservados. Detalle y reversión docs/ETIQUETAS-VERTICAL.md; impresora/iPhone físicos pendientes.
+
 ## 13/10/2026 — Motor QR/OCR compartido (desarrollo)
 
 OCR local para palets en Stock y celular-PC, tres frames y validación contextual; perfiles/EAN separados. Reutiliza zoom, mano y feedback. Licencias locales, cache bajo demanda, cierre seguro y regresiones documentadas en docs/ESCANER-INTELIGENTE.md. Sin cambiosMain/permisos/datos; cámara física pendiente.
