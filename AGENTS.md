@@ -27,3 +27,5 @@ Antes de cada commit revisar elementos innecesarios, pasos evitables, claridad d
 
 ## Publicación y versiones
 Cada commit de código incrementa release.json mediante .githooks/pre-commit (core.hooksPath=.githooks). Antes de publicar, ejecutar node scripts/bump-release.cjs 'Resumen breve en español' para registrar cambios concretos; el hook evita un segundo incremento si release.json ya está staged. Mantener versiones independientes Main/beta, no copiar release.json antiguo entre ramas. Probar y documentar cada entrega.
+
+Versión visible desde esta entrega: 1.00. El contador version de release.json sigue interno para caché; major/minor generan la etiqueta. El helper incrementa minor (1.01), --major incrementa major y reinicia minor (2.00). No usar números flotantes ni reiniciar el contador interno.

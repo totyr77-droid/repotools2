@@ -1,6 +1,12 @@
 {
-  "version": 4,
+  "version": 5,
   "changes": [
+    {
+      "version": 5,
+      "label": "1.00",
+      "date": "2026-10-14",
+      "summary": "Controles flotantes uniformes, contador de reportes separado y versiones 1.00."
+    },
     {
       "version": 4,
       "date": "2026-10-14",
@@ -21,5 +27,8 @@
       "date": "2026-10-14",
       "summary": "Versión visible y registro de actualizaciones en Ajustes."
     }
-  ]
+  ],
+  "major": 1,
+  "minor": 0,
+  "label": "1.00"
 }
