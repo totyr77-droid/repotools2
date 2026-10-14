@@ -23,3 +23,9 @@ API de capacidades y configuración: https://developer.mozilla.org/en-US/docs/We
 ## Reversión
 
 Revertir el commit de esta entrega: lector, estilos, versiones header/footer y nombre de precache. Sin migraciones/datos/permisos afectados; conservar BETA exclusivo desarrollo.
+
+## Zoom según mano — 13/10/2026
+
+Slider vertical en el lateral de la mano configurada, con centro en la mitad inferior del visor. Flash y entrada manual al lado opuesto; sin reflejar iconos/textos. Preferencia existente body[data-hand], inmediata y válida también en horizontal para pantallas táctiles; escritorio conserva distribución derecha. En pantallas de hasta360px se muestra solo el acceso1× para evitar solapamientos; el rango completo sigue disponible en el slider. Sin cambios de reconocimiento, audio, vibración o control del track. Rango real y paso del dispositivo existentes, mínimo1× si compatible, fallback sin zoom cuando no se admite.
+
+Archivos: css/ean-scanner.css, css/responsive.css, vistas/header.vista.php (versiones), sw.js (v14), tests/scanner-hand-layout.cjs y tests/responsive-workspaces.cjs. Validación: scanner-zoom y scanner-hand-layout pasan; PHP header válido. Safari/cámara físicos pendientes: confirmar rango real, deslizamiento y comodidad con ambas manos. Revertir el commit de esta entrega solo en desarrollo; no afectaMain.

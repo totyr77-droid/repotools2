@@ -66,8 +66,6 @@
  .nav-celular { z-index:100; }
 }
 @media(max-width:768px) and (pointer:coarse) {
- body[data-hand=left] .ean-camera-controls .ean-camera-zoom { left:auto; right:0; }
- body[data-hand=left] .ean-camera-controls :is(.ean-camera-light,.ean-camera-manual) { right:auto; left:0; }
  body[data-hand=left] .report-camera-flash { right:auto; left:12px; }
  body[data-hand=left] #publicPalletStock { margin-inline-end:auto; }
 }
@@ -94,4 +92,10 @@
 @media(min-width:1101px) {
  .account-panel-profile .settings-preferences { grid-column:2; grid-row:1; }
  .account-panel-profile .settings-access { grid-column:3; grid-row:1; }
+}
+
+/* Camera hand preference also applies to phones in landscape. */
+@media (pointer:coarse) {
+ body[data-hand=left] .ean-camera-controls .ean-camera-zoom { left:0; right:auto; }
+ body[data-hand=left] .ean-camera-controls :is(.ean-camera-light,.ean-camera-manual) { right:0; left:auto; }
 }

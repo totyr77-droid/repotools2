@@ -43,3 +43,10 @@
 .ean-camera-zoom-shortcuts button { width:44px; min-height:44px; padding:4px; border:1px solid #ffffff59; border-radius:50%; background:#f5f8ff29; color:white; font-size:.75rem; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); touch-action:manipulation; cursor:pointer; }
 .ean-camera-zoom-shortcuts button[aria-pressed=true] { background:#fff; color:#27187e; }
 @media(max-width:360px) { .ean-camera-zoom-shortcuts { gap:2px; } .ean-camera-zoom-shortcuts button { width:44px; } }
+
+/* Thumb controls: zoom follows the dominant hand; secondary tools stay opposite. */
+.ean-camera-controls .ean-camera-zoom { left:auto; right:0; top:auto; bottom:0; transform:none; box-sizing:border-box; }
+.ean-camera-controls .ean-camera-light { left:0; right:auto; top:auto; bottom:56px; transform:none; box-sizing:border-box; }
+.ean-camera-controls .ean-camera-manual { left:0; right:auto; top:auto; bottom:0; transform:none; box-sizing:border-box; }
+.ean-camera-controls .ean-camera-manual-only { top:auto; bottom:0; transform:none; }
+@media(max-width:360px) { .ean-camera-zoom-shortcuts button:not([data-zoom="1"]) { display:none; } }
