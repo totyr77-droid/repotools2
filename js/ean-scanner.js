@@ -109,7 +109,89 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, feedbackPreferences = () => ({}), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
+  // Shared identification engine. Camera/QR decoder and feedback remain in create().
+  const ocrBase = (() => { try { return new URL('vendor/ocr/', document.currentScript?.src || new URL('js/ean-scanner.js', window.location.href)).href; } catch { return 'js/vendor/ocr/'; } })();
+  let ocrLibrary;
+  function loadOCR() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+    if (!ocrLibrary) ocrLibrary = new Promise((resolve, reject) => {
+      const script = document.createElement('script'); script.src = ocrBase + 'tesseract.min.js';
+      script.onload = () => resolve(window.Tesseract); script.onerror = () => { script.remove(); ocrLibrary = null; reject(Error('OCR unavailable')); };
+      document.head.append(script);
+    });
+    return ocrLibrary;
+  }
+  function palletIdentifier(value) {
+    const text = String(value ?? '').trim(); if (/^\d{8}$/.test(text)) return text;
+    try {
+      const url = new URL(text), here = new URL(window.location.href);
+      const production = ['repotools.online', 'www.repotools.online', 'repotools2.onrender.com'];
+      const trusted = url.origin === here.origin || (production.includes(url.hostname) && !url.port);
+      if (!trusted || !['http:', 'https:'].includes(url.protocol) || url.username || url.password || !url.pathname.endsWith('/palet.php')) return null;
+      const code = url.searchParams.get('codigo'); return /^\d{8}$/.test(code || '') ? code : null;
+    } catch { return null; }
+  }
+  function ocrConsensus() {
+    let code = '', count = 0, lastFrame = null, lastTime = 0;
+    return (value, frame, now = performance.now()) => {
+      if (!/^\d{8}$/.test(value || '')) { code = ''; count = 0; return false; }
+      if (frame === lastFrame) return false;
+      lastFrame = frame;
+      if (value !== code || now - lastTime > 12000) { code = value; count = 0; }
+      lastTime = now; return ++count === 3;
+    };
+  }
+  function ocrCandidate(data) {
+    const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
+    const rows = lines.length ? lines : [{ text: data.text, confidence: data.confidence }];
+    const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
+    return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
+  }
+  function palletOCR(element, active, accept, status) {
+    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus();
+    const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
+    if (!context) return { dispose() {}, resume() {}, reset() {} };
+    const marker = document.createElement('div'); marker.className = 'ean-identification-track'; marker.hidden = true; marker.setAttribute('aria-hidden', 'true'); element.append(marker);
+    function schedule() { if (!disposed) timer = setTimeout(read, 550); }
+    async function read() {
+      if (disposed || busy) return; if (!active()) { schedule(); return; }
+      const video = element.querySelector('video');
+      if (!video?.videoWidth || video.readyState < 2 || video.currentTime === lastFrame) { schedule(); return; }
+      busy = true;
+      try {
+        if (!worker) {
+          const library = await loadOCR(); if (disposed || !active()) return;
+          creating = library.createWorker('eng', 1, { workerPath: ocrBase + 'worker.min.js', corePath: ocrBase, langPath: ocrBase.replace(/\/$/, ''), workerBlobURL: false, errorHandler: () => {} });
+          worker = await creating;
+          if (disposed) { await worker.terminate(); worker = null; return; }
+          await worker.setParameters({ tessedit_char_whitelist: '0123456789', tessedit_pageseg_mode: '11' });
+        }
+        if (!active() || disposed) return;
+        const frame = visibleFrame(video), scale = Math.min(1, 1280 / frame.width);
+        const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
+        canvas.width = Math.round(frame.width * scale); canvas.height = Math.round(frame.height * scale);
+        context.drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
+        const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
+        if (disposed || !active()) return;
+        const candidate = ocrCandidate(result.data);
+        marker.hidden = !candidate?.box;
+        if (candidate?.box) {
+          const b = candidate.box; Object.assign(marker.style, { left: (b.x0 / canvas.width * 100) + '%', top: (b.y0 / canvas.height * 100) + '%', width: ((b.x1 - b.x0) / canvas.width * 100) + '%', height: ((b.y1 - b.y0) / canvas.height * 100) + '%' });
+        }
+        if (candidate) { status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
+        else confirm(null, stamp);
+      } catch { if (!disposed) { status(true); disposed = true; marker.remove(); try { await worker?.terminate(); } catch {} } }
+      finally { busy = false; if (disposed) { canvas.width = canvas.height = 0; } else schedule(); }
+    }
+    schedule();
+    return {
+      reset() { confirm = ocrConsensus(); marker.hidden = true; },
+      resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
+      dispose() { disposed = true; clearTimeout(timer); marker.remove(); if (!busy) { canvas.width = canvas.height = 0; try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
+    };
+  }
+
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
     let revision = 0, session = null, queue = Promise.resolve();
     const enqueue = task => {
@@ -321,7 +403,7 @@
     async function release(current) {
       if (!current) return;
       if (!current.cleanup) current.cleanup = (async () => {
-        current.accepting = false; current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
+        current.accepting = false; current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
         if (current.reader.isScanning) await current.reader.stop();
         current.reader.clear();
@@ -351,11 +433,16 @@
         if (!window.Html5Qrcode || !window.Html5QrcodeSupportedFormats) throw new Error('No se pudo cargar el lector. Intenta nuevamente.');
         const formats = window.Html5QrcodeSupportedFormats;
         const isQR = format === 'qr';
-        const validate = isQR ? code => typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
+        const kind = typeof identification === 'function' ? identification() : identification;
+        const normalize = isQR && kind === 'pallet' ? palletIdentifier : value => value;
+        const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
         const current = { reader, accepting: true, token, isQR, validate, confirm: confirmation(validate) };
         session = current;
         const accept = (code, source = 'camera') => {
+          code = normalize(code);
+          if (code === null) { if (current.accepting && session === current && token === revision && canAccept()) { current.confirm(null); current.ocr?.reset(); onStatus('Este QR no corresponde a un palet de Repotools.'); } return; }
+          if (isQR && kind === 'pallet' && current.lastDelivered === code) return;
           if(current.lastDelivered===code){const elapsed=Date.now()-current.lastDeliveredSeen;current.lastDeliveredSeen=Date.now();if(elapsed<repeatCooldown)return;if(rearmRepeated)current.lastDelivered='';}
           if (!current.accepting || session !== current || token !== revision || !canAccept()) return;
           // Con object-fit: cover se confirma únicamente la zona que el usuario
@@ -367,21 +454,21 @@
           }
           if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();
-          const confirmed = current.confirm(code);
+          const confirmed = source === 'ocr' || current.confirm(code);
           if (!confirmed) {
             element.classList.add('ean-detecting'); onStatus('Detectando código…'); clearTimeout(current.progressTimer);
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
           if (!isQR) rememberScanPhoto(code, element);
-          current.accepting = false; clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
+          current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
             Promise.resolve().then(()=>{beep(feedbackPreferences());return onCode(code);}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
               if(token!==revision||session!==current)return;
               current.confirm=confirmation(validate);current.accepting=true;element.classList.remove('ean-confirmed');
-              try{background(current,accept);}catch{}
+              try{background(current,accept);current.ocr?.resume();}catch{}
             }).catch(error=>{if(token===revision)onError(error);});
             return;
           }
@@ -410,7 +497,8 @@
           } catch {}
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          onStatus('Centra un solo código dentro del recuadro.');
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } });
+          onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
           current.accepting = false;
@@ -424,5 +512,5 @@
     const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
-  window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, takeScanPhoto, clearScanPhoto };
+  window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, palletIdentifier, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
 })();

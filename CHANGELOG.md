@@ -1,5 +1,9 @@
 # Entregas y decisiones de Repotools
 
+## 13/10/2026 — Motor QR/OCR compartido (desarrollo)
+
+OCR local para palets en Stock y celular-PC, tres frames y validación contextual; perfiles/EAN separados. Reutiliza zoom, mano y feedback. Licencias locales, cache bajo demanda, cierre seguro y regresiones documentadas en docs/ESCANER-INTELIGENTE.md. Sin cambiosMain/permisos/datos; cámara física pendiente.
+
 ## 13/10/2026 — Número de etiqueta al ancho disponible (desarrollo)
 
 Código del palet a2040px de ancho, fuente360px y posición reservada bajo el QR; márgenes A4 y texto inferior intactos. Prueba de límites geométricos, PDF1/2/5 páginas, QR y selección múltiple pasan; revisión visual PNG. Cambio exclusivo desarrollo, pendiente impresora real. Revertir el commit de esta entrega para volver al código anterior.

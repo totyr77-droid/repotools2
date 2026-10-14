@@ -16,6 +16,8 @@ Rangos actuales: usuario, moderador, supervisor, administrador y manager. APIs v
 
 ## Escaneo y celular-PC
 
+Palets: el mismo lector incorpora OCR local bajo demanda mediante Tesseract.js en WebWorker, validación de ocho dígitos y consenso de tres fotogramas. Stock y relay activan identification:pallet; perfiles aportan validateQR y EAN conserva su algoritmo. Controles y feedback no se duplican. Inventario, archivos, pruebas y límites físicos: docs/ESCANER-INTELIGENTE.md.
+
 `js/ean-scanner.js` es el lector compartido EAN/QR. Mantiene validación/confirmación de lecturas, localización y rotaciones del canvas, Quagga, zoom y flash según dispositivo. Html5Qrcode2.3.8 y Quagga1.12.1 son archivos locales en `js/vendor/`; no modificar algoritmos al cambiar presentación. Fuentes, iconos y mapas todavía utilizan otros proveedores externos.
 
 `js/device-connection.js` y `api/scan-relay.php` conectan el celular y PC de la misma cuenta con consentimiento. En PC se usa teclado/lector o celular; el contexto determina EAN/QR y destino. Internet es necesario en ambos equipos. Véase [docs/ESCANEO-PC-CELULAR.md](docs/ESCANEO-PC-CELULAR.md).

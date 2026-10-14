@@ -50,3 +50,6 @@
 .ean-camera-controls .ean-camera-manual { left:0; right:auto; top:auto; bottom:0; transform:none; box-sizing:border-box; }
 .ean-camera-controls .ean-camera-manual-only { top:auto; bottom:0; transform:none; }
 @media(max-width:360px) { .ean-camera-zoom-shortcuts button:not([data-zoom="1"]) { display:none; } }
+
+.ean-identification-track { position:absolute; z-index:2; border:2px solid #facc15; border-radius:4px; pointer-events:none; box-sizing:border-box; }
+.ean-identification-track[hidden] { display:none; }

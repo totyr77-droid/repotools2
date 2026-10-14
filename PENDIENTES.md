@@ -14,6 +14,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Escáner inteligente compartido QR + OCR de palets en desarrollo: Stock y relayPC usan identificador normalizado; perfiles mantienen su validador y EAN conserva checksum/flujo. OCR local3 frames/worker, seguimiento, duplicados y cancelación; prueba física Safari/altura pendiente. Inventario, validación y reversión docs/ESCANER-INTELIGENTE.md. Main intacto.
+
 Zoom de cámara ajustado a la mano hábil, abajo del visor; herramientas opuestas, horizontal táctil incluido y acceso1× compacto. Detalle/pruebas/reversión docs/ZOOM-DESLIZANTE.md. Solo desarrollo; cámara/Safari físicos pendientes.
 
 Refinamiento etiquetas8b5cedc confirmado en beta (3 recursosHTTP200/SHA256 idénticos; Main intacto): A4 horizontal/PDF conservado, QR con quiet zone adaptable4 módulos y dígitos sin compresión. Pruebas1/2/6, QR y ceros iniciales; detalle/archivos/reversión docs/ETIQUETAS-HORIZONTAL.md. Safari físico/impresora/OCR a distancia pendientes. Solo desarrollo.
