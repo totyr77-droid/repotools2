@@ -26,3 +26,5 @@ Pendiente físico: Safari/iPhone instalado y pestaña normal, modo avión desde 
 
 ## Reversión
 Revertir el commit de esta entrega en desarrollo, sin tocar Main. No hay migraciones SQL. Al revertir conservar `indexedDB.open('repotools-stock-offline',3)` y almacén `leases`: volver a versión2 causaría VersionError en navegadores ya actualizados. No borrar colas del usuario. El ledger aditivo reutiliza `stock_operations`; conservar sus filas para no perder idempotencia. Actualizar versión del shell al revertir recursos, para retirar caché anterior.
+
+Verificación pública de beta (2026-10-14): recursos comparados por SHA-256, plantilla con versiones nuevas y conectividad200/no-store. Navegador Chrome temporal preparó el Service Worker y reabrió Inicio sin red a390px; sin escrituras en datos de producción. Implementación1392b3d y actualización de cachéff6592d subidas exclusivamente a desarrollo. Main permaneció f7c6003e7dcec8a38ec640c068260107538b769d. Esto no sustituye las pruebas físicas pendientes de Safari.

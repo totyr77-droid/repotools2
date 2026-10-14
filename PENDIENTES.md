@@ -93,3 +93,5 @@ Punto6: resumen Stock4 métricas + últimos5 movimientos plegados, alcance propi
 
 ## Offline inteligente — beta, 2026-10-13
 Detección real red/servidor/sesión, badge del logo y sincronizador compartido. Colas IndexedDB v3 conservadas por usuario, revisión de conflictos e idempotencia Stock/Biblioteca. Copias sanitizadas con fecha, QR/OCR global preparado y palets desconocidos requieren conexión. Sin migración SQL. Alcance, pruebas y reversión segura (no bajar IndexedDB a2): docs/OFFLINE-INTELIGENTE.md. Safari y cámara reales pendientes; listas EAN online/offline siguen separadas.
+
+Entrega offline verificada en beta el2026-10-14:1392b3d + ff6592d, hashes públicos/plantilla/health correctos y shell reabierto sin red en Chrome390px. Regresión57:54 iniciales y3 fallos corregidos/repetidos; OCR real cacheado sobre video sintético, privacidad, conflictos e idempotencia. Continuar Safari físico/modo avión/red intermitente/almacenamiento; listas EAN online-offline separadas. Main intacto. Detalles y reversión IndexedDBv3: docs/OFFLINE-INTELIGENTE.md.
