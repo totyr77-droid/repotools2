@@ -158,3 +158,7 @@ Confirmación verificada UUID/cuenta/acción/ID+código y snapshot en transacci�
 
 ## Offline visual y EAN — beta,2026-10-14
 Inicio/Stock/Biblioteca shell compacto, acciones claras44px según mano, modo una mano con acciones abajo, nav inferior safearea/PCarriba. Biblioteca productos/pendientes muestran barrasEAN13/EAN8 usando JsBarcode3.11.6 local compartido con online; SWv32. Sin cambios cola/DB/cámara/permisos. offline-library-visual, stock-sync-integrity y offline-intelligent completo aprobados; bloqueo previo de Buscar palet no reproducido tras cierre modal sin transición discreta y repetición. Docs/reversión/pruebas físicas: docs/OFFLINE-UX-Y-EAN.md. Safari/PWA/lector físico pendientes. Main intacto.
+
+
+## Referidos y ranking — beta,2026-10-14
+Ajustes→Referidos, enlace/código permanente, atribución atómica solo nuevascuentas, verificación Resend pendiente/validada/revisión/rechazada, rankingUTC/Argentina3períodos/50página/posición propia; administración privada filtros25/historial/reversión manager. SeñalesHMAC30d/proxyexplícito/sin fingerprint ni rechazo porIP; tablas6 y migración explícita aplicadas soloNeon repotools-desarrollo, usuario confirmóDATABASE_URLbetaaislada. Activación flags+host+secreto+APP_URLbeta, bloqueada producción. Pruebas referrals PHP/UI/settings/nav/security pasan con fixtures, no mailreal ni Safari/PostgreSQL concurrencia. Docs/config/privacidad/reversión: docs/REFERIDOS-BETA.md. Main intacto. Verificar despliegue y probarcorreo propio sincuentasprod.
