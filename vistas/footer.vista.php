@@ -91,5 +91,5 @@
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261014-toasts"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261014-toasts"><script src="js/stock-overview.js?v=20261014-compact1"></script><?php endif; ?>
 <script src="js/motion.js?v=20261014-offline1"></script>
-<script src="js/one-hand-mode.js?v=20261014-compact1"></script><script src="js/mobile-navigation.js?v=20261014-compact1"></script><script src="js/ux-polish.js?v=20261014-compact2"></script></body>
+<script src="js/one-hand-mode.js?v=20261014-compact1"></script><script src="js/mobile-navigation.js?v=20261014-compact1"></script><script src="js/ux-polish.js?v=20261014-handbar1"></script></body>
 </html>
