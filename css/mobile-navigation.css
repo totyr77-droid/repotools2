@@ -17,5 +17,5 @@
 }
 
 @media(min-width:769px){.repo-mobile-nav{display:none}}
-@media(max-width:768px){.repo-mobile-nav #nav-celular.motion-selector::before{display:none}.repo-mobile-nav #nav-celular>a[aria-current=page]{background:var(--nav-selected)!important}body:has(.repo-mobile-nav) .stock-tabs,body:has(.repo-mobile-nav) .reports-tabs{display:none}}
+@media(max-width:768px){.repo-mobile-nav #nav-celular.motion-selector::before{display:none}.repo-mobile-nav #nav-celular>a[aria-current=page]{background:var(--nav-selected)!important}body:has(.repo-mobile-nav) .stock-palets-block>.stock-tabs,body:has(.repo-mobile-nav) .reports-panel>.reports-tabs{display:none}}
 #repoLibraryNavSearch{width:100%;min-height:44px;margin:8px 0 12px;box-sizing:border-box}
