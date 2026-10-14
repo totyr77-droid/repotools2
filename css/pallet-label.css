@@ -1,4 +1,4 @@
-﻿* { box-sizing:border-box; }
+* { box-sizing:border-box; }
 body { margin:0; font:16px Arial,sans-serif; background:#eeecf5; color:#27187e; }
 .label-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; max-width:1123px; margin:16px auto; padding:0 16px; }
 .label-toolbar-actions { display:flex; gap:8px; }
@@ -17,4 +17,9 @@ body { margin:0; font:16px Arial,sans-serif; background:#eeecf5; color:#27187e; 
  .label-sheet { display:block; width:280mm; max-width:100%; height:193mm; margin:0; padding:0; border:0; overflow:hidden; break-inside:avoid; page-break-inside:avoid; break-after:auto; page-break-after:auto; }
  .label-sheet+.label-sheet { break-before:page; page-break-before:always; }
  .label-sheet img { display:block; width:100%; height:100%; max-width:100%; object-fit:contain; }
+}
+@media print {
+ .label-sheet,.label-sheet img { box-shadow:none!important; border-radius:0!important; filter:none!important; }
+ .label-sheet { break-inside:avoid-page; }
+ .label-sheet img { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
 }

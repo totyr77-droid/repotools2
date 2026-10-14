@@ -31,3 +31,23 @@ Safari físico/AirPrint/impresora doméstica y distancia de6m pendientes. No se 
 ## Reversión
 
 Revertir el commit de esta entrega (SVG/PNG, CSS, página/visorPDF y versiones). Sin migraciones ni cambios de datos. Mantener BETA exclusivo desarrollo.
+
+## Refinamiento beta solicitado — 13/10/2026
+
+Se reutiliza la composición horizontal/PDF902b5f7. El QR mantiene texto, matriz y nivelM; solo su tamaño y posición se ajustan para reservar4 módulos blancos en los cuatro lados según la cantidad real de módulos. Sigue dentro del área imprimible, también para URL de beta y subcarpetas. Número con Arial/Helvetica Bold280, proporciones naturales (se eliminan textLength/lengthAdjust del SVG y la compresión del PDF); contraste negro/blanco y alineación del texto derecho mejorada. Aviso y fecha siguen completos en la misma hoja. CSS de impresión fuerza ausencia de sombras/filtros exteriores/esquinas y conserva el logo negro interno.
+
+Archivos modificados:
+- css/pallet-label.css
+- js/pallet-label.js
+- js/pallet-label-pdf.js
+- etiqueta.php
+- vistas/footer.vista.php
+- tests/pallet-label-layout.cjs
+- tests/pallet-label-pdf.cjs
+- docs/ETIQUETAS-HORIZONTAL.md
+- CHANGELOG.md
+- PENDIENTES.md
+
+Validación: HTML y PDF directo1/2/6 páginas A4 horizontal; PDF.js independiente leyó/renderizó todas las páginas, revisión visual del reservado y6 QR decodificados coincidentes con cada ID. Pruebas adicionales de QR de beta/subcarpeta, ceros iniciales y reserva futura, margen mínimo4 módulos y números sin deformación. pending-label-print comprueba preview/selección320/390/1366, ruta iPhone simulada a PDF, descarga al bloquear popup, impresión desktop y permisos403. PHP/JS syntax pasan.
+
+No se probó Safari/AirPrint en un iPhone físico ni OCR a distancia: requiere prueba real con cámara/impresora. No se registran pruebas simuladas como físicas. El PDF define297×210mm y una página por etiqueta sin depender de @page del navegador. Revertir este refinamiento devuelve los tamaños anteriores, manteniendo el PDF horizontal y sin afectar datos/QR/permisos.

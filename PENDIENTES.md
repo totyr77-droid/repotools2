@@ -14,6 +14,8 @@ Entregas y validaciones en [CHANGELOG.md](CHANGELOG.md). Las notas anteriores se
 
 ## Última entrega — 13/10/2026
 
+Refinamiento etiquetas beta: A4 horizontal/PDF conservado, QR con quiet zone adaptable4 módulos y dígitos sin compresión. Pruebas1/2/6, QR y ceros iniciales; detalle/archivos/reversión docs/ETIQUETAS-HORIZONTAL.md. Safari físico/impresora/OCR a distancia pendientes. Solo desarrollo.
+
 Cierre de lista de animaciones7e5cbf0 publicado y confirmado en beta (global2, HTTP200 y hashes iguales a Git): campos pequeños, salida de menús/notificaciones y confirmaciones sin demora lógica; global2/SW-v13. Pruebas/reversión docs/MOVIMIENTO-GLOBAL.md. Queda Safari/iPhone físico; no continuar funciones ajenas sin nuevo pedido.
 
 Movimiento global0c15647 en desarrollo, desplegado: portada/JS/CSS betaHTTP200 y hashes correctos verificados por el pedido actual. indicadores deslizantes, microinteracciones, paneles/menús/diálogos/navegación y offline; reducido/hand/cleanup. Cámara y mapas excluidos. Pruebas/reversión docs/MOVIMIENTO-GLOBAL.md. Safari físico pendiente.

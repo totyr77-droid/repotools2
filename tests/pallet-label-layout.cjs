@@ -37,13 +37,14 @@ let browser;
   });
   assert.equal(data.width,3508);assert.equal(data.height,2480);assert.ok(data.black>20000,'Actual horizontal logo is visible in black');
   const logo=fs.readFileSync('img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-2048w.png').toString('base64');
+  assert.ok(!data.svg.includes('lengthAdjust=')&&!data.svg.includes('textLength='),'Digits are not compressed or stretched');
   assert.ok(data.svg.includes(logo),'Uses specified original logo, embedded in vector');
   const bounds=await page.evaluate(svg=>{
     const holder=document.createElement('div');holder.innerHTML=svg;document.body.append(holder);
     const number=holder.querySelector('#pallet-label-code'),box=number.getBBox();
     const result={x:box.x,y:box.y,width:box.width,height:box.height};holder.remove();return result;
   },data.svg);
-  assert.ok(Math.abs(bounds.width-1200)<2&&bounds.x>=2179&&bounds.x+bounds.width<=3381,'Code fills available width and respects page margins');
+  assert.ok(Math.abs(bounds.width-1245.44)<3&&bounds.x>=2154&&bounds.x+bounds.width<=3406,'Natural-width digits stay inside safe margins');
   assert.ok(bounds.y>820&&bounds.y+bounds.height<1570,'Large code stays below its caption and above footer');
   fs.writeFileSync('tmp/pallet-a4-preview.png',Buffer.from(data.dataURL.split(',')[1],'base64'));
   await page.addScriptTag({content:fs.readFileSync('js/vendor/html5-qrcode-2.3.8.min.js','utf8')});

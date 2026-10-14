@@ -159,3 +159,7 @@ Selectores con un fondo deslizante, microinteracciones y transiciones de paneles
 ## 13/10/2026 — Completar transiciones
 
 Salida de flyouts/notificaciones, campos condicionales pequeños y confirmaciones dinámicas sin demorar la decisión. FormData/estados/permisos intactos; fallback inmediato, reduced motion y scanner excluido. Pruebas específicas y reversión en docs/MOVIMIENTO-GLOBAL.md. Safari físico pendiente.
+
+## 13/10/2026 — Refinar etiquetas beta
+
+Conserva A4 horizontal y PDF, adapta quiet zone del QR según módulos, elimina compresión de números para lectura/OCR y refuerza CSS de impresión. Pruebas1/2/6 páginas y QR de producción/beta/subcarpeta pasan. Solo desarrollo; Safari físico y lectura lejana pendientes. Detalle/archivos/reversión: docs/ETIQUETAS-HORIZONTAL.md.

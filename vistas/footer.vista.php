@@ -57,7 +57,7 @@
 <script src="js/product-info.js?v=20261013-loading1"></script>
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
-<script src="js/pallet-label.js?v=20261013-landscape2"></script>
+<script src="js/pallet-label.js?v=20261013-landscape3"></script>
 
 <script src="js/stock.js?v=20261013-loader-final"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
