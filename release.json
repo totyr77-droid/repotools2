@@ -1,6 +1,11 @@
 {
-  "version": 2,
+  "version": 3,
   "changes": [
+    {
+      "version": 3,
+      "date": "2026-10-14",
+      "summary": "Recorte de fotos con ajuste opcional y registro de actualizaciones compacto para cuentas con rango."
+    },
     {
       "version": 2,
       "date": "2026-10-14",
