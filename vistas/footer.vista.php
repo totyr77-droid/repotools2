@@ -76,7 +76,7 @@
 <?php if (current_user()): ?><script src="js/scan-library.js?v=20261010-result2"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/scan-photo.js?v=20261011-orientation1"></script>
-<script src="js/dialog-scroll.js?v=20261011-lock1"></script>
+<script src="js/dialog-scroll.js?v=20261014-offline1"></script>
 <script src="js/title-icons.js?v=20261011-icons1"></script>
 
 <script src="js/botones.js?v=20261013-motion2"></script>
@@ -90,6 +90,6 @@
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261013-activity1"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261013-overview1"><script src="js/stock-overview.js?v=20261013-overview1"></script><?php endif; ?>
-<script src="js/motion.js?v=20261013-global2"></script>
+<script src="js/motion.js?v=20261014-offline1"></script>
 </body>
 </html>
