@@ -17,10 +17,10 @@
     <button id="mainRapidFinish" class="library-primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>Finalizar</button>
   </div>
 
-  <div id="cartelScaner">
+  <div id="cartelScaner" hidden>
     <div class="cartelscaner-box">
       <div class="cartelscaner-box-titulo" role="status" data-state="success">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span id="scanResultHeading">Producto guardado</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span id="scanResultHeading"></span>
       </div>
 
       <div class="cartelscaner-box-info">

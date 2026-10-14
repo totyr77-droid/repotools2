@@ -267,6 +267,7 @@ function cerrarResultados() {
 }
 
 function abrirScanner() {
+  const oldNotice=document.getElementById('scanLibraryStatus');if(oldNotice)oldNotice.textContent='';
   rapidActive = false;
   actualizarModoRapido();
   if (!els.contenedormax.open) els.contenedormax.showModal();

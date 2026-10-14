@@ -1,6 +1,11 @@
 {
-  "version": 3,
+  "version": 4,
   "changes": [
+    {
+      "version": 4,
+      "date": "2026-10-14",
+      "summary": "Escáner de Inicio sin aviso previo de guardado y botón integrado al contenido."
+    },
     {
       "version": 3,
       "date": "2026-10-14",
