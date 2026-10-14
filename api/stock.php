@@ -43,9 +43,11 @@ try {
         if (isset($_POST['offline_owner']) && (int)$_POST['offline_owner']!==$uid) throw new CatalogException('Esta carga pertenece a otra cuenta. Inicia sesión con la cuenta original.',403);
         if (!is_string($key)||!preg_match('/^[a-f0-9-]{36}$/D',$key)) throw new CatalogException('Recarga el formulario e intenta nuevamente.',422);
         if (isset($_POST['offline_owner']) && (($_POST['action']??'')!=='save_product' || (int)($_POST['product_id']??0)!==0 || (int)($_POST['pallet_id']??0)<1 || !isset($_POST['offline_revision']))) throw new CatalogException('Esta operación necesita conexión y confirmación. No se puede enviar como carga offline.',422);
+        if(($_POST['action']??'')==='deduct_product')stock_editable($db,(int)($_POST['pallet_id']??0),$uid);
         $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
+        $deductPayload=($_POST['action']??'')==='deduct_product'?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','product_id','revision','amount','kind','pack_size']))):null;
         $offlinePayload=isset($_POST['offline_owner'])?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','code','product_id','ean','name','amount','kind','pack_size','expires']))):null;
-        if ($cached!==false) { $previous=json_decode($cached,true);if($offlinePayload!==null&&isset($previous['_offline_payload'])&&!hash_equals($previous['_offline_payload'],$offlinePayload))throw new CatalogException('Esta operación ya fue enviada con otros datos. Conservamos la carga para revisar.',409);unset($previous['_offline_payload']);$db->commit();stock_response(200,$previous); }
+        if ($cached!==false) { $previous=json_decode($cached,true);if($deductPayload!==null&&isset($previous['_deduct_payload'])&&!hash_equals($previous['_deduct_payload'],$deductPayload))throw new CatalogException('Esta operación ya está confirmada. Revisá la cantidad actual antes de otra resta.',409);unset($previous['_deduct_payload']);if($offlinePayload!==null&&isset($previous['_offline_payload'])&&!hash_equals($previous['_offline_payload'],$offlinePayload))throw new CatalogException('Esta operación ya fue enviada con otros datos. Conservamos la carga para revisar.',409);unset($previous['_offline_payload']);$db->commit();stock_response(200,$previous); }
         $action=$_POST['action']??''; $id=(int)($_POST['pallet_id']??0); $result=[];
         $tracks=in_array($action,['claim','import','save_product','delete_product','description','delete','invite','accept','decline','revoke','leave'],true);
         $historyId=$id;
@@ -65,6 +67,10 @@ try {
                 $result=stock_save_product($db,$uid,$_POST);
                 $result['pallet_revision']=(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$result['id']])->fetchColumn();
                 break;
+            case 'deduct_product':
+                $result=stock_deduct_product($db,$uid,$_POST);
+                stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$uid,$id,$result['remaining']?(int)$_POST['product_id']:null,'quantity_deducted',json_encode($result['_movement'],JSON_UNESCAPED_UNICODE)]);
+                unset($result['_movement']);break;
             case 'import':
                 $products=json_decode(is_string($_POST['products']??null)?$_POST['products']:'',true);
                 if (!is_array($products)||count($products)>500) throw new CatalogException('No pudimos leer este palet del dispositivo.',422);
@@ -124,8 +130,8 @@ try {
             $details=$_POST;unset($details['csrf'],$details['operation_key']);
             stock_query($db,'INSERT INTO pallet_admin_events(user_id,pallet_id,code,action,details) VALUES(?,?,?,?,?)',[$uid,$id?:null,$target?:'',(string)$action,json_encode($details,JSON_UNESCAPED_UNICODE)]);
         }
-        $result['ok']=true;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
+        $result['ok']=true;if($deductPayload!==null)$result['_deduct_payload']=$deductPayload;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }
-    $db->commit();unset($result['_offline_payload']); $result['csrf']=$csrf; $result['user_id']=$uid; stock_response(200,$result);
+    $db->commit();unset($result['_offline_payload'],$result['_deduct_payload']); $result['csrf']=$csrf; $result['user_id']=$uid; stock_response(200,$result);
 } catch(CatalogException $error) { if($db?->inTransaction())$db->rollBack(); stock_response($error->status,['error'=>$error->getMessage()]); }
 catch(Throwable $error) { if($db?->inTransaction())$db->rollBack(); error_log('Repotools stock error: '.get_class($error).' code='.$error->getCode()); stock_response(503,['error'=>'No pudimos guardar el palet. Tu formulario sigue disponible para reintentar.']); }

@@ -183,3 +183,15 @@ function stock_notify(PDO $db,int $user): array {
     }
     return $current;
 }
+
+function stock_deduct_product(PDO $db,int $user,array $input): array {
+    $id=(int)($input['pallet_id']??0);stock_editable($db,$id,$user);
+    $product=stock_query($db,'SELECT * FROM pallet_products WHERE id=? AND pallet_id=?',[(int)($input['product_id']??0),$id])->fetch();
+    if(!$product||(int)$product['revision']!==(int)($input['revision']??-1))throw new CatalogException('El producto cambió. Revisá la cantidad actual antes de restar.',409);
+    $quantity=stock_product_input([...$input,'ean'=>$product['ean'],'expires'=>$product['expires'],'name'=>$product['name']])['units'];
+    $remaining=(int)$product['units']-$quantity;if($remaining<0)throw new CatalogException('No podés restar más mercadería de la disponible.',422);
+    $changed=$remaining?stock_query($db,'UPDATE pallet_products SET units=?,revision=revision+1 WHERE id=? AND pallet_id=? AND revision=?',[$remaining,$product['id'],$id,$product['revision']])->rowCount():stock_query($db,'DELETE FROM pallet_products WHERE id=? AND pallet_id=? AND revision=?',[$product['id'],$id,$product['revision']])->rowCount();
+    if(!$changed)throw new CatalogException('El producto cambió. Revisá la cantidad actual antes de restar.',409);
+    stock_touch($db,$id,$user);
+    return ['id'=>$id,'code'=>stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn(),'remaining'=>$remaining,'removed'=>$quantity,'pallet_revision'=>(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$id])->fetchColumn(),'_movement'=>['ean'=>$product['ean'],'reference'=>$product['name'],'expires'=>$product['expires'],'removed_units'=>$quantity,'old'=>(int)$product['units'],'new'=>$remaining]];
+}

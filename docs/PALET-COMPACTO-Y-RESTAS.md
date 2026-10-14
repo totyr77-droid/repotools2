@@ -1,0 +1,17 @@
+﻿# Palet compacto, actividad unificada y restas (beta)
+
+Orden del palet: encabezado y cruz según mano, número/descripcion opcional, propietario y último movimiento, productos, Agregar mercadería, Restar mercadería si quedan productos, configuración y sucursal. Acciones inferiores compactas con zona táctil cómoda. El botón de edición externa de sucursal se elimina; el botón Sucursal abre el mismo selector con acceso al cambio existente. Se conserva la edición individual de productos.
+
+Actividad y Último movimiento abren el mismo visor paginado y sus fichas, filtrados a ese palet. Permisos actuales se validan en el servidor; administradores pueden consultar la actividad de un palet al que acceden individualmente, sin convertir el historial general en un listado global indiscriminado.
+
+Altas nuevas: una fila product_added incluye cantidad y vencimiento inicial. Las modificaciones posteriores del vencimiento siguen registrándose. Para filas antiguas, la presentación combina pares consecutivos de product_added/expiry_added del mismo palet, actor, producto y momento; conserva la fecha en la ficha. Si el producto fue eliminado se compara también el EAN de los metadatos. No se eliminan ni reescriben registros históricos; la agrupación es conservadora y no inventa vínculos si no coinciden esos datos.
+
+Restar usa el escáner global, lector/teclado en PC y teléfono vinculado. Un único lote se selecciona directamente; varios lotes del mismo EAN requieren elegir uno, mostrando vencimiento y disponible. Admite unidades/cajas/bultos y expresiones de cantidad. EAN escaneado fijo, sin edición visible. La resta requiere conexión: no se agrega a la cola offline.
+
+Servidor: acción deduct_product, permisos, revisión de producto, cantidad positiva, límite disponible, transacción y clave idempotente con huella del contenido. Un reintento no vuelve a descontar. Una revisión distinta devuelve409 y conserva el formulario hasta revisar; no se sobrescribe automáticamente. Al llegar a cero se elimina únicamente ese lote. El palet permanece registrado. Una fila quantity_deducted conserva EAN, referencia, vencimiento, cantidad restada y Antes/Después, también para resultado cero.
+
+Pruebas aisladas SQLite/Chrome: pallet-deduct-ui (permisos, cantidades inválidas, revisiones, rechazo offline, duplicados, selección explícita, cajas y calculadora, lote agotado y estado vacío), pallet-activity-ui (visor individual/general, paginación, fichas y privacidad), pallet-activity-grouping.php (datos antiguos conservados y agrupación tras eliminación), stock-overview.php, stock-api, stock-offline-ui y stock-branches-ui. Revisión visual360/390/430/1366 y preferencia de mano con puntero táctil. Safari/cámara físicos y PostgreSQL real quedan pendientes.
+
+Reversión: revertir el commit de esta entrega exclusivamente en desarrollo. Sin migración SQL ni IndexedDB. Conservar la acción/lectura quantity_deducted para interpretar movimientos ya existentes o mantener su representación genérica; las cantidades ya descontadas no se deshacen con Git. Cualquier devolución de mercadería debe ser una operación autorizada independiente. Subir versiones de scripts al revertir. El historial bruto permanece intacto.
+
+Regresión completa:59pruebas CJS,54aprobadas en la primera ejecución; cinco casos de espera/UI se repitieron secuencialmente y todos pasaron. Dos comprobaciones PHP en memoria también pasaron. No atribuir los fallos paralelos a un dispositivo real sin medirlos; conservar pendiente Safari físico y revisar estabilidad de la suite bajo concurrencia.

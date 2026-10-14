@@ -58,11 +58,11 @@
 <script src="js/stock-utils.js?v=20261012-reserved-label"></script>
 <script src="js/pallet-label.js?v=20261013-portrait1"></script>
 
-<script src="js/stock.js?v=20261014-silent1"></script>
+<script src="js/stock.js?v=20261014-pallet2"></script>
 <script src="js/stock-summary.js?v=20261012-branch-refresh"></script>
 <script src="js/public-pallet.js?v=20261013-loading1"></script>
 <script src="js/branch-maps.js?v=20261013-map-compact"></script>
-<script src="js/stock-branches.js?v=20261013-loading1"></script>
+<script src="js/stock-branches.js?v=20261014-pallet2"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
@@ -89,7 +89,7 @@
 <script src="js/onboarding.js?v=20261013-transition1"></script>
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
-<?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261014-history1"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261014-history1"><script src="js/stock-overview.js?v=20261014-history1"></script><?php endif; ?>
+<?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261014-pallet2"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261014-pallet2"><script src="js/stock-overview.js?v=20261014-pallet2"></script><?php endif; ?>
 <script src="js/motion.js?v=20261014-offline1"></script>
 </body>
 </html>
