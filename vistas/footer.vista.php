@@ -24,12 +24,16 @@
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
 <!-- SCRIPTS -->
+<script src="js/navigation.js?v=20261014-stable-hand"></script>
+<script src="js/one-hand-mode.js?v=20261014-stable-hand"></script>
+<script src="js/mobile-navigation.js?v=20261014-subnav2"></script>
+<script src="js/ux-polish.js?v=20261014-stable-hand"></script>
 <?php if(!empty($paginaDemo)): ?><script src="js/guest-demo.js?v=20261013-demo1"></script><?php endif; ?>
 <script src="js/loading.js?v=20261013-loading1"></script>
 <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=20261014-toasts"></script><script src="js/connectivity.js?v=20261014-silent1"></script><script src="js/offline-cache.js?v=20261014-silent1"></script><script src="js/offline-sync.js?v=20261014-sync-stable"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=20261014-silent1"><script src="js/sync-status.js?v=20261014-silent1"></script><script src="js/library-offline.js?v=20261014-toasts"></script><?php endif; ?>
 <script src="js/date-time.js?v=20261011-dates1"></script>
-<script src="js/navigation.js?v=20261013-motion1"></script>
+
 <script src="js/device-connection.js?v=20261013-identification1"></script>
 <script src="js/action-notices.js?v=20261014-device-notice"></script>
 <?php $referralNotice=$_SESSION['referral_registration_notice']??null;if($referralNotice&&current_user()&&(int)$referralNotice['user_id']===(int)current_user()['id']){unset($_SESSION['referral_registration_notice']);if((int)$referralNotice['at']>time()-900): ?><script>window.RepoToast?.(<?= json_encode($referralNotice['message'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>,{kind:'info'});</script><?php endif;} ?>
@@ -92,7 +96,7 @@
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=20261013-tops2"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=20261014-toasts"></script><link rel="stylesheet" href="css/stock-export.css?v=20261013-export1"><script src="js/stock-export.js?v=20261013-export1"></script><link rel="stylesheet" href="css/stock-overview.css?v=20261014-toasts"><script src="js/stock-overview.js?v=20261014-pallet2"></script><?php endif; ?>
 <script src="js/motion.js?v=20261014-offline1"></script>
-<script src="js/one-hand-mode.js?v=20261014-subnav2"></script>
-<script src="js/mobile-navigation.js?v=20261014-subnav2"></script>
-<script src="js/ux-polish.js?v=20261014-history2"></script></body>
+
+
+</body>
 </html>
