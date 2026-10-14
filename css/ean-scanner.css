@@ -68,3 +68,5 @@
 @media(prefers-reduced-motion:reduce){.repo-camera-guide{transition:none}}
 
 .relay-scanner-dialog[data-ready=false] .repo-camera-guide{border-color:#c52a3c;z-index:7}
+
+.repo-camera-guide[hidden]{display:none!important}

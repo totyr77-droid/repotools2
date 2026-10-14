@@ -13,14 +13,14 @@
     element.append(guide,marker); let timer;
     function layout() { const width=element.clientWidth,height=element.clientHeight;const side=Math.min(width,height)*.85;guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
     layout(); const observer=typeof ResizeObserver==='function'?new ResizeObserver(layout):null;observer?.observe(element);
-    function reset() { clearTimeout(timer); marker.hidden = true; }
+    function reset() { clearTimeout(timer); marker.hidden = true; guide.hidden = false; }
     return {
       track(box, width, height) {
         reset(); if (!box || !width || !height || ![box.x0,box.y0,box.x1,box.y1].every(Number.isFinite)) return;
         const x0=Math.max(0,box.x0), y0=Math.max(0,box.y0), x1=Math.min(width,box.x1), y1=Math.min(height,box.y1);
         if(x1<=x0||y1<=y0)return;
         Object.assign(marker.style,{left:x0/width*100+'%',top:y0/height*100+'%',width:(x1-x0)/width*100+'%',height:(y1-y0)/height*100+'%'});
-        marker.hidden=false; timer=setTimeout(reset,700);
+        marker.hidden=false; guide.hidden = !isQR; timer=setTimeout(reset,700);
       }, reset,
       dispose() { observer?.disconnect(); reset(); guide.remove(); marker.remove(); element.classList.remove('repo-camera-viewport'); delete element.dataset.recognition; }
     };

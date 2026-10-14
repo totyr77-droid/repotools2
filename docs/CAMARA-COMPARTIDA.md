@@ -30,3 +30,5 @@ Pendiente físico: Safari iPhone y Chrome Android con cámara real, foco, zoom/t
 
 ## Revertir
 Revertir el commit de esta entrega en desarrollo. Mantener/incrementar la versión SW al revertir para que los clientes actualicen los recursos; no bajar IndexedDB ni tocar datos. Main no se modifica.
+
+EAN: desde 2026-10-14 la guía fija se oculta cuando existe una caja de detección válida. Vuelve si no hay coordenadas válidas, se pierde la detección (700ms) o se reinicia el estado. QR/OCR no cambia. Regresión shared-camera-ui/ean-scanner/scanner-zoom aprobada. SW shell-v20. Reversión: revertir esta entrega conservando/incrementando versión SW.
