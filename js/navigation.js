@@ -121,8 +121,11 @@
         else history.replaceState({ ...history.state, appScroll: scroll }, '', destination.href);
         document.title = next.title;
         activeURL = destination;
+        try{next.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_'+Number(next.body.dataset.uiUser||0))==='1'?'1':'0';}catch{next.body.dataset.oneHand='0';}
         document.body.replaceWith(document.importNode(next.body, true));
         finishStyles(); page = createPage();
+        window.repotoolsOfflineUser=Number(document.body.dataset.uiUser||0);
+        window.RepoOneHand?.refresh(); window.RepoMobileNav?.refresh();
         await execute(scripts,navigation.signal);
         if(token!==version)return;
         await window.RepotoolsPageLoader?.ready(loaderTicket);

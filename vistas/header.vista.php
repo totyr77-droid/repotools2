@@ -93,13 +93,14 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=20261014-pallet2" rel="stylesheet"><?php endif; ?>
 <link href="css/connectivity.css?v=20261014-silent1" rel="stylesheet"><link href="css/responsive.css?v=20261013-workspaces2" rel="stylesheet" type="text/css">
 <link href="css/motion.css?v=20261013-global2" rel="stylesheet">
-<link href="css/mobile-navigation.css?v=20261014-compact1" rel="stylesheet"><link href="css/one-hand-mode.css?v=20261014-compact1" rel="stylesheet"><link href="css/ux-polish.css?v=20261014-librarybar2" rel="stylesheet"></head>
-  <body data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
+<link href="css/mobile-navigation.css?v=20261014-compact1" rel="stylesheet"><link href="css/one-hand-mode.css?v=20261014-compact1" rel="stylesheet"><link href="css/ux-polish.css?v=20261014-stable-hand" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=20261014-stable-hand" as="script"><link rel="preload" href="js/ux-polish.js?v=20261014-stable-hand" as="script"></head>
+  <body data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <header>
-      <script>try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
+      <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <div class="header-contenedor">
         <a class="logo" href="./" aria-label="Inicio Repotools"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"></a>
 
+        <?php if(current_user() && (!empty($paginaStock)||!empty($paginaBiblioteca)||!empty($paginaReportes))): ?><a class="workspace-account-icon" href="cuenta.php" aria-label="Mi cuenta y ajustes" title="Mi cuenta y ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a><?php endif; ?>
         <nav class="nav" aria-label="Navegacion principal">
           <a href="./"><i class="fa-solid fa-house"></i>INICIO</a>
           <a href="stock.php" class="stock-nav-link"><i class="fa-solid fa-qrcode"></i>STOCK<span class="report-pending-badge stock-expiry-badge" data-stock-expiry aria-label="Productos por vencer o vencidos" hidden></span></a>
@@ -133,7 +134,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
         </button>
       </div>
     </header>
-    <?php if (current_user()): ?>
+    <?php if (current_user() && empty($paginaStock) && empty($paginaBiblioteca) && empty($paginaReportes)): ?>
     <div class="account-bar"><span class="account-greeting" title="Hola, <?= escape(current_user()['name']) ?>">Hola, <strong><?= escape(current_user()['name']) ?></strong><?php if (isset($roleLabels[$navRole])): $badge = $roleLabels[$navRole]; ?><span class="account-role account-role-<?= escape($navRole) ?>" title="<?= escape($badge[1]) ?>" aria-label="<?= escape($badge[1]) ?>"><i class="fa-solid <?= escape($badge[2]) ?>" aria-hidden="true"></i><?= escape($badge[0]) ?></span><?php endif; ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/></svg><span>Salir</span></button></form></div>
     <?php endif; ?>
 
