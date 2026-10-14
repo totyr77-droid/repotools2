@@ -85,7 +85,7 @@ body:has(.relay-connection-dialog[open]){overflow:hidden}.relay-connection-dialo
 #contenedormax[data-scan-mode=rapid] #mainRapidActions{min-width:0;margin:0}
 #contenedormax[data-scan-mode=rapid] #mainRapidActions button{width:44px;height:44px;min-width:44px;padding:10px;font-size:0;gap:0}
 #contenedormax[data-scan-mode=rapid] #mainRapidActions svg{width:20px;height:20px}
-#contenedormax[data-scan-mode=rapid] #contenedor video{max-height:32dvh!important;min-height:150px}
+
 @media(max-width:768px) and (pointer:coarse){
 body[data-hand=left] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{grid-template-columns:auto 1fr;text-align:right}
 body[data-hand=left] #contenedormax[data-scan-mode=rapid] #mainRapidActions{grid-column:1;grid-row:2}

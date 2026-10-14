@@ -2,6 +2,29 @@
   'use strict';
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
+  // One camera lease and viewport implementation for every recognition mode.
+  let cameraQueue = Promise.resolve(), cameraOwner = null;
+  function cameraTask(task) { const next = cameraQueue.then(task); cameraQueue = next.catch(() => {}); return next; }
+  function cameraViewport(element, isQR) {
+    if (!document.createElement || !element.append) return { track() {}, reset() {}, dispose() {} };
+    element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean';
+    const guide = document.createElement('div'); guide.className = 'repo-camera-guide'; guide.setAttribute('aria-hidden','true');
+    const marker = document.createElement('div'); marker.className = 'ean-identification-track'; marker.hidden = true; marker.setAttribute('aria-hidden','true');
+    element.append(guide,marker); let timer;
+    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=Math.min(width,height)*.85;guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
+    layout(); const observer=typeof ResizeObserver==='function'?new ResizeObserver(layout):null;observer?.observe(element);
+    function reset() { clearTimeout(timer); marker.hidden = true; }
+    return {
+      track(box, width, height) {
+        reset(); if (!box || !width || !height || ![box.x0,box.y0,box.x1,box.y1].every(Number.isFinite)) return;
+        const x0=Math.max(0,box.x0), y0=Math.max(0,box.y0), x1=Math.min(width,box.x1), y1=Math.min(height,box.y1);
+        if(x1<=x0||y1<=y0)return;
+        Object.assign(marker.style,{left:x0/width*100+'%',top:y0/height*100+'%',width:(x1-x0)/width*100+'%',height:(y1-y0)/height*100+'%'});
+        marker.hidden=false; timer=setTimeout(reset,700);
+      }, reset,
+      dispose() { observer?.disconnect(); reset(); guide.remove(); marker.remove(); element.classList.remove('repo-camera-viewport'); delete element.dataset.recognition; }
+    };
+  }
   let scanPhoto = null, photoTimer, photoVersion = 0;
   function clearScanPhoto() { ++photoVersion; scanPhoto = null; clearTimeout(photoTimer); }
   function takeScanPhoto(ean) {
@@ -147,11 +170,11 @@
     const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
     return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
   }
-  function palletOCR(element, active, accept, status) {
+  function palletOCR(element, active, accept, status, viewport) {
     let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus();
     const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
     if (!context) return { dispose() {}, resume() {}, reset() {} };
-    const marker = document.createElement('div'); marker.className = 'ean-identification-track'; marker.hidden = true; marker.setAttribute('aria-hidden', 'true'); element.append(marker);
+
     function schedule() { if (!disposed) timer = setTimeout(read, 550); }
     async function read() {
       if (disposed || busy) return; if (!active()) { schedule(); return; }
@@ -174,31 +197,24 @@
         const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
         if (disposed || !active()) return;
         const candidate = ocrCandidate(result.data);
-        marker.hidden = !candidate?.box;
-        if (candidate?.box) {
-          const b = candidate.box; Object.assign(marker.style, { left: (b.x0 / canvas.width * 100) + '%', top: (b.y0 / canvas.height * 100) + '%', width: ((b.x1 - b.x0) / canvas.width * 100) + '%', height: ((b.y1 - b.y0) / canvas.height * 100) + '%' });
-        }
+        viewport?.track(candidate?.box, canvas.width, canvas.height);
         if (candidate) { status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
         else confirm(null, stamp);
-      } catch { if (!disposed) { status(true); disposed = true; marker.remove(); try { await worker?.terminate(); } catch {} } }
+      } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
       finally { busy = false; if (disposed) { canvas.width = canvas.height = 0; } else schedule(); }
     }
     schedule();
     return {
-      reset() { confirm = ocrConsensus(); marker.hidden = true; },
+      reset() { confirm = ocrConsensus(); viewport?.reset(); },
       resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
-      dispose() { disposed = true; clearTimeout(timer); marker.remove(); if (!busy) { canvas.width = canvas.height = 0; try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
+      dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { canvas.width = canvas.height = 0; try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
     };
   }
 
   function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
-    let revision = 0, session = null, queue = Promise.resolve();
-    const enqueue = task => {
-      const operation = queue.then(task);
-      queue = operation.catch(() => {});
-      return operation;
-    };
+    let revision = 0, session = null;
+    const enqueue = cameraTask;
     function cameraControls(current) {
       const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
       if (!document.createElement) return;
@@ -360,6 +376,9 @@
                 result = await window.Quagga.decodeSingle({ src: canvas.toDataURL('image/jpeg', .92), inputStream: { size: 0 }, locate: true, locator: { halfSample: false, patchSize: 'small' }, decoder: { readers: ['ean_reader', 'ean_8_reader'] }, numOfWorkers: 0 });
               } catch { /* El decodificador alternativo sigue disponible. */ }
               if (validEAN(result?.codeResult?.code)) {
+                if (Array.isArray(result.box) && result.box.length >= 4 && result.box.every(p=>Array.isArray(p)&&p.length>=2&&p.every(Number.isFinite))) {
+                  current.viewport?.track({x0:Math.min(...result.box.map(p=>p[0])),y0:Math.min(...result.box.map(p=>p[1])),x1:Math.max(...result.box.map(p=>p[0])),y1:Math.max(...result.box.map(p=>p[1]))},canvas.width,canvas.height);
+                }
                 accept(result.codeResult.code, 'background');
                 return;
               }
@@ -405,8 +424,12 @@
       if (!current.cleanup) current.cleanup = (async () => {
         current.accepting = false; current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
-        if (current.reader.isScanning) await current.reader.stop();
-        current.reader.clear();
+        try { if (current.reader.isScanning) await current.reader.stop(); }
+        finally {
+          element.querySelector?.('video')?.srcObject?.getTracks?.().forEach(track=>track.stop());
+          current.viewport?.dispose(); element.classList.remove('repo-camera-viewport'); if(element.dataset)delete element.dataset.recognition;
+          try { current.reader.clear(); } finally { if (cameraOwner?.current === current) cameraOwner = null; }
+        }
         element.classList.remove('ean-confirmed');
         element.classList.remove('ean-detecting');
         if (session === current) session = null;
@@ -426,6 +449,7 @@
       const token = ++revision;
       if (session) session.accepting = false;
       return enqueue(async () => {
+        await cameraOwner?.release();
         await release(session);
         if (token !== revision) return false;
         element.classList.remove('ean-confirmed');
@@ -436,9 +460,10 @@
         const kind = typeof identification === 'function' ? identification() : identification;
         const normalize = isQR && kind === 'pallet' ? palletIdentifier : value => value;
         const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
+        if (element.dataset) { element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean'; }
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
         const current = { reader, accepting: true, token, isQR, validate, confirm: confirmation(validate) };
-        session = current;
+        session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera') => {
           code = normalize(code);
           if (code === null) { if (current.accepting && session === current && token === revision && canAccept()) { current.confirm(null); current.ocr?.reset(); onStatus('Este QR no corresponde a un palet de Repotools.'); } return; }
@@ -495,9 +520,10 @@
               current.cameraUpdates = track.applyConstraints({ ...track.getConstraints(), advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
             }
           } catch {}
+          current.viewport = cameraViewport(element, isQR);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } });
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport);
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
