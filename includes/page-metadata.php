@@ -10,7 +10,7 @@ function repotools_page_metadata(?string $title = null, ?string $description = n
     $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/');
     $path = $uri['path'] ?? '/';
     $allowed = ['/', '/index.php', '/index.html', '/stock.php', '/biblioteca.php', '/tops.php', '/reportes.php', '/cuenta.php', '/palet.php', '/stock-compartido.php'];
-    $short = preg_match('~^/[psb]/[A-Za-z0-9]{8}/?$~D', $path) || preg_match('~^/s/(?:[A-Za-z0-9_-]{22}|[a-f0-9]{64})/?$~D', $path);
+    $short = preg_match('~^/q/[0-9]{8}/?$~D', $path) || preg_match('~^/[psb]/[A-Za-z0-9]{8}/?$~D', $path) || preg_match('~^/s/(?:[A-Za-z0-9_-]{22}|[a-f0-9]{64})/?$~D', $path);
     if (!in_array($path, $allowed, true) && !$short) $path = '/';
     if (in_array($path, ['/index.php', '/index.html'], true)) $path = '/';
     parse_str($uri['query'] ?? '', $query);

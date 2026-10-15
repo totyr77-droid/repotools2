@@ -124,7 +124,7 @@ function read(reader, code) { now += 100; reader.success(code, { decodedText: co
   await qr.start('qr'); const qrReader = readers.at(-1);
   assert.deepEqual(Array.from(qrReader.config.formatsToSupport), [0], 'El palet usa el motor compartido en modo QR');
   read(qrReader, ''); read(qrReader, 'PALET-001'); read(qrReader, 'PALET-001');
-  assert.equal(frame.has('ean-detecting'), true); assert.equal(qrCodes.length, 0);
+  assert.equal(frame.has('ean-detecting'), false); await flush();assert.equal(qrCodes.length, 1, 'QR válido confirma sin tres lecturas redundantes');
   read(qrReader, 'PALET-001'); await flush();
   assert.deepEqual(qrCodes, ['PALET-001']); assert.equal(qrReader.stops, 1);
   assert.equal(toneSession, 'playback', 'QR comparte la misma confirmación sonora que EAN');
@@ -162,5 +162,6 @@ function read(reader, code) { now += 100; reader.success(code, { decodedText: co
   for (let i = 0; i < 3; i++) read(visibleReader, '7803403004612');
   await flush();
   assert.deepEqual(visibleCodes, ['7803403004612']);
+  const Original=window.Html5Qrcode;window.Html5Qrcode=class extends Original{constructor(...args){super(...args);this.qrcode=Object.freeze({decodeAsync:async()=>({text:'FROZEN'}),decodeRobustlyAsync:async()=>({text:'FROZEN'})});}};const fallbackCodes=[];const fallback=service.rawCreate('frozen',{onCode:c=>fallbackCodes.push(c)});await fallback.start('qr');read(readers.at(-1),'FROZEN');await flush();assert.deepEqual(fallbackCodes,['FROZEN'],'An unavailable adapter preserves the standard camera decoder');await fallback.stop();window.Html5Qrcode=Original;
   console.log('OK: checksum EAN8/13, encuadre visible, confirmacion estable y ciclo de camara.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

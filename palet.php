@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/includes/auth.php'; require_once __DIR__.'/includes/stock-icons.php';
+$publicShareBase=rtrim(str_replace('\\','/',dirname($_SERVER['SCRIPT_NAME']??'/palet.php')),'/').'/';
 $publicPageTitle='Palet · Repotools';
 if(is_string($_GET['codigo']??null)&&preg_match('/^[0-9]{8}$/D',$_GET['codigo']))$publicPageTitle='Palet '.$_GET['codigo'].' · Repotools';
 $publicPageDescription='Consulta los productos, las cantidades y los vencimientos de este palet en Repotools.';

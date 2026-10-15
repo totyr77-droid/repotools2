@@ -1,0 +1,58 @@
+{
+  "source": "tmp/scanner-before-1.11.js",
+  "environment": "Chrome headless desktop, 960x1280 canvas captureStream 15fps; synthetic motion/perspective; not real camera/device/height",
+  "summary": [
+    {
+      "scene": "qr-brief-clear",
+      "correct": 0,
+      "total": 3,
+      "medianMs": null,
+      "p95Ms": null,
+      "medianToneMs": null
+    }
+  ],
+  "records": [
+    {
+      "scene": "qr-brief-clear",
+      "repeat": 0,
+      "correct": false,
+      "delivered": null,
+      "openMs": 94.70000000298023,
+      "firstObservedFrameMs": 166,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [],
+      "taskMs": 1685.257,
+      "taskPercent": 39.831174663200194,
+      "heapBytes": 3129564
+    },
+    {
+      "scene": "qr-brief-clear",
+      "repeat": 1,
+      "correct": false,
+      "delivered": null,
+      "openMs": 1.6000000089406967,
+      "firstObservedFrameMs": 61.6000000089407,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [],
+      "taskMs": 1852.3370000000002,
+      "taskPercent": 44.839917695473254,
+      "heapBytes": 3298180
+    },
+    {
+      "scene": "qr-brief-clear",
+      "repeat": 2,
+      "correct": false,
+      "delivered": null,
+      "openMs": 2,
+      "firstObservedFrameMs": 70.79999999701977,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [],
+      "taskMs": 1713.746,
+      "taskPercent": 41.605875212430206,
+      "heapBytes": 3334888
+    }
+  ]
+}

@@ -1,0 +1,1171 @@
+{
+  "source": "js/ean-scanner.js",
+  "environment": "Chrome headless desktop, 960x1280 canvas captureStream 15fps; synthetic motion/perspective; not real camera/device/height",
+  "summary": [
+    {
+      "scene": "qr-new-label-below",
+      "correct": 0,
+      "total": 3,
+      "medianMs": null,
+      "p95Ms": null,
+      "medianToneMs": null
+    }
+  ],
+  "records": [
+    {
+      "scene": "qr-new-label-below",
+      "repeat": 0,
+      "correct": false,
+      "delivered": null,
+      "openMs": 131,
+      "firstObservedFrameMs": 184.70000000298023,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 414.8999999910593,
+          "elapsed": 113.8999999910593,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 416.8999999910593,
+          "elapsed": 115.8999999910593,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 431.09999999403954,
+          "elapsed": 130.09999999403954,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 485.3999999910593,
+          "elapsed": 184.3999999910593,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 585.0999999940395,
+          "elapsed": 284.09999999403954,
+          "mode": "qr",
+          "costMs": 37.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 694.2000000029802,
+          "elapsed": 393.29999999701977,
+          "mode": "qr",
+          "costMs": 42.1000000089407,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 776.7999999970198,
+          "elapsed": 475.79999999701977,
+          "mode": "qr",
+          "costMs": 20.299999997019768,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 880.3999999910593,
+          "elapsed": 579.3999999910593,
+          "mode": "qr",
+          "costMs": 40.19999998807907,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 974.7999999970198,
+          "elapsed": 673.7999999970198,
+          "mode": "qr",
+          "costMs": 30.30000001192093,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1057.7999999970198,
+          "elapsed": 756.7999999970198,
+          "mode": "qr",
+          "costMs": 20,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1144.7999999970198,
+          "elapsed": 843.7999999970198,
+          "mode": "qr",
+          "costMs": 24.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1249.2999999970198,
+          "elapsed": 948.2999999970198,
+          "mode": "qr",
+          "costMs": 41.79999999701977,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 1340.3999999910593,
+          "elapsed": 1039.3999999910593,
+          "mode": "qr",
+          "costMs": 27.799999997019768,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1424.3999999910593,
+          "elapsed": 1123.3999999910593,
+          "mode": "qr",
+          "costMs": 21.399999991059303,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1508.8999999910593,
+          "elapsed": 1207.8999999910593,
+          "mode": "qr",
+          "costMs": 20.599999994039536,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1611.2999999970198,
+          "elapsed": 1310.2999999970198,
+          "mode": "qr",
+          "costMs": 40,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 1704.7999999970198,
+          "elapsed": 1403.7999999970198,
+          "mode": "qr",
+          "costMs": 29.799999997019768,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1786.2000000029802,
+          "elapsed": 1485.2000000029802,
+          "mode": "qr",
+          "costMs": 18.100000008940697,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1881.8999999910593,
+          "elapsed": 1580.8999999910593,
+          "mode": "qr",
+          "costMs": 29.69999998807907,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 1983.8999999910593,
+          "elapsed": 1682.8999999910593,
+          "mode": "qr",
+          "costMs": 39.69999998807907,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 2077.2999999970198,
+          "elapsed": 1776.2999999970198,
+          "mode": "qr",
+          "costMs": 31.299999997019768,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 2157.5999999940395,
+          "elapsed": 1856.5999999940395,
+          "mode": "qr",
+          "costMs": 27.799999997019768,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 2240,
+          "elapsed": 1939,
+          "mode": "qr",
+          "costMs": 19.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 2354.0999999940395,
+          "elapsed": 2053.0999999940395,
+          "mode": "qr",
+          "costMs": 50.900000005960464,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 2444.7999999970198,
+          "elapsed": 2143.7999999970198,
+          "mode": "qr",
+          "costMs": 26.400000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 2526.2999999970198,
+          "elapsed": 2225.2999999970198,
+          "mode": "qr",
+          "costMs": 19.5,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 2612.3999999910593,
+          "elapsed": 2311.3999999910593,
+          "mode": "qr",
+          "costMs": 23.099999994039536,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 2733,
+          "elapsed": 2432,
+          "mode": "qr",
+          "costMs": 53.79999999701977,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 2832.0999999940395,
+          "elapsed": 2531.0999999940395,
+          "mode": "qr",
+          "costMs": 32.8999999910593,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 2917.7000000029802,
+          "elapsed": 2616.7000000029802,
+          "mode": "qr",
+          "costMs": 23,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 3014.7999999970198,
+          "elapsed": 2713.7999999970198,
+          "mode": "qr",
+          "costMs": 33.099999994039536,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 3159.5999999940395,
+          "elapsed": 2858.5999999940395,
+          "mode": "qr",
+          "costMs": 85.8999999910593,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 3312.2000000029802,
+          "elapsed": 3011.2000000029802,
+          "mode": "qr",
+          "costMs": 46,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 3406.0999999940395,
+          "elapsed": 3105.0999999940395,
+          "mode": "qr",
+          "costMs": 34.5,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 3491,
+          "elapsed": 3190,
+          "mode": "qr",
+          "costMs": 29.400000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 3620,
+          "elapsed": 3319,
+          "mode": "qr",
+          "costMs": 66.5,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 3758.7999999970198,
+          "elapsed": 3457.7999999970198,
+          "mode": "qr",
+          "costMs": 47.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 3844.2999999970198,
+          "elapsed": 3543.2999999970198,
+          "mode": "qr",
+          "costMs": 28.400000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 3939.0999999940395,
+          "elapsed": 3638.0999999940395,
+          "mode": "qr",
+          "costMs": 29.5,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 4067.7999999970198,
+          "elapsed": 3766.7999999970198,
+          "mode": "qr",
+          "costMs": 65.20000000298023,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 4205.5,
+          "elapsed": 3904.5,
+          "mode": "qr",
+          "costMs": 40.400000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 4296.5,
+          "elapsed": 3995.5,
+          "mode": "qr",
+          "costMs": 31.799999997019768,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 4385.5999999940395,
+          "elapsed": 4084.5999999940395,
+          "mode": "qr",
+          "costMs": 26.899999991059303,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 4516.899999991059,
+          "elapsed": 4215.899999991059,
+          "mode": "qr",
+          "costMs": 64.09999999403954,
+          "width": 960,
+          "height": 1280
+        }
+      ],
+      "taskMs": 2382.295,
+      "taskPercent": 53.71578354002255,
+      "heapBytes": 3762580
+    },
+    {
+      "scene": "qr-new-label-below",
+      "repeat": 1,
+      "correct": false,
+      "delivered": null,
+      "openMs": 1.7999999970197678,
+      "firstObservedFrameMs": 42.400000005960464,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 4562.399999991059,
+          "elapsed": 0.09999999403953552,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 4563.20000000298,
+          "elapsed": 0.9000000059604645,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 4564,
+          "elapsed": 1.7000000029802322,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 4604.70000000298,
+          "elapsed": 42.400000005960464,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 4717.70000000298,
+          "elapsed": 155.40000000596046,
+          "mode": "qr",
+          "costMs": 30.600000008940697,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 4820.5999999940395,
+          "elapsed": 258.29999999701977,
+          "mode": "qr",
+          "costMs": 40.20000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 4911.0999999940395,
+          "elapsed": 348.79999999701977,
+          "mode": "qr",
+          "costMs": 36.79999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5005.5,
+          "elapsed": 443.20000000298023,
+          "mode": "qr",
+          "costMs": 38.79999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5092.399999991059,
+          "elapsed": 530.0999999940395,
+          "mode": "qr",
+          "costMs": 32,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5187.70000000298,
+          "elapsed": 625.4000000059605,
+          "mode": "qr",
+          "costMs": 33.20000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5280.399999991059,
+          "elapsed": 718.0999999940395,
+          "mode": "qr",
+          "costMs": 32.79999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5396.899999991059,
+          "elapsed": 834.5999999940395,
+          "mode": "qr",
+          "costMs": 55.5,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 5527,
+          "elapsed": 964.7000000029802,
+          "mode": "qr",
+          "costMs": 44.70000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5620.0999999940395,
+          "elapsed": 1057.7999999970198,
+          "mode": "qr",
+          "costMs": 28.5,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5717.29999999702,
+          "elapsed": 1155,
+          "mode": "qr",
+          "costMs": 33.29999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 5844.70000000298,
+          "elapsed": 1282.4000000059605,
+          "mode": "qr",
+          "costMs": 67.20000000298023,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 5985.79999999702,
+          "elapsed": 1423.5,
+          "mode": "qr",
+          "costMs": 39.400000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6069.70000000298,
+          "elapsed": 1507.4000000059605,
+          "mode": "qr",
+          "costMs": 26.30000001192093,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6165.20000000298,
+          "elapsed": 1602.9000000059605,
+          "mode": "qr",
+          "costMs": 37.80000001192093,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6283.29999999702,
+          "elapsed": 1721,
+          "mode": "qr",
+          "costMs": 53.099999994039536,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 6385.29999999702,
+          "elapsed": 1823,
+          "mode": "qr",
+          "costMs": 29,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6464.29999999702,
+          "elapsed": 1902,
+          "mode": "qr",
+          "costMs": 24.099999994039536,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6572.79999999702,
+          "elapsed": 2010.5,
+          "mode": "qr",
+          "costMs": 29.299999997019768,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6687.20000000298,
+          "elapsed": 2124.9000000059605,
+          "mode": "qr",
+          "costMs": 58,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 6795,
+          "elapsed": 2232.7000000029802,
+          "mode": "qr",
+          "costMs": 35,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6888.70000000298,
+          "elapsed": 2326.4000000059605,
+          "mode": "qr",
+          "costMs": 31.400000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 6985.20000000298,
+          "elapsed": 2422.9000000059605,
+          "mode": "qr",
+          "costMs": 33,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 7118.0999999940395,
+          "elapsed": 2555.7999999970198,
+          "mode": "qr",
+          "costMs": 57.29999999701977,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 7222.899999991059,
+          "elapsed": 2660.5999999940395,
+          "mode": "qr",
+          "costMs": 35.79999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 7308.5,
+          "elapsed": 2746.2000000029802,
+          "mode": "qr",
+          "costMs": 28.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 7410.5999999940395,
+          "elapsed": 2848.2999999970198,
+          "mode": "qr",
+          "costMs": 37,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 7536.5999999940395,
+          "elapsed": 2974.2999999970198,
+          "mode": "qr",
+          "costMs": 68.20000000298023,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 7683.70000000298,
+          "elapsed": 3121.4000000059605,
+          "mode": "qr",
+          "costMs": 45.80000001192093,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 7778,
+          "elapsed": 3215.7000000029802,
+          "mode": "qr",
+          "costMs": 35.70000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 7878,
+          "elapsed": 3315.7000000029802,
+          "mode": "qr",
+          "costMs": 41.70000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 8010.5999999940395,
+          "elapsed": 3448.2999999970198,
+          "mode": "qr",
+          "costMs": 55.79999999701977,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 8135.5,
+          "elapsed": 3573.2000000029802,
+          "mode": "qr",
+          "costMs": 41.20000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 8236.29999999702,
+          "elapsed": 3674,
+          "mode": "qr",
+          "costMs": 34,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 8327.89999999106,
+          "elapsed": 3765.5999999940395,
+          "mode": "qr",
+          "costMs": 32.3999999910593,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 8469.5,
+          "elapsed": 3907.2000000029802,
+          "mode": "qr",
+          "costMs": 64.90000000596046,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 8588.79999999702,
+          "elapsed": 4026.5,
+          "mode": "qr",
+          "costMs": 34,
+          "width": 720,
+          "height": 960
+        }
+      ],
+      "taskMs": 2108.129,
+      "taskPercent": 51.59395496818404,
+      "heapBytes": 3689444
+    },
+    {
+      "scene": "qr-new-label-below",
+      "repeat": 2,
+      "correct": false,
+      "delivered": null,
+      "openMs": 2.9000000059604645,
+      "firstObservedFrameMs": 41.6000000089407,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 8648.59999999404,
+          "elapsed": 0.20000000298023224,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 8650,
+          "elapsed": 1.6000000089406967,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 8650.70000000298,
+          "elapsed": 2.300000011920929,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 8690,
+          "elapsed": 41.6000000089407,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 8794.29999999702,
+          "elapsed": 145.90000000596046,
+          "mode": "qr",
+          "costMs": 29.700000002980232,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 8895.70000000298,
+          "elapsed": 247.30000001192093,
+          "mode": "qr",
+          "costMs": 38.30000001192093,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 8991.59999999404,
+          "elapsed": 343.20000000298023,
+          "mode": "qr",
+          "costMs": 40,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9073.89999999106,
+          "elapsed": 425.5,
+          "mode": "qr",
+          "costMs": 29.69999998807907,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9179.59999999404,
+          "elapsed": 531.2000000029802,
+          "mode": "qr",
+          "costMs": 40.79999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9266.59999999404,
+          "elapsed": 618.2000000029802,
+          "mode": "qr",
+          "costMs": 33.29999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9376.39999999106,
+          "elapsed": 728,
+          "mode": "qr",
+          "costMs": 34.5,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9506.59999999404,
+          "elapsed": 858.2000000029802,
+          "mode": "qr",
+          "costMs": 54.5,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 9626.29999999702,
+          "elapsed": 977.9000000059605,
+          "mode": "qr",
+          "costMs": 50.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9736.09999999404,
+          "elapsed": 1087.7000000029802,
+          "mode": "qr",
+          "costMs": 35.70000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9844.39999999106,
+          "elapsed": 1196,
+          "mode": "qr",
+          "costMs": 36,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 9972.09999999404,
+          "elapsed": 1323.7000000029802,
+          "mode": "qr",
+          "costMs": 53.8999999910593,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 10082.29999999702,
+          "elapsed": 1433.9000000059605,
+          "mode": "qr",
+          "costMs": 39.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 10182.59999999404,
+          "elapsed": 1534.2000000029802,
+          "mode": "qr",
+          "costMs": 30.899999991059303,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 10275.09999999404,
+          "elapsed": 1626.7000000029802,
+          "mode": "qr",
+          "costMs": 29.700000002980232,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 10399.79999999702,
+          "elapsed": 1751.4000000059605,
+          "mode": "qr",
+          "costMs": 60.599999994039536,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 10513.20000000298,
+          "elapsed": 1864.800000011921,
+          "mode": "qr",
+          "costMs": 33.900000005960464,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 10604.5,
+          "elapsed": 1956.1000000089407,
+          "mode": "qr",
+          "costMs": 32,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 10696.59999999404,
+          "elapsed": 2048.2000000029802,
+          "mode": "qr",
+          "costMs": 30,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 10805.89999999106,
+          "elapsed": 2157.5,
+          "mode": "qr",
+          "costMs": 57.3999999910593,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 10923.59999999404,
+          "elapsed": 2275.2000000029802,
+          "mode": "qr",
+          "costMs": 36.29999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 11015.70000000298,
+          "elapsed": 2367.300000011921,
+          "mode": "qr",
+          "costMs": 36.70000000298023,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 11104.89999999106,
+          "elapsed": 2456.5,
+          "mode": "qr",
+          "costMs": 32.599999994039536,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 11208.70000000298,
+          "elapsed": 2560.300000011921,
+          "mode": "qr",
+          "costMs": 48.400000005960464,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 11337.20000000298,
+          "elapsed": 2688.800000011921,
+          "mode": "qr",
+          "costMs": 45,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 11433.5,
+          "elapsed": 2785.1000000089407,
+          "mode": "qr",
+          "costMs": 32.5,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 11543.09999999404,
+          "elapsed": 2894.7000000029802,
+          "mode": "qr",
+          "costMs": 34.8999999910593,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 11678.29999999702,
+          "elapsed": 3029.9000000059605,
+          "mode": "qr",
+          "costMs": 75.90000000596046,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 11835.29999999702,
+          "elapsed": 3186.9000000059605,
+          "mode": "qr",
+          "costMs": 46.29999999701977,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 11943.79999999702,
+          "elapsed": 3295.4000000059605,
+          "mode": "qr",
+          "costMs": 29.200000002980232,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 12036.89999999106,
+          "elapsed": 3388.5,
+          "mode": "qr",
+          "costMs": 28.69999998807907,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 12171.29999999702,
+          "elapsed": 3522.9000000059605,
+          "mode": "qr",
+          "costMs": 69.70000000298023,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 12311.89999999106,
+          "elapsed": 3663.5,
+          "mode": "qr",
+          "costMs": 38.19999998807907,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 12389.29999999702,
+          "elapsed": 3740.9000000059605,
+          "mode": "qr",
+          "costMs": 20.099999994039536,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 12470.70000000298,
+          "elapsed": 3822.300000011921,
+          "mode": "qr",
+          "costMs": 24,
+          "width": 720,
+          "height": 960
+        },
+        {
+          "stage": "analysis",
+          "at": 12600,
+          "elapsed": 3951.6000000089407,
+          "mode": "qr",
+          "costMs": 62.29999999701977,
+          "width": 960,
+          "height": 1280
+        }
+      ],
+      "taskMs": 2093.9700000000007,
+      "taskPercent": 51.38576687116566,
+      "heapBytes": 3482840
+    }
+  ]
+}

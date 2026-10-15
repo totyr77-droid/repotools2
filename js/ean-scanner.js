@@ -3,7 +3,7 @@
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
   // One camera lease and viewport implementation for every recognition mode.
-  let cameraQueue = Promise.resolve(), cameraOwner = null;
+  let cameraQueue = Promise.resolve(), cameraOwner = null;const metricListeners=new Set();
   function cameraTask(task) { const next = cameraQueue.then(task); cameraQueue = next.catch(() => {}); return next; }
   function cameraViewport(element, isQR, pallet = false) {
     if (!document.createElement || !element.append) return { track() {}, reset() {}, dispose() {} };
@@ -76,7 +76,7 @@
       }
     } catch {}
   }
-  async function beep(preferences = {}) {
+  async function beep(preferences = {}, onScheduled = () => {}) {
     if (preferences.vibration !== false) { try { window.navigator?.vibrate?.(60); } catch {} }
     if (preferences.sound === false || !audioContext) return;
     let restoreSession = () => {}, scheduled = false;
@@ -101,7 +101,7 @@
       oscillator.connect(gain); gain.connect(audioContext.destination);
       const restore = restoreSession;
       oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
-      oscillator.start(now); oscillator.stop(now + .15);
+      oscillator.start(now); onScheduled(); oscillator.stop(now + .15);
       scheduled = true;
       // Release the exclusive policy even if iOS interrupts before onended.
       setTimeout(restore, 500);
@@ -122,9 +122,10 @@
 
   // Confirma el mismo EAN en fotogramas separados y dentro de una ventana corta.
   function confirmation(validate = validEAN) {
-    let code = '', count = 0, first = 0, last = 0;
-    return (value, now = performance.now()) => {
-      if (!validate(value)) { code = ''; count = 0; return false; }
+    let code = '', count = 0, first = 0, last = 0, lastFrame = null;
+    return (value, now = performance.now(), frame = null) => {
+      if (!validate(value)) { code = ''; count = 0; lastFrame=null; return false; }
+      if(frame!==null&&frame===lastFrame)return false;lastFrame=frame;
       if (value !== code || now - last > 650 || now - first > 1500) {
         code = value; count = 1; first = last = now; return false;
       }
@@ -152,8 +153,8 @@
       const url = new URL(text), here = new URL(window.location.href);
       const production = ['repotools.online', 'www.repotools.online', 'repotools2.onrender.com'];
       const trusted = url.origin === here.origin || (production.includes(url.hostname) && !url.port);
-      if (!trusted || !['http:', 'https:'].includes(url.protocol) || url.username || url.password || !url.pathname.endsWith('/palet.php')) return null;
-      const code = url.searchParams.get('codigo'); return /^\d{8}$/.test(code || '') ? code : null;
+      if (!trusted || !['http:', 'https:'].includes(url.protocol) || url.username || url.password || (!url.pathname.endsWith('/palet.php')&&!/\/q\/\d{8}\/?$/.test(url.pathname))) return null;
+      const code = /\/q\/(\d{8})\/?$/.exec(url.pathname)?.[1]||url.searchParams.get('codigo'); return /^\d{8}$/.test(code || '') ? code : null;
     } catch { return null; }
   }
   function ocrConsensus() {
@@ -172,14 +173,14 @@
     const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
     return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
   }
-  function palletOCR(element, active, accept, status, viewport) {
+  function palletOCR(element, active, accept, status, viewport, canAnalyze = () => true) {
     let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus();
     const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
     if (!context) return { dispose() {}, resume() {}, reset() {} };
 
     function schedule() { if (!disposed) timer = setTimeout(read, 550); }
     async function read() {
-      if (disposed || busy) return; if (!active()) { schedule(); return; }
+      if (disposed || busy) return; if (document.hidden || !active() || !canAnalyze()) { schedule(); return; }
       const video = element.querySelector('video');
       if (!video?.videoWidth || video.readyState < 2 || video.currentTime === lastFrame) { schedule(); return; }
       busy = true;
@@ -213,18 +214,26 @@
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false, onMetric = () => {} }) {
     const element = document.getElementById(elementId);
     const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status,:scope > #userScannerStatus')||(elementId==='contenedor'?document.getElementById('mainScannerStatus'):null);if(statusArea){statusArea.classList.add('camera-message-area','scanner-status');statusArea.classList.add('camera-message-overlay');}
     let revision = 0, session = null;
+    function metric(current,stage,detail={}){if(stage==='action')current.actionStarted=true;const event={stage,at:performance.now(),elapsed:performance.now()-current.requestedAt,mode:current.isQR?'qr':'ean',...detail};for(const listener of [onMetric,...metricListeners]){try{listener(event);}catch{}}}
     const enqueue = cameraTask;
+    // Drop concurrent decode requests; never queue old frames behind a slow decoder.
+    function serialDecoder(current){
+      // Pinned html5-qrcode 2.3.8 adapter; fail back to its native scan loop if unavailable.
+      const decoder=current.reader.qrcode;if(current.adapterUnavailable||!decoder)return false;if(current.serialDecoder)return true;
+      try{for(const name of ['decodeAsync','decodeRobustlyAsync']){if(typeof decoder[name]!=='function')continue;const decode=decoder[name].bind(decoder);decoder[name]=async input=>{if(current.decodeBusy)throw Error('Decoder busy');current.decodeBusy=true;try{return await decode(input);}finally{current.decodeBusy=false;}};}current.serialDecoder=true;return true;}
+      catch{current.adapterUnavailable=true;metric(current,'adapter-unavailable');return false;}
+    }
     function cameraControls(current) {
       const track = element.querySelector?.('video')?.srcObject?.getVideoTracks?.()[0];
       if (!document.createElement) return;
-      const capabilities = track?.getCapabilities?.() ?? {}, settings = track?.getSettings?.() ?? {};
+      const capabilities = track?.getCapabilities?.() ?? {}, settings = track?.getSettings?.() ?? {};metric(current,'camera-capabilities',{width:settings.width,height:settings.height,zoom:capabilities.zoom?{...capabilities.zoom,current:settings.zoom}:null,focusContinuous:Boolean(capabilities.focusMode?.includes('continuous')),torch:capabilities.torch===true});
       const zoom = capabilities.zoom;
-      const minZoom = Math.max(1, zoom?.min ?? 1);
-      const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && zoom.max > minZoom;
+      const minZoom = zoom?.min ?? 1;
+      const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && minZoom>0 && zoom.max > minZoom && Number.isFinite(settings.zoom);
       if (!hasZoom && capabilities.torch !== true && !onManual) return;
       const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
       controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', 'Controles de cámara');
@@ -237,7 +246,7 @@
           const advanced = Object.assign({}, ...(constraints.advanced ?? []), { [name]: value });
           await track.applyConstraints({ ...constraints, advanced: [advanced] });
           if (!active()) return false;
-          const actual = track.getSettings()[name];
+          const actual = track.getSettings()[name];metric(current,'camera-control',{name,requested:value,actual});
           if (name === 'torch' ? actual !== value : !Number.isFinite(actual) || Math.abs(actual - value) > Math.max(.1, (zoom?.step || 0) / 2)) throw new Error('Control no disponible');
           return true;
         });
@@ -304,7 +313,7 @@
           button.addEventListener('click', () => { input.value = value; updateZoom(); }); shortcuts.append(button);
         }
         render(applied);
-        if (Number.isFinite(settings.zoom) && settings.zoom < Number(input.min)) updateZoom();
+        // Opening a scanner never changes the zoom selected by the camera/user.
         let holdDelay,holdTimer;const holdController=new AbortController();
         const stopHold=()=>{clearTimeout(holdDelay);clearInterval(holdTimer);};
         const adjust=direction=>{if(disposed||!active())return;input.value=snap(Number(input.value)+direction*Math.max(.1,step));updateZoom();};
@@ -343,7 +352,7 @@
       // Adaptador para html5-qrcode 2.3.8: reutiliza su decodificador sobre el canvas,
       // sin convertir cada fotograma en archivos ni crear URLs de imágenes.
       const decoder = current.reader.qrcode;
-      if (!context || typeof decoder?.decodeRobustlyAsync !== 'function') return;
+      if (!context || typeof decoder?.decodeRobustlyAsync !== 'function' || !serialDecoder(current)) return;
       const profiles = [{ angle: 0, crop: .7 }, { angle: -45, crop: .7 }, { angle: 45, crop: .7 }, { angle: 90, crop: .7 }, { angle: 0, crop: 1 }, { angle: -30, crop: .7 }, { angle: 30, crop: .7 }, { angle: -60, crop: .7 }, { angle: 60, crop: .7 }, { angle: 90, crop: 1 }, { angle: -18, crop: .7 }, { angle: 18, crop: .7 }];
       const probe = document.createElement('canvas'), probeContext = probe.getContext('2d', { willReadFrequently: true });
       function locate(video, frame) {
@@ -367,27 +376,42 @@
         if (Math.abs(angle - axis) < 7) angle = axis;
         return { angle, crop: .7, centerX: xMass / mass / probe.width, centerY: yMass / mass / probe.height };
       }
-      let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false;
-      const dispose = () => { if (disposed) return; disposed = true; canvas.width = canvas.height = probe.width = probe.height = 0; };
-      current.disposeBackground = () => { clearTimeout(current.backgroundTimer); if (!running) dispose(); };
+      let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false, lastFrame=null,lastQuagga=-Infinity,attempts=0;
+      const lowPower=Number(window.navigator?.hardwareConcurrency||8)<=4;
+      if(typeof current.reader.pause==='function'){try{current.reader.pause(false);if(current.reader.scannerPausedUiElement)current.reader.scannerPausedUiElement.style.display='none';current.exclusive=true;}catch{}}
+      let detailButton,detailTimer,manualRequest=false;
+      function offerDetail(){
+        if(!current.accepting||session!==current)return;
+        const video=element.querySelector('video'),frame=video?.videoWidth?visibleFrame(video):null;
+        if(!frame||!canAccept()||document.hidden){detailTimer=setTimeout(offerDetail,500);return;}
+        if(Math.max(frame.width,frame.height)<=(lowPower?640:960))return;
+        detailButton=document.createElement('button');detailButton.type='button';detailButton.className='ean-camera-detail';
+        detailButton.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8V3h5m8 0h5v5M3 16v5h5m8 0h5v-5"/><circle cx="12" cy="12" r="4"/></svg><span>Analizar detalle</span>';
+        detailButton.addEventListener('click',()=>{if(!current.accepting||!canAccept())return;current.requestDetail=true;detailButton.disabled=true;detailButton.setAttribute('aria-busy','true');detailButton.querySelector('span').textContent='Analizando…';metric(current,'detail-request');});element.append(detailButton);
+      }
+      if(current.isQR)detailTimer=setTimeout(offerDetail,1800);
+      serialDecoder(current);
+      const dispose = () => { if (disposed) return; disposed = true;clearTimeout(detailTimer);detailButton?.remove(); canvas.width = canvas.height = probe.width = probe.height = 0; };
+      current.disposeBackground = () => {clearTimeout(detailTimer);detailButton?.remove();clearTimeout(current.backgroundTimer); if (!running) dispose(); };
       async function analyze() {
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
         // No supplemental JPEG/OCR work while the page is in the background.
-        if (document.hidden) { current.backgroundTimer = setTimeout(analyze, 500); return; }
+        if (document.hidden || !canAccept()) { current.backgroundTimer = setTimeout(analyze, 500); return; }
         const video = element.querySelector('video');
         const started = performance.now();
-        if (video?.videoWidth && video.videoHeight && started - (current.lastPrimaryDetection ?? -Infinity) > 180) {
-          running = true;
+        if (video?.videoWidth && video.videoHeight && video.readyState>=2 && video.currentTime!==lastFrame && !current.decodeBusy && (current.exclusive||started - (current.lastPrimaryDetection ?? -Infinity) > 180)) {
+          running = true;lastFrame=video.currentTime;
           try {
             const frame = visibleFrame(video);
-            const adaptive = current.isQR ? { angle: 0, crop: 1 } : lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video, frame) : null);
-            if (!current.isQR && window.Quagga?.decodeSingle && !adaptive) {
+            manualRequest=Boolean(current.requestDetail);const detailed=current.requestDetail||(++attempts%(lowPower&&current.isQR?3:4)===(lowPower&&current.isQR?2:0)&&started-(current.cameraReadyAt??current.requestedAt)>(lowPower?350:500));current.requestDetail=false;
+            const adaptive = current.isQR ? { angle: 0, crop: 1, detailed } : lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video, frame) : null);
+            if (!current.isQR && window.Quagga?.decodeSingle && !adaptive && started-lastQuagga>1200) {
               // Localiza barras y su orientación en una sola imagen. El canvas
               // y las cajas del localizador permanecen fuera de la interfaz.
               const scale = Math.min(1, 1920 / Math.max(frame.width, frame.height));
               canvas.width = Math.round(frame.width * scale); canvas.height = Math.round(frame.height * scale);
               context.drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
-              let result;
+              let result;lastQuagga=started;
               try {
                 result = await window.Quagga.decodeSingle({ src: canvas.toDataURL('image/jpeg', .92), inputStream: { size: 0 }, locate: true, locator: { halfSample: false, patchSize: 'small' }, decoder: { readers: ['ean_reader', 'ean_8_reader'] }, numOfWorkers: 0 });
               } catch { /* El decodificador alternativo sigue disponible. */ }
@@ -395,7 +419,7 @@
                 if (Array.isArray(result.box) && result.box.length >= 4 && result.box.every(p=>Array.isArray(p)&&p.length>=2&&p.every(Number.isFinite))) {
                   current.viewport?.track({x0:Math.min(...result.box.map(p=>p[0])),y0:Math.min(...result.box.map(p=>p[1])),x1:Math.max(...result.box.map(p=>p[0])),y1:Math.max(...result.box.map(p=>p[1]))},canvas.width,canvas.height);
                 }
-                accept(result.codeResult.code, 'background');
+                accept(result.codeResult.code, 'background',lastFrame);
                 return;
               }
             }
@@ -405,7 +429,8 @@
             // central reduce trabajo sin reducir resolución; la vista completa
             // también busca códigos que estén fuera del centro.
             const sourceWidth = Math.round(frame.width * profile.crop), sourceHeight = Math.round(frame.height * profile.crop);
-            const scale = Math.min(1, 1920 / Math.max(sourceWidth, sourceHeight));
+            const limit=current.isQR?(profile.detailed?1920:lowPower?640:960):(detailed?1920:lowPower?960:1280);
+            const scale = Math.min(1, limit / Math.max(sourceWidth, sourceHeight));
             const width = sourceWidth * scale, height = sourceHeight * scale;
             // drawImage recorta lo que queda fuera del video; el fondo blanco
             // permite mantener centradas también las barras cercanas a un borde.
@@ -419,26 +444,26 @@
             context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, clipX, clipY, clipWidth, clipHeight, -width / 2 + (clipX - sourceX) * scale, -height / 2 + (clipY - sourceY) * scale, clipWidth * scale, clipHeight * scale); context.restore();
             if (current.accepting && current.token === revision) {
               const result = await decoder.decodeRobustlyAsync(canvas);
-              const code = result.text;
-              if (current.validate(code)) { lastProfile = profile; accept(code, 'background'); } else lastProfile = null;
+              const code = result.text;metric(current,'decoded',{source:'background',width:canvas.width,height:canvas.height,detail:Boolean(profile.detailed),costMs:performance.now()-started});
+              if (current.validate(code)) { lastProfile = profile; accept(code, 'background',lastFrame); } else lastProfile = null;
             }
           } catch { lastProfile = null; }
           finally {
-            running = false;
+            running = false;if(detailButton&&manualRequest){detailButton.disabled=false;detailButton.removeAttribute('aria-busy');detailButton.querySelector('span').textContent='Analizar detalle';}
             if (!current.accepting || session !== current || current.token !== revision) dispose();
-            else current.backgroundTimer = setTimeout(analyze, Math.max(30, 100 - (performance.now() - started)));
+            else {const cost=performance.now()-started;metric(current,'analysis',{costMs:cost,width:canvas.width,height:canvas.height});current.backgroundTimer=setTimeout(analyze,Math.max(50,Math.min(600,cost*(lastProfile&&!current.isQR ? .4 : lowPower ? 2 : 1.2))));}
           }
           return;
         }
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
-        current.backgroundTimer = setTimeout(analyze, 100);
+        current.backgroundTimer = setTimeout(analyze, 60);
       }
       current.backgroundTimer = setTimeout(analyze, 100);
     }
     async function release(current) {
       if (!current) return;
       if (!current.cleanup) current.cleanup = (async () => {
-        current.accepting = false; current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
+        current.accepting = false;current.frameObserver?.disconnect();current.frameAbort?.abort(); current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
         try { if (current.reader.isScanning) await current.reader.stop(); }
         finally {
@@ -459,7 +484,7 @@
       return enqueue(() => release(session));
     }
     function start(format = 'ean') {
-      clearScanPhoto();
+      const requestedAt=performance.now();clearScanPhoto();
       // Se habilita el audio en el toque que abre la cámara, antes de esperar
       // permisos o fotogramas, para que el primer escaneo también tenga sonido.
       if (feedbackPreferences().sound !== false) prepareSound();
@@ -480,9 +505,9 @@
         const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
         if (element.dataset) { element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean'; }
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
-        const current = { reader, accepting: true, token, isQR, validate, confirm: confirmation(validate) };
-        session = current; cameraOwner = { current, release: () => release(current) };
-        const accept = (code, source = 'camera') => {
+        const current = { reader, accepting: true, token, isQR, validate, requestedAt, confirm: confirmation(validate) };metric(current,'camera-request');
+        serialDecoder(current);session = current; cameraOwner = { current, release: () => release(current) };
+        const accept = (code, source = 'camera', recognizedFrame = null) => {
           code = normalize(code);
           if (code === null) { if (current.accepting && session === current && token === revision && canAccept()) { current.confirm(null); current.ocr?.reset(); onStatus('Este QR no corresponde a un palet de Repotools.'); } return; }
           if (isQR && kind === 'pallet' && current.lastDelivered === code) return;
@@ -490,25 +515,26 @@
           if (!current.accepting || session !== current || token !== revision || !canAccept()) return;
           // Con object-fit: cover se confirma únicamente la zona que el usuario
           // ve. El lector oculto usa ese mismo recorte, sin bandas negras.
-          const video = source === 'camera' ? element.querySelector?.('video') : null;
+          const video = element.querySelector?.('video');
           if (video?.videoWidth && document.createElement && typeof reader.qrcode?.decodeRobustlyAsync === 'function') {
             const frame = visibleFrame(video);
-            if (!isQR && (frame.width < video.videoWidth - 2 || frame.height < video.videoHeight - 2)) return;
+            if (!current.exclusive && source==='camera' && !isQR && (frame.width < video.videoWidth - 2 || frame.height < video.videoHeight - 2)) return;
           }
           if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();
-          const confirmed = source === 'ocr' || current.confirm(code);
+          metric(current,'decoded',{source});
+          const confirmed = source === 'ocr' || isQR || current.confirm(code,performance.now(),recognizedFrame??(video?.videoWidth&&video.readyState>=2?video.currentTime:null));
           if (!confirmed) {
             element.classList.add('ean-detecting'); onStatus('Detectando código…'); clearTimeout(current.progressTimer);
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
-          if (!isQR) rememberScanPhoto(code, element);
+          metric(current,'confirmed',{source});
           current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
-            Promise.resolve().then(()=>{beep(feedbackPreferences());return onCode(code);}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
+            Promise.resolve().then(()=>{metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR)rememberScanPhoto(code,element);metric(current,'action');return onCode(code);}).then(()=>metric(current,'action-complete')).catch(error=>{if(token===revision&&session===current){onError(error);}}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
               if(token!==revision||session!==current)return;
               current.confirm=confirmation(validate);current.accepting=true;element.classList.remove('ean-confirmed');
               try{background(current,accept);current.ocr?.resume();}catch{}
@@ -517,19 +543,20 @@
           }
           enqueue(async () => {
             if(token!==revision)return;
-            beep(feedbackPreferences()); await new Promise(resolve => setTimeout(resolve, 180)); await release(current);
-            if (token === revision) Promise.resolve().then(() => { if (token === revision) return onCode(code); }).catch(error => { if (token === revision) onError(error); });
+            metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR)rememberScanPhoto(code,element); await new Promise(resolve => setTimeout(resolve, 180)); await release(current);
+            if (token === revision) Promise.resolve().then(() => { if (token === revision) {metric(current,'action');return onCode(code);} }).then(()=>{if(current.actionStarted)metric(current,'action-complete');}).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };
         onStatus('Abriendo cámara…');
         try {
+          if(typeof MutationObserver==='function'&&element.querySelector){current.frameAbort=new AbortController();const observed=()=>{const video=element.querySelector('video');if(!video||video===current.observedVideo)return;current.observedVideo=video;const first=()=>{if(!current.firstFrame){current.firstFrame=true;metric(current,'first-frame',{width:video.videoWidth,height:video.videoHeight});current.frameObserver?.disconnect();}};if(video.readyState>=2)first();else video.addEventListener('loadeddata',first,{once:true,signal:current.frameAbort.signal});};current.frameObserver=new MutationObserver(observed);current.frameObserver.observe(element,{childList:true,subtree:true});observed();}
           current.starting = reader.start({ facingMode: 'environment' }, {
             fps: 15,
-            videoConstraints: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+            videoConstraints: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate:{ideal:24} },
             disableFlip: true,
             qrbox: (width, height) => isQR ? { width: Math.max(50, Math.floor(Math.min(width, height) * .85)), height: Math.max(50, Math.floor(Math.min(width, height) * .85)) } : { width: Math.max(50, Math.floor(width * .94)), height: Math.max(50, Math.floor(height * .85)) }
           }, code => accept(code, 'camera'), () => {});
-          await current.starting;
+          await current.starting;current.cameraReadyAt=performance.now();metric(current,'camera-open');const firstVideo=element.querySelector?.('video');if(!current.firstFrame&&firstVideo?.readyState>=2){current.firstFrame=true;metric(current,'first-frame',{width:firstVideo.videoWidth,height:firstVideo.videoHeight});}
           if (token !== revision) { await release(current); return false; }
           // Solicita enfoque continuo solo si la cámara lo admite, sin retrasar
           // la lectura ni fallar en navegadores que no exponen este control.
@@ -543,7 +570,7 @@
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport);
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>1500 && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy);
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
@@ -559,5 +586,5 @@
     const normalCode=onCode;if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
-  window.RepoEANScanner = { create, rawCreate, validEAN, confirmation, palletIdentifier, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
+  window.RepoEANScanner = { observe(listener){if(typeof listener!=='function')throw TypeError('Observer required');metricListeners.add(listener);return()=>metricListeners.delete(listener);}, create, rawCreate, validEAN, confirmation, palletIdentifier, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
 })();

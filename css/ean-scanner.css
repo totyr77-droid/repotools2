@@ -85,3 +85,8 @@
 .ean-reader>.camera-message-overlay{position:absolute!important;z-index:4;top:8px;left:8px;right:8px;block-size:2.7em!important;min-block-size:2.7em!important;max-height:2.7em;margin:0!important;padding:4px 8px;border:0;border-radius:6px;background:rgba(0,0,0,.56);color:white;text-align:center;font-size:.8rem;line-height:1.25;pointer-events:none;overflow:hidden}
 
 .ean-camera-zoom input[type=range]{height:clamp(24px,12dvh,100px)}
+
+.ean-camera-detail{position:absolute;bottom:max(10px,env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:9;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;max-width:calc(100% - 120px);padding:8px 10px;border:1px solid #ffffff55;border-radius:10px;background:#17122bd9;color:white;font:inherit;font-size:.75rem;white-space:nowrap;touch-action:manipulation}.ean-camera-detail svg{width:18px;height:18px;flex:none}.ean-camera-detail:disabled{opacity:.65}.ean-camera-detail:focus-visible{outline:2px solid white;outline-offset:3px}
+
+/* Camera controls remain legible when the label fills the frame with white. */
+.repo-camera-viewport .ean-camera-light,.repo-camera-viewport .ean-camera-manual{background:#17122b99;color:#fff}
