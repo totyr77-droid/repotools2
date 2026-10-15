@@ -82,7 +82,7 @@
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+<script src="js/vendor/lz-string-1.4.4.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>

@@ -135,7 +135,7 @@ function branch_public(PDO $db,string $token,int $page=0): array {
     $share=stock_query($db,'SELECT * FROM stock_shares WHERE token=? AND active=1',[$token])->fetch();
     if (!$share) throw new CatalogException('Este enlace fue desactivado o no existe.',404);
     $branch=$share['branch_id']?branch_owned($db,(int)$share['branch_id'],(int)$share['owner_id']):null;
-    $sql='SELECT p.id,p.code,p.description,p.updated_at,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,a.name AS updated_name,a.public_name AS updated_public_name,a.id AS updated_user_id,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
+    $sql='SELECT p.id,p.code,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
     $args=[$share['owner_id']];
     if ($branch) { $sql.=' AND p.branch_id=? AND NOT EXISTS(SELECT 1 FROM stock_share_exclusions x WHERE x.share_id=? AND x.pallet_id=p.id)'; $args[]=$branch['id'];$args[]=$share['id']; }
     else { $sql.=' AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=? AND sp.pallet_id=p.id)'; $args[]=$share['id']; }
@@ -148,7 +148,7 @@ function branch_public(PDO $db,string $token,int $page=0): array {
     $pallets=[];
     $rows=stock_query($db,$sql.' ORDER BY p.code,p.id LIMIT 21 OFFSET '.($page*20),$args)->fetchAll();
     $hasMore=count($rows)>20;
-    $rows=array_map('stock_public_identity',array_slice($rows,0,20)); $products=[];
+    $rows=array_slice($rows,0,20); $products=[];
     if ($rows) {
         $ids=array_column($rows,'id'); $marks=implode(',',array_fill(0,count($ids),'?'));
         foreach (stock_query($db,"SELECT b.pallet_id,b.ean,b.name,b.expires,b.units,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$marks}) ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,b.name,b.id",$ids)->fetchAll() as $product) {
@@ -157,8 +157,7 @@ function branch_public(PDO $db,string $token,int $page=0): array {
     }
     foreach ($rows as $row) {
         $branchInfo=$row['branch_name']===null?null:['name'=>$row['branch_name'],'address'=>$row['branch_address'],'locality'=>$row['branch_locality'],'province'=>$row['branch_province'],'description'=>$row['branch_description']];
-        $updated=(new DateTimeImmutable($row['updated_at'],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
-        $pallets[]=['code'=>$row['code'],'description'=>$row['description'],'branch'=>$branchInfo,'owner_name'=>$row['owner_name'],'owner_company'=>$row['owner_company'],'updated_at'=>$updated,'updated_name'=>$row['updated_name'],'products'=>$products[$row['id']]??[]];
+        $pallets[]=['code'=>$row['code'],'branch'=>$branchInfo,'products'=>$products[$row['id']]??[]];
     }
     return ['title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page,'summary'=>$summary];
 }

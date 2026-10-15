@@ -3,6 +3,7 @@ $paginaInicio = true;
 include 'vistas/header.vista.php';
 ?>
 <main>
+<script>window.repotoolsListCSRF = <?= json_encode(csrf_token(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;<?php if(isset($sharedScanCodes)): ?>window.repotoolsSharedCodes=<?= json_encode($sharedScanCodes,JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;<?php endif; ?></script>
   <?php if (current_user()): ?>
   <script>window.repotoolsStats = <?= json_encode(['userId' => (int) current_user()['id'], 'csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
   <?php endif; ?>

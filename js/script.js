@@ -148,6 +148,7 @@ function limpiarLista(valores) {
 }
 
 function cargarListaCompartida() {
+  if(Array.isArray(window.repotoolsSharedCodes)){lista=limpiarLista(window.repotoolsSharedCodes);delete window.repotoolsSharedCodes;if(lista.length){esListaCompartida=true;guardarLista();abrirResultados();}return;}
   if (!urlActual.search || !window.LZString) return;
 
   try {
@@ -299,7 +300,7 @@ function cambiarModoRapido(enabled) {
 function mostrarProductoRapido(product) {
   document.getElementById('mainRapidLast').textContent = product && typeof product === 'object'
     ? window.RepoProductInfo.summary(product)
-    : typeof product === 'string' ? product : 'Producto no encontrado';
+    : 'Código detectado';
   document.getElementById('mainRapidLast').title = document.getElementById('mainRapidLast').textContent;
   if (!product || typeof product === 'string') document.getElementById('mainRapidPanel').dataset.state = 'warning';
 }
@@ -392,7 +393,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   els.resultadoApi.textContent = "Buscando producto…";
   const resultadoAPI = await buscarProductoPorEAN(codigo);
   if (revision !== scanResultRevision) return;
-  window.RepoProductInfo.renderSummary(els.resultadoApi, resultadoAPI);
+  if(resultadoAPI&&typeof resultadoAPI==='object')window.RepoProductInfo.renderSummary(els.resultadoApi, resultadoAPI);else els.resultadoApi.textContent='Código detectado';
   window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), codigo);
 }
 
@@ -462,7 +463,9 @@ async function compartirLista() {
   return compartirCodigos([...lista]);
 }
 async function compartirCodigos(codigos) {
-  const link = crearLinkCompartido(codigos);
+  let link = crearLinkCompartido(codigos);
+  if(navigator.onLine){try{const response=await fetch('api/listas.php',{method:'POST',body:new URLSearchParams({csrf:window.repotoolsListCSRF,codes:JSON.stringify(codigos)})}),data=await response.json();if(!response.ok||!data.url)throw Error(data.error||'No pudimos crear el enlace.');link=data.url;}catch{window.RepoToast?.('Usamos el enlace completo. Tu lista se conserva.',{kind:'info'});}}
+
 
   if (navigator.share) {
     try {
@@ -484,7 +487,7 @@ async function compartirCodigos(codigos) {
 function crearLinkCompartido(codigos = lista) {
   const json = JSON.stringify(codigos);
   const comprimido = LZString.compressToBase64(json);
-  return `${urlOriginal}?${comprimido}`;
+  return new URL('index.php',document.baseURI).href+'?'+comprimido;
 }
 
 async function fallbackCompartir(link) {

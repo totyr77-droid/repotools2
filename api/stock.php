@@ -48,7 +48,7 @@ try {
             $result['items']=array_map('stock_product_names',$result['items']);
             $result['has_more']=count($result['items'])>200;$result['items']=array_slice($result['items'],0,200);
         }
-        elseif (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid)];
+        elseif (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid,($_GET['public']??'')==='1')];
         elseif (isset($_GET['ean'])) {
             if (!$uid) throw new CatalogException('Inicia sesión para agregar productos.',401);
             $ean=$_GET['ean'];
@@ -134,6 +134,15 @@ try {
                 if ($label['pallet_id']) throw new CatalogException('Este código ya tiene un palet. Recarga antes de eliminarlo.',409);
                 if ((int)$label['reserved_by']!==$uid&&!stock_is_admin($db,$uid)) throw new CatalogException('Solo puedes eliminar tus etiquetas pendientes.',403);
                 stock_query($db,'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE code=?',[$label['code']]); break;
+            case 'delete_many':
+                $ids=json_decode(is_string($_POST['pallet_ids']??null)?$_POST['pallet_ids']:'',true);
+                if(!is_array($ids)||!$ids||count($ids)>100)throw new CatalogException('Seleccioná entre 1 y 100 palets.',422);
+                foreach($ids as $target)if(!is_int($target)||$target<1)throw new CatalogException('La selección no es válida.',422);
+                $ids=array_unique($ids);
+                // Authorize the entire batch before changing anything. The existing transaction is atomic.
+                foreach($ids as $target)stock_editable($db,$target,$uid,true);
+                foreach($ids as $target){$before=pallet_activity_snapshot($db,$target);stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$target]);stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$target]);$after=$before;$after['released']=1;pallet_activity_record($db,$uid,$target,$before,$after);audit_stock($db,$uid,'delete',$key.':'.$target,audit_from_activity($before),audit_from_activity($after),[]);}
+                break;
             case 'delete':
                 stock_editable($db,$id,$uid,true); stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$id]);
                 stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$id]); break;
@@ -169,7 +178,7 @@ try {
             $details=$_POST;unset($details['csrf'],$details['operation_key']);
             stock_query($db,'INSERT INTO pallet_admin_events(user_id,pallet_id,code,action,details) VALUES(?,?,?,?,?)',[$uid,$id?:null,$target?:'',(string)$action,json_encode($details,JSON_UNESCAPED_UNICODE)]);
         }
-        if($action!=='preferences')audit_stock($db,$uid,$action,$key,$auditBefore,$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id))),$_POST);
+        if(!in_array($action,['preferences','delete_many'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id))),$_POST);
         $result['ok']=true;if($deductPayload!==null)$result['_deduct_payload']=$deductPayload;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }
     if($method==='POST' && $offlinePayload!==null)$result=stock_offline_confirmation($db,$result,$key,$uid);

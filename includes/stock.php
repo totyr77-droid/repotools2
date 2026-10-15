@@ -54,7 +54,7 @@ function stock_product_names(array $product): array {
     unset($product['catalog_product'],$product['catalog_brand'],$product['catalog_quantity']);
     return $product;
 }
-function stock_detail(PDO $db, string $code, ?int $user): array {
+function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): array {
     $label=stock_label($db,$code); $admin=stock_is_admin($db,$user);
     if (!$label['pallet_id']) return ['code'=>$code,'available'=>true,'reserved_until'=>(int)$label['reserved_until'],'reserved_name'=>$label['reserved_by'] && (int)$label['reserved_until']>time() ? get_public_user_name(stock_query($db,'SELECT id,name,public_name FROM users WHERE id=?',[(int)$label['reserved_by']])->fetch() ?: ['id'=>(int)$label['reserved_by']]) : null,'can_claim'=>$user !== null && (!$label['reserved_by'] || (int)$label['reserved_by']===$user),'can_print'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_delete'=>$admin||($user !== null && (int)$label['reserved_by']===$user),'can_edit'=>false];
     $p=stock_query($db,'SELECT p.*,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,a.name AS updated_name,a.public_name AS updated_public_name,a.id AS updated_user_id FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by WHERE p.id=? AND p.released=0',[$label['pallet_id']])->fetch();
@@ -69,10 +69,15 @@ function stock_detail(PDO $db, string $code, ?int $user): array {
     unset($product);
     if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.public_name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
     if(isset($p['members']))foreach($p['members'] as &$member){$member['name']=get_public_user_name($member);unset($member['public_name']);}unset($member);
-    if ($p['can_edit'] && $p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch() ?: null;
-    if (!$p['can_edit']) unset($p['description'],$p['branch_id']);
-    // Only names and product details are public; account identifiers/access are private.
+    if (($p['can_edit']||$public||$user===null) && $p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch() ?: null;
+    if (!$p['can_edit']) unset($p['description'],$p['branch_id'],$p['owner_name'],$p['owner_company'],$p['updated_at'],$p['created_at'],$p['updated_name']);
+    // Read-only visitors receive merchandise, not internal account metadata.
     if (!$p['can_edit'] && !$p['pending_invitation']) unset($p['owner_id'],$p['updated_by']);
+    if($public||$user===null){
+        if(!isset($p['branch'])&&!empty($p['branch_id']))$p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch()?:null;
+        $p=array_intersect_key($p,array_flip(['code','available','products','branch']));
+        $p['products']=array_map(static fn($product)=>array_intersect_key($product,array_flip(['ean','name','display_name','reference_name','catalog_name','units','expires'])),$p['products']);
+    }
     return $p;
 }
 function stock_editable(PDO $db, int $id, int $user, bool $ownerOnly=false): array {
