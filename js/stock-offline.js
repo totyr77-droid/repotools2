@@ -37,7 +37,7 @@
     async confirm(row,pallet,receipt){
       const db=await ready;
       return new Promise((resolve,reject)=>{const tx=db.transaction(['loads','sent','palets'],'readwrite'),loads=tx.objectStore('loads'),r=loads.get(row.key);r.onsuccess=()=>{
-        if(!r.result||r.result.user!==user){tx.abort();return;}
+        if(!r.result||r.result.user!==user||JSON.stringify(clean(r.result.data))!==JSON.stringify(clean(row.data))){tx.abort();return;}
         tx.objectStore('sent').put({...receipt,key:row.key,user,at:Date.now(),operation_id:row.key,state:'completed'});
         const snapshots=tx.objectStore('palets'),key=user+':'+pallet.code,old=snapshots.get(key);old.onsuccess=()=>{if(!old.result||Number(old.result.pallet.id)!==Number(pallet.id)||Number(old.result.pallet.revision||0)<=Number(pallet.revision||0))snapshots.put({key,user,pallet:clean(pallet),at:Date.now()});};
         loads.delete(row.key);

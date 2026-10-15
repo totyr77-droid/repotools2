@@ -1,6 +1,12 @@
 {
-  "version": 6,
+  "version": 7,
   "changes": [
+    {
+      "version": 7,
+      "label": "1.02",
+      "date": "2026-10-15",
+      "summary": "Sincronización de palets confirmada por producto y unidades, sin perder ni duplicar cargas."
+    },
     {
       "version": 6,
       "label": "1.01",
@@ -35,6 +41,6 @@
     }
   ],
   "major": 1,
-  "minor": 1,
-  "label": "1.01"
+  "minor": 2,
+  "label": "1.02"
 }
