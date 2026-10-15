@@ -28,6 +28,7 @@ try {
         if($item['type']==='stock_invitation'){
             if(preg_match('/^pallet-invite:(\d+):/',$item['event_key'],$match)){
                 $p=stock_query($db,'SELECT p.code,u.id,u.name,u.public_name FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.id=?',[(int)$match[1]])->fetch();
+                $item['invitation_code']=$p?$p['code']:null;
                 $item['body']=$p?get_public_user_name($p).' te invita al palet '.$p['code'].'. Acepta desde Stock.':'Te invitaron a un palet. Consultá Stock.';
             }else $item['body']='Te invitaron a un palet. Consultá Stock.';
         }

@@ -107,3 +107,14 @@ body[data-hand=left] #stockShareBranchSelected{flex-direction:row-reverse}
 #stockShareDialog.share-branch-selected .stock-share-footer{flex:none}
 #stockShareDialog.share-branch-selected .stock-share-footer>label{display:block}
 #stockShareDialog.share-branch-selected .stock-share-footer>label input{display:block;width:100%;margin-top:6px}
+
+/* Invitations stay compact until the user asks to see them. */
+#stockInvitations{margin-block:12px}
+#stockInvitations>summary{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;list-style:none;color:#27187e;font-weight:600;font-size:1rem;direction:ltr;text-align:left}
+#stockInvitations>summary::-webkit-details-marker{display:none}
+#stockInvitations>summary svg{width:20px;height:20px;flex:none}
+#stockInvitations>summary svg:last-child{margin-left:auto;transition:transform .2s}
+#stockInvitations[open]>summary svg:last-child{transform:rotate(180deg)}
+#invitationList{max-height:45dvh;overflow-y:auto;overscroll-behavior:contain}
+.stock-invitation-target{background:#efedf8;border-radius:8px;box-shadow:inset 3px 0 #27187e}
+@media(prefers-reduced-motion:reduce){#stockInvitations>summary svg:last-child{transition:none}}
