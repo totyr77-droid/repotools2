@@ -3,6 +3,7 @@
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
 
+  const tabs=document.querySelector('.reports-tabs');if(tabs)for(const selector of ['[data-moderation-view=general]','#moderationReports','[data-moderation-view=users]','[data-moderation-view=logs]','[data-moderation-view=branches]']){const tab=tabs.querySelector(selector);if(tab)tabs.append(tab);}
   const list = document.getElementById('reportsList'), status = document.getElementById('reportsStatus');
   const dialog = document.getElementById('reviewReportDialog'), details = document.getElementById('reviewReportDetails'), form = document.getElementById('reviewReportForm'), message = document.getElementById('reviewReportStatus');
   const close = document.getElementById('closeReviewReport'), approve = document.getElementById('approveReport'), reject = document.getElementById('rejectReport');
@@ -30,7 +31,7 @@
   const logLabels = {branch:'Sucursal',product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet',user_role:'Cambio de rango',user_profile:'Datos de cuenta'};
   const actionLabels = {branch_created:'Sucursal creada',branch_updated:'Sucursal actualizada',branch_deleted:'Sucursal eliminada',approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',profile_updated:'Perfil actualizado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
   document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
-    moderationView = button.dataset.moderationView; auditPage = 0;
+    moderationView = button.dataset.moderationView; auditPage = 0;button.scrollIntoView({block:'nearest',inline:'nearest',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});
     if(queue){const url=new URL(location.href);url.searchParams.set('view',moderationView);history.replaceState({...history.state},'',url);}
     const reports = ['pending','history'].includes(moderationView); if(reports)reportState=moderationView;
     const filters=document.getElementById('reportStateTabs'); if(filters)filters.hidden=!reports;

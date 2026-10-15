@@ -93,7 +93,7 @@
     get('libraryProducts').replaceChildren();
     if (!library) return;
     get('collectionTitle').textContent = library.name;
-    get('collectionTitle').title = library.name;
+    get('collectionTitle').title = library.name;get('collectionTitle').classList.add('section-icon-title');get('collectionTitle').style.setProperty('--title-icon', 'url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8"><path d="m12 3 10 5-10 5L2 8l10-5M2 12l10 5 10-5M2 16l10 5 10-5"/></svg>')+'")');
     get('shareLibrary').hidden = library.products.length < 1; get('shareLibrary').disabled = busy || get('shareLibrary').hidden;
     get('shareLibrary').title = 'Compartir colección';
     if (!library.products.length) {

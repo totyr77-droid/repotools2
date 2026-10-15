@@ -3,7 +3,9 @@ declare(strict_types=1);
 require_once __DIR__.'/database.php';
 function device_kind(?string $agent=null): string {
     $agent=$agent??($_SERVER['HTTP_USER_AGENT']??'');
-    return preg_match('/Mobile|Android|iPhone|iPad|iPod/i',$agent)?'mobile':'desktop';
+    // Tablets occupy the workstation slot so a phone can remain the companion reader.
+    if(preg_match('/iPad/i',$agent)||preg_match('/Android/i',$agent)&&!preg_match('/Mobile/i',$agent))return 'desktop';
+    return preg_match('/Mobile|Android|iPhone|iPod/i',$agent)?'mobile':'desktop';
 }
 function device_claim(PDO $db,array $user,string $kind,string $token,bool $replace=false): bool {
     if(!in_array($kind,['desktop','mobile'],true)||!preg_match('/^[a-f0-9]{64}$/D',$token))throw new InvalidArgumentException('Invalid device');
