@@ -35,3 +35,23 @@ body.offline-shell main.app-page-enter{animation:none!important;transform:none!i
 @media(max-width:899px){.offline-shell #offlineQueueSummary{margin-bottom:calc(90px + env(safe-area-inset-bottom))}}
 
 .offline-product-list>summary{min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;color:#27187e;font-weight:600}.offline-product-list>summary::before{content:'›';display:inline-block;transition:transform .18s}.offline-product-list[open]>summary::before{transform:rotate(90deg)}
+/* Compact offline groups and the same violet action hierarchy as online. */
+.offline-shell header .repo-connection-badge:is([data-state=offline],[data-state=server],[data-state=auth],[data-state=pending],[data-state=review]){background:#fff1cf;color:#70511a;border:1px solid #e4cf9b}
+.offline-shell header h1{display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:#27187e}
+.offline-shell button:where(:not(.ean-camera-controls button)){border:0;background:#eae6f5;color:#27187e;font-weight:500}
+.offline-shell button.primary{background:#27187e;color:#fff}
+.offline-shell button.danger{background:#fbe9ec;color:#b62336}
+.offline-shell button:disabled{opacity:.5;cursor:default}
+.offline-shell button:focus-visible,.offline-pallet-summary:focus-visible{outline:2px solid #7562d7;outline-offset:3px}
+.offline-shell .offline-pallet-card{padding:0;display:block!important;align-self:start;min-width:0}
+.offline-pallet-summary{display:flex;align-items:center;gap:10px;min-height:64px;padding:12px;cursor:pointer;list-style:none;color:#27187e}
+.offline-pallet-summary::-webkit-details-marker{display:none}
+.offline-pallet-summary::after{content:'›';font-size:24px;margin-left:auto;transition:transform .18s}
+.offline-pallet-group[open]>.offline-pallet-summary::after{transform:rotate(90deg)}
+.offline-pallet-title{min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}
+.offline-pallet-title strong{font-size:1rem;font-variant-numeric:tabular-nums}
+.offline-pallet-body{padding:0 12px 12px;border-top:1px solid #eeedf2}
+.offline-pallet-body>.offline-pallet-heading{padding-top:10px}
+.offline-pallet-body .row>button{grid-column:2;grid-row:1/4;max-width:128px}
+.offline-pallet-body .offline-pending{display:block}
+@media(prefers-reduced-motion:reduce){.offline-pallet-summary::after{transition:none}}
