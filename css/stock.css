@@ -226,3 +226,17 @@ body[data-hand] #palletTools.stock-toolbar{flex-direction:row!important}
 @media(min-width:1024px) and (hover:hover) and (pointer:fine){#stockProductForm{grid-template-areas:'ean ean' 'lookup lookup' 'expiry name' 'presentation amount' 'total total' 'status status' 'actions actions'}#stockEanLabel,#stockFixedEan{grid-area:ean}#stockLookupStatus{grid-area:lookup}#stockProductForm>label:has(#stockExpiry){grid-area:expiry}#stockProductForm>label:has(#stockProductName){grid-area:name}#stockProductForm>.stock-form-row{grid-area:presentation}#stockProductForm>.stock-form-row:has(#stockPackLabel[hidden]){grid-template-columns:1fr}#stockProductForm>label:has(#stockAmount){grid-area:amount}#stockAmountResult{grid-area:total}#stockProductStatus{grid-area:status}#stockProductForm>.library-dialog-actions{grid-area:actions}}
 
 @media(any-pointer:coarse){.stock-calculator-disclosure{display:block}}
+
+/* Quantity keypad: one display, anchored above its field without overlays. */
+.stock-quantity-line{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:6px 8px}
+.stock-quantity-line>.stock-calculator{position:static;grid-column:1/-1;grid-row:1;justify-self:center;width:min(100%,280px);max-width:100%;height:auto;max-height:none;margin:0 0 2px;padding:8px;gap:4px;grid-template-rows:repeat(5,44px);border:1px solid #e2dded;box-shadow:0 3px 12px #17203312;color:#27197F}
+.stock-quantity-line>.stock-calculator[hidden]{display:none}
+.stock-quantity-line>.stock-calculator button{min-height:44px;height:44px;padding:4px;font-size:1rem;color:#27197F}
+.stock-quantity-line>.stock-calculator .stock-calculator-done,.stock-quantity-line>.stock-calculator button[data-calc="="],.stock-quantity-line>.stock-calculator button[data-calc-deduct="="]{background:#27197F;color:white}
+.stock-quantity-line>input{grid-column:1;grid-row:2;width:100%;box-sizing:border-box}
+.stock-quantity-line>.stock-calculator-disclosure{display:block;grid-column:2;grid-row:2;order:0}
+body[data-one-hand="1"][data-hand=left] .stock-quantity-line>.stock-calculator{justify-self:start}
+body[data-one-hand="1"][data-hand=right] .stock-quantity-line>.stock-calculator{justify-self:end}
+body[data-one-hand="1"][data-hand=left] .stock-quantity-line{grid-template-columns:44px minmax(0,1fr)}
+body[data-one-hand="1"][data-hand=left] .stock-quantity-line>input{grid-column:2}
+body[data-one-hand="1"][data-hand=left] .stock-quantity-line>.stock-calculator-disclosure{grid-column:1}
