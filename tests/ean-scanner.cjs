@@ -75,7 +75,7 @@ function read(reader, code) { now += 100; reader.success(code, { decodedText: co
   await flush();
   assert.deepEqual(accepted, [a]);
   assert.equal(beeps, 1, 'El primer resultado confirmado suena una sola vez');
-  assert.equal(peak, .45, 'Tono más audible, con envolvente que evita clics');
+  assert.equal(peak, .72, 'Tono más audible, con envolvente que evita clics');
   assert.deepEqual(vibration, [60], 'Una vibración breve por confirmación, nunca por detecciones parciales');
   assert.equal(toneSession, 'playback', 'El pitido confirmado usa reproducción audible con silencio en iOS compatible');
   assert.equal(window.navigator.audioSession.type, 'ambient', 'Al terminar restaura la política de mezcla anterior');

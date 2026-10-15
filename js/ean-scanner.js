@@ -96,8 +96,8 @@
       if (audioContext.state !== 'running') await audioContext.resume();
       if (audioContext.state !== 'running') return;
       const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
-      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1100, now);
-      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.45, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
+      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1600, now);
+      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.72, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
       oscillator.connect(gain); gain.connect(audioContext.destination);
       const restore = restoreSession;
       oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
@@ -215,6 +215,7 @@
 
   function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
+    const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status');if(statusArea){statusArea.classList.add('camera-message-area');if(element.previousElementSibling!==statusArea)element.before(statusArea);}
     let revision = 0, session = null;
     const enqueue = cameraTask;
     function cameraControls(current) {
