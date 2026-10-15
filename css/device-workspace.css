@@ -220,3 +220,5 @@ body[data-hand=left] #contenedormax[data-scan-mode=rapid] .main-rapid-ean{grid-c
 .repotools-send-toast[popover]{right:auto;bottom:auto;margin:0}
 
 .offline-sync-history{margin-top:8px;padding:0;border:0;background:transparent;color:inherit}.offline-sync-history .offline-sync-view{border-color:#e1deed;background:#f3f1f9;color:#27187e;font-size:.85rem}
+
+.relay-connection-fab{touch-action:none;user-select:none;transition:left .2s,top .2s}.relay-connection-fab[data-dragging=true]{transition:none;cursor:grabbing}@media(prefers-reduced-motion:reduce){.relay-connection-fab{transition:none}}
