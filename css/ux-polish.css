@@ -81,3 +81,30 @@ body[data-hand] :is(#palletMetadata,#palletStatus,#stockHistoryList,#stockMoveme
 #publicPallet #publicPalletStatus[data-error=true]{background:#fff0f1;color:#a52334}#publicPallet[data-label-reserved=true] #publicPalletStatus{background:#fff7dd;color:#705315}
 
 .repo-state-note{direction:ltr!important;text-align:left!important;padding:10px 12px!important;border:0!important;border-radius:9px;line-height:1.5;background:#f0edf8!important;color:#27187e!important}.repo-state-note::after{content:'';display:block;clear:both}.repo-state-icon{width:18px;height:18px;float:left;margin:2px 8px 0 0;flex:none}.repo-state-note[data-state=success]{background:#eaf7ef!important;color:#23704a!important}.repo-state-note[data-state=warning]{background:#fff7dd!important;color:#705315!important}.repo-state-note[data-state=error]{background:#fff0f1!important;color:#a52334!important}
+
+/* Branch sharing: compact summary, secondary editor, persistent footer. */
+#stockShareDialog.share-branch-selected{height:auto;top:calc(var(--dialog-visible-top,0px) + 12px);bottom:auto;margin-block:0}
+#stockShareDialog.share-branch-selected:has(#stockShareBranchReview[open]){height:min(620px,calc(var(--dialog-visible-height,100dvh) - 24px))}
+#stockShareDialog.share-branch-selected #stockShareForm{flex:1}
+#stockShareDialog.share-branch-selected .stock-share-scroll{flex:1;display:flex;flex-direction:column;overflow-y:auto;overflow-anchor:none}
+#stockShareBranchSelected:not([hidden]){display:flex;align-items:center;gap:10px;margin:6px 0}
+#stockShareBranchSelected>div{flex:1;min-width:0;text-align:left}
+#stockShareBranchSelected strong,#stockShareBranchSelected small{display:block;overflow-wrap:anywhere}
+#stockShareBranchSelected small{color:#686578;font-size:.8rem}
+#stockShareBranchSelected button{min-height:44px;flex:none}
+body[data-hand=left] #stockShareBranchSelected{flex-direction:row-reverse}
+#stockShareDialog.share-branch-selected #stockShareBranchReview{display:flex;flex-direction:column;min-height:0;margin:6px 0;overflow:hidden}
+#stockShareDialog.share-branch-selected #stockShareBranchReview[hidden]{display:none}
+#stockShareDialog.share-branch-selected #stockShareBranchReview[open]{flex:1 0 170px}
+#stockShareBranchReview .share-review-edit{margin-left:auto;font-size:.78rem}
+#stockShareBranchToggle{display:flex;align-items:center;gap:7px;min-height:44px;padding:8px 10px;background:#efedf8;color:#27187e;border:0;border-radius:9px;font-size:.83rem;cursor:pointer;flex:none;width:100%;text-align:left}
+#stockShareBranchToggle svg{width:18px;height:18px;flex:none}
+#stockShareBranchToggle .library-chevron{margin-left:0}
+#stockShareBranchReview[open] .library-chevron{transform:rotate(180deg)}
+#stockShareBranchReview:not([open])>:not(#stockShareBranchToggle),#stockShareBranchReview>p{display:none}
+#stockShareDialog.share-branch-selected #stockShareBranchPalets{flex:1;min-height:0;max-height:230px;overflow-y:auto;overscroll-behavior:contain;margin:0;overflow-anchor:none}
+#stockShareFutureHint{font-size:.76rem;line-height:1.35;margin:6px 0}
+#stockShareDialog.share-branch-selected #stockShareHint{display:none}
+#stockShareDialog.share-branch-selected .stock-share-footer{flex:none}
+#stockShareDialog.share-branch-selected .stock-share-footer>label{display:block}
+#stockShareDialog.share-branch-selected .stock-share-footer>label input{display:block;width:100%;margin-top:6px}
