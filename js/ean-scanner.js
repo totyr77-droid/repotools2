@@ -215,7 +215,7 @@
 
   function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
-    const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status,:scope > #userScannerStatus');if(statusArea){statusArea.classList.add('camera-message-area','scanner-status');if(element.previousElementSibling!==statusArea)element.before(statusArea);}
+    const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status,:scope > #userScannerStatus')||(elementId==='contenedor'?document.getElementById('mainScannerStatus'):null);if(statusArea){statusArea.classList.add('camera-message-area','scanner-status');statusArea.classList.add('camera-message-overlay');}
     let revision = 0, session = null;
     const enqueue = cameraTask;
     function cameraControls(current) {
@@ -249,7 +249,7 @@
         const text = document.createElement('span'); text.className = 'ean-camera-zoom-icon'; text.setAttribute('aria-hidden', 'true');
         text.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg>';
         const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
-        input.hidden=true;
+        input.hidden=false;
         const step = Number.isFinite(zoom.step) && zoom.step > 0 ? zoom.step : .1;
         const snap = value => Math.max(Number(input.min), Math.min(Number(input.max), Number((zoom.min + Math.round((value - zoom.min) / step) * step).toFixed(6))));
         input.min = Math.max(minZoom, Number((zoom.min + Math.ceil((minZoom - zoom.min) / step) * step).toFixed(6)));
@@ -295,6 +295,7 @@
         };
         input.addEventListener('input', updateZoom);
         input.addEventListener('change', updateZoom);
+        label.addEventListener('contextmenu',event=>event.preventDefault());
         label.addEventListener('touchmove', event => event.stopPropagation(), { passive: true });
         for (const value of [1, 2, 5]) {
           if (value < Number(input.min) || value > zoom.max || Math.abs(snap(value) - value) > .001) continue;
@@ -309,7 +310,11 @@
         const adjust=direction=>{if(disposed||!active())return;input.value=snap(Number(input.value)+direction*Math.max(.1,step));updateZoom();};
         function zoomButton(direction){const b=document.createElement('button');b.type='button';b.className='ean-zoom-step';b.textContent=direction<0?'−':'+';b.setAttribute('aria-label',direction<0?'Reducir zoom':'Aumentar zoom');b.addEventListener('pointerdown',e=>{if(e.button!==0||b.disabled)return;e.preventDefault();stopHold();b.setPointerCapture?.(e.pointerId);adjust(direction);holdDelay=setTimeout(()=>holdTimer=setInterval(()=>adjust(direction),90),300);});b.addEventListener('click',e=>{if(e.detail===0)adjust(direction);});b.addEventListener('lostpointercapture',stopHold);return b;}
         minus=zoomButton(-1);plus=zoomButton(1);for(const event of ['pointerup','pointercancel','blur'])window.addEventListener(event,stopHold,{signal:holdController.signal});render(applied);
-        label.append(minus,output,plus,input); controls.append(label);
+        let pinch=null;const distance=e=>Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+        element.addEventListener('touchstart',e=>{if(e.touches.length===2&&!e.target.closest('.ean-camera-controls')){pinch={distance:distance(e),zoom:Number(input.value)};e.preventDefault();}},{passive:false,signal:holdController.signal});
+        element.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){e.preventDefault();input.value=snap(pinch.zoom*distance(e)/Math.max(1,pinch.distance));updateZoom();}},{passive:false,signal:holdController.signal});
+        for(const event of ['touchend','touchcancel'])element.addEventListener(event,()=>{pinch=null;},{signal:holdController.signal});
+        label.append(plus,input,output,minus); controls.append(label);
         if (shortcuts.childElementCount > 1) controls.append(shortcuts);
         current.cancelZoom = () => { stopHold();holdController.abort();disposed = true; pending = null; if (timer !== null) clearTimeout(timer); };
       }
@@ -439,6 +444,7 @@
         finally {
           element.querySelector?.('video')?.srcObject?.getTracks?.().forEach(track=>track.stop());
           current.viewport?.dispose(); element.classList.remove('repo-camera-viewport'); if(element.dataset)delete element.dataset.recognition;
+          if(statusArea&&statusArea.parentElement===element)element.before(statusArea);
           try { current.reader.clear(); } finally { if (cameraOwner?.current === current) cameraOwner = null; }
         }
         element.classList.remove('ean-confirmed');
@@ -463,6 +469,7 @@
         await cameraOwner?.release();
         await release(session);
         if (token !== revision) return false;
+        if(statusArea&&statusArea.parentElement===element)element.before(statusArea);
         element.classList.remove('ean-confirmed');
         element.classList.remove('ean-detecting');
         if (!window.Html5Qrcode || !window.Html5QrcodeSupportedFormats) throw new Error('No se pudo cargar el lector. Intenta nuevamente.');
@@ -509,8 +516,9 @@
             return;
           }
           enqueue(async () => {
-            await new Promise(resolve => setTimeout(resolve, 100)); await release(current);
-            if (token === revision) Promise.resolve().then(() => { if (token === revision) { beep(feedbackPreferences()); return onCode(code); } }).catch(error => { if (token === revision) onError(error); });
+            if(token!==revision)return;
+            beep(feedbackPreferences()); await new Promise(resolve => setTimeout(resolve, 180)); await release(current);
+            if (token === revision) Promise.resolve().then(() => { if (token === revision) return onCode(code); }).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };
         onStatus('Abriendo cámara…');
@@ -532,6 +540,7 @@
             }
           } catch {}
           current.viewport = cameraViewport(element, isQR, kind === 'pallet');
+          if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
           if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport);
@@ -541,6 +550,7 @@
           current.accepting = false;
           await release(current);
           if (token !== revision) return false;
+          if(statusArea)element.append(statusArea);
           throw error;
         }
       });

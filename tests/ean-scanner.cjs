@@ -23,7 +23,7 @@ window.navigator = { audioSession: { type: 'auto' }, vibrate: duration => vibrat
 window.AudioContext = class {
   constructor() { audioCreated++; lastAudio = this; this.state = 'suspended'; this.currentTime = 0; this.destination = {}; }
   resume() { audioResumed++; this.state = 'running'; return Promise.resolve(); }
-  createOscillator() { return { frequency: { setValueAtTime() {} }, connect() {}, disconnect() {}, start() { beeps++; toneSession = window.navigator.audioSession?.type; }, stop() { this.onended?.(); } }; }
+  createOscillator() { return { frequency: { setValueAtTime() {} }, connect() {}, disconnect() {}, start() { assert.equal(readers.at(-1).isScanning,true,'Tone occurs before camera release in every mode');beeps++; toneSession = window.navigator.audioSession?.type; }, stop() { this.onended?.(); } }; }
   createGain() { return { gain: { setValueAtTime() {}, linearRampToValueAtTime(value) { peak = value; }, exponentialRampToValueAtTime() {} }, connect() {}, disconnect() {} }; }
   createBuffer() { return {}; }
   createBufferSource() { return { connect() {}, disconnect() {}, start() { unlocked++; this.onended?.(); } }; }

@@ -16,3 +16,9 @@
   function ownerName(p){return p.owner_name+(p.owner_company?' ('+p.owner_company+')':'');}
   window.RepoStockUtils={ownerName,movementDate,calculate,dateISO,dateDisplay,expiryText,palletCode};
 })();
+// Quantity editing is shared by connected/offline forms; identifiers keep leading zeros.
+(()=>{if(typeof document==='undefined'||window.RepoQuantityInputs)return;window.RepoQuantityInputs=true;
+const editable=node=>node?.matches?.('#stockAmount,#deductAmount,#offlineAmount,#stockPackSize,#deductPackSize,#offlinePackSize,#deductPack,#offlinePack,#labelCount')&&!node.readOnly&&!node.disabled;
+document.addEventListener('focusin',event=>{if(editable(event.target)&&event.target.value==='0'){try{event.target.select();}catch{}};});
+document.addEventListener('input',event=>{const field=event.target;if(editable(field)&&!event.isComposing&&/^0+\d+$/.test(field.value))field.value=field.value.replace(/^0+(?=\d)/,'');},true);
+})();
