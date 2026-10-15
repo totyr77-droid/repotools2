@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/reports.php';
+require_once __DIR__.'/audit.php';
 
 function profile_user(PDO $db, int $id, bool $lock = false): array {
     $s = $db->prepare('SELECT id,name,email,company,role,created_at FROM users WHERE id=?'.($lock && $db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql'?' FOR UPDATE':'')); $s->execute([$id]);
@@ -38,14 +39,15 @@ function profile_update_information(PDO $db,int $actorId,int $targetId,array $in
             if(isset($changes['email'])) {
                 $s=$db->prepare('SELECT id FROM users WHERE LOWER(email)=LOWER(?) AND id<>?');$s->execute([$after['email'],$targetId]);
                 if($s->fetchColumn()!==false)throw new CatalogException('Ese correo ya pertenece a otra cuenta.',422);
-                $db->prepare('UPDATE users SET email=?,auth_version=auth_version+1 WHERE id=?')->execute([$after['email'],$targetId]);
+                $db->prepare('UPDATE users SET pending_email=? WHERE id=?')->execute([$after['email'],$targetId]);
                 $db->prepare('DELETE FROM password_resets WHERE user_id=?')->execute([$targetId]);
             }
             $db->prepare('UPDATE users SET name=?,company=? WHERE id=?')->execute([$name,$company,$targetId]);
+            audit_event($db,$actorId,'account_updated','profile:'.$targetId.':'.bin2hex(random_bytes(12)),['category'=>'users','target_user'=>$targetId],$before,$after);
             $after['changes']=$changes;$after['actor']=$actor['name'];
             $db->prepare('INSERT INTO user_profile_events(user_id,actor_id,before_data,after_data) VALUES(?,?,?,?)')->execute([$targetId,$actorId,json_encode($before,JSON_UNESCAPED_UNICODE),json_encode($after,JSON_UNESCAPED_UNICODE)]);
         }
-        $db->commit();
+        $db->commit();if(isset($changes['email'])){require_once __DIR__.'/email-verification.php';try{email_request($db,$targetId,$after['email']);}catch(Throwable $mailError){error_log('Repotools pending email delivery unavailable');}}
     }catch(Throwable $e){if($db->inTransaction())$db->rollBack();if($e instanceof PDOException && is_unique_violation($e))throw new CatalogException('Ese correo ya pertenece a otra cuenta.',422);throw $e;}
 }
 function profile_roles(array $actor, array $target): array {
@@ -61,6 +63,7 @@ function profile_change_role(PDO $db, int $actorId, int $targetId, string $role)
         if (!in_array($role, profile_roles($actor, $target), true)) throw new CatalogException('Tu rango no permite realizar este cambio.', 403);
         if ($target['role'] === 'manager' && $role !== 'manager' && (int)$db->query("SELECT COUNT(*) FROM users WHERE role='manager'")->fetchColumn() <= 1) throw new CatalogException('Debe quedar al menos un manager en la aplicación.', 422);
         if ($target['role'] !== $role) {
+            audit_event($db,$actorId,'role_changed','role:'.$targetId.':'.bin2hex(random_bytes(12)),['category'=>'roles','target_user'=>$targetId],['role'=>$target['role']],['role'=>$role]);
             $s = $db->prepare('UPDATE users SET role=? WHERE id=?'); $s->execute([$role,$targetId]);
             $s = $db->prepare('INSERT INTO user_role_events(user_id,actor_id,old_role,new_role) VALUES(?,?,?,?)'); $s->execute([$targetId,$actorId,$target['role'],$role]);
         }
@@ -76,7 +79,7 @@ function profile_block_reports(PDO $db, int $actorId, int $targetId, bool $block
         if (report_is_blocked($db,$target)!==$blocked) {
             if ($blocked) $db->prepare('INSERT INTO report_blocks(user_id,blocked_by) VALUES (?,?)')->execute([$targetId,$actorId]);
             else $db->prepare('DELETE FROM report_blocks WHERE user_id=?')->execute([$targetId]);
-            $db->prepare('INSERT INTO report_block_events(user_id,actor_id,action) VALUES (?,?,?)')->execute([$targetId,$actorId,$blocked?'blocked':'unblocked']);
+            $db->prepare('INSERT INTO report_block_events(user_id,actor_id,action) VALUES (?,?,?)')->execute([$targetId,$actorId,$blocked?'blocked':'unblocked']);audit_event($db,$actorId,$blocked?'blocked':'unblocked','block:'.$targetId.':'.bin2hex(random_bytes(10)),['category'=>'roles','target_user'=>$targetId],[],['blocked'=>$blocked]);
         }
         $db->commit();
     } catch (Throwable $e) {if ($db->inTransaction()) $db->rollBack();throw $e;}

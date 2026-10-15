@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../includes/auth.php';
+require_once __DIR__.'/../includes/auth.php';require_once __DIR__.'/../includes/audit.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 function account_reply(int $status,array $data): void {http_response_code($status);echo json_encode($data,JSON_UNESCAPED_UNICODE);exit;}
@@ -10,17 +10,19 @@ if (($_POST['action']??'')==='public_name') {
     $public=validate_public_user_name($_POST['public_name']??null);
     if($public===null) account_reply(422,['error'=>'Usá entre 3 y 24 caracteres: letras, números, espacios, puntos, guiones o guiones bajos.']);
     try{
-        $db=database();$stmt=$db->prepare('UPDATE users SET public_name=? WHERE id=?');$stmt->execute([$public,current_user()['id']]);
+        $db=database();$db->beginTransaction();$before=audit_q($db,'SELECT public_name FROM users WHERE id=?'.($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql'?' FOR UPDATE':''),[current_user()['id']])->fetch();$stmt=$db->prepare('UPDATE users SET public_name=? WHERE id=?');$stmt->execute([$public,current_user()['id']]);
+        if($before['public_name']!==$public)audit_event($db,(int)current_user()['id'],'public_name_updated',bin2hex(random_bytes(16)),['category'=>'users'],$before,['public_name'=>$public]);$db->commit();
         $_SESSION['user']['public_name']=$public;
         account_reply(200,['public_name'=>$public]);
-    }catch(Throwable $e){account_reply(503,['error'=>'No pudimos guardar tu nombre público. Intentá nuevamente.']);}
+    }catch(Throwable $e){if(isset($db)&&$db->inTransaction())$db->rollBack();account_reply(503,['error'=>'No pudimos guardar tu nombre público. Intentá nuevamente.']);}
 }
 $name=is_string($_POST['name']??null)?trim($_POST['name']):'';
 $company=is_string($_POST['company']??null)?trim($_POST['company']):'';
 if(mb_strlen($name)<2||mb_strlen($name)>80||mb_strlen($company)>100) account_reply(422,['error'=>'Ingresá un nombre de 2 a 80 caracteres y una empresa de hasta 100.']);
 try {
-    $db=database();$stmt=$db->prepare('UPDATE users SET name=?,company=? WHERE id=?');
+    $db=database();$db->beginTransaction();$before=audit_q($db,'SELECT name,company FROM users WHERE id=?'.($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql'?' FOR UPDATE':''),[current_user()['id']])->fetch();$stmt=$db->prepare('UPDATE users SET name=?,company=? WHERE id=?');
     $stmt->execute([$name,$company,current_user()['id']]);
+    if($before!==['name'=>$name,'company'=>$company])audit_event($db,(int)current_user()['id'],'account_updated',bin2hex(random_bytes(16)),['category'=>'users'],$before,['name'=>$name,'company'=>$company]);$db->commit();
     $_SESSION['user']['name']=$name;$_SESSION['user']['company']=$company;
     account_reply(200,['name'=>$name,'company'=>$company]);
-}catch(Throwable $e){error_log('Repotools: no se pudo actualizar la cuenta.');account_reply(503,['error'=>'No pudimos guardar los datos. Intentá nuevamente.']);}
+}catch(Throwable $e){if(isset($db)&&$db->inTransaction())$db->rollBack();error_log('Repotools: no se pudo actualizar la cuenta.');account_reply(503,['error'=>'No pudimos guardar los datos. Intentá nuevamente.']);}

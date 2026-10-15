@@ -32,6 +32,8 @@
 <script src="js/product-crop.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/mobile-navigation.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/account-sharing.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/pwa-install.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if(!empty($paginaDemo)): ?><script src="js/guest-demo.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/loading.js?v=<?= (int)app_release()['version'] ?>"></script>

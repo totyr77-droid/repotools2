@@ -4,6 +4,7 @@ $paginaCuenta = true;
 require_once __DIR__.'/includes/stock-icons.php';
 $mostrarCreditos = true;
 require_once __DIR__.'/includes/referrals.php';
+require_once __DIR__.'/includes/email-verification.php';
 $referralsEnabled=referrals_enabled();
 $register = ($_GET['mode'] ?? '') === 'registro';
 $next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion'], true) ? $_GET['next'] : '';
@@ -67,13 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) &
                 $db->prepare('DELETE FROM login_attempts WHERE started < ?')->execute([time() - 900]);
                 $db->prepare('INSERT INTO login_attempts (key, attempts, started) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET attempts = login_attempts.attempts + 1')->execute([$key, time()]);
                 if ($register) {
-                    if($referralsEnabled){referral_limit($db,'signup:'.hash('sha256',session_id()),20,3600);$referralInput=is_string($_POST['referral_code']??null)?trim($_POST['referral_code']):$referralInput;$db->beginTransaction();referral_lock($db);if(referral_q($db,'SELECT id FROM users WHERE LOWER(email)=?',[$email])->fetchColumn())throw new ReferralError('No se pudo crear la cuenta con ese correo. Intentá iniciar sesión.');}
+                    {referral_limit($db,'signup:'.hash('sha256',session_id()),20,3600);$referralInput=is_string($_POST['referral_code']??null)?trim($_POST['referral_code']):$referralInput;$db->beginTransaction();referral_lock($db);if(referral_q($db,'SELECT id FROM users WHERE LOWER(email)=?',[$email])->fetchColumn())throw new ReferralError('No se pudo crear la cuenta con ese correo. Intentá iniciar sesión.');}
                     $initialPublicName=generate_public_user_name($name,0);
                     $stmt = $db->prepare('INSERT INTO users (name, email, password_hash, company, public_name) VALUES (?, ?, ?, ?, ?) RETURNING id');
                     $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $company, $initialPublicName]);
                     $newUserId=(int)$stmt->fetchColumn();$stmt->closeCursor();
                     if($initialPublicName==='Usuario #0') $db->prepare('UPDATE users SET public_name=? WHERE id=?')->execute([generate_public_user_name($name,$newUserId),$newUserId]);
-                    if($referralsEnabled){$referralId=referral_attach($db,$newUserId,$email,$referralInput,[...$_SERVER,'referral_honeypot'=>is_string($_POST['contact_website']??null)?$_POST['contact_website']:''],time());$db->commit();unset($_SESSION['referral_invitation']);if($referralId){$delivery=[];try{$delivery=referral_issue($db,$newUserId);}catch(Throwable $mailError){error_log('Repotools: referral verification delivery unavailable');}$_SESSION['referral_registration_notice']=['user_id'=>$newUserId,'at'=>time(),'message'=>!empty($delivery['sent'])?'Cuenta creada. Confirmá tu correo para validar la invitación.':'Cuenta creada. Pedí la verificación desde Ajustes → Referidos.'];}}
+                    {if($referralsEnabled)referral_attach($db,$newUserId,$email,$referralInput,[...$_SERVER,'referral_honeypot'=>is_string($_POST['contact_website']??null)?$_POST['contact_website']:''],time());audit_event($db,$newUserId,'account_created','registration:'.$newUserId,['category'=>'users'],[],['registered'=>true]);$db->commit();unset($_SESSION['referral_invitation']);}
+                    try{$delivery=email_request($db,$newUserId);$_SESSION['referral_registration_notice']=['user_id'=>$newUserId,'at'=>time(),'message'=>!empty($delivery['sent'])?'Cuenta creada. Te enviamos la bienvenida y verificación.':'Cuenta creada. Podés pedir la verificación desde Perfil.'];}catch(Throwable $e){error_log('Repotools welcome delivery unavailable');}
                 }
                 $stmt = $db->prepare('SELECT id, name, public_name, email, role, company, password_hash, auth_version FROM users WHERE email = ?');
                 $stmt->execute([$email]);
@@ -110,14 +112,14 @@ include __DIR__ . '/vistas/header.vista.php';
     <details id="myProfileQR" class="profile-qr"><summary><?= stock_icon('qr') ?>Mi QR de perfil<span class="profile-chevron"><?= stock_icon('chevron') ?></span></summary><div class="profile-qr-image"></div><p role="status"></p></details>
 
     <?php include __DIR__.'/vistas/public-name.vista.php'; ?>
+<div id="emailVerification"><?php $verification=database()->prepare('SELECT email_verified_at,pending_email FROM users WHERE id=?');$verification->execute([current_user()['id']]);$emailState=$verification->fetch(); ?><div class="email-verification-row"><p><?= account_icon('mail') ?><?= $emailState['email_verified_at']?'Correo verificado':'Correo pendiente' ?></p><button id="resendVerification" class="library-secondary" type="button"<?= $emailState['email_verified_at']&&!$emailState['pending_email']?' hidden':'' ?>>Reenviar</button></div><?php if($emailState['pending_email']): ?><p class="settings-hint">Nueva dirección pendiente de confirmar. La anterior sigue vigente.</p><?php endif; ?><details><summary>Cambiar correo</summary><form id="changeEmailForm"><label>Nuevo correo<input type="email" name="email" maxlength="254" autocomplete="email" required></label><button type="submit" class="library-primary">Verificar nuevo correo</button></form></details><a href="referidos.php">Mis referidos</a></div>
     </section>
     <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2>
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
-    <?php if($referralsEnabled): ?><a href="referidos.php"><?= stock_icon('share') ?>Referidos</a><?php endif; ?>
     <a href="stock.php"><?= stock_icon('qr') ?>Palets</a>
-    <a href="index.php"><?= stock_icon('barcode') ?>Escáner</a></nav>
+    <a href="index.php"><?= stock_icon('barcode') ?>Escáner</a><a id="shareApp" href="referidos.php"><?= stock_icon('share') ?>Compartir app</a></nav>
     <button id="replayOnboarding" type="button" class="onboarding-replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/></svg>Ver introducción</button>
     </section>
     <section id="accountPreferences" class="settings-group settings-preferences" aria-labelledby="settingsPreferencesTitle" data-csrf="<?= escape(csrf_token()) ?>"><h2 id="settingsPreferencesTitle">Preferencias</h2>

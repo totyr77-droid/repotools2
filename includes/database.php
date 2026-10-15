@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=28;
+const REPOTOOLS_SCHEMA_VERSION=29;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -226,6 +226,40 @@ function initialize_database(PDO $db): void {
         if (!isset($applied[28])) {
             $db->exec("CREATE TABLE public_link_aliases (code TEXT PRIMARY KEY CHECK(length(code)=8), kind TEXT NOT NULL CHECK(kind IN ('p','s','b')), target TEXT NOT NULL, UNIQUE(kind,target))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(28)');
+        }
+        if (!isset($applied[29])) {
+            $db->exec("CREATE TABLE audit_events(event_id TEXT PRIMARY KEY,actor_id BIGINT NOT NULL,actor_name TEXT NOT NULL,actor_role TEXT NOT NULL,actor_rank INTEGER NOT NULL,action TEXT NOT NULL,category TEXT NOT NULL,result TEXT NOT NULL,occurred_at TEXT NOT NULL,synced_at TEXT NOT NULL,operation_id TEXT NOT NULL,branch_id BIGINT,pallet_id BIGINT,pallet_code TEXT NOT NULL DEFAULT '',ean TEXT NOT NULL DEFAULT '',target_user BIGINT,before_data TEXT NOT NULL,after_data TEXT NOT NULL)");
+            $db->exec('CREATE INDEX audit_recent ON audit_events(synced_at,event_id)');
+            $db->exec('CREATE INDEX audit_actor_date ON audit_events(actor_id,occurred_at)');
+            $db->exec('CREATE INDEX audit_pallet_date ON audit_events(pallet_code,occurred_at)');
+            $db->exec('CREATE INDEX audit_branch_date ON audit_events(branch_id,occurred_at)');
+            $db->exec('CREATE INDEX audit_ean_date ON audit_events(ean,occurred_at)');
+            $db->exec('CREATE TABLE ranking_daily(kind TEXT NOT NULL,subject_id BIGINT NOT NULL,day TEXT NOT NULL,value BIGINT NOT NULL,PRIMARY KEY(kind,subject_id,day))');
+            $db->exec('CREATE INDEX ranking_day_kind ON ranking_daily(kind,day,subject_id)');
+            $db->exec('ALTER TABLE users ADD COLUMN email_verified_at BIGINT');
+            $db->exec('ALTER TABLE users ADD COLUMN pending_email TEXT');
+            $db->exec('CREATE TABLE email_verifications(token_hash TEXT PRIMARY KEY,user_id BIGINT NOT NULL REFERENCES users(id),address TEXT NOT NULL,expires BIGINT NOT NULL,used_at BIGINT,created BIGINT NOT NULL)');
+            $db->exec('CREATE INDEX email_verification_user ON email_verifications(user_id,created)');
+            $db->exec('CREATE TABLE email_delivery_limits(user_id BIGINT PRIMARY KEY,last_sent BIGINT NOT NULL,window_start BIGINT NOT NULL,attempts INTEGER NOT NULL)');
+            require_once __DIR__.'/referrals.php';referral_schema($db,true);$db->exec('CREATE INDEX IF NOT EXISTS referrals_verified_period ON referrals(state,email_verified_at,referrer_id)');$db->exec('CREATE INDEX IF NOT EXISTS referrals_owner_status ON referrals(referrer_id,state,email_verified_at)');$db->exec('CREATE INDEX audit_category_date ON audit_events(category,occurred_at)');
+            // Legacy logs remain inspectable; their historical rank was not captured.
+            $sources=[
+                ['product_edits','e.user_id','e.ean','e.created_at',"'edited'",'movements'],
+                ['pallet_admin_events','e.user_id','e.code','e.created_at','e.action','movements'],
+                ['user_role_events','e.actor_id',"''",'e.created_at',"'role_changed'",'roles'],
+                ['user_profile_events','e.actor_id',"''",'e.created_at',"'account_updated'",'users'],
+                ['branch_events','e.actor_id',"''",'e.created_at','e.action','movements'],
+                ['report_block_events','e.actor_id',"''",'e.created_at','e.action','roles']
+            ];
+            foreach($sources as [$table,$actor,$target,$date,$action,$category])$db->exec("INSERT INTO audit_events(event_id,actor_id,actor_name,actor_role,actor_rank,action,category,result,occurred_at,synced_at,operation_id,pallet_code,before_data,after_data) SELECT 'legacy:{$table}:'||e.id,COALESCE({$actor},0),COALESCE(u.public_name,'Usuario eliminado'),'No registrado',3,{$action},'{$category}','confirmed',CAST({$date} AS TEXT),CAST({$date} AS TEXT),'legacy:{$table}:'||e.id,{$target},'{}','{\"legacy\":true,\"historical_role_unknown\":true}' FROM {$table} e LEFT JOIN users u ON u.id={$actor} ON CONFLICT(event_id) DO NOTHING");
+
+            require_once __DIR__.'/audit.php';
+            foreach($sources as [$table]){foreach(array_chunk($db->query('SELECT * FROM '.$table)->fetchAll(),40) as $batch){$values=[];foreach($batch as $legacy){$before=json_decode($legacy['before_data']??'{}',true)??[];$after=json_decode($legacy['after_data']??$legacy['details']??'{}',true)??[];if(isset($legacy['old_role'])){$before=['role'=>$legacy['old_role']];$after=['role'=>$legacy['new_role']];}$after['historical_role_unknown']=true;$values[]=['legacy:'.$table.':'.$legacy['id'],json_encode(audit_clean($before)),json_encode(audit_clean($after)),$legacy['ean']??'',$legacy['user_id']??null,(new DateTimeImmutable($legacy['created_at'],new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s')];}$sets=[];$params=[];foreach(['before_data','after_data','ean','target_user','occurred_at','synced_at'] as $index=>$column){$case=$column.'=CASE event_id';foreach($values as $row){$case.=' WHEN ? THEN ?';$params[]=$row[0];$params[]=$row[min($index+1,5)];}$sets[]=$case.' ELSE '.$column.' END';}$ids=array_column($values,0);$q=$db->prepare('UPDATE audit_events SET '.implode(',',$sets).' WHERE event_id IN ('.implode(',',array_fill(0,count($ids),'?')).')');$q->execute([...$params,...$ids]);}}
+            $db->exec("UPDATE audit_events SET pallet_code='' WHERE event_id LIKE 'legacy:product_edits:%'");
+            $db->exec("INSERT INTO audit_events(event_id,actor_id,actor_name,actor_role,actor_rank,action,category,result,occurred_at,synced_at,operation_id,ean,before_data,after_data) SELECT 'legacy:review:'||r.id,COALESCE(r.reviewed_by,0),COALESCE(u.public_name,'Usuario eliminado'),'No registrado',3,r.status,'roles','confirmed',CAST(r.reviewed_at AS TEXT),CAST(r.reviewed_at AS TEXT),'legacy:review:'||r.id,r.ean,'{}','{}' FROM product_reports r LEFT JOIN users u ON u.id=r.reviewed_by WHERE r.reviewed_at IS NOT NULL ON CONFLICT(event_id) DO NOTHING");
+            $db->exec("INSERT INTO audit_events(event_id,actor_id,actor_name,actor_role,actor_rank,action,category,result,occurred_at,synced_at,operation_id,before_data,after_data) SELECT 'legacy:registration:'||u.id,u.id,u.public_name,'No registrado',3,'account_created','users','confirmed',CAST(u.created_at AS TEXT),CAST(u.created_at AS TEXT),'legacy:registration:'||u.id,'{}','{}' FROM users u WHERE 1=1 ON CONFLICT(event_id) DO NOTHING");
+            foreach($db->query('SELECT r.invitee_id,r.email_verified_at,r.email_hash,u.email FROM referrals r JOIN users u ON u.id=r.invitee_id WHERE r.email_verified_at IS NOT NULL') as $legacy)if(hash_equals($legacy['email_hash'],hash('sha256',strtolower(trim($legacy['email'])))))$db->prepare('UPDATE users SET email_verified_at=? WHERE id=?')->execute([$legacy['email_verified_at'],$legacy['invitee_id']]);
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(29)');
         }
         $db->commit();
     } catch (Throwable $error) {

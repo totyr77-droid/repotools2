@@ -18,6 +18,7 @@ include 'vistas/header.vista.php';
     <button id="boton" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5v14M6 5v14M10 5v14M13 5v14M18 5v14M21 5v14"/></svg>Escanear producto</button>
 
     <!--BOTON VER-->
+    <aside id="pwaInstallCard" class="pwa-install-card" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3H5v18h14V3h-3M12 3v11m-4-4 4 4 4-4"/></svg><div><strong>RepoTools a mano</strong><p>Instalala para abrirla desde tu pantalla de inicio.</p><button id="installApp" type="button" class="library-secondary">Instalar app</button><p id="installAppHelp" hidden></p></div></aside>
     <section class="home-list"><div class="home-list-heading"><div><h2>Tu lista</h2><p>Guardada en este dispositivo.</p></div><div class="home-list-actions">
     <div class="box-tools" id="resultados">
       <button class="resultados-box" id="ver" type="button" aria-label="Ver codigos escaneados">

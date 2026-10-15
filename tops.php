@@ -2,7 +2,7 @@
 require_once __DIR__.'/includes/auth.php';
 require_once __DIR__.'/includes/tops.php';
 $viewer=current_user();$paginaCuenta=true;$paginaTops=true;
-$category=isset(tops_categories()[$_GET['categoria']??''])?$_GET['categoria']:'codigos';
+$category=isset(tops_categories()[$_GET['categoria']??''])?$_GET['categoria']:'referidos';
 $period=in_array($_GET['periodo']??'', ['semana','mes','historico'],true)?$_GET['periodo']:'semana';
 $error='';$ranking=['leaders'=>[],'own'=>null];
 try{$ranking=tops_ranking(database(),$category,$period,$viewer?(int)$viewer['id']:null);}catch(Throwable $e){$error='No pudimos cargar el ranking. Intentá más tarde.';}

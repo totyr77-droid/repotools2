@@ -118,3 +118,15 @@ body[data-hand=left] #stockShareBranchSelected{flex-direction:row-reverse}
 #invitationList{max-height:45dvh;overflow-y:auto;overscroll-behavior:contain}
 .stock-invitation-target{background:#efedf8;border-radius:8px;box-shadow:inset 3px 0 #27187e}
 @media(prefers-reduced-motion:reduce){#stockInvitations>summary svg:last-child{transition:none}}
+
+
+#emailVerification{margin-top:12px;font-size:.85rem}#emailVerification p{margin:6px 0}#emailVerification summary{min-height:44px;display:flex;align-items:center;color:#27187e;cursor:pointer}#emailVerification input{max-width:100%;box-sizing:border-box}
+.pwa-install-card:not([hidden]){display:flex;gap:10px;padding:12px;border-radius:12px;background:#efedf8;color:#27187e;text-align:left;width:100%;box-sizing:border-box;align-items:flex-start}
+.pwa-install-card>svg{width:22px;height:22px;flex:none}.pwa-install-card p{font-size:.82rem;line-height:1.4;margin:4px 0 8px}.pwa-install-card button{min-height:44px}.pwa-install-card #installAppHelp{color:#536174;margin-top:8px}
+
+.audit-extra-filters{flex-basis:100%}.audit-extra-filters>summary,.audit-event-detail>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;color:#27187e}.audit-extra-filters>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}.audit-event-detail{direction:ltr;text-align:left}.audit-event-detail pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-height:35dvh;overflow:auto}.audit-event-detail p{overflow-wrap:anywhere;font-size:.8rem}.audit-extra-filters input{min-width:0;width:100%;box-sizing:border-box}
+@media(min-width:1100px){.audit-event-detail[open]>div{position:fixed;right:16px;top:110px;bottom:32px;width:360px;max-width:35vw;overflow:auto;padding:16px;background:white;box-shadow:0 4px 24px #17203320;border:1px solid #e7e3f0;border-radius:12px;z-index:110}.audit-event-detail[open]::before{content:'Detalle del movimiento';display:block;color:#27187e;font-weight:600}}
+
+.email-verification-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.email-verification-row p{display:flex;align-items:center;gap:8px;min-width:0;color:#27187e}.email-verification-row svg{width:20px;height:20px;flex:none}#emailVerification button{width:auto;min-height:44px;padding:8px 12px;font-size:.82rem}body[data-hand=left] .email-verification-row{flex-direction:row-reverse}
+
+#emailVerification>a{display:inline-flex;align-items:center;min-height:44px}

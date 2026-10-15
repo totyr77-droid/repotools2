@@ -165,6 +165,7 @@ function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision
         $product = catalog_product($db, $ean);
         $db->prepare('INSERT INTO product_edits (ean, user_id, before_data, after_data) VALUES (?, ?, ?, ?)')->execute([$ean, $userId, json_encode($before, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), json_encode($reviewedReportId===null?$product:[...$product,'reviewed_report_id'=>$reviewedReportId], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)]);
         $db->prepare('DELETE FROM product_lookup_state WHERE ean = ?')->execute([$ean]);
+        if($reviewedReportId===null){require_once __DIR__.'/audit.php';audit_event($db,$userId,'edited','catalog:'.$ean.':'.$product['revision'],['category'=>'movements','ean'=>$ean],$before??[],$product,'confirmed',null,1);}
         if ($ownTransaction) $db->commit();
         return $product;
     } catch (Throwable $error) { if ($ownTransaction && $db->inTransaction()) $db->rollBack(); throw $error; }

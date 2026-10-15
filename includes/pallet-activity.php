@@ -2,8 +2,8 @@
 declare(strict_types=1);
 require_once __DIR__.'/stock.php';
 function pallet_activity_snapshot(PDO $db,int $id): ?array {
-    $p=stock_query($db,'SELECT id,description,released FROM pallets WHERE id=?',[$id])->fetch();if(!$p)return null;
-    $p['products']=stock_query($db,'SELECT id,ean,name,units,expires FROM pallet_products WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+    $p=stock_query($db,'SELECT id,code,branch_id,description,released,activated,owner_id FROM pallets WHERE id=?',[$id])->fetch();if(!$p)return null;
+    $p['products']=stock_query($db,'SELECT id,ean,name,units,expires,revision FROM pallet_products WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
     $p['members']=stock_query($db,"SELECT user_id FROM pallet_access WHERE pallet_id=? AND status='accepted'",[$id])->fetchAll(PDO::FETCH_COLUMN);
     $p['accesses']=stock_query($db,'SELECT user_id,status FROM pallet_access WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_KEY_PAIR);
     return $p;

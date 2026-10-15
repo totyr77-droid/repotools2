@@ -21,12 +21,14 @@ function library_share_create(PDO $db, int $userId, int $libraryId): string {
     $stmt->execute([$libraryId]);
     $products = $stmt->fetchAll();
     if (count($products) < 1) throw new DomainException('Agrega un producto para compartir.');
+    $own=!$db->inTransaction();if($own)$db->beginTransaction();try{
     $token = bin2hex(random_bytes(32));
     $payload = json_encode(['name' => $name, 'products' => $products], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     $db->prepare('INSERT INTO library_shares (token, source_library_id, owner_id, payload) VALUES (?, ?, ?, ?) ON CONFLICT(source_library_id) DO UPDATE SET payload = excluded.payload')->execute([$token, $libraryId, $userId, $payload]);
     $stmt = $db->prepare('SELECT token FROM library_shares WHERE source_library_id = ?');
     $stmt->execute([$libraryId]);
-    return $stmt->fetchColumn();
+    $saved=$stmt->fetchColumn();require_once __DIR__.'/audit.php';audit_event($db,$userId,'library_shared','library:'.$libraryId.':'.hash('sha256',$payload),['category'=>'links'],[],['collection'=>$name,'products'=>count($products)],'confirmed',null,1);if($own)$db->commit();return $saved;
+    }catch(Throwable $e){if($own&&$db->inTransaction())$db->rollBack();throw $e;}
 }
 
 function library_share_import(PDO $db, int $userId, string $token): int {
