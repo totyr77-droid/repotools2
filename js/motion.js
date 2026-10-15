@@ -2,7 +2,7 @@
  const groups='.main-scan-modes,.hand-options,.stock-tabs,.reports-tabs,.reports-state-tabs,.library-collections,.branch-picker-tabs,.branch-shortcuts,.share-mode-tabs,.tops-periods,.offline-tabs,.nav,.nav-celular';
  const panels='#reportsList,#collectionPanel,#palletProducts,#ownedPanel,#pendingPanel,#sharedSection,#adminPanel,#stockShareResult,#palletBranchPreview,#mainRapidPanel,#userWorkspace,#userProfile,#userDirectoryList,#topsRanking,#offlineContent,#stockSearchResults,.library-status,.report-photo-request,.report-more-data,.report-sender-data,.library-empty-notice';
  const fields='#stockPackLabel,#stockEanLabel,#userEditEmailLabel,#offlineStockFields,.library-status';
- const ignored='.ean-reader,video,canvas,.branch-map,.leaflet-container,.maplibregl-map';
+ const ignored='#offlineContent,.ean-reader,video,canvas,.branch-map,.leaflet-container,.maplibregl-map';
  function mount(body,page){
    let frame=0,disposed=false;const tracked=new Map(),dirty=new Set(),animations=new Set(),lastReveal=new WeakMap(),reduced=matchMedia('(prefers-reduced-motion: reduce)');
    let entered=false;

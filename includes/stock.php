@@ -18,7 +18,7 @@ function stock_query(PDO $db, string $sql, array $args = []): PDOStatement {
 }
 function stock_expire(PDO $db): void {
     $now = time();
-    stock_query($db, 'UPDATE pallets SET released=1 WHERE released=0 AND activated=0 AND prepared_until<=?', [$now]);
+    stock_query($db, 'UPDATE pallets SET released=1 WHERE released=0 AND activated=0 AND prepared_until<=? AND NOT EXISTS (SELECT 1 FROM pallet_products b WHERE b.pallet_id=pallets.id)', [$now]);
     $db->exec('UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id IN (SELECT id FROM pallets WHERE released=1)');
     stock_query($db, 'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE pallet_id IS NULL AND reserved_until<=?', [$now]);
 }
@@ -26,6 +26,7 @@ function stock_label(PDO $db, string $code): array {
     if (!preg_match('/^[0-9]{8}$/D', $code)) throw new CatalogException('Ingresa los 8 números del palet.', 422);
     $label = stock_query($db, 'SELECT * FROM pallet_labels WHERE code=?', [$code])->fetch();
     if (!$label) throw new CatalogException('Este código no fue generado por Repotools.', 404);
+    if (stock_query($db,'SELECT id FROM pallets WHERE code=? AND released=0 AND id<>? LIMIT 1',[$code,(int)($label['pallet_id']??0)])->fetchColumn()) throw new CatalogException('No pudimos verificar el vínculo de este código con su palet. Necesita revisión; no está disponible para reutilizar.',409);
     return $label;
 }
 function stock_generate(PDO $db, int $user): array {
@@ -146,7 +147,13 @@ function stock_save_product(PDO $db,int $user,array $input): array {
     } else stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size) VALUES(?,?,?,?,?,?,?)',[$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size']]);
     if ($v['kind']!=='units') stock_query($db,'INSERT INTO stock_product_references(ean,kind,pack_size,updated_by) VALUES(?,?,?,?) ON CONFLICT(ean,kind) DO UPDATE SET pack_size=excluded.pack_size,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP',[$v['ean'],$v['kind'],$v['pack_size'],$user]);
     stock_query($db,'UPDATE pallets SET activated=1 WHERE id=?',[$id]); stock_touch($db,$id,$user);
-    return ['code'=>$p['code'],'id'=>$id,'relocated'=>$relocated];
+    $result=['code'=>$p['code'],'id'=>$id,'relocated'=>$relocated];
+    if (!$productId) {
+        $saved=stock_query($db,'SELECT id,ean,expires,units,revision FROM pallet_products WHERE pallet_id=? AND ean=? AND expires=?',[$id,$v['ean'],$v['expires']])->fetch();
+        if (!$saved || (int)$saved['units'] !== (int)($existing['units']??0)+$v['units']) throw new CatalogException('No pudimos confirmar las unidades del producto. La carga no se aplicó.',503);
+        $result['movement']=['product_id'=>(int)$saved['id'],'ean'=>$saved['ean'],'expires'=>$saved['expires'],'units_added'=>$v['units'],'units_before'=>(int)($existing['units']??0),'units_after'=>(int)$saved['units'],'product_revision'=>(int)$saved['revision']];
+    }
+    return $result;
 }
 function stock_warning_days(PDO $db,int $user): int {
     $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();

@@ -29,3 +29,5 @@ Pendientes físicas: Safari/iPhone y PWA instalada, teclado virtual/áreas segur
 La publicación solicitada apunta a Main/servicio de producción, no depende de esperar despliegue del servicio betaFree. No se implementó un supuesto arreglo de infraestructura ni se cambió facturación: restricciones o incidencias de Render se gestionan en el proveedor. No se atribuye el fallo previo a una causa técnica sin logs.
 
 Revertir el commit de este pulido en Main, sin borrar datos ni almacenamiento local. Desactivar el switch restaura modo tradicional. Verificar despliegue por hashes y plantilla sin BETA; push no demuestra que Render publicó.
+
+Publicación comprobada: Main b447a20a82afa41e59688295aa87261cbb1973fb; producción HTTP200,5assets coincidentes y plantilla sin BETA. Verificador local tmp/verify-main-ux.cjs. Este pulido no promueve Referidos ni contratos nuevos de sincronización.

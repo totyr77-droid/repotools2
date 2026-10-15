@@ -40,9 +40,10 @@
 
 <script src="js/device-connection.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/action-notices.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php $referralNotice=$_SESSION['referral_registration_notice']??null;if($referralNotice&&current_user()&&(int)$referralNotice['user_id']===(int)current_user()['id']){unset($_SESSION['referral_registration_notice']);if((int)$referralNotice['at']>time()-900): ?><script>window.RepoToast?.(<?= json_encode($referralNotice['message'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>,{kind:'info'});</script><?php endif;} ?>
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
+<script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -50,7 +51,7 @@
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/biblioteca.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php elseif (!empty($paginaReportes)): ?>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
+<script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -73,7 +74,7 @@
 <script src="js/stock-branches.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.ean-upc.min.js"></script>
+<script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -99,5 +100,7 @@
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-export.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-export.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-overview.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-overview.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/motion.js?v=<?= (int)app_release()['version'] ?>"></script>
+
+
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
 </html>

@@ -12,6 +12,7 @@ function stock_icon(string $name): string {
         'barcode'=>'<path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/>',
         'keyboard'=>'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M7 16h10"/>',
         'print'=>'<path d="M6 9V3h12v6M6 17H3V9h18v8h-3M6 14h12v7H6zM17 12h.01"/>',
+        'copy'=>'<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/>',
         'share'=>'<path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/>',
         'settings'=>'<path d="M9.7 2h4.6l.6 2.8 2.1 1.2 2.7-.8 2.3 4-2.1 2v2.4l2.1 2-2.3 4-2.7-.8-2.1 1.2-.6 2.8H9.7l-.6-2.8L7 18.8l-2.7.8-2.3-4 2.1-2v-2.4L2 9.2l2.3-4 2.7.8 2.1-1.2z"/><circle cx="12" cy="12" r="3"/>',
         'trash'=>'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',

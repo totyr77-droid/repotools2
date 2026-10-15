@@ -3,10 +3,14 @@ require_once __DIR__ . '/includes/auth.php';
 $paginaCuenta = true;
 require_once __DIR__.'/includes/stock-icons.php';
 $mostrarCreditos = true;
+require_once __DIR__.'/includes/referrals.php';
+$referralsEnabled=referrals_enabled();
 $register = ($_GET['mode'] ?? '') === 'registro';
 $next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion'], true) ? $_GET['next'] : '';
 $error = $_SESSION['logout_error'] ?? '';
 unset($_SESSION['logout_error']);
+$invitation=$_SESSION['referral_invitation']??null;
+$referralInput=($invitation&&($invitation['expires']??0)>time())?(string)$invitation['code']:'';
 $name = '';
 $email = '';
 $company = '';
@@ -63,11 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) &
                 $db->prepare('DELETE FROM login_attempts WHERE started < ?')->execute([time() - 900]);
                 $db->prepare('INSERT INTO login_attempts (key, attempts, started) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET attempts = login_attempts.attempts + 1')->execute([$key, time()]);
                 if ($register) {
+                    if($referralsEnabled){referral_limit($db,'signup:'.hash('sha256',session_id()),20,3600);$referralInput=is_string($_POST['referral_code']??null)?trim($_POST['referral_code']):$referralInput;$db->beginTransaction();referral_lock($db);if(referral_q($db,'SELECT id FROM users WHERE LOWER(email)=?',[$email])->fetchColumn())throw new ReferralError('No se pudo crear la cuenta con ese correo. Intentá iniciar sesión.');}
                     $initialPublicName=generate_public_user_name($name,0);
                     $stmt = $db->prepare('INSERT INTO users (name, email, password_hash, company, public_name) VALUES (?, ?, ?, ?, ?) RETURNING id');
                     $stmt->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $company, $initialPublicName]);
                     $newUserId=(int)$stmt->fetchColumn();$stmt->closeCursor();
                     if($initialPublicName==='Usuario #0') $db->prepare('UPDATE users SET public_name=? WHERE id=?')->execute([generate_public_user_name($name,$newUserId),$newUserId]);
+                    if($referralsEnabled){$referralId=referral_attach($db,$newUserId,$email,$referralInput,[...$_SERVER,'referral_honeypot'=>is_string($_POST['contact_website']??null)?$_POST['contact_website']:''],time());$db->commit();unset($_SESSION['referral_invitation']);if($referralId){$delivery=[];try{$delivery=referral_issue($db,$newUserId);}catch(Throwable $mailError){error_log('Repotools: referral verification delivery unavailable');}$_SESSION['referral_registration_notice']=['user_id'=>$newUserId,'at'=>time(),'message'=>!empty($delivery['sent'])?'Cuenta creada. Confirmá tu correo para validar la invitación.':'Cuenta creada. Pedí la verificación desde Ajustes → Referidos.'];}}
                 }
                 $stmt = $db->prepare('SELECT id, name, public_name, email, role, company, password_hash, auth_version FROM users WHERE email = ?');
                 $stmt->execute([$email]);
@@ -82,7 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['device_decision']) &
                 }
 
             }
-        } catch (PDOException $exception) {
+        } catch (ReferralError $exception) {if(isset($db)&&$db->inTransaction())$db->rollBack();$error=$exception->getMessage();
+        } catch (PDOException $exception) {if(isset($db)&&$db->inTransaction())$db->rollBack();
             $error = is_unique_violation($exception) ? 'No se pudo crear la cuenta con ese correo. Intenta iniciar sesión.' : 'No pudimos acceder a las cuentas. Intenta más tarde.';
         }
     }
@@ -117,6 +124,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
+    <?php if($referralsEnabled): ?><a href="referidos.php"><?= stock_icon('share') ?>Referidos</a><?php endif; ?>
     <a href="stock.php"><?= stock_icon('qr') ?>Palets</a>
     <a href="index.php"><?= stock_icon('barcode') ?>Escáner</a></nav>
     <button id="replayOnboarding" type="button" class="onboarding-replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/></svg>Ver introducción</button>
@@ -133,6 +141,7 @@ include __DIR__ . '/vistas/header.vista.php';
       <label><span class="account-field-title"><?= account_icon('company') ?>Empresa o agencia <small>(opcional)</small></span><input name="company" autocomplete="organization" maxlength="100" placeholder="Marca, empresa o agencia" value="<?= escape($company) ?>"></label><p class="account-field-hint">Se mostrará junto a tu nombre en los palets.</p><?php endif; ?>
       <label><span class="account-field-title"><?= account_icon('mail') ?>Correo electrónico</span><input type="email" name="email" autocomplete="email" maxlength="254" placeholder="nombre@correo.com" required value="<?= escape($email) ?>"></label>
       <label><span class="account-field-title"><?= account_icon('lock') ?>Contraseña</span><span class="account-password-field"><input id="accountPassword" type="password" name="password" autocomplete="<?= $register ? 'new-password' : 'current-password' ?>" placeholder="<?= $register ? 'Al menos 10 caracteres' : 'Tu contraseña' ?>" <?= $register ? 'minlength="10" maxlength="72"' : '' ?> required><button class="password-toggle" type="button" aria-label="Mostrar contraseña" title="Mostrar contraseña" aria-controls="accountPassword" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></span></label>
+      <?php if($register&&$referralsEnabled): ?><details class="referral-registration"<?= $referralInput!==''?' open':'' ?>><summary>Código de invitación <small>(opcional)</small></summary><label>Código<input name="referral_code" maxlength="12" autocomplete="off" placeholder="Ej.: A7B2C9D4E8F1" value="<?= escape($referralInput) ?>"></label></details><div hidden aria-hidden="true"><input name="contact_website" tabindex="-1" autocomplete="off"></div><?php endif; ?>
       <button type="submit"><?= $register ? 'CREAR CUENTA' : 'INGRESAR' ?></button>
     </form><?php endif; ?>
     <?php if (!$register): ?><a class="account-create-button" href="cuenta.php?mode=registro&amp;next=<?= escape($next) ?>"><?= account_icon('user') ?><span>Crear cuenta</span></a><?php endif; ?>

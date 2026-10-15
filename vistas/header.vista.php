@@ -80,6 +80,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/action-notices.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
+    <?php if (!empty($paginaReferidos)): ?><link href="css/referrals.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
     <?php if (!empty($paginaTops)): ?><link href="css/tops.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/home.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/results-viewer.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
@@ -93,11 +94,13 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
 <link href="css/connectivity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/responsive.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
 <link href="css/motion.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
-<link href="css/mobile-navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/one-hand-mode.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/ux-polish.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>" as="script"><link rel="preload" href="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>" as="script"></head>
+<link href="css/mobile-navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
+<link href="css/one-hand-mode.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
+<link href="css/ux-polish.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>" as="script"><link rel="preload" href="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>" as="script"></head>
   <?php require_once __DIR__.'/../includes/app-release.php'; ?><body data-app-updates="<?= current_user() && isset($roleLabels[$navRole]) ? '1' : '0' ?>" data-app-version="<?= (int)app_release()['version'] ?>" data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
+    <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <header>
-      <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
-    <div class="header-contenedor">
+      <div class="header-contenedor">
         <a class="logo" href="./" aria-label="Inicio Repotools"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"><?php if(current_user()&&$navRole==='manager'): ?><span class="app-logo-version" aria-label="Versión <?= app_release_label() ?>">v<?= app_release_label() ?></span><?php endif; ?></a>
 
         <?php if(current_user() && (!empty($paginaStock)||!empty($paginaBiblioteca)||!empty($paginaReportes))): ?><a class="workspace-account-icon" href="cuenta.php" aria-label="Mi cuenta y ajustes" title="Mi cuenta y ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a><?php endif; ?>

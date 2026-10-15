@@ -24,3 +24,8 @@ Repotools debe sentirse rápido, simple, limpio y predecible. Aplicar estos crit
 - Textos breves, naturales y directos en español rioplatense consistente.
 
 Antes de cada commit revisar elementos innecesarios, pasos evitables, claridad de la acción principal, comodidad móvil, minimalismo, consistencia de iconos y posibles confusiones. Corregir cualquier problema encontrado antes de publicar. Integrar cada función como parte natural de la aplicación.
+
+## Publicación y versiones
+Cada commit de código incrementa release.json mediante .githooks/pre-commit (core.hooksPath=.githooks). Antes de publicar, ejecutar node scripts/bump-release.cjs 'Resumen breve en español' para registrar cambios concretos; el hook evita un segundo incremento si release.json ya está staged. Mantener versiones independientes Main/beta, no copiar release.json antiguo entre ramas. Probar y documentar cada entrega.
+
+Versión visible desde esta entrega: 1.00. El contador version de release.json sigue interno para caché; major/minor generan la etiqueta. El helper incrementa minor (1.01), --major incrementa major y reinicia minor (2.00). No usar números flotantes ni reiniciar el contador interno.
