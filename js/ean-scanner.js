@@ -215,7 +215,7 @@
 
   function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false }) {
     const element = document.getElementById(elementId);
-    const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status');if(statusArea){statusArea.classList.add('camera-message-area');if(element.previousElementSibling!==statusArea)element.before(statusArea);}
+    const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status,:scope > #userScannerStatus');if(statusArea){statusArea.classList.add('camera-message-area','scanner-status');if(element.previousElementSibling!==statusArea)element.before(statusArea);}
     let revision = 0, session = null;
     const enqueue = cameraTask;
     function cameraControls(current) {

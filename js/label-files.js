@@ -15,7 +15,7 @@
     for (const file of files) {
       const name = encoder.encode(file.name), data = new Uint8Array(await file.arrayBuffer()), crc = crc32(data);
       const local = header(30, 0x04034b50), central = header(46, 0x02014b50);
-      local.view.setUint16(4, 20, true); local.view.setUint16(6, 0x800, true);
+      local.view.setUint16(12,33,true);central.view.setUint16(14,33,true);local.view.setUint16(4, 20, true); local.view.setUint16(6, 0x800, true);
       local.view.setUint32(14, crc, true); local.view.setUint32(18, data.length, true); local.view.setUint32(22, data.length, true); local.view.setUint16(26, name.length, true);
       central.view.setUint16(4, 20, true); central.view.setUint16(6, 20, true); central.view.setUint16(8, 0x800, true);
       central.view.setUint32(16, crc, true); central.view.setUint32(20, data.length, true); central.view.setUint32(24, data.length, true); central.view.setUint16(28, name.length, true); central.view.setUint32(42, offset, true);
@@ -33,7 +33,8 @@
   };
   labels.shareFiles = async files => {
     if (!files.length) throw Error('No hay etiquetas para compartir.');
-    if (navigator.canShare?.({ files })) {
+    let supported=false;try{supported=!!navigator.canShare?.({files});}catch{}
+    if (supported) {
       try { await navigator.share({ files, title: 'Etiquetas de palets · Repotools' }); return 'Etiquetas compartidas.'; }
       catch (error) { if (error.name === 'AbortError') throw error; }
     }

@@ -12,7 +12,7 @@ window.Html5Qrcode=class{constructor(id){this.id=id;this.isScanning=false;reader
 });
 await p.locator('#boton').click();await p.waitForFunction(()=>camera.starts===1);assert.equal(await p.locator('#mainScanNormal').getAttribute('aria-pressed'),'true');
 const emit=async(code,frames=3)=>{for(let i=0;i<frames;i++){await p.evaluate(c=>readers.at(-1).success(c),code);await p.waitForTimeout(110)}};
-await p.locator('#mainScanRapid').click();assert.equal(await p.evaluate(()=>camera.starts),1,'Switching to rapid preserves the live stream');
+await p.waitForTimeout(300);const normalFrame=await p.locator('.main-camera-slot').boundingBox(),normalDialog=await p.locator('#contenedormax').boundingBox();await p.locator('#mainScanRapid').click();const rapidFrame=await p.locator('.main-camera-slot').boundingBox(),rapidDialog=await p.locator('#contenedormax').boundingBox();assert.ok(Math.abs(normalFrame.y-rapidFrame.y)<1&&Math.abs(normalFrame.height-rapidFrame.height)<1);assert.ok(Math.abs(normalDialog.height-rapidDialog.height)<1);assert.equal(await p.evaluate(()=>camera.starts),1,'Switching to rapid preserves the live stream');
 const feedbackHeight=(await p.locator('.main-rapid-feedback').boundingBox()).height;
 await p.evaluate(()=>document.body.dataset.hand='left');assert.ok((await p.locator('#mainScanNormal').boundingBox()).x<(await p.locator('#mainScanRapid').boundingBox()).x,'Normal is reachable on the left');
 await p.evaluate(()=>document.body.dataset.hand='right');assert.ok((await p.locator('#mainScanNormal').boundingBox()).x>(await p.locator('#mainScanRapid').boundingBox()).x,'Normal is reachable on the right');

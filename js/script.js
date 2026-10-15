@@ -285,7 +285,7 @@ function cambiarModoRapido(enabled) {
   rapidActive = enabled;
   if (enabled) {
     rapidCount = 0;
-    document.getElementById('mainRapidCount').textContent = 'Escaneados: 0';
+    document.getElementById('mainRapidCount').textContent = 'Escaneados: 0';document.getElementById('mainRapidOutcome').textContent='';
     document.getElementById('mainRapidLast').textContent = 'Listo para escanear';
     document.getElementById('mainRapidCode').textContent = '';
     document.getElementById('mainRapidActions').replaceChildren();
@@ -306,6 +306,7 @@ function mostrarProductoRapido(product) {
 
 async function iniciarScanner() {
   const revision = ++scannerRevision;
+  delete els.contenedormax.dataset.hasResult;
   scanResultRevision++;
   resultadoActual = '';
   ultimoAgregado = null;
@@ -357,7 +358,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   indiceActual = lista.indexOf(codigo) + 1;
 
   if (rapidActive) {
-    rapidCount++;
+    rapidCount++;document.getElementById('mainRapidOutcome').textContent=esDuplicado?'Ya está en tu lista. No se agregó otra vez.':'Producto agregado a tu lista.';
     document.getElementById('mainRapidCount').textContent = `Escaneados: ${rapidCount}`;
     document.getElementById('mainRapidCode').textContent = codigo;
     document.getElementById('mainRapidLast').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto agregado';
@@ -373,8 +374,10 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
     return;
   }
 
+  els.contenedormax.dataset.hasResult='true';
   els.contenedor.hidden = true;
-  document.getElementById('mainScannerStatus').hidden = true;
+  document.getElementById('mainScannerStatus').textContent='Lectura confirmada.';
+  document.getElementById('mainScannerStatus').hidden = false;
   els.copy.disabled = false;
   els.cartelScaner.hidden = false;
   els.cartelScaner.style.display = 'flex';
