@@ -7,6 +7,19 @@
   const dialog = document.getElementById('reviewReportDialog'), details = document.getElementById('reviewReportDetails'), form = document.getElementById('reviewReportForm'), message = document.getElementById('reviewReportStatus');
   const close = document.getElementById('closeReviewReport'), approve = document.getElementById('approveReport'), reject = document.getElementById('rejectReport');
   let queue = document.querySelector('[data-report-view]').dataset.reportView === 'queue', version = 0, listVersion = 0, active, csrf, busy = false, photos = [];
+  function makeReportCard(card, id) {
+    card.classList.add('report-card-open');
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `Abrir reporte #${id}`);
+    card.addEventListener('click', () => open(id));
+    card.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        open(id);
+      }
+    });
+  }
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   let moderationView = 'pending', auditPage = 0, reportState = 'pending';
@@ -58,7 +71,7 @@
             const heading=document.createElement('div');heading.className='report-card-heading';info.append(heading);text('h2',`#${item.id}`,heading);badge(heading,item.status);
             const ean=text('p',item.ean,info);ean.className='report-inline';icon(ean,'ean');text('p',`${item.submitter_name} · Revisado por ${item.reviewer_name||'Staff'}`,info);text('p',stamp(item.reviewed_at),info);
             const changes=text('div','',info);changes.className='report-change-tags';for(const change of item.changes||[]){const chip=text('span',fields[change.field],changes);chip.className='report-change-tag';icon(chip,'edit');}if(!item.changes?.length)text('span','Fotos o comentarios',changes);
-            const button=text('button','Ver cambios',card);icon(button,'eye');button.type='button';button.className='library-secondary';button.addEventListener('click',()=>open(item.id));
+            makeReportCard(card, item.id);
           }else{
             const heading=text('div','',info);heading.className='report-card-heading report-log-heading';
             const typeIcon={branch:'brand',product_edit:'edit',report_review:'file',report_block:'shield',pallet_admin:'pallet',user_role:'user',user_profile:'edit'}[item.event_type]||'file';
@@ -84,7 +97,9 @@
         const ean = text('p', report.ean, info); ean.className = 'report-inline'; ean.setAttribute('aria-label', 'EAN ' + report.ean); icon(ean, 'ean');
         if (queue) { const sender = text('p', report.submitter_name || 'Invitado', info); sender.className = 'report-inline report-card-sender'; icon(sender, 'user'); }
         else text('p', report.description, info);
-        const button = text('button', queue ? 'Revisar' : 'Ver reporte', card); button.type = 'button'; button.className = 'library-secondary'; button.addEventListener('click', () => open(report.id)); list.append(card);
+        if (queue) makeReportCard(card, report.id);
+        else { const button = text('button', 'Ver reporte', card); button.type = 'button'; button.className = 'library-secondary'; button.addEventListener('click', () => open(report.id)); }
+        list.append(card);
       }
       if (queue && result.blocked_reports?.length) {
         const section = document.createElement('details'); section.className = 'report-sender'; list.append(section);
