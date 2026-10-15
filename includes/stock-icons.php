@@ -18,6 +18,8 @@ function stock_icon(string $name): string {
         'trash'=>'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
         'user'=>'<circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/>',
         'clock'=>'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+        'package-plus'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5V13m9-5v5M7.5 5.5l9 5M17 18h6m-3-3v6"/>',
+        'package-minus'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5V13m9-5v5M7.5 5.5l9 5M17 18h6"/>',
         'plus'=>'<path d="M12 4v16M4 12h16"/>',
         'check'=>'<path d="m5 12 4 4 10-10"/>',
         'close'=>'<path d="m6 6 12 12M18 6 6 18"/>',

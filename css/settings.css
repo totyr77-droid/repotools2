@@ -42,3 +42,6 @@
 .settings-toggle-name>svg{width:20px;height:20px;flex:0 0 20px}
 .account-panel-profile .settings-toggle-name{line-height:1.35;flex:1}
 .account-panel-profile .settings-toggle-control{flex:none}
+
+.account-panel-profile .settings-profile .account-security{max-width:none;margin-top:20px;padding-top:0;border:0}.account-panel-profile .settings-profile .account-security-actions{grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.account-panel-profile .settings-layout{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}.settings-profile,.settings-preferences,.settings-access{grid-column:auto;grid-row:auto}}

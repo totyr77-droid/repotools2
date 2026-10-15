@@ -309,7 +309,7 @@
       if (capabilities.torch === true) {
         const button = document.createElement('button'); button.type = 'button'; button.className = 'ean-camera-light';
         let enabled = settings.torch === true;
-        button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 10-12h-7Z"/></svg>';
+        button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h12v4l-4 5v9h-4v-9L6 7V3Zm0 4h12M10 15h4"/><path class="torch-off-mark" d="m3 3 18 18"/></svg>';
         const render = () => { const label = enabled ? 'Apagar luz' : 'Encender luz'; button.setAttribute('aria-label', label); button.title = label; button.setAttribute('aria-pressed', String(enabled)); };
         render();
         button.addEventListener('click', async () => {
