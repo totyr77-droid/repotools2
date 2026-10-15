@@ -101,7 +101,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <header>
       <div class="header-contenedor">
-        <a class="logo" href="./" aria-label="Inicio Repotools"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"><?php if(current_user()&&$navRole==='manager'): ?><span class="app-logo-version" aria-label="Versión <?= app_release_label() ?>">v<?= app_release_label() ?></span><?php endif; ?></a>
+        <a class="logo" href="./" aria-label="Inicio Repotools"><span class="logo-mark"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"><?php if(current_user()&&$navRole==='manager'): ?><span class="app-logo-version" aria-label="Versión <?= app_release_label() ?>">v<?= app_release_label() ?></span><?php endif; ?></span></a>
 
         <?php if(current_user() && (!empty($paginaStock)||!empty($paginaBiblioteca)||!empty($paginaReportes))): ?><a class="workspace-account-icon" href="cuenta.php" aria-label="Mi cuenta y ajustes" title="Mi cuenta y ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a><?php endif; ?>
         <nav class="nav" aria-label="Navegacion principal">

@@ -99,3 +99,5 @@
  body[data-hand=left] .ean-camera-controls .ean-camera-zoom { left:0; right:auto; }
  body[data-hand=left] .ean-camera-controls :is(.ean-camera-light,.ean-camera-manual) { right:0; left:auto; }
 }
+
+.logo .logo-mark{position:relative;display:inline-flex;align-items:center;line-height:1}.logo .logo-mark img{display:block}.logo .logo-mark .app-logo-version{top:calc(100% + 1px);bottom:auto;right:0;line-height:1;font-size:9px;background:transparent;padding:0}

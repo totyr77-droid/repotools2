@@ -244,11 +244,11 @@
         return operation;
       }
       if (hasZoom) {
-        const label = document.createElement('label'); label.className = 'ean-camera-zoom';
+        const label = document.createElement('div'); label.className = 'ean-camera-zoom';label.setAttribute('role','group');label.setAttribute('aria-label','Zoom de cámara');
         const text = document.createElement('span'); text.className = 'ean-camera-zoom-icon'; text.setAttribute('aria-hidden', 'true');
         text.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg>';
         const input = document.createElement('input'); input.type = 'range'; input.setAttribute('aria-label', 'Zoom de cámara');
-        input.setAttribute('aria-orientation', 'vertical');
+        input.hidden=true;
         const step = Number.isFinite(zoom.step) && zoom.step > 0 ? zoom.step : .1;
         const snap = value => Math.max(Number(input.min), Math.min(Number(input.max), Number((zoom.min + Math.round((value - zoom.min) / step) * step).toFixed(6))));
         input.min = Math.max(minZoom, Number((zoom.min + Math.ceil((minZoom - zoom.min) / step) * step).toFixed(6)));
@@ -258,8 +258,9 @@
         const output = document.createElement('span'); output.className = 'ean-camera-zoom-value';
         const shortcuts = document.createElement('div'); shortcuts.className = 'ean-camera-zoom-shortcuts';
         shortcuts.setAttribute('role', 'group'); shortcuts.setAttribute('aria-label', 'Zoom rápido');
+        let minus,plus;
         const render = value => {
-          input.value = value;
+          input.value = value;if(minus)minus.disabled=value<=Number(input.min);if(plus)plus.disabled=value>=Number(input.max);
           const display = Number(value.toFixed(2)).toString();
           output.textContent = display + '×';
           input.setAttribute('aria-valuetext', display + ' aumentos');
@@ -294,7 +295,7 @@
         input.addEventListener('input', updateZoom);
         input.addEventListener('change', updateZoom);
         label.addEventListener('touchmove', event => event.stopPropagation(), { passive: true });
-        for (const value of (Number(input.max) >= 5 ? [1, 2, 5] : [1, 2, 3])) {
+        for (const value of [1, 2, 5]) {
           if (value < Number(input.min) || value > zoom.max || Math.abs(snap(value) - value) > .001) continue;
           const button = document.createElement('button'); button.type = 'button'; button.dataset.zoom = value;
           button.textContent = value + '×'; button.setAttribute('aria-label', 'Zoom ' + value + ' aumentos');
@@ -302,9 +303,14 @@
         }
         render(applied);
         if (Number.isFinite(settings.zoom) && settings.zoom < Number(input.min)) updateZoom();
-        label.append(text, input, output); controls.append(label);
+        let holdDelay,holdTimer;const holdController=new AbortController();
+        const stopHold=()=>{clearTimeout(holdDelay);clearInterval(holdTimer);};
+        const adjust=direction=>{if(disposed||!active())return;input.value=snap(Number(input.value)+direction*Math.max(.1,step));updateZoom();};
+        function zoomButton(direction){const b=document.createElement('button');b.type='button';b.className='ean-zoom-step';b.textContent=direction<0?'−':'+';b.setAttribute('aria-label',direction<0?'Reducir zoom':'Aumentar zoom');b.addEventListener('pointerdown',e=>{if(e.button!==0||b.disabled)return;e.preventDefault();stopHold();b.setPointerCapture?.(e.pointerId);adjust(direction);holdDelay=setTimeout(()=>holdTimer=setInterval(()=>adjust(direction),90),300);});b.addEventListener('click',e=>{if(e.detail===0)adjust(direction);});b.addEventListener('lostpointercapture',stopHold);return b;}
+        minus=zoomButton(-1);plus=zoomButton(1);for(const event of ['pointerup','pointercancel','blur'])window.addEventListener(event,stopHold,{signal:holdController.signal});render(applied);
+        label.append(minus,output,plus,input); controls.append(label);
         if (shortcuts.childElementCount > 1) controls.append(shortcuts);
-        current.cancelZoom = () => { disposed = true; pending = null; if (timer !== null) clearTimeout(timer); };
+        current.cancelZoom = () => { stopHold();holdController.abort();disposed = true; pending = null; if (timer !== null) clearTimeout(timer); };
       }
       if (capabilities.torch === true) {
         const button = document.createElement('button'); button.type = 'button'; button.className = 'ean-camera-light';
