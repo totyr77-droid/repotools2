@@ -33,3 +33,5 @@ body.offline-shell main.app-page-enter{animation:none!important;transform:none!i
 @media(min-width:900px){.offline-shell #offlineContent{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.offline-shell #offlineContent>.offline-actions,.offline-shell #offlineContent>.notice{grid-column:1/-1}.offline-shell article{margin:0}.offline-shell .offline-tabs{position:static;height:auto;padding:6px;border:0;border-radius:12px;background:#eeebf7}.offline-shell .offline-tabs button{flex-direction:row;height:44px}.offline-shell main{padding-bottom:24px}}
 .offline-shell .offline-tabs button[aria-pressed=true]{background:#27187e!important;color:#fff!important;border-radius:10px}
 @media(max-width:899px){.offline-shell #offlineQueueSummary{margin-bottom:calc(90px + env(safe-area-inset-bottom))}}
+
+.offline-product-list>summary{min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;color:#27187e;font-weight:600}.offline-product-list>summary::before{content:'›';display:inline-block;transition:transform .18s}.offline-product-list[open]>summary::before{transform:rotate(90deg)}

@@ -69,6 +69,7 @@
 <script src="js/pallet-label.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/label-files.js?v=<?= (int)app_release()['version'] ?>"></script>
 
+<script src="js/stock-preparation.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/stock.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/public-pallet.js?v=<?= (int)app_release()['version'] ?>"></script>

@@ -367,6 +367,8 @@
       current.disposeBackground = () => { clearTimeout(current.backgroundTimer); if (!running) dispose(); };
       async function analyze() {
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
+        // No supplemental JPEG/OCR work while the page is in the background.
+        if (document.hidden) { current.backgroundTimer = setTimeout(analyze, 500); return; }
         const video = element.querySelector('video');
         const started = performance.now();
         if (video?.videoWidth && video.videoHeight && started - (current.lastPrimaryDetection ?? -Infinity) > 180) {

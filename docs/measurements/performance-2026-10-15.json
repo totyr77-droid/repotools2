@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-15",
+  "baseline": "ea983634ffed2ce39fbc63c3c4053dddb90bfb34",
+  "scope": "Local isolated fixtures; not production load, physical camera or iPhone",
+  "sw": {
+    "before": {
+      "scenario": "SW offline known + stalled transport",
+      "milliseconds": 8079
+    },
+    "after": {
+      "scenario": "SW offline known + stalled transport",
+      "milliseconds": 43
+    }
+  },
+  "capacity": {
+    "before": {
+      "palets": 50,
+      "products": 5000,
+      "largeViewPalets": 0,
+      "bytes": 2454572,
+      "elapsedMs": 371
+    },
+    "after": {
+      "palets": 70,
+      "products": 7000,
+      "largeViewPalets": 70,
+      "legacyLibraries": 1,
+      "bytes": 2454572,
+      "elapsedMs": 183,
+      "renderedPalets": 70,
+      "expandedProducts": 100
+    }
+  },
+  "relay": {
+    "before": {
+      "samples_ms": [
+        1718,
+        1984,
+        1897,
+        1831,
+        1733
+      ],
+      "median_ms": 1831
+    },
+    "after": {
+      "samples_ms": [
+        348,
+        384,
+        311,
+        201,
+        144
+      ],
+      "median_ms": 311
+    }
+  },
+  "database": {
+    "before": {
+      "environment": "temporary SQLite, no network/API",
+      "samples": 30,
+      "warm_initializer_calls": 4,
+      "db_connect_ms": 0.401,
+      "new_schema_ms": 18.86,
+      "warm_migration_median_ms": 0.249,
+      "warm_migration_p95_ms": 0.504,
+      "count_users_median_ms": 0.23,
+      "migration_version_checks": 2
+    },
+    "after": {
+      "environment": "temporary SQLite, no network/API",
+      "samples": 30,
+      "warm_initializer_calls": 1,
+      "db_connect_ms": 0.852,
+      "new_schema_ms": 20.623,
+      "warm_migration_median_ms": 0.212,
+      "warm_migration_p95_ms": 0.356,
+      "count_users_median_ms": 0.186,
+      "migration_version_checks": 2
+    }
+  },
+  "http": {
+    "before": {
+      "environment": "Local PHP/SQLite, 2 users, 2 pallets, authenticated manager; HTTP response only, not rendering or external APIs",
+      "samples": 10,
+      "results": [
+        {
+          "path": "/index.php",
+          "first_ms": 68.73,
+          "median_ms": 33.44,
+          "p95_ms": 49.1
+        },
+        {
+          "path": "/stock.php",
+          "first_ms": 50.34,
+          "median_ms": 42.5,
+          "p95_ms": 44.73
+        },
+        {
+          "path": "/api/stock.php",
+          "first_ms": 38.21,
+          "median_ms": 39.94,
+          "p95_ms": 43.06
+        },
+        {
+          "path": "/api/stock.php?code=12345678",
+          "first_ms": 39.74,
+          "median_ms": 37.59,
+          "p95_ms": 43.72
+        },
+        {
+          "path": "/biblioteca.php",
+          "first_ms": 34.5,
+          "median_ms": 35.54,
+          "p95_ms": 40.11
+        },
+        {
+          "path": "/tops.php",
+          "first_ms": 44.13,
+          "median_ms": 34.59,
+          "p95_ms": 47
+        },
+        {
+          "path": "/cuenta.php",
+          "first_ms": 42.01,
+          "median_ms": 40.36,
+          "p95_ms": 46.23
+        },
+        {
+          "path": "/reportes.php?view=branches",
+          "first_ms": 35.32,
+          "median_ms": 40.08,
+          "p95_ms": 42.92
+        }
+      ]
+    },
+    "after": {
+      "environment": "Local PHP/SQLite, 2 users, 2 pallets, authenticated manager; HTTP response only, not rendering or external APIs",
+      "samples": 10,
+      "results": [
+        {
+          "path": "/index.php",
+          "first_ms": 64.57,
+          "median_ms": 32.38,
+          "p95_ms": 36.42
+        },
+        {
+          "path": "/stock.php",
+          "first_ms": 25.45,
+          "median_ms": 25.07,
+          "p95_ms": 29.05
+        },
+        {
+          "path": "/api/stock.php",
+          "first_ms": 21.31,
+          "median_ms": 30.87,
+          "p95_ms": 48.02
+        },
+        {
+          "path": "/api/stock.php?code=12345678",
+          "first_ms": 40.13,
+          "median_ms": 36.47,
+          "p95_ms": 42.71
+        },
+        {
+          "path": "/biblioteca.php",
+          "first_ms": 37.01,
+          "median_ms": 38.85,
+          "p95_ms": 47.05
+        },
+        {
+          "path": "/tops.php",
+          "first_ms": 42.11,
+          "median_ms": 41.13,
+          "p95_ms": 63.7
+        },
+        {
+          "path": "/cuenta.php",
+          "first_ms": 38.41,
+          "median_ms": 44.84,
+          "p95_ms": 47.95
+        },
+        {
+          "path": "/reportes.php?view=branches",
+          "first_ms": 41.25,
+          "median_ms": 34.73,
+          "p95_ms": 38.28
+        }
+      ]
+    }
+  }
+}

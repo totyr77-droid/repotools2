@@ -90,6 +90,7 @@
   async function navigate(href, { historyMode = 'push', scroll = [0, 0] } = {}) {
     href = new URL(href, location.href).href;
     if (new URL(href).origin !== location.origin) { location.assign(href); return; }
+      if (navigator.onLine === false) { location.assign(href); return; }
     window.RepotoolsPageLoader?.mark('NAVIGATION_CLICK_MS');
     const loaderTicket = window.RepotoolsPageLoader?.show(true);
     const token = ++version;
@@ -136,7 +137,7 @@
       });
       await commitQueue;
     } catch (error) {
-      if (token === version && error.name !== 'AbortError') { navigation.abort(); location.assign(href); }
+      if (token === version && (error.name !== 'AbortError' || navigator.onLine === false)) { navigation.abort(); location.assign(href); }
     } finally { if (token === version) { pending = null; document.documentElement.classList.remove('app-navigating'); } }
   }
   page = createPage();

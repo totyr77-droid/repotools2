@@ -24,11 +24,14 @@ if ($method==='POST' && (!$uid || !valid_csrf())) stock_response($uid?403:401,['
 $csrf=csrf_token(); session_write_close(); $db=null;
 try {
     $db=database(); $db->beginTransaction();
-    if ($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql') $db->query('SELECT pg_advisory_xact_lock(72684623)');
-    else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
-    stock_expire($db);
+    $expiryDue=$method==='POST'||stock_query($db,'SELECT 1 FROM pallet_labels WHERE (pallet_id IS NULL AND reserved_until>0 AND reserved_until<=?) OR pallet_id IN (SELECT id FROM pallets WHERE released=1 OR (released=0 AND activated=0 AND prepared_until<=? AND NOT EXISTS(SELECT 1 FROM pallet_products b WHERE b.pallet_id=pallets.id))) LIMIT 1',[time(),time()])->fetchColumn();
+    if($expiryDue){if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');stock_expire($db);}
     if ($method==='GET') {
-        if (isset($_GET['search'])||isset($_GET['expiries'])) {
+        if(isset($_GET['offline_codes'])){
+            if(!$uid)throw new CatalogException('Inicia sesión para preparar Stock.',401);
+            $codes=is_string($_GET['offline_codes'])?explode(',',$_GET['offline_codes']):[];if(!$codes||count($codes)>5||count(array_unique($codes))!==count($codes))throw new CatalogException('El lote no es válido.',422);
+            $items=[];foreach($codes as $code){if(!preg_match('/^[0-9]{8}$/D',$code))throw new CatalogException('El código no es válido.',422);$allowed=stock_query($db,"SELECT p.id FROM pallets p WHERE p.code=? AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$code,$uid,$uid])->fetchColumn();if(!$allowed)throw new CatalogException('Este palet no está disponible para preparar en tu cuenta.',403);$items[]=stock_detail($db,$code,$uid);}$result=['pallets'=>$items];
+        } elseif (isset($_GET['search'])||isset($_GET['expiries'])) {
             if(!$uid)throw new CatalogException('Inicia sesión para consultar Stock.',401);
             $search=is_string($_GET['search']??null)?trim($_GET['search']):'';
             if(mb_strlen($search)>100)throw new CatalogException('La búsqueda admite hasta 100 caracteres.',422);

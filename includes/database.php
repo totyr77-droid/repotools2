@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
+// Increment together with the next app_schema_migrations block.
+const REPOTOOLS_SCHEMA_VERSION=27;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -47,6 +49,9 @@ function initialize_database(PDO $db): void {
     $id = $postgres ? 'BIGSERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
     $ref = $postgres ? 'BIGINT' : 'INTEGER';
     $timestamp = $postgres ? 'TIMESTAMPTZ' : 'TEXT';
+    // A complete installed schema needs no DDL or global migration lock.
+    // Missing/older installations still take the original lock and recheck under it.
+    try {$versions=$db->query('SELECT version FROM app_schema_migrations WHERE version BETWEEN 1 AND '.REPOTOOLS_SCHEMA_VERSION)->fetchAll(PDO::FETCH_COLUMN);if(count(array_unique(array_map('intval',$versions)))===REPOTOOLS_SCHEMA_VERSION)return;}catch(PDOException $e){if(!in_array((string)$e->getCode(),['42P01','HY000'],true)||($e->getCode()==='HY000'&&!str_contains($e->getMessage(),'no such table')))throw $e;}
     $db->beginTransaction();
     try {
         if ($postgres) $db->query('SELECT pg_advisory_xact_lock(72684621)');
