@@ -29,7 +29,7 @@
       const title = document.createElement('strong'); title.textContent = item.title;
       const body = document.createElement('span'); body.textContent = item.body;
       const date = document.createElement('time'); date.dateTime = item.created_at;
-      const instant = new Date(item.created_at); date.textContent = Number.isNaN(instant.getTime()) ? '' : instant.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short', timeZone:'America/Buenos_Aires', hourCycle:'h23' });
+      const instant = window.RepoDateTime?.parse(item.created_at)||new Date(item.created_at); date.textContent = Number.isNaN(instant.getTime()) ? '' : instant.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short', timeZone:'America/Buenos_Aires', hourCycle:'h23' });
       const content = document.createElement('div'); content.className = 'notification-content'; content.append(title, body);if(item.expiry_label){const tag=document.createElement('span');tag.className='notification-expiry-label';tag.textContent=item.expiry_label;content.append(tag);}content.append(date); link.append(icon, content);
       link.addEventListener('click', async event => {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;

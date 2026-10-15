@@ -321,7 +321,8 @@
     const control = get('shareLibrary'); control.disabled = true;
     try {
       const result = await shareRequest({ action: 'share', library_id: library.id });
-      const url = new URL('biblioteca.php', location.href); url.searchParams.set('share', result.token);
+      let url = new URL('biblioteca.php', location.href); url.searchParams.set('share', result.token);
+      url=new URL(await window.RepoShareLinks.url('b',result.token,config.csrf,url.href));
       const showLink = () => { get('libraryShareUrl').value = url.href; openDialog('libraryShareDialog'); };
       if (navigator.share) {
         try { await navigator.share({ title: library.name, text: `${library.name}: ${library.products.length} productos`, url: url.href }); }
@@ -334,25 +335,29 @@
     try { await navigator.clipboard.writeText(get('libraryShareUrl').value); get('libraryShareDialog').close(); message('Enlace copiado.'); }
     catch { get('libraryShareUrl').select(); message('Copia este enlace para compartir.'); }
   });
+  let importedLibraryId = null;
   async function previewImport() {
     if (!config.share) return;
-    openDialog('libraryImportDialog'); get('confirmLibraryImport').disabled = true;
+    openDialog('libraryImportDialog'); get('confirmLibraryImport').hidden=false;get('confirmLibraryImport').disabled = true;
     get('libraryImportStatus').textContent = 'Cargando colección…';
     try {
       const response = await fetch(`api/biblioteca.php?share=${encodeURIComponent(config.share)}`);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'No pudimos cargar la colección.');
-      get('libraryImportQuestion').textContent = `¿Agregar «${result.collection.name}» a tu biblioteca con estos ${result.collection.products.length} productos?`;
+      get('libraryImportQuestion').textContent = `¿Agregar «${result.collection.name}» a tu biblioteca con ${result.collection.products.length} ${result.collection.products.length===1?'producto':'productos'}?`;
       get('libraryImportProducts').replaceChildren();
       result.collection.products.forEach(product => {
         const item = document.createElement('li'); item.textContent = product.name || 'Producto sin nombre';
         const code = document.createElement('small'); code.textContent = `EAN ${product.ean}`; item.append(code); get('libraryImportProducts').append(item);
       });
       get('libraryImportStatus').textContent = result.alreadyAdded ? 'Esta colección ya está en tu biblioteca.' : '';
-      get('confirmLibraryImport').disabled = result.alreadyAdded;
-    } catch (error) { get('libraryImportStatus').textContent = error.message; }
+      importedLibraryId = result.alreadyAdded ? Number(result.libraryId) : null;
+      get('confirmLibraryImport').textContent = importedLibraryId ? 'Ver en mi biblioteca' : 'Agregar a mi biblioteca';
+      get('confirmLibraryImport').disabled = false;
+    } catch (error) { get('libraryImportStatus').textContent = error.message;get('confirmLibraryImport').hidden=true;get('libraryImportQuestion').textContent=''; }
   }
   get('confirmLibraryImport').addEventListener('click', async () => {
+    if(importedLibraryId){activeId=importedLibraryId;render();get('libraryImportDialog').close();const url=new URL(location.href);url.searchParams.delete('share');history.replaceState(null,'',url);return;}
     const control = get('confirmLibraryImport'); control.disabled = true;
     try {
       const result = await shareRequest({ action: 'import', token: config.share });

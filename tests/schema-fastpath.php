@@ -8,4 +8,5 @@ if((int)$db->query('SELECT MAX(version) FROM app_schema_migrations')->fetchColum
 // Simulate an older installed schema, without touching configured databases.
 $db->exec('DROP TABLE pallet_activity');$db->exec('DELETE FROM app_schema_migrations WHERE version=27');initialize_database($db);
 $db->query('SELECT id FROM pallet_activity');
+$db->exec('DROP TABLE public_link_aliases');$db->exec('DELETE FROM app_schema_migrations WHERE version=28');initialize_database($db);$db->query('SELECT code FROM public_link_aliases');
 echo "OK: fresh schema, installed fast path, old-schema upgrade and version guard.\n";

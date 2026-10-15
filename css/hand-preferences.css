@@ -14,16 +14,16 @@ body[data-hand=left] .library-collection-header,body[data-hand=left] .home-list-
 body[data-hand=left] .library-collection-name{flex-direction:row}
 body[data-hand=left] #collectionSettings{order:-1}
 body[data-hand=left] .home-list-actions,body[data-hand=left] .home-list-actions .box-tools{flex-direction:row}
-body[data-hand=left] .library-heading>div,body[data-hand=left] .library-heading>h2,body[data-hand=left] .results-heading>h2,body[data-hand=left] .notification-heading>h2,body[data-hand=left] .home-list-heading>div:first-child,body[data-hand=left] .library-product-description,body[data-hand=left] .stock-product>div:first-child{text-align:right}
-body[data-hand=left] .library-collection-name h2{flex:1;text-align:right}
-body[data-hand=left] .library-product-code{justify-content:flex-end}
+body[data-hand=left] .library-heading>div,body[data-hand=left] .library-heading>h2,body[data-hand=left] .results-heading>h2,body[data-hand=left] .notification-heading>h2,body[data-hand=left] .home-list-heading>div:first-child,body[data-hand=left] .library-product-description,body[data-hand=left] .stock-product>div:first-child{text-align:left}
+body[data-hand=left] .library-collection-name h2{flex:1;text-align:left}
+body[data-hand=left] .library-product-code{justify-content:flex-start}
 body[data-hand=left] #palletTools .library-settings-menu:not([popover]){right:auto;left:0}
 body[data-hand=left] .alerta-cerrar,body[data-hand=left] .stock-close,body[data-hand=left] .palet-editor__close{right:auto;left:12px}
-body[data-hand=left] .cartelscaner-box-info,body[data-hand=left] .cartelscaner-box .resultado-api,body[data-hand=left] .cartelscaner-box .product-summary-name{text-align:right}
-body[data-hand=left] .cartelscaner-box-titulo,body[data-hand=left] .cartelscaner-box .resultado-title{justify-content:flex-end}
-body[data-hand=left] #cartelScaner .resultado-box{align-items:flex-end;justify-content:flex-end;text-align:right}
+body[data-hand=left] .cartelscaner-box-info,body[data-hand=left] .cartelscaner-box .resultado-api,body[data-hand=left] .cartelscaner-box .product-summary-name{text-align:left}
+body[data-hand=left] .cartelscaner-box-titulo,body[data-hand=left] .cartelscaner-box .resultado-title{justify-content:flex-start}
+body[data-hand=left] #cartelScaner .resultado-box{align-items:flex-start;justify-content:flex-start;text-align:left}
 body[data-hand=left] #cartelScaner .resultado-box:has(.product-summary-quantity){align-items:center;justify-content:flex-end}
-body[data-hand=left] #cartelScaner .resultado-box:has(.product-summary-quantity) .resultado-title{justify-content:flex-end}
+body[data-hand=left] #cartelScaner .resultado-box:has(.product-summary-quantity) .resultado-title{justify-content:flex-start}
 }
 @media(max-width:768px){.profile-pending{margin:8px 12px}.profile-pending a{white-space:nowrap}}
 

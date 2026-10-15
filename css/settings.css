@@ -45,3 +45,5 @@
 
 .account-panel-profile .settings-profile .account-security{max-width:none;margin-top:20px;padding-top:0;border:0}.account-panel-profile .settings-profile .account-security-actions{grid-template-columns:minmax(0,1fr)}
 @media(min-width:900px){.account-panel-profile .settings-layout{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}.settings-profile,.settings-preferences,.settings-access{grid-column:auto;grid-row:auto}}
+
+.settings-security{margin:0!important;padding:0!important;border:0!important;grid-column:1/-1}.settings-security .account-security-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:8px}body[data-hand=left] .settings-group>h2,body[data-hand=left] .settings-hint{text-align:left}body[data-hand=left] .settings-group h3{justify-content:flex-start}

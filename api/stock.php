@@ -109,6 +109,16 @@ try {
                 $updated=stock_query($db,'UPDATE pallets SET description=? WHERE id=? AND revision=?',[trim($description),$id,(int)($_POST['revision']??0)])->rowCount();
                 if (!$updated) throw new CatalogException('El palet cambió. Recarga antes de guardar la descripción.',409);
                 stock_touch($db,$id,$uid); break;
+            case 'delete_labels':
+                $codes=json_decode(is_string($_POST['codes']??null)?$_POST['codes']:'',true);
+                if (!is_array($codes)||!$codes||count($codes)>100) throw new CatalogException('Seleccioná entre 1 y 100 etiquetas.',422);
+                foreach(array_unique($codes) as $code){
+                    if(!is_string($code)||!preg_match('/^[0-9]{8}$/D',$code)) throw new CatalogException('Código no válido.',422);
+                    $label=stock_label($db,$code);
+                    if($label['pallet_id']) throw new CatalogException('Un código ya tiene mercadería. Recargá antes de eliminar.',409);
+                    if((int)$label['reserved_by']!==$uid&&!stock_is_admin($db,$uid)) throw new CatalogException('Solo podés eliminar tus etiquetas pendientes.',403);
+                    stock_query($db,'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE code=?',[$code]);
+                } break;
             case 'delete_label':
                 $label=stock_label($db,(string)($_POST['code']??''));
                 if ($label['pallet_id']) throw new CatalogException('Este código ya tiene un palet. Recarga antes de eliminarlo.',409);

@@ -1,3 +1,4 @@
+<script src="js/share-links.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if(!empty($paginaCuenta)&&empty($paginaReportes)&&empty($paginaTops)): include __DIR__.'/updates.vista.php'; endif; ?>
 <?php if (!empty($paginaInicio) || !empty($mostrarCreditos)): ?>
 <footer class="footer site-footer" id="contacto">
