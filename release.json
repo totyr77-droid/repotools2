@@ -1,6 +1,12 @@
 {
-  "version": 29,
+  "version": 30,
   "changes": [
+    {
+      "version": 30,
+      "label": "1.25",
+      "date": "2026-10-15",
+      "summary": "Registros con título de acción y detalle al tocar la tarjeta."
+    },
     {
       "version": 29,
       "label": "1.24",
@@ -173,6 +179,6 @@
     }
   ],
   "major": 1,
-  "minor": 24,
-  "label": "1.24"
+  "minor": 25,
+  "label": "1.25"
 }
