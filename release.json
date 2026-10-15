@@ -1,6 +1,12 @@
 {
-  "version": 19,
+  "version": 20,
   "changes": [
+    {
+      "version": 20,
+      "label": "1.15",
+      "date": "2026-10-15",
+      "summary": "Biblioteca recupera su barra compacta de una mano; Stock conserva su distribución."
+    },
     {
       "version": 19,
       "label": "1.14",
@@ -113,6 +119,6 @@
     }
   ],
   "major": 1,
-  "minor": 14,
-  "label": "1.14"
+  "minor": 15,
+  "label": "1.15"
 }
