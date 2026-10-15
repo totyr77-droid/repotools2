@@ -173,3 +173,5 @@ body[data-hand=left] #labelList .stock-card{padding-inline-start:46px;padding-in
 .library-confirm-dialog .library-dialog-actions{flex-direction:row!important}body[data-hand=right] .library-confirm-dialog .library-confirm-delete{order:-1;margin-inline-end:8px}body[data-hand=left] .library-confirm-dialog .library-confirm-delete{order:99;margin-inline-start:8px}
 
 @media(max-width:768px){input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select{font-size:max(16px,1em)!important}}
+
+.audit-event-detail{direction:ltr;text-align:left}.audit-change{padding:8px 0;border-bottom:1px solid #e7e5ef;overflow-wrap:anywhere}.audit-change p{margin:4px 0}.audit-change small{color:#626b7a}.audit-technical{margin-top:12px}.audit-technical pre{max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.75rem}
