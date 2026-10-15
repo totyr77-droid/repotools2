@@ -237,3 +237,8 @@ Entregaescáner1.12 confirmada: Main73385f0d544bb4768bc361efc71dbaa41cecdd4f/ori
 
 
 1.13 Compartir palets/Sucursal: sucursal seleccionada resumida con dirección y Cambiar; Palets incluidos X/Y + Editar, editor secundario colapsado al abrir (también enlaces existentes), scroll interno máximo230px y pie separado. Exclusiones se conservan al contraer; futuros palets siguen automáticos, backend/permisos intactos. Posición superior estable, sin hueco reservado al cerrar; viewport reducido mantiene nombre/crear accesibles. Pruebas share-branch-compact-ui (80palets,320/390/430/1366,ambasmanos,teclado350), stock-branches-ui e integral-ui aprobadas. Capturas móviles revisadas; Safari/iPhone y Android físicos pendientes. Reversión: revertir commit UI completo (vista/js/css/tests/release); sin migraciones ni cambios de datos.
+
+Entrega1.13 confirmada: Main1bb1ace/originmain, producción4/4recursos HTTP200 coinciden (release/js/css/SW). Notificaciónmanager6194 actualizada. Safari/iPhone/Android físicos pendientes. Sin cambios de datos de inventario/permisos ni lógica backend.
+
+
+1.14 reversión selectiva Stock una mano: retiradas únicamente tres reglas de e7c4198 (fila superior invertida derecha, override fila izquierda y margen izquierdo0 historial). Recupera distribución anterior de toolbar e historial con margen automático; conserva flotantes de escanear/buscar y mano global. No cambia Inicio/Biblioteca/Moderación/Ajustes, backend, invitaciones, escáner, palets, enlaces ni editor compactoSucursal1.13. Prueba one-hand-workspaces aprobada:5secciones,320/390/1366,ambasmanos; captura390revisada sin solapamiento. Safari físico pendiente. Reversión de esta entrega: reaplicar exclusivamente esas tres reglas desde e7c4198, sin revertir otras mejoras.
