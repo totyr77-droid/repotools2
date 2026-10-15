@@ -1,6 +1,12 @@
 {
-  "version": 10,
+  "version": 11,
   "changes": [
+    {
+      "version": 11,
+      "label": "1.06",
+      "date": "2026-10-15",
+      "summary": "Vencimientos al final de los accesos de Stock"
+    },
     {
       "version": 10,
       "label": "1.05",
@@ -59,6 +65,6 @@
     }
   ],
   "major": 1,
-  "minor": 5,
-  "label": "1.05"
+  "minor": 6,
+  "label": "1.06"
 }
