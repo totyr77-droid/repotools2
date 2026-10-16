@@ -142,7 +142,7 @@
     get('eanCatalogName').textContent=product.catalog_name||'';
     get('eanCatalogName').hidden=!product.reference_name||!product.catalog_name||product.catalog_name===product.name;
     get('eanValue').textContent = product.ean;
-    get('eanPosition').textContent = `${viewerIndex + 1} de ${library.products.length}`;
+    get('eanPosition').hidden=library.products.length<2;get('eanPosition').textContent = `${viewerIndex + 1} de ${library.products.length}`;
     get('librarySwipeHint').hidden = library.products.length < 2;
     get('previousLibraryEan').disabled = viewerIndex === 0;
     get('nextLibraryEan').disabled = viewerIndex === library.products.length - 1;
@@ -151,7 +151,7 @@
       if (!window.JsBarcode) throw new Error('No se pudo cargar el código de barras.');
       JsBarcode(get('libraryBarcode'), product.ean, { format: product.ean.length === 8 ? 'EAN8' : 'EAN13', width: 3, height: 110, displayValue: false, margin: 16 });
     } catch {
-      get('eanPosition').textContent += ' · No se pudo dibujar este EAN.';
+      get('eanPosition').hidden=false;get('eanPosition').textContent += ' · No se pudo dibujar este EAN.';
     }
   }
   function productDialog(ean = '', libraryId = activeId) {
@@ -226,6 +226,7 @@
       return;
     }
     try {
+      if(libraries.find(l=>Number(l.id)===Number(productLibraryId))?.products.some(p=>p.ean===ean)){get('libraryProductDialog').close();message('Ya tenés este producto en esta colección de tu biblioteca.');return;}
       await mutate({ action: 'add_product', library_id: productLibraryId, ean: get('libraryProductEan').value.trim(), name: get('libraryProductName').value.trim() });
       get('libraryProductDialog').close(); message(navigator.onLine?'Producto guardado.':'Guardado en este dispositivo · pendiente de sincronizar.');
     } catch (error) { message(error.message); }
@@ -247,6 +248,7 @@
     openDialog('libraryInfoDialog'); window.RepoProductInfo.show(get('libraryProductDetails'), ean, { fresh: true });
   });
   get('libraryInfoDialog').addEventListener('close', () => window.RepoProductInfo.clear(get('libraryProductDetails')));
+  get('copyLibraryEan').addEventListener('click',async()=>{const ean=get('eanValue').textContent.trim();if(!ean)return;try{await navigator.clipboard.writeText(ean);window.RepoToast?.('Código EAN copiado.');}catch{window.RepoToast?.('No se pudo copiar el código EAN.',{kind:'error'});}});
   get('reportLibraryProduct').addEventListener('click', () => {
     const ean = get('eanValue').textContent;
     if (window.RepoEANScanner.validEAN(ean)) window.RepoProductReports.open(ean);
