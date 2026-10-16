@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const page=window.RepoNavigation?.page,document=page?.document||globalThis.document,fetch=page?.fetch||globalThis.fetch.bind(globalThis),$=id=>document.getElementById(id),root=$('stockApp');if(!root)return;
-let tags=[],active=null,csrf=window.repotoolsStock.csrf,saving=false;
+let tags=root.repoTags||[],active=root.repoTagPallet||null,csrf=window.repotoolsStock.csrf,saving=false;
 const icon=()=>{const svg=$('editPalletTag').querySelector('svg').cloneNode(true);return svg;};
 const selected=()=>$('stockTagFilter').value;
 const nameFor=code=>tags.find(t=>t.code===code)?.name||'';
@@ -16,5 +16,5 @@ function renderTagChoices(){const host=$('palletTagChoices'),term=$('palletTagNa
 $('palletTagName').addEventListener('input',updateClearTag);$('clearPalletTag').addEventListener('click',()=>{$('palletTagName').value='';updateClearTag();$('palletTagName').focus();});$('cancelPalletTag').addEventListener('click',()=>{if(!saving)$('palletTagDialog').close();});
 $('editPalletTag').addEventListener('click',()=>{if(!active?.id)return;$('palletTagName').value=nameFor(active.code);updateClearTag();$('palletTagStatus').textContent='';$('palletTagDialog').showModal();$('palletTagName').focus();});
 $('palletTagForm').addEventListener('submit',async event=>{event.preventDefault();if(saving)return;const target=active;if(!target?.id)return;saving=true;const button=event.submitter;button.disabled=true;$('cancelPalletTag').disabled=true;$('clearPalletTag').disabled=true;$('palletTagName').readOnly=true;renderTagChoices();$('palletTagStatus').textContent='Guardando…';try{const response=await fetch('api/stock.php',{method:'POST',credentials:'same-origin',body:new URLSearchParams({csrf,operation_key:crypto.randomUUID(),action:'tag',pallet_id:target.id,name:$('palletTagName').value})}),result=await response.json();if(!response.ok)throw Error(result.error||'No se pudo guardar.');csrf=result.csrf||csrf;tags=result.tags;render();$('palletTagDialog').close();window.RepoToast?.('Etiqueta guardada.');root.dispatchEvent(new Event('stock:filters'));}catch(e){$('palletTagStatus').textContent=navigator.onLine?e.message:'Sin conexión. Tu etiqueta sigue disponible para reintentar.';}finally{saving=false;button.disabled=false;$('cancelPalletTag').disabled=false;$('clearPalletTag').disabled=false;$('palletTagName').readOnly=false;renderTagChoices();}});
-apply();page?.onLeave(()=>{if(window.RepoStockTags?.apply===apply)delete window.RepoStockTags;});
+render();page?.onLeave(()=>{if(window.RepoStockTags?.apply===apply)delete window.RepoStockTags;});
 })();

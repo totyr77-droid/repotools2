@@ -500,3 +500,8 @@ body[data-hand=right] #palletDialog #palletTools>.stock-primary-actions{order:2;
 .notification-control:has(#refreshAppCache)>.sync-receipt-button[data-available=false]{display:none}@media(max-width:768px){.header-contenedor:has(#refreshAppCache) .logo{min-width:0;flex:1}.header-contenedor:has(#refreshAppCache) .logo img{max-width:100%;width:132px}.header-contenedor .notification-control:has(#refreshAppCache){margin-inline:6px;flex-shrink:0}}
 
 @media(max-width:768px){.header-contenedor:has(#refreshAppCache) .logo-mark{max-width:100%}.header-contenedor:has(#refreshAppCache) .logo img{min-width:0}}
+
+/* Palet: una sola separación por producto y márgenes compactos. */
+#palletDialog[open]{padding:12px 14px;gap:4px}#palletDialog>.library-heading{padding-top:0;padding-bottom:6px;margin:0}#palletDialog #palletMetadata{padding:0;margin:0;gap:6px}#palletDialog #palletMetadata>p,#palletDialog #palletMetadata .stock-metadata-movement{padding-block:0;margin-block:0}#palletDialog #palletTools{border-top:0;padding-top:2px;padding-bottom:max(0px,env(safe-area-inset-bottom,0px));margin:0}#palletDialog #palletDescription{display:flex;gap:5px;align-items:flex-start;font-size:.8rem}#palletDialog #palletDescription[hidden]{display:none}#palletDialog #palletDescription svg{width:16px;height:16px;flex:none;margin-top:1px}#palletDialog #palletDescription span{min-width:0;overflow-wrap:anywhere}
+
+#palletDialog #palletMetadata .stock-metadata-movement{min-height:36px;height:auto;padding:0}
