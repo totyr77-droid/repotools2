@@ -44,3 +44,5 @@ self.addEventListener('message',event=>{
 // Shell refresh: retain left-handed placement with older preference snapshots.
 
 // Shell refresh: follow expiry input after dialog animations and lookup layout changes.
+
+// Refresh quantity calculator placement and offline spacing without changing app version.

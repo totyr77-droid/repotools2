@@ -72,3 +72,6 @@ body.offline-shell main.app-page-enter{animation:none!important;transform:none!i
 .repo-date-keypad,.repo-date-keypad[popover]{height:258px!important;min-height:0!important;grid-template-rows:repeat(5,44px);grid-auto-rows:44px;align-content:start;overflow:auto;bottom:auto!important;right:auto!important}.repo-date-keypad button{height:44px;min-height:44px;max-height:44px;box-sizing:border-box;align-self:stretch}
 
 .repo-keypad-title{grid-column:1/-1;display:flex;align-items:center;justify-content:center;margin:0;font-size:.8rem;line-height:24px;font-weight:600;color:#27187e}.repo-date-keypad,.repo-date-keypad[popover]{height:287px!important;grid-template-rows:24px repeat(5,44px)}.stock-quantity-line>.stock-calculator,.stock-quantity-line>.stock-calculator[popover],#offlineCalculator{grid-template-rows:24px repeat(5,44px);height:auto}
+
+/* Misma altura completa que la calculadora online. */
+#offlineCalculator{gap:4px}
