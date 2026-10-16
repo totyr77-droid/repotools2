@@ -353,3 +353,34 @@ body[data-hand=left] .stock-find .stock-toolbar:not(:has(.branch-stock-filter:no
 #emailVerification .security-email-change form{margin:0;max-width:460px}
 #emailVerification .security-email-change label{margin:0}
 #emailVerification .security-email-change button{min-height:44px;margin:0}
+
+/* Compact results and contained mobile sheets; reading never follows handedness. */
+#stockApp .stock-expiry-group>h3{margin:8px 0 6px}
+#stockApp .stock-expiry-panel .stock-grid{gap:8px;margin-bottom:0}
+#stockApp .stock-expiry-group+.stock-expiry-group{margin-top:0}
+#stockApp>.stock-palets-block{margin-top:6px!important}
+.one-hand-sheet:has(.stock-find){width:calc(100% - 24px)!important;max-width:calc(100% - 24px)!important;min-width:0;box-sizing:border-box;margin-inline:auto!important;overflow-x:hidden;direction:ltr}
+.one-hand-sheet .stock-find,.one-hand-sheet .stock-grid,.one-hand-sheet .stock-toolbar{min-width:0;max-width:100%;box-sizing:border-box}
+.one-hand-sheet .stock-find .stock-card{width:100%;min-width:0;box-sizing:border-box;overflow-wrap:anywhere}
+#pendingPrintTools{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;overflow:visible;direction:ltr}
+#pendingPrintTools>:is(button,a){width:100%;min-width:0;min-height:44px;padding:6px 2px;margin:0!important;font-size:.7rem;box-sizing:border-box}
+#pendingPrintTools:not(:has(#selectAllPendingLabels:not([hidden]))){display:flex}
+#pendingPrintTools:not(:has(#selectAllPendingLabels:not([hidden])))>button{width:auto;padding-inline:12px}
+#printPendingLabels{position:relative}
+.pending-print-count{position:absolute;top:-5px;right:-2px;min-width:19px;height:19px;padding:0 3px;box-sizing:border-box;border-radius:10px;background:#c92a38;color:#fff;font-size:.65rem;line-height:19px;text-align:center}
+#contenedormax[data-has-result=true][data-scan-mode=normal] #mainScanModes{display:none!important}
+#contenedormax[data-has-result=true][data-scan-mode=normal][open]{grid-template-rows:auto minmax(0,1fr);overflow-x:hidden}
+#contenedormax[data-has-result=true][data-scan-mode=normal] .main-scan-result-zone{grid-row:2;min-width:0;overflow-x:hidden}
+#contenedormax .resultado-box,#contenedormax .resultado-api{min-width:0;max-width:100%;width:100%;box-sizing:border-box;direction:ltr;text-align:left!important}
+#contenedormax .resultado-api{display:flex;flex-direction:column;align-items:flex-start!important;gap:4px}
+#contenedormax .resultado-title{min-width:0;max-width:100%;flex-wrap:wrap;justify-content:flex-start!important;overflow-wrap:anywhere}
+body[data-hand] #contenedormax .main-rapid-feedback{direction:ltr;text-align:left;flex-direction:row}
+body[data-hand] #contenedormax #mainRapidLast{flex:1;text-align:left}
+body[data-hand] #contenedormax .main-rapid-meta{direction:ltr;text-align:left}
+body[data-hand] #palletDialog[data-read-only=true] .stock-product{direction:ltr;flex-direction:row!important;justify-content:flex-start;text-align:left}
+#palletDialog[data-read-only=true] .stock-product>div:first-child{width:100%;flex:1;text-align:left!important}
+#stockApp>#stockExpiryPanel.is-open{margin-top:8px}
+body[data-hand] #contenedormax .resultado-box{display:flex;flex-direction:column!important;align-items:stretch!important;gap:8px}
+#contenedormax .cartelscaner-box,#contenedormax .cartelscaner-box-info{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+body[data-hand] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{text-align:left}
+.one-hand-sheet:has(.stock-find){background:#fff}

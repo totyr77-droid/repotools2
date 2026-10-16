@@ -1,6 +1,12 @@
 {
-  "version": 45,
+  "version": 46,
   "changes": [
+    {
+      "version": 46,
+      "label": "1.41",
+      "date": "2026-10-16",
+      "summary": "Correcciones de espacios, buscador móvil, contador de impresión y lectura de resultados y palets."
+    },
     {
       "version": 45,
       "label": "1.40",
@@ -269,6 +275,6 @@
     }
   ],
   "major": 1,
-  "minor": 40,
-  "label": "1.40"
+  "minor": 41,
+  "label": "1.41"
 }
