@@ -96,6 +96,7 @@
 
 <script src="js/botones.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/report-notifications.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php if(current_user()&&($navRole??'')==='manager'): ?><script src="js/manager-cache.js?v=<?= substr(sha1_file(__DIR__.'/../js/manager-cache.js'),0,12) ?>"></script><?php endif; ?>
 <script src="js/notifications.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/public-name.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/account-edit.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/account-security.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>

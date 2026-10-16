@@ -19,3 +19,16 @@ self.addEventListener('fetch',event=>{
 
 let preparingOCR;
 self.addEventListener('message',event=>{if(event.data?.type!=='prepare-ocr')return;if(!preparingOCR)preparingOCR=(async()=>{const cache=await caches.open('repotools-ocr-v1');for(const name of ['tesseract.min.js','worker.min.js','tesseract-core-lstm.wasm.js','tesseract-core-simd-lstm.wasm.js','eng.traineddata.gz']){const url=new URL('js/vendor/ocr/'+name,self.registration.scope).href;if(await cache.match(url))continue;const response=await fetch(url);if(!response.ok)throw Error('OCR preparation failed');await cache.put(url,response);}})().catch(()=>{}).finally(()=>preparingOCR=null);event.waitUntil(preparingOCR);});
+
+// Refresh only application files; preserve OCR, IndexedDB, drafts and offline queues.
+self.addEventListener('message',event=>{
+ if(event.data?.type!=='manager-refresh-cache'||!event.ports[0])return;
+ event.waitUntil((async()=>{const port=event.ports[0];try{
+  const base=new URL(self.registration.scope),auth=await fetch(new URL('api/manager-cache.php',base),{method:'POST',credentials:'same-origin',cache:'no-store',body:new URLSearchParams({csrf:event.data.csrf||''})});if(!auth.ok)throw Error(auth.status===403?'No tenés permiso para actualizar la caché.':'No se pudo validar tu sesión.');
+  const names=(await caches.keys()).filter(name=>name.startsWith('repotools-shell-')),targets=new Map();
+  const allowed=value=>{const url=new URL(value,base);if(url.origin!==base.origin||!url.pathname.startsWith(base.pathname))return false;const path=url.pathname.slice(base.pathname.length);return !path.startsWith('js/vendor/ocr/')&&(/^(js|css|img)\//.test(path)||path==='offline.html');};
+  for(const name of names){const cache=await caches.open(name);for(const request of await cache.keys())if(allowed(request.url)){const list=targets.get(request.url)||[];list.push(cache);targets.set(request.url,list);}}
+  const current=await caches.open(CACHE);for(const asset of [...ASSETS,...(Array.isArray(event.data.assets)?event.data.assets:[])])if(typeof asset==='string'&&allowed(asset)){const url=new URL(asset,base).href,list=targets.get(url)||[];if(!list.includes(current))list.push(current);targets.set(url,list);}
+  const jobs=[...targets];let index=0;await Promise.all(Array.from({length:4},async()=>{while(index<jobs.length){const [url,stores]=jobs[index++],response=await fetch(url,{cache:'reload',credentials:'same-origin'});if(!response.ok)throw Error('No se pudieron actualizar todos los archivos. Volvé a intentar.');for(const store of stores)await store.put(url,response.clone());}}));port.postMessage({ok:true});
+ }catch(error){port.postMessage({ok:false,error:error.message||'No se pudo actualizar la caché.'});}})());
+});
