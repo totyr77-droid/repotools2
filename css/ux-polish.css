@@ -600,3 +600,19 @@ body[data-hand=left] .header-contenedor:has(#refreshAppCache) .logo{justify-cont
 #stockProductForm #stockProductStatus:empty{display:none}
 #stockProductForm>.library-dialog-actions{margin-top:10px}
 }
+
+/* Restar mercadería: campos compactos y un solo borde en cantidad. */
+#stockDeductForm #deductFields>.stock-form-row:has(#deductPackLabel[hidden]){grid-template-columns:minmax(0,1fr)}
+#stockDeductForm #deductFields .stock-form-row label>span{min-height:0;margin-bottom:4px;flex:none}
+:is(#stockDeductForm,#stockProductForm) .stock-quantity-line>input{margin:0;border:0;outline:0;box-shadow:none;height:48px;min-height:48px;box-sizing:border-box;background:transparent}
+@media(max-width:768px){
+#stockDeductDialog{padding:14px;box-sizing:border-box}
+#stockDeductDialog>.library-heading{margin-block:0 8px;padding-block:0 8px}
+#stockDeductForm label,#stockDeductForm #deductFields .stock-form-row label{margin:8px 0}
+#stockDeductForm input,#stockDeductForm select{min-height:44px;padding:10px;box-sizing:border-box}
+#stockDeductForm #deductFixedEan{margin:8px 0 4px}
+#stockDeductForm #deductProductName{margin:4px 0 8px}
+#stockDeductForm #deductRemaining{margin:6px 0}
+#stockDeductForm #deductStatus:empty{display:none}
+#stockDeductForm>.library-dialog-actions{margin-top:12px}
+}
