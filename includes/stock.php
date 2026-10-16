@@ -63,7 +63,7 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     $owner=$user !== null && (int)$p['owner_id']===$user;
     $access=$user ? stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$p['id'],$user])->fetchColumn() : false;
-    $p['can_tag']=$owner||$access==='accepted'; $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted'; $p['pending_invitation']=$access==='pending';
+    $p['can_tag']=$admin&&($owner||$access==='accepted'); $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted'; $p['pending_invitation']=$access==='pending';
     $p['products']=stock_query($db,'SELECT b.*,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id=? ORDER BY CASE WHEN b.expires=\'\' THEN 1 ELSE 0 END,b.expires,b.name,b.id',[$p['id']])->fetchAll();
     foreach ($p['products'] as &$product) $product=stock_product_names($product);
     unset($product);
@@ -209,9 +209,11 @@ function stock_deduct_product(PDO $db,int $user,array $input): array {
 }
 
 function stock_user_tags(PDO $db,int $user): array {
+    if(!stock_is_admin($db,$user))return [];
     return stock_query($db,"SELECT t.pallet_id,t.name,p.code FROM pallet_user_tags t JOIN pallets p ON p.id=t.pallet_id WHERE t.user_id=? AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$user,$user,$user])->fetchAll();
 }
 function stock_save_tag(PDO $db,int $user,int $id,mixed $name): void {
+    if(!stock_is_admin($db,$user))throw new CatalogException('Las etiquetas requieren rango administrador o manager.',403);
     // Personal labels require current ownership or an accepted invitation, including for admins.
     if(!stock_query($db,"SELECT id FROM pallets p WHERE id=? AND released=0 AND (owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$id,$user,$user])->fetchColumn())throw new CatalogException('No tenés acceso a las etiquetas de este palet.',403);
     if(!is_string($name)||mb_strlen(trim($name))>40||preg_match('/[\x00-\x1F\x7F]/u',$name))throw new CatalogException('La etiqueta admite hasta 40 caracteres.',422);
