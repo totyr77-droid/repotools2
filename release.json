@@ -1,6 +1,12 @@
 {
-  "version": 34,
+  "version": 35,
   "changes": [
+    {
+      "version": 35,
+      "label": "1.30",
+      "date": "2026-10-16",
+      "summary": "Correcciones de enlaces, fechas, menú de Biblioteca, sucursales según mano y presentación de TOPs."
+    },
     {
       "version": 34,
       "label": "1.29",
@@ -203,6 +209,6 @@
     }
   ],
   "major": 1,
-  "minor": 29,
-  "label": "1.29"
+  "minor": 30,
+  "label": "1.30"
 }
