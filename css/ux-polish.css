@@ -390,3 +390,16 @@ body[data-hand] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{text-align
 #emailVerification .settings-email-status>.email-verification-row{margin:0;flex:none;flex-direction:row;gap:6px}
 #emailVerification .settings-email-status .email-verification-row p{font-size:.75rem;gap:5px;padding:6px;white-space:nowrap}
 #emailVerification .settings-email-status .email-verification-row svg{width:16px;height:16px}
+
+
+/* Result dialogs size to their content; only their body scrolls when necessary. */
+#contenedormax.library-dialog.library-scanner-dialog[data-has-result=true][data-scan-mode=normal][open]{display:flex!important;flex-direction:column;align-items:stretch;height:auto!important;min-height:0!important;max-height:calc(var(--dialog-visible-height,100dvh) - 24px);overflow:hidden}
+#contenedormax[data-has-result=true][data-scan-mode=normal] .main-scan-result-zone{flex:0 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
+#contenedormax[data-has-result=true][data-scan-mode=normal] #cartelScaner{height:auto;max-height:none;overflow:visible}
+#contenedormax[data-has-result=true][data-scan-mode=normal] .cartelscaner-box{height:auto;min-height:0;max-height:none;overflow:visible;flex-shrink:0}
+#contenedormax[data-has-result=true][data-scan-mode=normal] .cartelscaner-box-info{flex-shrink:0;height:auto;min-height:0}
+#contenedormax[data-has-result=true][data-scan-mode=normal] .cartelscaner-box-info>*{flex-shrink:0}
+#stockShareList{min-width:0;max-width:100%;overflow-x:hidden}
+#stockShareList .branch-row{width:100%;min-width:0;box-sizing:border-box;padding-inline:0;overflow:visible}
+body[data-hand] #stockShareList .branch-actions{width:auto;min-width:0;max-width:100%;justify-self:end;justify-content:flex-start!important;padding:0;margin-inline:0!important;box-sizing:border-box}
+body[data-hand=left] #stockShareList .branch-actions{justify-self:start}
