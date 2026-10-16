@@ -12,6 +12,7 @@ DirectoryIndex index.php index.html
 </IfModule>
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteRule ^r/index\.php$ /index.php [R=302,END]
     RewriteRule ^([psb])/([A-Za-z0-9]{8})/?$ enlace.php?kind=$1&alias=$2 [END]
     RewriteRule ^l/([A-Za-z0-9]{8})/?$ lista-compartida.php?code=$1 [END]
     RewriteRule ^r/([A-Za-z0-9]{12})/?$ invitar.php?code=$1 [END]
