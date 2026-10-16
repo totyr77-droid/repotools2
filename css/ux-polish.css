@@ -330,3 +330,17 @@ body[data-hand=left] .stock-find .branch-stock-filter{grid-column:3}
 body[data-hand=left] .stock-find #cancelStockFilters{grid-column:1}
 body[data-hand=left] .stock-find .stock-toolbar:not(:has(.branch-stock-filter:not([hidden]))){grid-template-columns:auto minmax(0,1fr)}
 @media(max-width:480px){.stock-find .stock-toolbar{grid-template-columns:minmax(0,1fr) 102px 44px}body[data-hand=left] .stock-find .stock-toolbar{grid-template-columns:44px minmax(0,1fr) 102px}#cancelStockFilters span{display:none}.stock-find .stock-search-label input{font-size:16px}}
+
+/* Stock: compact spacing between actions, search, tabs and pending labels. */
+#stockApp>.stock-primary-actions{margin-top:8px;margin-bottom:6px}
+#stockApp>.stock-find{margin:6px 0}
+#stockApp>.stock-palets-block{margin-top:8px!important}
+#stockApp .stock-palets-block>h2{flex-wrap:wrap;gap:4px 7px;margin:0 0 6px;align-items:baseline}
+#stockApp .stock-palets-block>h2>svg{align-self:center}
+#stockPendingHint{flex:1 1 190px;margin:0;font-size:.76rem;font-weight:400;line-height:1.35;color:#626b7a;text-align:left}
+#stockPendingHint[hidden]{display:none}
+#stockApp .stock-tabs{margin:6px 0 8px}
+#stockApp #pendingPrintTools{margin:6px 0 8px}
+#stockApp #pendingPallets:empty,#stockApp #stockSearchResults:empty{display:none}
+#stockApp>#stockExpiryPanel:not(.is-open){margin:0}
+#stockApp>#stockStatus:empty{display:none}

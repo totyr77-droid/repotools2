@@ -1,6 +1,12 @@
 {
-  "version": 41,
+  "version": 42,
   "changes": [
+    {
+      "version": 42,
+      "label": "1.37",
+      "date": "2026-10-16",
+      "summary": "Stock más compacto y explicación de Pendientes junto al título."
+    },
     {
       "version": 41,
       "label": "1.36",
@@ -245,6 +251,6 @@
     }
   ],
   "major": 1,
-  "minor": 36,
-  "label": "1.36"
+  "minor": 37,
+  "label": "1.37"
 }
