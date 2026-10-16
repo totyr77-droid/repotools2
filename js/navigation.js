@@ -125,12 +125,14 @@
         try{next.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_'+Number(next.body.dataset.uiUser||0))==='1'?'1':'0';}catch{next.body.dataset.oneHand='0';}
         document.body.replaceWith(document.importNode(next.body, true));
         finishStyles(); page = createPage();
+        // Reset before section scripts can anchor layout to the previous scroll position.
+        window.scrollTo({ left: scroll[0], top: scroll[1], behavior: 'instant' });
         window.repotoolsOfflineUser=Number(document.body.dataset.uiUser||0);
         window.RepoOneHand?.refresh(); window.RepoMobileNav?.refresh();
         await execute(scripts,navigation.signal);
         if(token!==version)return;
         await window.RepotoolsPageLoader?.ready(loaderTicket);
-        window.scrollTo(...scroll);
+        window.scrollTo({ left: scroll[0], top: scroll[1], behavior: 'instant' });
         if (destination.hash) document.getElementById(decodeURIComponent(destination.hash.slice(1)))?.scrollIntoView();
         const heading = document.querySelector('main h1'); if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
         window.dispatchEvent(new CustomEvent('repotools:navigated'));

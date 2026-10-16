@@ -25,7 +25,7 @@
 <?php endif; ?>
 <!-- SCRIPTS -->
 
-<script src="js/navigation.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/navigation.js'),0,12) ?>"></script>
 <link rel="stylesheet" href="css/product-crop.css?v=<?= (int)app_release()['version'] ?>">
 <script src="js/product-crop.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>"></script>
