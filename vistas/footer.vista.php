@@ -91,7 +91,7 @@
 <?php if (current_user()): ?><script src="js/scan-library.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/scan-photo.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/dialog-scroll.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/dialog-scroll.js?v=<?= substr(sha1_file(__DIR__.'/../js/dialog-scroll.js'),0,12) ?>"></script>
 <script src="js/title-icons.js?v=<?= (int)app_release()['version'] ?>"></script>
 
 <script src="js/botones.js?v=<?= (int)app_release()['version'] ?>"></script>

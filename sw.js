@@ -32,3 +32,5 @@ self.addEventListener('message',event=>{
   const jobs=[...targets];let index=0;await Promise.all(Array.from({length:4},async()=>{while(index<jobs.length){const [url,stores]=jobs[index++],response=await fetch(url,{cache:'reload',credentials:'same-origin'});if(!response.ok)throw Error('No se pudieron actualizar todos los archivos. Volvé a intentar.');for(const store of stores)await store.put(url,response.clone());}}));port.postMessage({ok:true});
  }catch(error){port.postMessage({ok:false,error:error.message||'No se pudo actualizar la caché.'});}})());
 });
+
+// Shell refresh: shared dialog backdrop dismissal, online and offline.
