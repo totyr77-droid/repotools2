@@ -76,7 +76,7 @@ function inicializar() {
 function bindEventos() {
   document.getElementById('mainScanNormal')?.addEventListener('click', () => cambiarModoRapido(false));
   document.getElementById('mainScanRapid')?.addEventListener('click', () => cambiarModoRapido(true));
-  document.getElementById('mainRapidFinish')?.addEventListener('click', cerrarScanner);
+  document.getElementById('mainRapidFinish')?.addEventListener('click', () => {cerrarScanner();if(lista.length)abrirResultados();});
   els.borrarD?.addEventListener("click", borrarTodo);
   els.ver?.addEventListener("click", abrirResultados);
   els.cantidadBox?.addEventListener("click", () => {
