@@ -1,6 +1,12 @@
 {
-  "version": 37,
+  "version": 38,
   "changes": [
+    {
+      "version": 38,
+      "label": "1.33",
+      "date": "2026-10-16",
+      "summary": "Pegar EAN dentro del campo, búsqueda visible y avance cómodo de vencimiento a descripción y cantidad."
+    },
     {
       "version": 37,
       "label": "1.32",
@@ -221,6 +227,6 @@
     }
   ],
   "major": 1,
-  "minor": 32,
-  "label": "1.32"
+  "minor": 33,
+  "label": "1.33"
 }

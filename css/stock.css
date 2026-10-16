@@ -244,3 +244,9 @@ body[data-one-hand="1"][data-hand=left] .stock-quantity-line>.stock-calculator-d
 body[data-one-hand="1"][data-hand=left] .stock-quantity-line{grid-template-columns:48px minmax(0,1fr)}
 body[data-one-hand="1"][data-hand=left] .stock-quantity-line>input{border-radius:0 8px 8px 0}
 body[data-one-hand="1"][data-hand=left] .stock-quantity-line>.stock-calculator-disclosure>summary{border-left:0;border-right:1px solid #e2dded;border-radius:8px 0 0 8px}
+.stock-ean-paste{position:relative;display:block;min-width:0;width:100%}
+#stockEanInput{width:100%;padding-right:52px;box-sizing:border-box;min-height:48px;margin:0}
+#pasteStockEan{position:absolute;right:1px;top:1px;width:46px;height:46px;min-height:44px;padding:12px;border:0;border-radius:0 9px 9px 0;margin:0;background:#eeebf7;color:#27197f}
+#pasteStockEan svg{width:20px;height:20px}
+body[data-hand=left] #pasteStockEan{left:1px;right:auto;border-radius:9px 0 0 9px}
+body[data-hand=left] #stockEanInput{padding-left:52px;padding-right:12px}
