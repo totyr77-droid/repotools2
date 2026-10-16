@@ -437,3 +437,15 @@ body[data-hand] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{margin:0;g
 #contenedormax[data-scan-mode=rapid] .main-scan-result-zone{max-height:none}
 #contenedormax[data-scan-mode=rapid] .main-camera-slot{height:100%;max-height:none;min-height:0}
 #contenedormax.library-dialog.library-scanner-dialog[data-scan-mode=rapid][open]{overflow:hidden}
+
+/* Keep the EAN with product details and pair actions with the scan status. */
+#contenedormax[data-scan-mode=rapid] .main-rapid-feedback{height:116px;min-height:116px;max-height:116px}
+#contenedormax[data-scan-mode=rapid] .main-rapid-info{width:100%;min-width:0;direction:ltr;text-align:left}
+body[data-hand] #contenedormax[data-scan-mode=rapid] .main-rapid-info .main-rapid-ean{display:flex;align-items:center;justify-content:flex-start;gap:5px;margin-top:4px;font-size:.75rem;line-height:18px;grid-area:auto}
+#contenedormax[data-scan-mode=rapid] .main-rapid-panel[data-state=idle] .main-rapid-info .main-rapid-ean{display:none}
+body[data-hand] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto;grid-template-areas:'text actions';align-items:center;gap:6px;margin:0;min-height:44px}
+#contenedormax[data-scan-mode=rapid] .main-rapid-status-text{grid-area:text;min-width:0;text-align:left;direction:ltr;font-size:.75rem;line-height:1.35}
+body[data-hand] #contenedormax[data-scan-mode=rapid] #mainRapidActions{grid-area:actions;display:flex;align-items:center;margin:0;gap:4px}
+body[data-hand=left] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{grid-template-columns:auto minmax(0,1fr);grid-template-areas:'actions text'}
+#contenedormax[data-scan-mode=rapid] #mainRapidActions button{padding:12px;width:44px;height:44px;min-height:44px;border-radius:9px}
+#contenedormax[data-scan-mode=rapid] #mainRapidActions svg{width:18px;height:18px}
