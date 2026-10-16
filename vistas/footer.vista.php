@@ -40,7 +40,7 @@
 <script src="js/date-time.js?v=<?= (int)app_release()['version'] ?>"></script>
 
 <script src="js/connection-position.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/device-connection.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/device-connection.js?v=<?= substr(sha1_file(__DIR__.'/../js/device-connection.js'),0,12) ?>"></script>
 <script src="js/action-notices.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php $referralNotice=$_SESSION['referral_registration_notice']??null;if($referralNotice&&current_user()&&(int)$referralNotice['user_id']===(int)current_user()['id']){unset($_SESSION['referral_registration_notice']);if((int)$referralNotice['at']>time()-900): ?><script>window.RepoToast?.(<?= json_encode($referralNotice['message'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>,{kind:'info'});</script><?php endif;} ?>
 <?php if (!empty($paginaBiblioteca)): ?>

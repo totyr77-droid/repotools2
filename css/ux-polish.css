@@ -616,3 +616,11 @@ body[data-hand=left] .header-contenedor:has(#refreshAppCache) .logo{justify-cont
 #stockDeductForm #deductStatus:empty{display:none}
 #stockDeductForm>.library-dialog-actions{margin-top:12px}
 }
+
+/* Teclado/lector de escritorio: sin altura ni overlays heredados de cámara. */
+@media(min-width:769px){
+.library-scanner-dialog .ean-reader.scan-desktop-surface,#contenedormax #contenedor.scan-desktop-surface{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible;background:white}
+.scan-desktop-surface>.camera-message-overlay{display:none!important}
+.scan-desktop-surface .scan-method-picker form{position:static;inset:auto;min-height:0;height:auto;max-height:none;overflow:visible;margin:0}
+.scan-desktop-surface .scan-method-picker form>p:empty{display:none}
+}
