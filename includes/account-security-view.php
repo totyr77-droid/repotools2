@@ -1,7 +1,6 @@
 <section class="account-security settings-group settings-security">
   <h2>Seguridad</h2>
   <div class="account-security-actions"><button id="changePassword" class="library-secondary" type="button"><?= account_icon('lock') ?>Cambiar contraseña</button><button id="closeOtherSessions" class="library-secondary" type="button"><?= stock_icon('close') ?>Cerrar otras sesiones</button></div>
-  <details class="security-email-change"><summary>Cambiar correo</summary><form id="changeEmailForm"><label>Contraseña actual<input type="password" name="current_password" autocomplete="current-password" maxlength="72" required></label><label>Nuevo correo<input type="email" name="email" maxlength="254" autocomplete="email" required></label><button type="submit" class="library-primary">Verificar nuevo correo</button></form></details>
   <p id="accountSecurityStatus" role="status"></p>
 </section>
 <dialog id="accountSecurityDialog" class="account-edit-dialog" aria-labelledby="accountSecurityTitle"><div class="account-edit-heading"><h2><?= account_icon('lock') ?><span id="accountSecurityTitle">Cambiar contraseña</span></h2><button type="button" class="app-close" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>

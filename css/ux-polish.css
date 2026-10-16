@@ -344,3 +344,12 @@ body[data-hand=left] .stock-find .stock-toolbar:not(:has(.branch-stock-filter:no
 #stockApp #pendingPallets:empty,#stockApp #stockSearchResults:empty{display:none}
 #stockApp>#stockExpiryPanel:not(.is-open){margin:0}
 #stockApp>#stockStatus:empty{display:none}
+
+/* Email status and changes belong to the same profile disclosure. */
+#emailVerification .settings-current-email{margin:10px 0 4px;overflow-wrap:anywhere;font-size:.9rem;color:#27197F}
+#emailVerification .security-email-change{margin-top:12px;padding-top:12px;border-top:1px solid #e4e0ed}
+#emailVerification .settings-email-change-title{display:flex;align-items:center;gap:6px;margin:0 0 10px;font-size:.9rem;font-weight:600;color:#27197F}
+#emailVerification .settings-email-change-title svg{width:18px;height:18px;flex:none}
+#emailVerification .security-email-change form{margin:0;max-width:460px}
+#emailVerification .security-email-change label{margin:0}
+#emailVerification .security-email-change button{min-height:44px;margin:0}
