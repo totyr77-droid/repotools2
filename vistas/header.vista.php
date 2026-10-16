@@ -58,7 +58,6 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link rel="stylesheet" href="css/vendor/fontawesome-6.7.2/css/brands.min.css">
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
     <link href="css/loading.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
-    <?php if(!empty($paginaDemo)): ?><link href="css/guest-demo.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
     <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
@@ -96,7 +95,8 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/motion.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
 <link href="css/mobile-navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
 <link href="css/one-hand-mode.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
-<link href="css/ux-polish.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>" as="script"><link rel="preload" href="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>" as="script"></head>
+<link href="css/ux-polish.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>" as="script"><link rel="preload" href="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>" as="script">    <?php if(!empty($paginaDemo)): ?><link href="css/guest-demo.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+</head>
   <?php require_once __DIR__.'/../includes/app-release.php'; ?><body data-app-updates="<?= current_user() && isset($roleLabels[$navRole]) ? '1' : '0' ?>" data-app-version="<?= (int)app_release()['version'] ?>" data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : (!empty($paginaBiblioteca) ? ' class="library-page"' : '') ?>>
     <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <header>

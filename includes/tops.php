@@ -13,17 +13,17 @@ function tops_legacy_ranking(PDO $db,string $category,string $period,?int $viewe
     $table=$category==='reportes'?'report_rewards':'scan_events';$metric=$category==='codigos'?'COUNT(DISTINCT e.code)':'COUNT(*)';
     $cte="WITH scores AS (SELECT e.user_id, {$metric} AS value FROM {$table} e{$where} GROUP BY e.user_id), ranked AS (SELECT user_id,value,RANK() OVER(ORDER BY value DESC) AS position FROM scores) ";
     $select='SELECT r.*,u.public_name FROM ranked r JOIN users u ON u.id=r.user_id ';
-    $stmt=$db->prepare($cte.$select.'ORDER BY value DESC,r.user_id ASC LIMIT 50');$stmt->execute($params);$rows=$stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt=$db->prepare($cte.$select.'ORDER BY value DESC,r.user_id ASC LIMIT 10');$stmt->execute($params);$rows=$stmt->fetchAll(PDO::FETCH_ASSOC);
     $safe=static function(array $row)use($viewer):array {return ['position'=>(int)$row['position'],'value'=>(int)$row['value'],'name'=>get_public_user_name(['public_name'=>$row['public_name'],'name'=>'Usuario','id'=>0]),'me'=>$viewer!==null&&(int)$row['user_id']===$viewer];};
     $own=null;
     if ($viewer!==null&&!array_filter($rows,fn($row)=>(int)$row['user_id']===$viewer)) {$stmt=$db->prepare($cte.$select.'WHERE r.user_id=?');$stmt->execute([...$params,$viewer]);$row=$stmt->fetch(PDO::FETCH_ASSOC);if($row)$own=$safe($row);}
     return ['leaders'=>array_map($safe,$rows),'own'=>$own];
 }
 
-function tops_categories(): array {return ['referidos'=>['Referidos','Solo cuentan invitaciones con correo confirmado, en la fecha de verificación.'],'actividad'=>['Actividad','Cada operación real confirmada cuenta una vez, sin importar las unidades.'],'sucursales'=>['Sucursales','Unidades ingresadas o retiradas. En un traslado, se cuenta solo el destino.']];}
+function tops_categories(): array {return ['codigos'=>['Escaneadores','Cada producto con EAN diferente escaneado en el período cuenta una vez.'],'reportes'=>['Reportadores','Solo cuentan los reportes aprobados y confirmados.'],'referidos'=>['Referidos','Solo cuentan invitaciones con correo confirmado, en la fecha de verificación.']];}
 function tops_ranking(PDO $db,string $category,string $period,?int $viewer=null,?DateTimeImmutable $now=null): array {
     if(isset(tops_legacy_categories()[$category]))return tops_legacy_ranking($db,$category,$period,$viewer,$now);
-    if(!isset(tops_categories()[$category])||!in_array($period,['semana','mes','historico'],true))throw new InvalidArgumentException('Filtro no válido.');
+    if((!isset(tops_categories()[$category])&&!in_array($category,['actividad','sucursales'],true))||!in_array($period,['semana','mes','historico'],true))throw new InvalidArgumentException('Filtro no válido.');
     $now=($now??new DateTimeImmutable())->setTimezone(new DateTimeZone('America/Argentina/Buenos_Aires'));
     $start=$period==='semana'?$now->modify('monday this week')->setTime(0,0):($period==='mes'?$now->modify('first day of this month')->setTime(0,0):null);
     if($category==='referidos'){$where="state='validated' AND email_verified_at IS NOT NULL";$params=[];if($start){$where.=' AND email_verified_at>=?';$params[]=$start->getTimestamp();}$where.=' AND email_verified_at<=?';$params[]=$now->getTimestamp();$scores='SELECT referrer_id AS subject_id,COUNT(*) AS value FROM referrals WHERE '.$where.' GROUP BY referrer_id';}

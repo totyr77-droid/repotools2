@@ -9,3 +9,5 @@
 <?php endif; ?>
 
 <?php if(!$error&&!$ranking['leaders']&&$ranking['own']): ?><p class="tops-own">Tu período: <strong>0 <?= $category==='referidos'?'referidos confirmados':'operaciones' ?></strong></p><?php endif; ?>
+
+<?php if(!$viewer&&!$error): ?><div class="tops-guest-position" aria-label="Tu lugar en el ranking"><span class="tops-position">—</span><strong>Tú</strong><b>0</b></div><?php endif; ?>

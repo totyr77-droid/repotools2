@@ -250,3 +250,31 @@ body[data-hand="left"] #stockShareList .branch-actions{flex-direction:row!import
 .public-summary-table .public-summary-flags{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:.76rem;margin-top:4px}
 .public-summary-table .public-summary-ean{font-variant-numeric:tabular-nums;font-size:.75rem}
 #copyCurrentEan svg{width:18px;height:18px;vertical-align:middle}
+/* Filtros y acciones: lectura estable, controles próximos al pulgar. */
+.stock-find .stock-toolbar{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.stock-find .stock-search-label{flex:1 1 180px;min-width:0}
+.stock-find .branch-stock-filter{flex:0 1 180px;margin:0;min-width:0;padding:0}
+.stock-find .branch-stock-filter>label{margin:0;display:flex;align-items:center;gap:6px;width:100%}
+.stock-find .branch-stock-filter select{min-height:44px;width:100%;min-width:0;margin:0}
+.stock-find .branch-stock-filter svg{width:18px;flex:none}
+.user-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(100px,150px)!important;gap:8px!important;align-items:end!important}
+.user-toolbar .user-search{display:block!important;min-width:0;margin:0}
+.user-input-group{display:flex;align-items:stretch;position:relative;min-width:0}
+.user-input-group .user-search-field{flex:1;min-width:0;margin:0}
+.user-input-group input{padding-right:48px!important;width:100%;box-sizing:border-box;min-height:44px;margin-bottom:0}
+.user-input-group button{position:absolute;right:1px;bottom:1px;width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;padding:8px!important;border-radius:0 9px 9px 0!important;margin:0!important}
+.user-toolbar .user-directory-filter{margin:0;min-width:0;display:block}
+.user-toolbar .user-directory-filter>svg{width:16px;height:16px;vertical-align:middle}
+.user-toolbar .user-directory-filter select{width:100%;min-height:44px;margin:0}
+.user-quick-actions{display:flex;justify-content:flex-end;margin-block:6px}
+.user-quick-actions #userScan{width:44px;height:44px;padding:10px}
+.user-quick-actions:empty{display:none}
+body[data-hand=right] .library-product{flex-direction:row-reverse!important}
+body[data-hand=left] .library-product{flex-direction:row!important}
+.library-product-description{text-align:left!important;direction:ltr}
+.library-product-actions>.library-remove-product{order:0!important;margin-inline:0!important}
+@media(max-width:768px){body[data-one-hand='1'] .library-product{flex-direction:column-reverse!important;align-items:stretch}body[data-one-hand='1'][data-hand=right] .library-product-actions{align-self:flex-start}body[data-one-hand='1'][data-hand=left] .library-product-actions{align-self:flex-end}body[data-one-hand='1'] .library-product-actions>button{min-width:44px;min-height:44px}body[data-one-hand='1'] .one-hand-fabs #userScan{order:1}body[data-one-hand='1'] .one-hand-fabs #userScan+button{order:0}.stock-find .branch-stock-filter{flex-basis:140px}}
+.tops-guest-position{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #b8afe7;background:#efedf8;border-radius:10px;margin-top:12px;color:#27197f}
+.tops-guest-position strong{flex:1}.tops-guest-position b{font-size:1.25rem}
+.user-input-group button svg{width:20px;height:20px}.user-quick-actions #userScan svg{width:22px;height:22px}
+@media(max-width:480px){.stock-find .stock-search-label{flex:1 1 0;min-width:0}.stock-find .branch-stock-filter{flex:0 0 112px}.stock-find .branch-stock-filter>label>svg{display:none}.stock-find .branch-stock-filter select{padding-inline:6px;font-size:.8rem}}
