@@ -575,3 +575,12 @@ body[data-one-hand='1']:has(:is(#collectionList,#stockApp)) .repo-mobile-subnav>
 /* Consulta de palet: indicador centrado en el flujo, sin superponer contenido. */
 #stockApp>#stockStatus.repotools-loading-host{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;text-align:center;min-height:72px}
 #stockApp>#stockStatus>.repotools-loader--local{position:static;inset:auto;min-height:0;padding:12px 0;background:transparent;border-radius:0;max-width:100%;box-sizing:border-box}
+
+/* El botón de caché no debe centrar el logo en el espacio sobrante. */
+@media(max-width:768px){
+.header-contenedor:has(#refreshAppCache) .logo{justify-content:flex-start;padding-inline:12px;box-sizing:border-box}
+body[data-hand=left] .header-contenedor:has(#refreshAppCache) .logo{justify-content:flex-end}
+.header-contenedor:has(#refreshAppCache) .logo img{width:144px;max-width:100%;height:auto;object-fit:contain}
+.header-contenedor:has(#refreshAppCache) .logo-mark{display:flex;flex:0 1 144px;min-width:0;max-width:100%}
+.header-contenedor:has(#refreshAppCache) .workspace-account-icon{margin-inline:0}
+}
