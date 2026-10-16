@@ -159,5 +159,5 @@ function branch_public(PDO $db,string $token,int $page=0): array {
         $branchInfo=$row['branch_name']===null?null:['name'=>$row['branch_name'],'address'=>$row['branch_address'],'locality'=>$row['branch_locality'],'province'=>$row['branch_province'],'description'=>$row['branch_description']];
         $pallets[]=['code'=>$row['code'],'branch'=>$branchInfo,'products'=>$products[$row['id']]??[]];
     }
-    return ['title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page,'summary'=>$summary];
+    return ['owner_name'=>get_public_user_name(stock_query($db,'SELECT id,name,public_name FROM users WHERE id=?',[(int)$share['owner_id']])->fetch()?:['id'=>(int)$share['owner_id']]),'title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page,'summary'=>$summary];
 }

@@ -93,6 +93,7 @@ function bindEventos() {
   els.copy?.addEventListener("click", copiarResultado);
   els.compartir?.addEventListener("click", compartirLista);
   els.compartirD?.addEventListener("click", compartirLista);
+  document.getElementById('copyCurrentEan')?.addEventListener('click', async () => { const ean=lista[indiceActual-1]; if(!ean)return; try { await navigator.clipboard.writeText(ean); window.RepoToast?.('EAN copiado.'); } catch { window.RepoToast?.('No se pudo copiar el EAN.',{kind:'error'}); } });
   document.getElementById('shareCurrentEan')?.addEventListener('click', () => { const ean = lista[indiceActual - 1]; if (ean) compartirCodigos([ean]); });
   document.getElementById('openResultInfo')?.addEventListener('click', () => {
     const ean = lista[indiceActual - 1]; if (!ean) return;

@@ -229,8 +229,8 @@ const result=await api('',{action:'deduct_product',pallet_id:deductTarget.id,pro
     let url=RepoPalletLabel.url(active.code);
     url=await window.RepoShareLinks.url('p',active.code,csrf,url);
     try {
-      if(navigator.share){await navigator.share({title:'Palet '+active.code,text:'Consulta el contenido actualizado de este palet en Repotools.',url});$('palletStatus').dataset.state='success';$('palletStatus').textContent='Enlace del palet compartido.';}
-      else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);$('palletStatus').dataset.state='success';$('palletStatus').textContent='Enlace copiado. Puedes enviarlo para consultar el palet.';}
+      if(navigator.share){await navigator.share({title:'Palet '+active.code,text:'Consulta el contenido actualizado de este palet en Repotools.',url});window.RepoToast?.('Enlace compartido.');}
+      else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);window.RepoToast?.('Enlace copiado.');}
       else throw Error('clipboard');
     }catch(e){if(e.name==='AbortError')return;$('palletStatus').replaceChildren();text('span','Enlace para consultar el palet: ',$('palletStatus'));const link=text('a',url,$('palletStatus'));link.href=url;link.target='_blank';link.rel='noopener';}
   });

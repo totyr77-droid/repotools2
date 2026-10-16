@@ -227,3 +227,26 @@ body[data-hand=left] #labelList .stock-card{padding-inline-start:46px;padding-in
 @media(max-width:768px){#stockShareDialog[open]{height:calc(var(--dialog-visible-height,100dvh) - max(12px,env(safe-area-inset-top,0px)) - max(12px,env(safe-area-inset-bottom,0px)))!important;width:calc(100vw - 24px);max-width:calc(100vw - 24px);box-sizing:border-box}}
 #publicPallet>.public-pallet-branch{margin:4px 0 12px;font-size:.9rem;color:#626b7a;overflow-wrap:anywhere}
 #publicPalletMetadata{margin:12px 0}
+/* Enlaces: una fila táctil; solo los controles cambian con la mano. */
+#stockShareList .branch-row{display:flex;flex-wrap:wrap;flex-direction:row!important;text-align:left!important;gap:8px}
+#stockShareList .branch-row>div:first-child{flex:1 1 180px;min-width:0;direction:ltr}
+#stockShareList .branch-actions{flex:0 0 auto;max-width:none;flex-wrap:nowrap!important;gap:6px;margin-left:auto;justify-content:flex-end!important;direction:ltr}
+#stockShareList .branch-actions>button{order:0!important;margin-inline:0!important;flex:0 0 44px}
+body[data-hand="right"] #stockShareList .branch-actions{flex-direction:row-reverse!important}
+body[data-hand="left"] #stockShareList .branch-actions{flex-direction:row!important}
+.public-share-owner{font-size:.85rem;color:var(--color-primary,#27197f);margin:4px 0 8px}
+.branch-public-list{gap:6px!important}
+.branch-public-pallet{margin-block:4px!important;padding:10px!important}
+:is(#publicStockShare,#publicPallet) .public-share-product-details{display:flex!important;flex-flow:row wrap!important;align-items:center;gap:6px 12px!important;justify-content:flex-start}
+:is(#publicStockShare,#publicPallet) .public-share-product-details p{margin:0}
+.public-share-expiry{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.public-summary-table{width:100%;border-collapse:collapse;table-layout:fixed;text-align:left;font-size:.85rem}
+.public-summary-table th{color:#27197f;font-weight:600}
+.public-summary-table :is(th,td){padding:9px 6px;vertical-align:top;border-bottom:1px solid #e7e4f1;overflow-wrap:anywhere}
+.public-summary-table th:first-child{width:27%}
+.public-summary-table th:last-child{width:36%}
+.public-summary-table .public-summary-product{display:table-row;background:none;border:0;box-shadow:none}
+.public-summary-table .public-summary-total{font-size:.9rem;white-space:normal}
+.public-summary-table .public-summary-flags{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:.76rem;margin-top:4px}
+.public-summary-table .public-summary-ean{font-variant-numeric:tabular-nums;font-size:.75rem}
+#copyCurrentEan svg{width:18px;height:18px;vertical-align:middle}
