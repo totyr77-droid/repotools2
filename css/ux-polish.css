@@ -384,3 +384,9 @@ body[data-hand] #contenedormax .resultado-box{display:flex;flex-direction:column
 #contenedormax .cartelscaner-box,#contenedormax .cartelscaner-box-info{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
 body[data-hand] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{text-align:left}
 .one-hand-sheet:has(.stock-find){background:#fff}
+
+#emailVerification .settings-email-status{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin-top:10px;direction:ltr;text-align:left}
+#emailVerification .settings-email-status>.settings-current-email{flex:1;min-width:0;margin:0;font-size:.85rem}
+#emailVerification .settings-email-status>.email-verification-row{margin:0;flex:none;flex-direction:row;gap:6px}
+#emailVerification .settings-email-status .email-verification-row p{font-size:.75rem;gap:5px;padding:6px;white-space:nowrap}
+#emailVerification .settings-email-status .email-verification-row svg{width:16px;height:16px}
