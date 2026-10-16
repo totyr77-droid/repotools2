@@ -58,3 +58,11 @@ body.offline-shell main.app-page-enter{animation:none!important;transform:none!i
 @media(prefers-reduced-motion:reduce){.offline-pallet-summary::after{transition:none}}
 
 .offline-shell button.offline-withdraw{background:#fff0f2;color:#b52a3b}
+.offline-quantity-line{display:flex;align-items:stretch;gap:0;min-width:0;width:100%}
+.offline-quantity-line #offlineAmount{flex:1;min-width:0;width:0;height:48px;margin:0;border-radius:9px 0 0 9px}
+.offline-quantity-line #offlineCalculatorToggle{flex:0 0 48px;margin:0}
+.offline-quantity-line #offlineCalculatorToggle summary{width:48px;height:48px;min-height:48px;box-sizing:border-box;border-radius:0 9px 9px 0;padding:12px;justify-content:center}
+#offlineCalculator{position:fixed;inset:auto;margin:0;padding:8px;box-sizing:border-box;z-index:1000;overflow-y:auto;background:white;color:#27197f;border:1px solid #dcd6ed;border-radius:12px;box-shadow:0 6px 22px #17203324;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+#offlineCalculator[hidden]{display:none!important}
+#offlineCalculator button{height:44px;min-height:44px;margin:0;padding:6px;border-radius:8px;background:#eeebf7;color:#27197f;font-size:1rem}
+#offlineCalculator .offline-calculator-done{grid-column:1/-1;background:#27197f;color:white}
