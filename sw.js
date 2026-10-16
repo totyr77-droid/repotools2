@@ -40,3 +40,5 @@ self.addEventListener('message',event=>{
 // Shell refresh: compact expiry keypad and explicit hand preference.
 
 // Shell refresh: keypad headings and expiry input anchoring.
+
+// Shell refresh: retain left-handed placement with older preference snapshots.
