@@ -400,7 +400,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   els.resultado.textContent = codigo;
   const heading = document.getElementById("scanResultHeading");
   document.getElementById('mainScannerTitle').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto escaneado';
-  if (heading) {heading.parentElement.hidden=!esDuplicado;heading.textContent='Este código ya está en tu lista. No lo agregamos otra vez.';heading.parentElement.dataset.state='warning';}
+  if (heading) {heading.parentElement.hidden=false;heading.textContent=esDuplicado?'Este código ya está en tu lista. No lo agregamos otra vez.':'Producto agregado a tu lista.';heading.parentElement.dataset.state=esDuplicado?'warning':'success';}
   document.getElementById('scanProductActions')?.replaceChildren();
   els.rescancelar.style.display = esDuplicado ? "none" : "block";
   actualizarContadores();

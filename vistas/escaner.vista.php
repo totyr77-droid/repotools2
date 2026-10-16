@@ -28,7 +28,7 @@
         <div class="resultado-box">
           <div class="resultado-api" role="status"></div>
           <div class="resultado-title">
-            <i class="fa-solid fa-barcode"></i><p id="resultado"></p>
+            <span class="scan-ean-code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/></svg><p id="resultado"></p></span><button class="library-secondary scan-ean-copy" id="copy" type="button" aria-label="Copiar EAN" title="Copiar EAN" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 8h12v13H8zM16 8V3H3v13h5"/></svg><span>Copiar</span></button>
           </div>
           <div id="scanProductActions" class="scan-product-actions" aria-label="Acciones del producto"></div>
         </div>
@@ -36,9 +36,6 @@
         <div class="CsBH">
           <button class="cantidadbox" type="button" aria-label="Ver resultados">
             <i class="fa-solid fa-box-open" aria-hidden="true"></i>Ver lista (<span id="cantidadScan"></span>)
-          </button>
-          <button class="copybox" id="copy" type="button" aria-label="Copiar codigo" disabled>
-            <i class="fa-solid fa-copy" aria-hidden="true"></i>Copiar EAN
           </button>
         </div>
         <p id="scanCopyStatus" class="scanner-status" role="status"></p>
