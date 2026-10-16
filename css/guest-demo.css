@@ -47,3 +47,10 @@
 .guest-demo [data-demo-product]{cursor:pointer}
 .guest-demo [data-demo-product]:focus-visible{outline:2px solid #27197F;outline-offset:2px}
 #demoPalletDialog .demo-label,#demoAccountDialog .demo-label{background:#fff0bd;color:#77530a}
+#demoProductNav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0;direction:ltr}
+#demoProductNav[hidden]{display:none}
+#demoProductNav button{display:grid;place-items:center;min-width:44px;min-height:44px;margin:0;padding:10px}
+#demoPreviousProduct svg{transform:rotate(90deg)}
+#demoNextProduct svg{transform:rotate(-90deg)}
+#demoProductPosition{font-size:.85rem;color:#626b7a}
+#demoPalletProducts .demo-barcode{display:block;width:100%;height:auto;max-height:130px;margin:10px 0;background:#fff}

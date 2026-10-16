@@ -8,6 +8,6 @@ function repotools_demo_data(): array {
             ['key'=>'demo-norte','code'=>'10000002','branch'=>'Sucursal Norte','count'=>1,'products'=>[['name'=>'Arroz 1 kg','amount'=>'24 unidades','expiry'=>'Vence en 90 días','state'=>'normal']]],
             ['key'=>'demo-sur','code'=>'10000003','branch'=>'Sucursal Sur','count'=>1,'products'=>[['name'=>'Agua mineral 1,5 L','amount'=>'18 unidades','expiry'=>'Vence en 60 días','state'=>'normal']]],
         ],
-        'list'=>[['name'=>'Gaseosa 2,25 L','ean'=>'779…001'],['name'=>'Vainillas 148 g','ean'=>'779…002'],['name'=>'Yogur vainilla','ean'=>'779…003'],['name'=>'Arroz 1 kg','ean'=>'779…004']],
+        'list'=>[['name'=>'Gaseosa 2,25 L','ean'=>'0200000000011'],['name'=>'Vainillas 148 g','ean'=>'0200000000028'],['name'=>'Yogur vainilla','ean'=>'0200000000035'],['name'=>'Arroz 1 kg','ean'=>'0200000000042']],
     ];
 }
