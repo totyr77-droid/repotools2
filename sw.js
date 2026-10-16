@@ -14,7 +14,7 @@ self.addEventListener('fetch',event=>{
   }
   if(path.startsWith('js/vendor/ocr/')) { event.respondWith(caches.open('repotools-ocr-v1').then(async cache => { const old=await cache.match(event.request); if(old)return old; const response=await fetch(event.request); if(response.ok)await cache.put(event.request,response.clone()); return response; })); return; }
   if(ICON_ASSETS.includes(path)){event.respondWith(caches.match(event.request,{ignoreSearch:true}).then(cached=>cached||fetch(event.request)));return;}
-  if(ASSETS.includes(path))event.respondWith(caches.open(CACHE).then(async cache=>{const cached=await cache.match(event.request,{ignoreSearch:true});if(cached)return cached;const response=await fetch(event.request);if(response.ok)await cache.put(event.request,response.clone());return response;}));
+  if(ASSETS.includes(path))event.respondWith(caches.open(CACHE).then(async cache=>{const hashed=/^[a-f0-9]{12}$/.test(url.searchParams.get('v')||'');const cached=await cache.match(event.request,{ignoreSearch:!hashed});if(cached)return cached;try{const response=await fetch(event.request);if(response.ok)await cache.put(event.request,response.clone());return response;}catch(error){if(hashed){const fallback=await cache.match(event.request,{ignoreSearch:true});if(fallback)return fallback;}throw error;}}));
 });
 
 let preparingOCR;

@@ -403,3 +403,10 @@ body[data-hand] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{text-align
 #stockShareList .branch-row{width:100%;min-width:0;box-sizing:border-box;padding-inline:0;overflow:visible}
 body[data-hand] #stockShareList .branch-actions{width:auto;min-width:0;max-width:100%;justify-self:end;justify-content:flex-start!important;padding:0;margin-inline:0!important;box-sizing:border-box}
 body[data-hand=left] #stockShareList .branch-actions{justify-self:start}
+
+/* Content-sized normal result: one scroll surface only if the viewport cannot fit it. */
+#contenedormax.library-dialog.library-scanner-dialog[data-has-result=true][data-scan-mode=normal][open]{display:block!important;height:auto!important;overflow-y:auto;overflow-x:hidden;max-height:calc(var(--dialog-visible-height,100dvh) - 24px)}
+#contenedormax[data-has-result=true][data-scan-mode=normal] .main-scan-result-zone{display:block;height:auto;max-height:none;overflow:visible}
+#contenedormax[data-has-result=true][data-scan-mode=normal] #cartelScaner{display:block!important;width:100%;height:auto;overflow:visible}
+#contenedormax[data-has-result=true][data-scan-mode=normal] .cartelscaner-box{display:block;width:100%;margin:0;box-sizing:border-box}
+#contenedormax[data-has-result=true][data-scan-mode=normal]>.library-heading{margin-bottom:8px}
