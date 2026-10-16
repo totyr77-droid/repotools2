@@ -565,3 +565,9 @@ body[data-one-hand='1']:has(:is(#collectionList,#stockApp)) .repo-mobile-subnav>
 }
 
 @media(max-width:768px){body[data-one-hand='1'] #collectionPanel{padding-bottom:12px}}
+
+/* Stock centrado junto a la descripción y su estado local. */
+#stockApp>.library-heading>div{display:grid!important;grid-template-columns:max-content minmax(0,1fr);grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center;min-width:0}
+#stockApp>.library-heading>div>h1{grid-column:1;grid-row:1 / span 2;align-self:center;margin:0}
+#stockApp>.library-heading>div>p{grid-column:2;grid-row:1;margin:0}
+#stockApp>.library-heading>div>#stockLocalStatus{grid-column:2;grid-row:2;width:auto;min-width:0;margin:0}
