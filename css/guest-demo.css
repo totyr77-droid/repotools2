@@ -28,3 +28,10 @@
 .guest-demo[data-demo-section=biblioteca]>.demo-list>.demo-product{background:white;border-style:solid}
 .guest-demo .demo-notice,.guest-demo .demo-pallet,.guest-demo .demo-product,.guest-demo .demo-product>div{text-align:left!important}
 .guest-demo .demo-notice,.guest-demo .demo-product{flex-direction:row!important}
+
+/* Demo controls share one compact row; all sample badges use the same yellow. */
+.guest-demo .demo-label{background:#fff0bd;color:#77530a}
+.guest-demo h1,.guest-demo h2,.guest-demo .demo-cta h2{color:#27197F}
+.guest-demo[data-demo-section=biblioteca]>.demo-tools{display:grid;grid-template-columns:1.15fr 1.2fr 1fr;gap:6px;align-items:stretch;direction:ltr}
+.guest-demo[data-demo-section=biblioteca]>.demo-tools>:is(a,button){width:100%;min-width:0;min-height:44px;height:auto;padding:7px 5px;box-sizing:border-box;font-size:.78rem;line-height:1.2;gap:4px;white-space:normal}
+.guest-demo[data-demo-section=biblioteca]>.demo-tools svg{width:18px;height:18px}
