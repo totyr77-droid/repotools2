@@ -523,3 +523,6 @@ body[data-hand=right] #palletDialog #palletTools>.stock-primary-actions{order:2;
 
 /* El aviso enfocado cubre también el margen interior del palet. */
 #palletDialog>#palletProducts{margin-inline:-14px;padding-inline:14px;width:calc(100% + 28px);max-width:none;box-sizing:border-box}#palletDialog #palletProducts>.stock-product-highlight{margin-inline:-14px;padding-inline:14px;width:calc(100% + 28px);box-sizing:border-box}
+
+/* El encabezado comparte el margen del contenido, sin un segundo padding lateral. */
+dialog>.library-heading,dialog>form>.library-heading,dialog>.results-heading,dialog>.dialog-heading{margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important;width:100%;max-width:100%;min-width:0;box-sizing:border-box}
