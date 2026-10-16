@@ -44,7 +44,9 @@ try {
             $sql="SELECT b.id,b.name,b.ean,b.expires,b.units,p.code,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN products c ON c.ean=b.ean WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))";
             $params=[$uid,$uid];
             $branchFilter=$_GET['branch']??'all';if(!is_string($branchFilter)||($branchFilter!=='all'&&$branchFilter!=='none'&&!preg_match('/^[1-9][0-9]{0,17}$/D',$branchFilter)))throw new CatalogException('La sucursal no es válida.',422);if($branchFilter==='none')$sql.=' AND p.branch_id IS NULL';elseif($branchFilter!=='all'){$sql.=' AND p.branch_id=?';$params[]=$branchFilter;}
-            if($search!==''){$sql.=' AND (LOWER(b.name) LIKE ? OR b.ean LIKE ? OR LOWER(c.name) LIKE ? OR LOWER(c.brand) LIKE ?)';$term='%'.mb_strtolower($search).'%';$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;}
+            $tag=$_GET['tag']??'';if(!is_string($tag)||mb_strlen($tag)>40)throw new CatalogException('La etiqueta no es válida.',422);
+            if($tag!==''){$sql.=' AND EXISTS(SELECT 1 FROM pallet_user_tags t WHERE t.pallet_id=p.id AND t.user_id=? AND t.name=?)';$params[]=$uid;$params[]=$tag;}
+            if($search!==''){$sql.=' AND (LOWER(b.name) LIKE ? OR b.ean LIKE ? OR LOWER(c.name) LIKE ? OR LOWER(c.brand) LIKE ? OR EXISTS(SELECT 1 FROM pallet_user_tags st WHERE st.pallet_id=p.id AND st.user_id=? AND LOWER(st.name) LIKE ?))';$term='%'.mb_strtolower($search).'%';$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$uid;$params[]=$term;}
             if(isset($_GET['expiries'])){$sql.=" AND b.expires<>'' AND b.expires<=?";$params[]=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$uid).' days')->format('Y-m-d');}
             $result=['items'=>stock_query($db,$sql." ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,p.code,b.id LIMIT 201",$params)->fetchAll(),'warning_days'=>stock_warning_days($db,$uid)];
             $result['items']=array_map('stock_product_names',$result['items']);
@@ -60,6 +62,7 @@ try {
             if (!$uid) throw new CatalogException('Inicia sesión para ver tus palets.',401);
             $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$uid])->fetchColumn();
             $result=['is_admin'=>stock_is_admin($db,$uid),'admin_pallets'=>[],'pallets'=>stock_list($db,$uid),'labels'=>stock_query($db,'SELECT code,reserved_until FROM pallet_labels WHERE reserved_by=? AND pallet_id IS NULL AND reserved_until>? ORDER BY reserved_until DESC',[$uid,time()])->fetchAll(),'invitations'=>stock_query($db,"SELECT p.id,p.code,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id FROM pallet_access a JOIN pallets p ON p.id=a.pallet_id JOIN users u ON u.id=p.owner_id WHERE a.user_id=? AND a.status='pending' AND p.released=0",[$uid])->fetchAll(),'expiry_days'=>$days===false?30:(int)$days,'warning_days'=>stock_warning_days($db,$uid)];
+            $result['tags']=stock_user_tags($db,$uid);
             $result['invitations']=array_map('stock_public_identity',$result['invitations']);
         }
     } else {
@@ -168,6 +171,8 @@ try {
                 $p=stock_editable($db,$id,$uid);
                 if ((int)$p['owner_id']===$uid) throw new CatalogException('Como propietario puedes eliminar el palet.',422);
                 stock_query($db,'DELETE FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$uid]); break;
+            case 'tag':
+                stock_save_tag($db,$uid,$id,$_POST['name']??'');$result['tags']=stock_user_tags($db,$uid);break;
             case 'preferences':
                 $days=filter_var($_POST['expiry_days']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>365]]);
                 if ($days===false) throw new CatalogException('Elige entre 0 y 365 días de anticipación.',422);
@@ -175,12 +180,12 @@ try {
             default: throw new CatalogException('Acción no válida.',422);
         }
         if($tracks){$historyId=(int)($result['id']??$historyId);if($historyId){$historyAfter=pallet_activity_snapshot($db,$historyId);pallet_activity_record($db,$uid,$historyId,($historyBefore&& (int)$historyBefore['id']===$historyId)?$historyBefore:null,$historyAfter);}}
-        if (stock_is_admin($db,$uid)&&($id||isset($_POST['code']))) {
+        if ($action!=='tag'&&stock_is_admin($db,$uid)&&($id||isset($_POST['code']))) {
             $target=$id?stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn():(string)$_POST['code'];
             $details=$_POST;unset($details['csrf'],$details['operation_key']);
             stock_query($db,'INSERT INTO pallet_admin_events(user_id,pallet_id,code,action,details) VALUES(?,?,?,?,?)',[$uid,$id?:null,$target?:'',(string)$action,json_encode($details,JSON_UNESCAPED_UNICODE)]);
         }
-        if(!in_array($action,['preferences','delete_many'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id))),$_POST);
+        if(!in_array($action,['preferences','delete_many','tag'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id))),$_POST);
         $result['ok']=true;if($deductPayload!==null)$result['_deduct_payload']=$deductPayload;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }
     if($method==='POST' && $offlinePayload!==null)$result=stock_offline_confirmation($db,$result,$key,$uid);

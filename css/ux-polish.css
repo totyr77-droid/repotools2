@@ -466,3 +466,24 @@ body[data-hand=left] #verb #copyCurrentEan{grid-column:3}
 /* Stock: búsqueda disponible al cargar el primer palet. */
 #stockApp[data-has-pallets="false"] .stock-find,body:has(#stockApp[data-has-pallets="false"]) .one-hand-fabs [aria-label="Buscar productos"]{display:none!important}
 @media(max-width:768px){body:not([data-one-hand='1']) #stockApp>.stock-primary-actions #scanPallet{display:flex;align-items:center;justify-content:center;padding:0;min-width:44px;height:44px;gap:0}body:not([data-one-hand='1']) #stockApp>.stock-primary-actions #scanPallet svg{display:block;margin:0;flex:none}}
+/* Filtros de stock y etiquetas personales. */
+.stock-find .stock-toolbar{grid-template-columns:minmax(0,1fr) auto auto!important;position:relative}
+.stock-find .stock-search-label{grid-column:1!important}
+.stock-find #stockFilters{grid-column:2;grid-row:1;position:relative;margin:0;min-width:44px}
+.stock-filters>summary{display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:8px;box-sizing:border-box;cursor:pointer;list-style:none}
+.stock-filters>summary::-webkit-details-marker{display:none}.stock-filters svg{width:18px;height:18px;flex:none}
+#stockFilterPanel{position:absolute;right:0;top:calc(100% + 6px);width:min(260px,calc(100vw - 48px));padding:12px;background:white;border:1px solid #e1e5ed;border-radius:12px;box-shadow:0 4px 16px #27187e22;z-index:8;display:flex;flex-direction:column;gap:8px}
+#stockFilterPanel label{display:block;font-size:.8rem;color:#62577e;margin:0}#stockFilterPanel select{width:100%;min-height:44px;margin:4px 0 0}
+#stockFilterPanel .branch-stock-filter{width:100%;flex:none}#stockFilterPanel .branch-stock-filter label{display:block}
+.stock-find #cancelStockFilters{grid-column:3!important;grid-row:1}#cancelStockFilters[hidden],#cancelStockFilters:disabled{display:none!important}
+.stock-find .stock-toolbar:has(#cancelStockFilters[hidden]){grid-template-columns:minmax(0,1fr) auto!important}
+body[data-hand=left] .stock-find .stock-toolbar{grid-template-columns:auto auto minmax(0,1fr)!important}body[data-hand=left] .stock-find .stock-search-label{grid-column:3!important}body[data-hand=left] .stock-find #stockFilters{grid-column:2}body[data-hand=left] .stock-find #cancelStockFilters{grid-column:1!important}
+body[data-hand=left] .stock-find .stock-toolbar:has(#cancelStockFilters[hidden]){grid-template-columns:auto minmax(0,1fr)!important}body[data-hand=left] .stock-find .stock-toolbar:has(#cancelStockFilters[hidden]) .stock-search-label{grid-column:2!important}body[data-hand=left] .stock-find .stock-toolbar:has(#cancelStockFilters[hidden]) #stockFilters{grid-column:1}
+body[data-hand=left] #stockFilterPanel{left:0;right:auto}.stock-filters.has-filters>summary{background:#27187e;color:#fff}
+.pallet-tag,.pallet-card-tag{color:#a21b76!important;background:#fce8f6;border:0;border-radius:7px;display:inline-flex!important;align-items:center;gap:4px;font-size:.75rem;max-width:100%;overflow-wrap:anywhere}
+.pallet-tag{padding:4px 8px;min-height:36px;margin-top:4px;cursor:pointer}.pallet-tag[hidden]{display:none!important}.pallet-tag svg,.pallet-card-tag svg{width:16px;height:16px;flex:none}.pallet-card-tag{padding:2px 6px;justify-self:start;grid-column:1/-1}
+.stock-pallet-card-content{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2px 6px;width:100%;min-width:0;text-align:left!important}.stock-pallet-card-content>strong{grid-column:1;grid-row:1}.stock-pallet-card-content>.branch-card-name{grid-column:2;grid-row:1;justify-self:end;margin:0;text-align:right;display:flex;gap:3px;align-items:center;font-size:.72rem;overflow-wrap:anywhere}.stock-pallet-card-content>.branch-card-name svg{width:16px;height:16px}.stock-pallet-card-meta,.stock-pallet-card-description{grid-column:1/-1}.stock-pallet-card-content small{margin-top:0}
+#palletDialog #palletMetadata{padding:4px 0;margin:0 0 6px;gap:6px}#palletDialog>.library-heading{padding-bottom:8px;margin-bottom:6px}#palletDialog #palletMetadata strong{margin-bottom:0}#palletDialog .stock-product{padding:10px 0;align-items:center}
+body[data-hand] #palletDialog .stock-product-actions{display:flex;flex-direction:column!important;gap:4px;align-items:center}#palletDialog .stock-product-actions button{width:40px;min-height:40px;height:40px;padding:9px;margin:0!important}#palletDialog .stock-product-actions button svg{width:18px;height:18px}body[data-hand] #palletDialog .stock-product-actions>.stock-delete{order:0;background:#c92a38;color:white;margin:0}#palletDialog .stock-product-actions>button:not(.stock-delete):not(.stock-deduct-button){order:1}#palletDialog .stock-product-actions>.stock-deduct-button{order:2}
+
+#palletDialog #palletStatus:empty{display:none}#palletDialog #palletMetadata{margin-bottom:4px}

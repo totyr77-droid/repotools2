@@ -63,7 +63,7 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     $owner=$user !== null && (int)$p['owner_id']===$user;
     $access=$user ? stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$p['id'],$user])->fetchColumn() : false;
-    $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted'; $p['pending_invitation']=$access==='pending';
+    $p['can_tag']=$owner||$access==='accepted'; $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted'; $p['pending_invitation']=$access==='pending';
     $p['products']=stock_query($db,'SELECT b.*,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id=? ORDER BY CASE WHEN b.expires=\'\' THEN 1 ELSE 0 END,b.expires,b.name,b.id',[$p['id']])->fetchAll();
     foreach ($p['products'] as &$product) $product=stock_product_names($product);
     unset($product);
@@ -206,4 +206,16 @@ function stock_deduct_product(PDO $db,int $user,array $input): array {
     if(!$changed)throw new CatalogException('El producto cambió. Revisá la cantidad actual antes de restar.',409);
     stock_touch($db,$id,$user);
     return ['id'=>$id,'code'=>stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn(),'remaining'=>$remaining,'removed'=>$quantity,'pallet_revision'=>(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$id])->fetchColumn(),'_movement'=>['ean'=>$product['ean'],'reference'=>$product['name'],'expires'=>$product['expires'],'removed_units'=>$quantity,'old'=>(int)$product['units'],'new'=>$remaining]];
+}
+
+function stock_user_tags(PDO $db,int $user): array {
+    return stock_query($db,"SELECT t.pallet_id,t.name,p.code FROM pallet_user_tags t JOIN pallets p ON p.id=t.pallet_id WHERE t.user_id=? AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$user,$user,$user])->fetchAll();
+}
+function stock_save_tag(PDO $db,int $user,int $id,mixed $name): void {
+    // Personal labels require current ownership or an accepted invitation, including for admins.
+    if(!stock_query($db,"SELECT id FROM pallets p WHERE id=? AND released=0 AND (owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$id,$user,$user])->fetchColumn())throw new CatalogException('No tenés acceso a las etiquetas de este palet.',403);
+    if(!is_string($name)||mb_strlen(trim($name))>40||preg_match('/[\x00-\x1F\x7F]/u',$name))throw new CatalogException('La etiqueta admite hasta 40 caracteres.',422);
+    $name=trim($name);
+    if($name===''){stock_query($db,'DELETE FROM pallet_user_tags WHERE user_id=? AND pallet_id=?',[$user,$id]);return;}
+    stock_query($db,'INSERT INTO pallet_user_tags(user_id,pallet_id,name) VALUES(?,?,?) ON CONFLICT(user_id,pallet_id) DO UPDATE SET name=excluded.name',[$user,$id,$name]);
 }

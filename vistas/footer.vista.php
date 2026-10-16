@@ -76,7 +76,8 @@
 <script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/public-pallet.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/stock-branches.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/stock-tags.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-tags.js'),0,12) ?>"></script>
+<script src="js/stock-branches.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-branches.js'),0,12) ?>"></script>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
