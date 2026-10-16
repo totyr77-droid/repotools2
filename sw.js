@@ -36,3 +36,5 @@ self.addEventListener('message',event=>{
 // Shell refresh: shared dialog backdrop dismissal, online and offline.
 
 // Shell refresh: confirm before leaving modified dialog forms.
+
+// Shell refresh: compact expiry keypad and explicit hand preference.

@@ -530,3 +530,5 @@ dialog>.library-heading,dialog>form>.library-heading,dialog>.results-heading,dia
 
 /* Lupa integrada al input, con tamaño real que incluye su padding. */
 .stock-find #stockSearchAction{box-sizing:border-box;width:42px;height:42px;min-height:42px;padding:12px;top:50%;bottom:auto;transform:translateY(-50%);background:transparent;border-radius:8px}.stock-find #stockSearchAction.is-clear{background:#fff0f2}.stock-find #stockSearchAction svg{display:block;width:18px;height:18px}
+
+.repo-date-keypad,.repo-date-keypad[popover]{height:258px!important;min-height:0!important;grid-template-rows:repeat(5,44px);grid-auto-rows:44px;align-content:start;overflow:auto;bottom:auto!important;right:auto!important}.repo-date-keypad button{height:44px;min-height:44px;max-height:44px;box-sizing:border-box;align-self:stretch}

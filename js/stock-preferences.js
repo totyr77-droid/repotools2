@@ -5,7 +5,7 @@
   const days=doc.getElementById('stockExpiryDays'),handForm=doc.getElementById('handPreferenceForm'),hands=[...handForm.querySelectorAll('input')];
   let csrf=root.dataset.csrf,savedDays=days.value,expiryBusy=false,expiryTimer,savedHand='';
   const notify=(message,kind='success')=>{if(root.isConnected)window.RepoToast?.(message,{kind});};
-  function applyHand(value){savedHand=value;doc.body.dataset.hand=value==='left'?'left':'right';hands.forEach(input=>input.checked=input.value===value);doc.querySelectorAll('[data-profile-pending]').forEach(el=>el.hidden=!!value);}
+  function applyHand(value){savedHand=value;doc.body.dataset.handPreference=['left','right'].includes(value)?value:'';doc.body.dataset.hand=value==='left'?'left':'right';hands.forEach(input=>input.checked=input.value===value);doc.querySelectorAll('[data-profile-pending]').forEach(el=>el.hidden=!!value);}
   async function save(body){
     const response=await window.fetch('api/preferencias.php',{method:'POST',credentials:'same-origin',keepalive:true,body:new URLSearchParams({...body,csrf})});
     const data=await response.json();if(!response.ok)throw Error(data.error||'No pudimos guardar la preferencia.');csrf=data.csrf;return data;

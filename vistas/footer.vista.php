@@ -35,7 +35,7 @@
 <script src="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if(!empty($paginaDemo)): ?><script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script><script src="js/guest-demo.js?v=<?= substr(sha1_file(__DIR__.'/../js/guest-demo.js'),0,12) ?>"></script><?php endif; ?>
 <script src="js/loading.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/connectivity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/offline-cache.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/offline-sync.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/connectivity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/offline-cache.js?v=<?= substr(sha1_file(__DIR__.'/../js/offline-cache.js'),0,12) ?>"></script><script src="js/offline-sync.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=<?= (int)app_release()['version'] ?>"><script src="js/sync-status.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/library-offline.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/date-time.js?v=<?= (int)app_release()['version'] ?>"></script>
 
@@ -99,7 +99,7 @@
 <script src="js/report-notifications.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if(current_user()&&($navRole??'')==='manager'): ?><script src="js/manager-cache.js?v=<?= substr(sha1_file(__DIR__.'/../js/manager-cache.js'),0,12) ?>"></script><?php endif; ?>
 <script src="js/notifications.js?v=<?= (int)app_release()['version'] ?>"></script>
-<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/public-name.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/account-edit.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/account-security.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/stock-preferences.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-preferences.js'),0,12) ?>"></script><script src="js/public-name.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/account-edit.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/account-security.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaCuenta) && current_user()): ?><script src="js/vendor/qrcode.min.js"></script><script src="js/user-profiles.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?>
 <?php include __DIR__ . '/onboarding.vista.php'; ?>
