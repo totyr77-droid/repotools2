@@ -66,3 +66,5 @@ body.offline-shell main.app-page-enter{animation:none!important;transform:none!i
 #offlineCalculator[hidden]{display:none!important}
 #offlineCalculator button{height:44px;min-height:44px;margin:0;padding:6px;border-radius:8px;background:#eeebf7;color:#27197f;font-size:1rem}
 #offlineCalculator .offline-calculator-done{grid-column:1/-1;background:#27197f;color:white}
+
+.repo-date-keypad{position:fixed;inset:auto;box-sizing:border-box;margin:0;padding:8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;border:1px solid #dedbea;border-radius:12px;background:#fff;box-shadow:0 4px 20px #27187e33;z-index:10010;color:#27187e}.repo-date-keypad[hidden]{display:none!important}.repo-date-keypad button{margin:0;padding:6px;min-height:40px;border:0;border-radius:8px;background:#eeebf7;color:#27187e;font:inherit;font-size:1rem;cursor:pointer}.repo-date-keypad .repo-date-next{grid-column:1/-1;background:#27187e;color:white;font-size:.85rem}.repo-date-keypad button[data-date-key='⌫']{color:#b42332;background:#fff0f2}
