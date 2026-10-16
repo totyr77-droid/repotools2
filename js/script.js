@@ -461,11 +461,12 @@ async function copiarResultado() {
   const revision = scanResultRevision;
   if (!els.contenedormax.open || code !== resultadoActual || !window.RepoEANScanner.validEAN(code)) return;
   const status = document.getElementById('scanCopyStatus');
+  status.textContent = '';
   try {
     await navigator.clipboard.writeText(code);
-    if (revision === scanResultRevision) status.textContent = 'EAN copiado: ' + code;
+    if (revision === scanResultRevision) window.RepoToast?.('Código EAN copiado.');
   } catch {
-    if (revision === scanResultRevision) status.textContent = 'No se pudo copiar. Mantén pulsado el EAN para seleccionarlo.';
+    if (revision === scanResultRevision) window.RepoToast?.('No se pudo copiar el código EAN.', {kind:'error'});
   }
 }
 
