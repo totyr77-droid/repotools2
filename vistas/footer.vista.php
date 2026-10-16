@@ -46,7 +46,7 @@
 <?php if (!empty($paginaBiblioteca)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
-<script src="js/ean-scanner.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -56,14 +56,14 @@
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/ean-scanner.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-management.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/reports-page.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/ean-scanner.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -84,7 +84,7 @@
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/ean-scanner.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/script.js?v=<?= substr(sha1_file(__DIR__.'/../js/script.js'),0,12) ?>"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>

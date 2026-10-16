@@ -299,11 +299,10 @@ function cambiarModoRapido(enabled) {
   if (!enabled || els.contenedor.hidden || window.RepoScanMethods?.isMobile === false) iniciarScanner();
 }
 function mostrarProductoRapido(product) {
-  document.getElementById('mainRapidLast').textContent = product && typeof product === 'object'
-    ? window.RepoProductInfo.summary(product)
-    : typeof product==='string'?'No pudimos consultar el producto':'Sin información. Tocá Reportar para completar los datos.';
-  document.getElementById('mainRapidLast').title = document.getElementById('mainRapidLast').textContent;
-  if (!product || typeof product === 'string') document.getElementById('mainRapidPanel').dataset.state = 'warning';
+  const host=document.getElementById('mainRapidLast');host.replaceChildren();
+  if(product&&typeof product==='object')host.append(camposProducto(product));
+  else {host.textContent=typeof product==='string'?'No pudimos consultar el producto':'Sin información. Tocá Reportar para completar los datos.';document.getElementById('mainRapidPanel').dataset.state='warning';}
+  host.title=host.textContent;
 }
 
 async function iniciarScanner() {
@@ -345,11 +344,15 @@ function cerrarScanner() {
   if (total !== null) window.RepoToast?.(`Escaneados: ${total}`);
 }
 
+function camposProducto(product){
+    const fields=document.createElement('dl');fields.className='scan-product-fields';
+    for(const [label,value] of [['Marca',product.brand],['Producto',product.name],['Contenido / gramaje',product.quantity]]){const term=document.createElement('dt'),detail=document.createElement('dd');term.textContent=label;detail.textContent=typeof value==='string'&&value.trim()?value.trim():'Sin información';if(detail.textContent==='Sin información')detail.className='scan-field-missing';fields.append(term,detail);}return fields;
+}
+
 function mostrarFichaEscaneada(product,ean=resultadoActual,revision=scanResultRevision) {
   const host=els.resultadoApi;host.replaceChildren();host.dataset.lookupState=product&&typeof product==='object'?'found':typeof product==='string'?'error':'missing';
   if(host.dataset.lookupState==='found'){
-    const fields=document.createElement('dl');fields.className='scan-product-fields';
-    for(const [label,value] of [['Marca',product.brand],['Producto',product.name],['Contenido / gramaje',product.quantity]]){const term=document.createElement('dt'),detail=document.createElement('dd');term.textContent=label;detail.textContent=typeof value==='string'&&value.trim()?value.trim():'Sin información';if(detail.textContent==='Sin información')detail.className='scan-field-missing';fields.append(term,detail);}host.append(fields);
+    host.append(camposProducto(product));
   }else{
     const title=document.createElement('strong'),hint=document.createElement('p');title.textContent=host.dataset.lookupState==='missing'?'No tenemos información de este producto':'No pudimos consultar la información del producto';hint.textContent=host.dataset.lookupState==='missing'?'Podés ayudarnos a completarla tocando Reportar.':'Intentá consultar nuevamente cuando tengas conexión.';host.append(title,hint);
     if(host.dataset.lookupState==='error'){const retry=document.createElement('button');retry.type='button';retry.className='library-secondary';retry.textContent='Volver a consultar';retry.addEventListener('click',async()=>{retry.disabled=true;let result;try{result=await window.RepoProductInfo.get(ean,{fresh:true});}catch{result='error';}if(revision===scanResultRevision&&els.contenedormax.open&&resultadoActual===ean)mostrarFichaEscaneada(result,ean,revision);});host.append(retry);}

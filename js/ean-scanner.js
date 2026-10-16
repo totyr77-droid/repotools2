@@ -232,7 +232,7 @@
       if (!document.createElement) return;
       const capabilities = track?.getCapabilities?.() ?? {}, settings = track?.getSettings?.() ?? {};metric(current,'camera-capabilities',{width:settings.width,height:settings.height,zoom:capabilities.zoom?{...capabilities.zoom,current:settings.zoom}:null,focusContinuous:Boolean(capabilities.focusMode?.includes('continuous')),torch:capabilities.torch===true});
       const zoom = capabilities.zoom;
-      const minZoom = current.isQR && current.kind === 'pallet' ? Math.max(1,zoom?.min ?? 1) : zoom?.min ?? 1;
+      const minZoom = !current.isQR || current.kind === 'pallet' ? Math.max(1,zoom?.min ?? 1) : zoom?.min ?? 1;
       const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && minZoom>0 && zoom.max > minZoom && Number.isFinite(settings.zoom);
       if (!hasZoom && capabilities.torch !== true && !onManual) return;
       const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
