@@ -232,7 +232,7 @@
       if (!document.createElement) return;
       const capabilities = track?.getCapabilities?.() ?? {}, settings = track?.getSettings?.() ?? {};metric(current,'camera-capabilities',{width:settings.width,height:settings.height,zoom:capabilities.zoom?{...capabilities.zoom,current:settings.zoom}:null,focusContinuous:Boolean(capabilities.focusMode?.includes('continuous')),torch:capabilities.torch===true});
       const zoom = capabilities.zoom;
-      const minZoom = zoom?.min ?? 1;
+      const minZoom = current.isQR && current.kind === 'pallet' ? Math.max(1,zoom?.min ?? 1) : zoom?.min ?? 1;
       const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && minZoom>0 && zoom.max > minZoom && Number.isFinite(settings.zoom);
       if (!hasZoom && capabilities.torch !== true && !onManual) return;
       const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
@@ -263,7 +263,7 @@
         const snap = value => Math.max(Number(input.min), Math.min(Number(input.max), Number((zoom.min + Math.round((value - zoom.min) / step) * step).toFixed(6))));
         input.min = Math.max(minZoom, Number((zoom.min + Math.ceil((minZoom - zoom.min) / step) * step).toFixed(6)));
         input.max = Number((zoom.min + Math.floor((zoom.max - zoom.min) / step) * step).toFixed(6)); input.step = step;
-        let applied = snap(Number.isFinite(settings.zoom) ? settings.zoom : Number(input.min));
+        let applied = settings.zoom;
         let pending = null, running = false, timer = null, disposed = false;
         const output = document.createElement('span'); output.className = 'ean-camera-zoom-value';
         const shortcuts = document.createElement('div'); shortcuts.className = 'ean-camera-zoom-shortcuts';
@@ -313,7 +313,8 @@
           button.addEventListener('click', () => { input.value = value; updateZoom(); }); shortcuts.append(button);
         }
         render(applied);
-        // Opening a scanner never changes the zoom selected by the camera/user.
+        // Pallet scanning excludes ultrawide zoom, including an inherited 0.5x setting.
+        if(applied<Number(input.min)){input.value=Number(input.min);updateZoom();}
         let holdDelay,holdTimer;const holdController=new AbortController();
         const stopHold=()=>{clearTimeout(holdDelay);clearInterval(holdTimer);};
         const adjust=direction=>{if(disposed||!active())return;input.value=snap(Number(input.value)+direction*Math.max(.1,step));updateZoom();};
@@ -505,7 +506,7 @@
         const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
         if (element.dataset) { element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean'; }
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
-        const current = { reader, accepting: true, token, isQR, validate, requestedAt, confirm: confirmation(validate) };metric(current,'camera-request');
+        const current = { reader, accepting: true, token, isQR, kind, validate, requestedAt, confirm: confirmation(validate) };metric(current,'camera-request');
         serialDecoder(current);session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera', recognizedFrame = null) => {
           code = normalize(code);

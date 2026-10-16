@@ -1,6 +1,12 @@
 {
-  "version": 43,
+  "version": 44,
   "changes": [
+    {
+      "version": 44,
+      "label": "1.39",
+      "date": "2026-10-16",
+      "summary": "Zoom mínimo de 1× en el escáner de palets."
+    },
     {
       "version": 43,
       "label": "1.38",
@@ -257,6 +263,6 @@
     }
   ],
   "major": 1,
-  "minor": 38,
-  "label": "1.38"
+  "minor": 39,
+  "label": "1.39"
 }
