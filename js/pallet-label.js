@@ -8,9 +8,9 @@
     const footer=Number(label.activated)?['Consultá el contenido actualizado escaneando el QR.']:['Si no usás este palet en 3 días desde su generación,','el código quedará disponible para otra persona.'];
     const deadline=Number(label.reserved_until||label.prepared_until);
     if(!Number(label.activated)&&deadline)footer.push('Reservado hasta '+new Date(deadline*1000).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short',hour12:false,timeZone:'America/Argentina/Buenos_Aires'}));
-    // Reserve four light modules on every side, independent of the URL length.
-    const qrSize=n*2*Math.floor(2360/(2*(n+8))),quiet=4*qrSize/n;
-    return {width:2480,height:3508,logo,matrix,n,qr:{x:1240-qrSize/2,y:360+quiet,size:qrSize},brand:{x:80,y:30,width:2320,height:250},caption:{x:1240,y:335,size:60},code:{x:1240,y:360+quiet+qrSize+quiet+460,size:500,width:8*500*.556},footerPosition:{x:1240,y:3320,size:48,step:54},footer};
+    // Draw the QR without an added quiet-zone border, like the profile QR.
+    const qrSize=n*2*Math.floor(2360/(2*n));
+    return {width:2480,height:3508,logo,matrix,n,qr:{x:1240-qrSize/2,y:360,size:qrSize},brand:{x:80,y:30,width:2320,height:250},caption:{x:1240,y:335,size:60},code:{x:1240,y:360+qrSize+460,size:500,width:8*500*.556},footerPosition:{x:1240,y:3320,size:48,step:54},footer};
   }
   function vector(label) {
     const l=layout(label),cell=l.qr.size/l.n;
