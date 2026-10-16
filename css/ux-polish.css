@@ -584,3 +584,19 @@ body[data-hand=left] .header-contenedor:has(#refreshAppCache) .logo{justify-cont
 .header-contenedor:has(#refreshAppCache) .logo-mark{display:flex;flex:0 1 144px;min-width:0;max-width:100%}
 .header-contenedor:has(#refreshAppCache) .workspace-account-icon{margin-inline:0}
 }
+
+/* Carga de producto: menos espacio entre campos sin reducir el área táctil. */
+@media(max-width:768px){
+#stockProductDialog{padding:14px;box-sizing:border-box}
+#stockProductDialog>.library-heading{margin-block:0 8px;padding-block:0 8px}
+#stockProductForm label{margin:6px 0}
+#stockProductForm input,#stockProductForm select{margin-top:4px;min-height:44px;padding:10px;box-sizing:border-box}
+#stockProductForm .stock-form-row{gap:8px}
+#stockProductForm .stock-form-row>label>span{margin-bottom:4px}
+#stockProductForm .stock-form-row input,#stockProductForm .stock-form-row select{margin-top:0}
+#stockProductForm .stock-lookup-status{margin:6px 0;padding:7px 9px}
+#stockProductForm #stockFixedEan{margin:6px 0}
+#stockProductForm #stockAmountResult{margin:4px 0;font-size:.78rem}
+#stockProductForm #stockProductStatus:empty{display:none}
+#stockProductForm>.library-dialog-actions{margin-top:10px}
+}
