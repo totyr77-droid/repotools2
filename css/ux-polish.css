@@ -539,3 +539,9 @@ dialog>.library-heading,dialog>form>.library-heading,dialog>.results-heading,dia
 
 /* Altura estable al deslizar entre productos con nombres cortos y largos. */
 #libraryEanDialog #eanProductName{height:2.6em;min-height:2.6em;max-height:2.6em;line-height:1.3;display:flex;align-items:center;justify-content:center;margin-block:12px 0;text-align:center;min-width:0}#libraryEanDialog .library-ean-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere;max-width:100%}#libraryEanDialog .library-ean-swipe-area[data-has-catalog=true] #eanCatalogName{height:2.7em;line-height:1.35;margin:4px 0 10px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}#libraryEanDialog .library-ean-swipe-area[data-has-catalog=true] #eanCatalogName[hidden]{display:block!important;visibility:hidden}
+
+/* Palets: contador legible y tarjetas parejas con o sin descripción. */
+.stock-local-count{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;vertical-align:middle}
+.stock-local-count>svg{width:13px;height:13px;flex:none}
+.stock-pallet-card{min-height:90px;box-sizing:border-box;align-items:center}
+.stock-pallet-card>svg{margin-top:0;align-self:center}

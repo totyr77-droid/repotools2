@@ -6,7 +6,14 @@
   const status=doc.createElement('small');status.className='stock-local-preparation';status.setAttribute('role','status');
   function progress(total,ready,error=false){
     if(left)return;status.hidden=total===0;const host=doc.getElementById('stockLocalStatus');if(host&&!status.isConnected)host.append(status);
-    status.dataset.error=String(error);status.textContent=error?'Copia local incompleta · '+ready+'/'+total+' palets.':ready<total?'Preparando copia local · '+ready+'/'+total+' palets':'Copia local lista · '+total+' palets';
+    status.dataset.error=String(error);
+    const label=total===1?'palet':'palets';
+    const message=error?'Copia local incompleta':ready<total?'Preparando copia local':'Copia local lista';
+    status.replaceChildren(doc.createTextNode(message+' · '));
+    const count=doc.createElement('span');count.className='stock-local-count';
+    const icon=doc.getElementById('palletIcon')?.querySelector('svg')?.cloneNode(true);
+    if(icon){icon.setAttribute('aria-hidden','true');count.append(icon);}
+    count.append(doc.createTextNode((error||ready<total?ready+'/'+total:total)+' '+label));status.append(count);
   }
   async function prepare(data){
     latest=data;const version=++generation;controller?.abort();const activeController=controller=new AbortController(),signal=activeController.signal;
