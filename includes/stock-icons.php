@@ -21,6 +21,7 @@ function stock_icon(string $name): string {
         'package-plus'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5V13m9-5v5M7.5 5.5l9 5M17 18h6m-3-3v6"/>',
         'package-minus'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5V13m9-5v5M7.5 5.5l9 5M17 18h6"/>',
         'plus'=>'<path d="M12 4v16M4 12h16"/>',
+        'mail'=>'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>',
         'check'=>'<path d="m5 12 4 4 10-10"/>',
         'close'=>'<path d="m6 6 12 12M18 6 6 18"/>',
         'chevron'=>'<path d="m6 9 6 6 6-6"/>',

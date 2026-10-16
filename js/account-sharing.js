@@ -2,6 +2,7 @@
   const page=window.RepoNavigation?.page,doc=page?.document||document,request=page?.fetch||fetch;
   let left=false;page?.onLeave(()=>left=true);
   const $=id=>doc.getElementById(id),toast=(message,kind='success')=>!left&&window.RepoToast?.(message,{kind});
+  if(location.hash==='#emailVerification'&&$('emailVerification'))$('emailVerification').open=true;
   let shareLink=null;
   $('shareApp')?.addEventListener('click',async event=>{event.preventDefault();try{
     if(!shareLink){const r=await request('api/referrals.php?link=1',{credentials:'same-origin',cache:'no-store'}),data=await r.json();if(left)return;if(!r.ok||!data.mine?.link)throw Error(data.error||'No pudimos preparar tu enlace.');shareLink=data.mine.link;}

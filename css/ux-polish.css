@@ -175,3 +175,42 @@ body[data-hand=left] #labelList .stock-card{padding-inline-start:46px;padding-in
 @media(max-width:768px){input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select{font-size:max(16px,1em)!important}}
 
 .audit-event-detail{direction:ltr;text-align:left}.audit-change{padding:8px 0;border-bottom:1px solid #e7e5ef;overflow-wrap:anywhere}.audit-change p{margin:4px 0}.audit-change small{color:#626b7a}.audit-technical{margin-top:12px}.audit-technical pre{max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.75rem}
+
+/* Profile email disclosure and compact verification result. */
+.account-email-disclosure{text-align:left!important}
+.account-email-disclosure>summary{min-height:44px}
+.account-email-disclosure .email-verification-row{flex-direction:row;margin-top:8px}
+.account-email-disclosure .email-verification-row p{margin:0;line-height:1.4;font-size:.85rem}
+.account-email-disclosure [data-verified=true] p{color:#17633d;background:#eaf7ef;padding:8px 10px;border-radius:8px}
+.verification-main.account-main{width:100%;max-width:none;min-height:0;box-sizing:border-box;padding:clamp(24px,6vh,64px) 16px;display:grid;grid-template-columns:minmax(0,1fr);justify-content:stretch;place-items:center}
+.verification-panel.account-panel{width:min(100%,460px);max-width:460px;box-sizing:border-box;padding:24px;margin:0;background:#fff;border:1px solid #e4e1ef;border-radius:16px;text-align:center}
+.verification-panel .verification-icon{width:56px;height:56px;display:grid;place-items:center;margin:0 auto 14px;border-radius:50%;color:#27197F;background:#efedf8}
+.verification-panel .verification-icon svg{width:28px;height:28px;flex:none}
+.verification-panel[data-state=verified] .verification-icon{background:#eaf7ef;color:#17633d}
+.verification-panel h1{font-size:1.35rem;line-height:1.3;margin:0 0 12px}
+.verification-panel p{font-size:.95rem;color:#626b7a;line-height:1.5;margin:0 0 18px;overflow-wrap:anywhere}
+.verification-panel button{min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.95rem}
+.verification-panel .verification-profile{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;font-size:.9rem;margin-top:12px;text-decoration:none}
+.verification-profile svg{width:19px;height:19px;flex:none}
+/* Keep library labels in step with the existing mobile subnav. */
+@media(max-width:768px){.one-hand-library-fabs{opacity:.72}.one-hand-library-fabs [data-floating-label]::after{opacity:0;visibility:hidden;transform:translate(-50%,4px);transition:opacity .18s,transform .2s,visibility .2s}body:has(.repo-mobile-nav[data-open=true]) .one-hand-library-fabs [data-floating-label]::after{opacity:1;visibility:visible;transform:translate(-50%,0)}}
+/* Stock: use the header for local readiness and remove stacked empty margins. */
+#stockLocalStatus{flex-basis:100%;width:100%;min-width:0;line-height:1.3}
+#stockLocalStatus:empty{display:none}
+#stockLocalStatus .stock-local-preparation{margin:0;font-size:.72rem;text-align:left}
+#stockApp>.stock-overview{padding:0!important;margin:8px 0!important}
+#stockApp>.stock-primary-actions{margin-bottom:8px}
+#stockApp>.stock-find{margin:8px 0}
+#stockApp>.stock-find .stock-toolbar{margin-bottom:0}
+#stockApp .stock-expiry-panel.is-open .stock-expiry-body{padding-block:0}
+#stockApp #stockSearchStatus:empty{display:none}
+#stockSearchResults .stock-expiry-group>h3{margin:4px 0 8px}
+#stockSearchResults .stock-card{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:12px;min-height:0;text-align:left}
+#stockSearchResults .stock-card strong{font-size:1rem;line-height:1.35;letter-spacing:0}
+#stockSearchResults .stock-card small{margin:0;font-size:.8rem;line-height:1.4}
+@media(prefers-reduced-motion:reduce){.one-hand-library-fabs [data-floating-label]::after{transition:none}}
+
+.verification-panel h1>svg{display:none}
+@media(max-width:768px){body:has(.verification-main) .header-contenedor .nav{display:none!important}body:has(.verification-main) .nav-celular{display:flex!important}}
+
+@media(max-width:768px){body:has(.verification-main) .nav-celular{position:fixed!important;top:auto!important;bottom:0!important;left:0!important;width:100%;height:calc(68px + env(safe-area-inset-bottom,0px));box-sizing:border-box;margin:0;padding:0 8px env(safe-area-inset-bottom,0px);display:flex!important;flex-direction:row;align-items:stretch;justify-content:space-around;background:#27197F;z-index:100}body:has(.verification-main) .nav-celular a{display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px;font-size:.65rem;height:68px;box-sizing:border-box}body:has(.verification-main) .nav-celular a i,body:has(.verification-main) .nav-celular a svg{font-size:20px;width:20px;height:20px}}

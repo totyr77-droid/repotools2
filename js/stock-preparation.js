@@ -5,7 +5,7 @@
   const store=RepoStockOffline(user);let generation=0,controller,left=false,latest;
   const status=doc.createElement('small');status.className='stock-local-preparation';status.setAttribute('role','status');
   function progress(total,ready,error=false){
-    if(left)return;status.hidden=total===0;const host=doc.getElementById('stockOverview');if(host&&!status.isConnected)host.append(status);
+    if(left)return;status.hidden=total===0;const host=doc.getElementById('stockLocalStatus');if(host&&!status.isConnected)host.append(status);
     status.dataset.error=String(error);status.textContent=error?'Copia local incompleta · '+ready+'/'+total+' palets.':ready<total?'Preparando copia local · '+ready+'/'+total+' palets':'Copia local lista · '+total+' palets';
   }
   async function prepare(data){
