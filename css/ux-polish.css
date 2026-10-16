@@ -546,11 +546,11 @@ dialog>.library-heading,dialog>form>.library-heading,dialog>.results-heading,dia
 .stock-pallet-card{min-height:90px;box-sizing:border-box;align-items:center}
 .stock-pallet-card>svg{margin-top:0;align-self:center}
 
-/* Biblioteca a una mano: filas compactas, primera entrada junto al pulgar. */
+/* Biblioteca a una mano: filas compactas en el orden de la colección. */
 @media(max-width:768px){
-body[data-one-hand='1'] #libraryProducts{display:flex;flex-direction:column-reverse;gap:0;margin-top:10px}
+body[data-one-hand='1'] #libraryProducts{display:flex;flex-direction:column;gap:0;margin-top:10px}
 body[data-one-hand='1'] #libraryProducts>.library-product{align-items:center;gap:10px;padding:12px 0;min-height:72px;box-sizing:border-box;border-bottom:0;border-top:1px solid #e1e5ed}
-body[data-one-hand='1'] #libraryProducts>.library-product:last-child{border-top:0}
+body[data-one-hand='1'] #libraryProducts>.library-product:first-child{border-top:0}
 body[data-one-hand='1'][data-hand=right] #libraryProducts>.library-product{flex-direction:row!important}
 body[data-one-hand='1'][data-hand=left] #libraryProducts>.library-product{flex-direction:row-reverse!important}
 body[data-one-hand='1'] #libraryProducts .library-product-actions{align-self:center;flex:none}
@@ -559,8 +559,8 @@ body[data-one-hand='1'] #libraryProducts .library-product-code{margin-top:6px;ma
 }
 
 @media(max-width:768px){
-body[data-one-hand='1']:has(:is(#collectionList,#stockApp)) .repo-mobile-subnav{flex-direction:row;direction:ltr}
-body[data-one-hand='1'][data-hand=left]:has(:is(#collectionList,#stockApp)) .repo-mobile-subnav{direction:rtl}
+body[data-one-hand='1']:has(:is(#collectionList,#stockApp)) .repo-mobile-subnav{flex-direction:row;direction:rtl}
+body[data-one-hand='1'][data-hand=left]:has(:is(#collectionList,#stockApp)) .repo-mobile-subnav{direction:ltr}
 body[data-one-hand='1']:has(:is(#collectionList,#stockApp)) .repo-mobile-subnav>button{direction:ltr}
 }
 
