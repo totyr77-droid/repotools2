@@ -230,9 +230,9 @@ body[data-hand] #palletTools.stock-toolbar{flex-direction:row!important}
 .stock-quantity-line>.stock-calculator .stock-calculator-done,.stock-quantity-line>.stock-calculator button[data-calc="="],.stock-quantity-line>.stock-calculator button[data-calc-deduct="="]{background:#27197F;color:white}
 .stock-quantity-line>input{grid-column:1;grid-row:1;width:100%;box-sizing:border-box}
 .stock-quantity-line>.stock-calculator-disclosure{display:block;grid-column:2;grid-row:1;order:0}
-body[data-one-hand="1"][data-hand=left] .stock-quantity-line{grid-template-columns:44px minmax(0,1fr)}
-body[data-one-hand="1"][data-hand=left] .stock-quantity-line>input{grid-column:2}
-body[data-one-hand="1"][data-hand=left] .stock-quantity-line>.stock-calculator-disclosure{grid-column:1}
+body[data-hand=left] .stock-quantity-line{grid-template-columns:44px minmax(0,1fr)}
+body[data-hand=left] .stock-quantity-line>input{grid-column:2}
+body[data-hand=left] .stock-quantity-line>.stock-calculator-disclosure{grid-column:1}
 
 /* Quantity input and calculator trigger form a single aligned control. */
 .stock-quantity-line{grid-template-columns:minmax(0,1fr) 48px;gap:0;border:1px solid #b6afcd;border-radius:9px;background:#fff}
@@ -241,9 +241,9 @@ body[data-one-hand="1"][data-hand=left] .stock-quantity-line>.stock-calculator-d
 .stock-quantity-line>input:focus{outline:0;box-shadow:none}
 .stock-quantity-line>.stock-calculator-disclosure{height:48px;min-height:48px;margin:0}
 .stock-quantity-line>.stock-calculator-disclosure>summary{width:48px;height:48px;min-height:48px;margin:0;padding:12px;border:0;border-left:1px solid #e2dded;border-radius:0 8px 8px 0;color:#27197F}
-body[data-one-hand="1"][data-hand=left] .stock-quantity-line{grid-template-columns:48px minmax(0,1fr)}
-body[data-one-hand="1"][data-hand=left] .stock-quantity-line>input{border-radius:0 8px 8px 0}
-body[data-one-hand="1"][data-hand=left] .stock-quantity-line>.stock-calculator-disclosure>summary{border-left:0;border-right:1px solid #e2dded;border-radius:8px 0 0 8px}
+body[data-hand=left] .stock-quantity-line{grid-template-columns:48px minmax(0,1fr)}
+body[data-hand=left] .stock-quantity-line>input{border-radius:0 8px 8px 0}
+body[data-hand=left] .stock-quantity-line>.stock-calculator-disclosure>summary{border-left:0;border-right:1px solid #e2dded;border-radius:8px 0 0 8px}
 .stock-ean-paste{position:relative;display:block;min-width:0;width:100%}
 #stockEanInput{width:100%;padding-right:52px;box-sizing:border-box;min-height:48px;margin:0}
 #pasteStockEan{position:absolute;right:1px;top:1px;width:46px;height:46px;min-height:44px;padding:12px;border:0;border-radius:0 9px 9px 0;margin:0;background:#eeebf7;color:#27197f}
