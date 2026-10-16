@@ -508,3 +508,5 @@ body[data-hand=right] #palletDialog #palletTools>.stock-primary-actions{order:2;
 
 /* Etiqueta de la tarjeta debajo de la sucursal, a la derecha. */
 .stock-pallet-card-content>.stock-pallet-card-description,.stock-pallet-card-content>.stock-pallet-card-meta{grid-column:1}.stock-pallet-card-content>.pallet-card-tag{grid-column:2;grid-row:2 / span 2;justify-self:end;align-self:center;text-align:left;margin:0;min-width:0}
+
+.stock-find #stockSearchResults:not(:empty){margin-top:12px}.stock-find #stockSearchAction{position:absolute;left:1px;top:1px;bottom:1px;width:40px;min-height:40px;padding:10px;margin:0;border:0;border-radius:9px;background:#f0ecfa;color:#27187e;z-index:1;display:flex;align-items:center;justify-content:center;cursor:pointer}.stock-find #stockSearchAction.is-clear{background:#fff0f2;color:#c92a38}.stock-find #stockSearchAction svg{width:18px;height:18px;flex:none}.stock-find .stock-search-label:has(#stockSearchAction) input{padding-left:46px!important}
