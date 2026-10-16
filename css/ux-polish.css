@@ -309,3 +309,24 @@ body[data-one-hand='1'] .one-hand-fabs #manageBranchAdd .one-hand-action-label{d
 @media(min-width:700px){#stockShareList .branch-row{grid-template-columns:minmax(0,1fr) auto!important}#stockShareList .branch-actions{grid-row:1;grid-column:2}body[data-hand=left] #stockShareList .branch-row{grid-template-columns:auto minmax(0,1fr)!important}body[data-hand=left] #stockShareList .branch-actions{grid-column:1}body[data-hand=left] #stockShareList .branch-row>div:first-child{grid-row:1;grid-column:2}}
 body[data-hand=right] .one-hand-fabs #manageBranchAdd{align-self:flex-end}
 body[data-hand=left] .one-hand-fabs #manageBranchAdd{align-self:flex-start}
+/* Una fila: búsqueda de productos y filtro de tarjetas de palets independientes. */
+.stock-find .stock-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,160px) auto;align-items:center;gap:6px;direction:ltr}
+.stock-find .stock-search-label{display:block;position:relative;min-width:0;width:100%;margin:0;grid-row:1;grid-column:1}
+.stock-find .stock-search-label>svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:18px;height:18px;pointer-events:none}
+.stock-find .stock-search-label input{height:44px;min-height:44px;padding-left:32px!important;padding-right:44px!important;box-sizing:border-box;margin:0}
+.stock-find .stock-search-clear{display:none!important}
+.stock-find .stock-search-camera{right:1px!important;width:42px;height:42px}
+.stock-find .branch-stock-filter{width:100%;min-width:0;margin:0;grid-row:1;grid-column:2}
+.stock-find .branch-stock-filter>label{display:block;min-width:0}
+.stock-find .branch-stock-filter>label>svg{display:none}
+.stock-find .branch-stock-filter select{height:44px;min-height:44px;max-width:100%;font-size:.8rem;padding-inline:6px;margin:0}
+#cancelStockFilters{display:flex;align-items:center;justify-content:center;gap:6px;height:44px;min-height:44px;min-width:44px;padding:10px;margin:0;grid-row:1;grid-column:3;font-size:.8rem}
+#cancelStockFilters svg{width:20px;height:20px;flex:none}
+.stock-find .stock-toolbar:not(:has(.branch-stock-filter:not([hidden]))){grid-template-columns:minmax(0,1fr) auto}
+.stock-find .stock-toolbar:not(:has(.branch-stock-filter:not([hidden]))) #cancelStockFilters{grid-column:2}
+body[data-hand=left] .stock-find .stock-toolbar{grid-template-columns:auto minmax(0,1fr) minmax(0,160px)}
+body[data-hand=left] .stock-find .stock-search-label{grid-column:2}
+body[data-hand=left] .stock-find .branch-stock-filter{grid-column:3}
+body[data-hand=left] .stock-find #cancelStockFilters{grid-column:1}
+body[data-hand=left] .stock-find .stock-toolbar:not(:has(.branch-stock-filter:not([hidden]))){grid-template-columns:auto minmax(0,1fr)}
+@media(max-width:480px){.stock-find .stock-toolbar{grid-template-columns:minmax(0,1fr) 102px 44px}body[data-hand=left] .stock-find .stock-toolbar{grid-template-columns:44px minmax(0,1fr) 102px}#cancelStockFilters span{display:none}.stock-find .stock-search-label input{font-size:16px}}
