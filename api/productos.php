@@ -15,6 +15,10 @@ if ($method === 'POST' && !$user) product_response(401, ['error' => 'Inicia sesi
 if ($method === 'POST' && !valid_csrf()) product_response(403, ['error' => 'La sesión venció. Recarga la página.']);
 $ean = $method === 'GET' ? ($_GET['ean'] ?? '') : ($_POST['ean'] ?? '');
 if (!is_string($ean) || !valid_product_ean($ean)) product_response(422, ['error' => 'El EAN no es válido.']);
+if($method==='POST'&&($_POST['action']??'')==='stock_reference_prepare'){
+    require_once __DIR__.'/../includes/catalog-reference.php';
+    try{$result=catalog_reference_prepare(database(),(int)$user['id'],$_POST);session_write_close();product_response(200,$result);}catch(CatalogException $error){product_response($error->status,['error'=>$error->getMessage()]);}catch(Throwable $error){product_response(503,['error'=>'No pudimos preparar la referencia.']);}
+}
 $csrf = csrf_token();
 session_write_close();
 try {

@@ -3,6 +3,7 @@ require_once __DIR__.'/../includes/auth.php';
 require_once __DIR__.'/../includes/stock.php';
 require_once __DIR__.'/../includes/pallet-activity.php';
 require_once __DIR__.'/../includes/audit.php';
+require_once __DIR__.'/../includes/catalog-reference.php';
 header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); header('X-Content-Type-Options: nosniff');
 function stock_response(int $status,array $body): void { http_response_code($status); echo json_encode($body,JSON_UNESCAPED_UNICODE); exit; }
 function stock_offline_confirmation(PDO $db,array $result,string $key,int $uid): array {
@@ -26,7 +27,7 @@ function stock_offline_confirmation(PDO $db,array $result,string $key,int $uid):
 $user=current_user(); $uid=$user?(int)$user['id']:null; $method=$_SERVER['REQUEST_METHOD'];
 if (!in_array($method,['GET','POST'],true)) stock_response(405,['error'=>'Solicitud no válida.']);
 if ($method==='POST' && (!$uid || !valid_csrf())) stock_response($uid?403:401,['error'=>$uid?'La sesión venció. Recarga la página.':'Inicia sesión para modificar palets.']);
-$csrf=csrf_token(); session_write_close(); $db=null;
+$csrf=csrf_token();$catalogPermit=$method==='POST'&&$uid?catalog_reference_take($uid,$_POST):null; session_write_close(); $db=null;
 try {
     $db=database(); $db->beginTransaction();
     $expiryDue=$method==='POST'||stock_query($db,'SELECT 1 FROM pallet_labels WHERE (pallet_id IS NULL AND reserved_until>0 AND reserved_until<=?) OR pallet_id IN (SELECT id FROM pallets WHERE released=1 OR (released=0 AND activated=0 AND prepared_until<=? AND NOT EXISTS(SELECT 1 FROM pallet_products b WHERE b.pallet_id=pallets.id))) LIMIT 1',[time(),time()])->fetchColumn();
@@ -92,7 +93,7 @@ try {
                     if ($current['code']!==($_POST['code']??'') || (int)(stock_label($db,$current['code'])['pallet_id']??0)!==$id) throw new CatalogException('Este código ya no corresponde al palet original. La carga sigue guardada.',409);
                     if ((int)($_POST['product_id']??0)!==0 || (int)$_POST['offline_revision']>(int)$current['revision']) throw new CatalogException('La versión de esta carga necesita revisión. La carga sigue guardada.',409);
                 }
-                $result=stock_save_product($db,$uid,$_POST);
+                $result=stock_save_product($db,$uid,$_POST);if($catalogPermit)$result['catalog_reference_saved']=catalog_reference_insert($db,$uid,$catalogPermit,$result);
                 $result['pallet_revision']=(int)stock_query($db,'SELECT revision FROM pallets WHERE id=?',[$result['id']])->fetchColumn();
                 break;
             case 'deduct_product':
