@@ -72,7 +72,7 @@
 <script src="js/label-files.js?v=<?= (int)app_release()['version'] ?>"></script>
 
 <script src="js/stock-preparation.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/stock.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/stock.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock.js'),0,12) ?>"></script>
 <script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/public-pallet.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>

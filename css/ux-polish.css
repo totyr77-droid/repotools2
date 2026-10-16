@@ -462,3 +462,7 @@ body[data-hand=left] #verb #openResultInfo{grid-column:1}
 body[data-hand=left] #verb #shareCurrentEan{grid-column:2}
 body[data-hand=left] #verb #copyCurrentEan{grid-column:3}
 #verb :is(#veri,#resultSwipeHint,#resultNavigation)[hidden]{display:none!important}
+
+/* Stock: búsqueda disponible al cargar el primer palet. */
+#stockApp[data-has-pallets="false"] .stock-find,body:has(#stockApp[data-has-pallets="false"]) .one-hand-fabs [aria-label="Buscar productos"]{display:none!important}
+@media(max-width:768px){body:not([data-one-hand='1']) #stockApp>.stock-primary-actions #scanPallet{display:flex;align-items:center;justify-content:center;padding:0;min-width:44px;height:44px;gap:0}body:not([data-one-hand='1']) #stockApp>.stock-primary-actions #scanPallet svg{display:block;margin:0;flex:none}}
