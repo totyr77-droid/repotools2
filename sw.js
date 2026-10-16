@@ -38,3 +38,5 @@ self.addEventListener('message',event=>{
 // Shell refresh: confirm before leaving modified dialog forms.
 
 // Shell refresh: compact expiry keypad and explicit hand preference.
+
+// Shell refresh: keypad headings and expiry input anchoring.
