@@ -449,3 +449,16 @@ body[data-hand] #contenedormax[data-scan-mode=rapid] #mainRapidActions{grid-area
 body[data-hand=left] #contenedormax[data-scan-mode=rapid] .main-rapid-meta{grid-template-columns:auto minmax(0,1fr);grid-template-areas:'actions text'}
 #contenedormax[data-scan-mode=rapid] #mainRapidActions button{padding:12px;width:44px;height:44px;min-height:44px;border-radius:9px}
 #contenedormax[data-scan-mode=rapid] #mainRapidActions svg{width:18px;height:18px}
+
+#verb .results-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;gap:6px;align-items:stretch;direction:ltr}
+#verb .results-actions>:is(#copyCurrentEan,#shareCurrentEan,#openResultInfo){grid-row:1;min-width:0;min-height:44px;padding:8px 5px;font-size:.8rem;line-height:1.25}
+#copyCurrentEan{grid-column:1}
+#shareCurrentEan{grid-column:2}
+#verb #openResultInfo{grid-column:3;display:grid;place-items:center;width:44px;padding:10px}
+#openResultInfo svg{width:20px;height:20px}
+#verb #compartirD,#verb #resultShareStatus{grid-column:1/-1}
+body[data-hand=left] #verb .results-actions{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr)}
+body[data-hand=left] #verb #openResultInfo{grid-column:1}
+body[data-hand=left] #verb #shareCurrentEan{grid-column:2}
+body[data-hand=left] #verb #copyCurrentEan{grid-column:3}
+#verb :is(#veri,#resultSwipeHint,#resultNavigation)[hidden]{display:none!important}

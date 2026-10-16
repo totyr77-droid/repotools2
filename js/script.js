@@ -233,7 +233,7 @@ function verCodigo(indice) {
     displayValue: true,
     margin: 10
   });
-  els.veri.textContent = `${indiceActual} / ${lista.length}`;
+  els.veri.textContent = `${indiceActual} / ${lista.length}`;els.veri.hidden=lista.length<2;document.getElementById('resultSwipeHint').hidden=lista.length<2;document.getElementById('resultNavigation').hidden=lista.length<2;
   els.vers.className = "library-primary";
   els.vera.className = "library-secondary";
   els.vers.disabled = indiceActual === lista.length;
