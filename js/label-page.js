@@ -20,14 +20,12 @@
  try{
    for(const label of window.repotoolsLabels){
      const sheet=document.createElement('section'),image=new Image();sheet.className='label-sheet';image.alt='Etiqueta Repotools del palet '+label.code;image.src=URL.createObjectURL(new Blob([RepoPalletLabel.vector(label)],{type:'image/svg+xml'}));image.decoding='async';image.loading='eager';sheet.append(image);
-     const share=document.createElement('button');share.type='button';share.className='label-share';share.setAttribute('aria-label','Compartir imagen');share.title='Compartir imagen';share.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></svg>';share.addEventListener('click',async()=>{try{status.textContent=await RepoPalletLabel.share(label);}catch(e){if(e.name!=='AbortError')status.textContent=e.message;}});sheet.append(share);sheets.append(sheet);
+     const share=document.createElement('button');share.type='button';share.className='label-share';share.setAttribute('aria-label','Compartir enlace');share.title='Compartir enlace';share.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></svg>';share.addEventListener('click',async()=>{try{status.textContent=await RepoPalletLabel.shareLink([label]);}catch(e){if(e.name!=='AbortError')status.textContent=e.message;}});sheet.append(share);sheets.append(sheet);
    }
    await Promise.all([...sheets.querySelectorAll('img')].map(image=>image.decode()));
    print.disabled=false;pdf.disabled=false;status.textContent='A4 vertical · una hoja por palet. También podés abrir el PDF.';
    pdf.addEventListener('click',openPDF);
    print.addEventListener('click',async()=>{
-     const appleMobile=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-     if(appleMobile){await openPDF();return;}
      print.disabled=true;
      try{await Promise.all([...sheets.querySelectorAll('img')].map(image=>image.decode()));window.print();}
      catch(e){status.textContent='No pudimos preparar la impresión. Probá abrir el PDF.';}

@@ -29,6 +29,7 @@ function account_icon(string $name): string {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$paths[$name].'</svg>';
 }
 function account_destination(string $next): string {
+    if($next==='stock'&&is_string($_SESSION['pending_label_codes']??null)){ $codes=$_SESSION['pending_label_codes'];unset($_SESSION['pending_label_codes']);if(preg_match('/^[0-9]{8}(?:,[0-9]{8}){0,99}$/D',$codes))return 'etiqueta.php?codigos='.rawurlencode($codes); }
     $target=$next==='moderacion'?'reportes.php?queue=1':($next?$next.'.php':'index.php');
     if ($next==='stock' && preg_match('/^[0-9]{8}$/D',$_SESSION['pending_stock_code']??'')) {
         $target.='?codigo='.$_SESSION['pending_stock_code']; unset($_SESSION['pending_stock_code']);

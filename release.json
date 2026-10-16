@@ -1,6 +1,12 @@
 {
-  "version": 44,
+  "version": 45,
   "changes": [
+    {
+      "version": 45,
+      "label": "1.40",
+      "date": "2026-10-16",
+      "summary": "Compartir etiquetas mediante enlace web e imprimir sin descargar PDF obligatorio."
+    },
     {
       "version": 44,
       "label": "1.39",
@@ -263,6 +269,6 @@
     }
   ],
   "major": 1,
-  "minor": 39,
-  "label": "1.39"
+  "minor": 40,
+  "label": "1.40"
 }
