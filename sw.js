@@ -42,3 +42,5 @@ self.addEventListener('message',event=>{
 // Shell refresh: keypad headings and expiry input anchoring.
 
 // Shell refresh: retain left-handed placement with older preference snapshots.
+
+// Shell refresh: follow expiry input after dialog animations and lookup layout changes.
