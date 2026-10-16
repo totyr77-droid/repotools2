@@ -69,13 +69,13 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     unset($product);
     if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.public_name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
     if(isset($p['members']))foreach($p['members'] as &$member){$member['name']=get_public_user_name($member);unset($member['public_name']);}unset($member);
-    if (($p['can_edit']||$public||$user===null) && $p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch() ?: null;
-    if (!$p['can_edit']) unset($p['description'],$p['branch_id'],$p['owner_name'],$p['owner_company'],$p['updated_at'],$p['created_at'],$p['updated_name']);
+    if ($p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch() ?: null;
+    if (!$p['can_edit']) unset($p['description'],$p['branch_id'],$p['owner_company'],$p['created_at']);
     // Read-only visitors receive merchandise, not internal account metadata.
     if (!$p['can_edit'] && !$p['pending_invitation']) unset($p['owner_id'],$p['updated_by']);
     if($public||$user===null){
         if(!isset($p['branch'])&&!empty($p['branch_id']))$p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch()?:null;
-        $p=array_intersect_key($p,array_flip(['code','available','products','branch']));
+        $p=array_intersect_key($p,array_flip(['code','available','products','branch','owner_name','updated_at','updated_name']));
         $p['products']=array_map(static fn($product)=>array_intersect_key($product,array_flip(['ean','name','display_name','reference_name','catalog_name','units','expires'])),$p['products']);
     }
     return $p;

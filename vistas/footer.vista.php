@@ -1,6 +1,6 @@
 <script src="js/share-links.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if(!empty($paginaCuenta)&&empty($paginaReportes)&&empty($paginaTops)): include __DIR__.'/updates.vista.php'; endif; ?>
-<?php if (!empty($paginaInicio) || !empty($mostrarCreditos)): ?>
+<?php if (empty($paginaInicio) && !empty($mostrarCreditos)): ?>
 <footer class="footer site-footer" id="contacto">
   <small class="site-footer__credits"><span>&copy; 2026 Repotools</span><span aria-hidden="true">&middot;</span><span>Hecho por <a href="https://www.instagram.com/greeyes_/" target="_blank" rel="noopener noreferrer">GR Dise&ntilde;o&nbsp;<span aria-hidden="true">&#8599;</span></a></span></small>
 </footer>

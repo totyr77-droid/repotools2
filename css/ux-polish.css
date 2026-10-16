@@ -214,3 +214,16 @@ body[data-hand=left] #labelList .stock-card{padding-inline-start:46px;padding-in
 @media(max-width:768px){body:has(.verification-main) .header-contenedor .nav{display:none!important}body:has(.verification-main) .nav-celular{display:flex!important}}
 
 @media(max-width:768px){body:has(.verification-main) .nav-celular{position:fixed!important;top:auto!important;bottom:0!important;left:0!important;width:100%;height:calc(68px + env(safe-area-inset-bottom,0px));box-sizing:border-box;margin:0;padding:0 8px env(safe-area-inset-bottom,0px);display:flex!important;flex-direction:row;align-items:stretch;justify-content:space-around;background:#27197F;z-index:100}body:has(.verification-main) .nav-celular a{display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px;font-size:.65rem;height:68px;box-sizing:border-box}body:has(.verification-main) .nav-celular a i,body:has(.verification-main) .nav-celular a svg{font-size:20px;width:20px;height:20px}}
+
+/* Sharing keeps a stable working area while switching branch/list modes. */
+#stockShareDialog[open]{height:min(720px,calc(var(--dialog-visible-height,100dvh) - max(12px,env(safe-area-inset-top,0px)) - max(12px,env(safe-area-inset-bottom,0px))))!important;max-height:calc(var(--dialog-visible-height,100dvh) - max(12px,env(safe-area-inset-top,0px)) - max(12px,env(safe-area-inset-bottom,0px)));top:calc(var(--dialog-visible-top,0px) + max(12px,env(safe-area-inset-top,0px)))!important;bottom:auto!important;margin-block:0!important}
+#stockShareDialog[open] #stockShareForm{flex:1;min-height:0}
+#stockShareDialog[open] .stock-share-scroll{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+#stockShareDialog[open] #stockShareChoices{flex:1;min-height:0;max-height:none;overflow:auto;overscroll-behavior:contain}
+#stockShareDialog[open] #stockShareBranchReview[open]{flex:1;min-height:0}
+#stockShareDialog[open] #stockShareBranchToggle,#stockShareDialog[open] #stockShareBranchReview>p{flex:none}
+#stockShareDialog[open] #stockShareBranchPalets{flex:1;min-height:0;max-height:none;overflow:auto;overscroll-behavior:contain}
+#stockShareDialog[open] .stock-share-footer{flex:none}
+@media(max-width:768px){#stockShareDialog[open]{height:calc(var(--dialog-visible-height,100dvh) - max(12px,env(safe-area-inset-top,0px)) - max(12px,env(safe-area-inset-bottom,0px)))!important;width:calc(100vw - 24px);max-width:calc(100vw - 24px);box-sizing:border-box}}
+#publicPallet>.public-pallet-branch{margin:4px 0 12px;font-size:.9rem;color:#626b7a;overflow-wrap:anywhere}
+#publicPalletMetadata{margin:12px 0}
