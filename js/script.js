@@ -301,7 +301,7 @@ function cambiarModoRapido(enabled) {
 function mostrarProductoRapido(product) {
   document.getElementById('mainRapidLast').textContent = product && typeof product === 'object'
     ? window.RepoProductInfo.summary(product)
-    : 'Código detectado';
+    : typeof product==='string'?'No pudimos consultar el producto':'Sin información. Tocá Reportar para completar los datos.';
   document.getElementById('mainRapidLast').title = document.getElementById('mainRapidLast').textContent;
   if (!product || typeof product === 'string') document.getElementById('mainRapidPanel').dataset.state = 'warning';
 }
@@ -345,6 +345,17 @@ function cerrarScanner() {
   if (total !== null) window.RepoToast?.(`Escaneados: ${total}`);
 }
 
+function mostrarFichaEscaneada(product,ean=resultadoActual,revision=scanResultRevision) {
+  const host=els.resultadoApi;host.replaceChildren();host.dataset.lookupState=product&&typeof product==='object'?'found':typeof product==='string'?'error':'missing';
+  if(host.dataset.lookupState==='found'){
+    const fields=document.createElement('dl');fields.className='scan-product-fields';
+    for(const [label,value] of [['Marca',product.brand],['Producto',product.name],['Contenido / gramaje',product.quantity]]){const term=document.createElement('dt'),detail=document.createElement('dd');term.textContent=label;detail.textContent=typeof value==='string'&&value.trim()?value.trim():'Sin información';if(detail.textContent==='Sin información')detail.className='scan-field-missing';fields.append(term,detail);}host.append(fields);
+  }else{
+    const title=document.createElement('strong'),hint=document.createElement('p');title.textContent=host.dataset.lookupState==='missing'?'No tenemos información de este producto':'No pudimos consultar la información del producto';hint.textContent=host.dataset.lookupState==='missing'?'Podés ayudarnos a completarla tocando Reportar.':'Intentá consultar nuevamente cuando tengas conexión.';host.append(title,hint);
+    if(host.dataset.lookupState==='error'){const retry=document.createElement('button');retry.type='button';retry.className='library-secondary';retry.textContent='Volver a consultar';retry.addEventListener('click',async()=>{retry.disabled=true;let result;try{result=await window.RepoProductInfo.get(ean,{fresh:true});}catch{result='error';}if(revision===scanResultRevision&&els.contenedormax.open&&resultadoActual===ean)mostrarFichaEscaneada(result,ean,revision);});host.append(retry);}
+  }
+}
+
 async function mostrarResultadoEscaneo(codigo,lectura=true) {
   if (!els.contenedormax.open || !window.RepoEANScanner.validEAN(codigo)) return;
   const revision = ++scanResultRevision;
@@ -386,15 +397,15 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   els.resultado.textContent = codigo;
   const heading = document.getElementById("scanResultHeading");
   document.getElementById('mainScannerTitle').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto escaneado';
-  if (heading) {heading.textContent = esDuplicado ? 'Ya tienes este producto en la lista. No lo agregamos otra vez.' : 'Producto agregado a tu lista.';heading.parentElement.dataset.state=esDuplicado?'warning':'success';}
+  if (heading) {heading.parentElement.hidden=!esDuplicado;heading.textContent='Este código ya está en tu lista. No lo agregamos otra vez.';heading.parentElement.dataset.state='warning';}
   document.getElementById('scanProductActions')?.replaceChildren();
   els.rescancelar.style.display = esDuplicado ? "none" : "block";
   actualizarContadores();
 
-  els.resultadoApi.textContent = "Buscando producto…";
+  els.resultadoApi.dataset.lookupState='loading';els.resultadoApi.textContent = "Buscando producto…";
   const resultadoAPI = await buscarProductoPorEAN(codigo);
   if (revision !== scanResultRevision) return;
-  if(resultadoAPI&&typeof resultadoAPI==='object')window.RepoProductInfo.renderSummary(els.resultadoApi, resultadoAPI);else els.resultadoApi.textContent='Código detectado';
+  mostrarFichaEscaneada(resultadoAPI,codigo,revision);
   window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), codigo);
 }
 
@@ -567,7 +578,7 @@ window.quitarOverlay = quitarOverlay;
   const { ean, product } = event.detail;
   if (els.contenedormax.open && resultadoActual === ean) {
     if (rapidActive) { mostrarProductoRapido(product); return; }
-    window.RepoProductInfo.renderSummary(els.resultadoApi, product);
+    mostrarFichaEscaneada(product);
     document.getElementById('scanProductActions')?.replaceChildren();
     window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), ean);
   }

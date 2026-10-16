@@ -86,7 +86,7 @@
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/ean-scanner.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/script.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/script.js?v=<?= substr(sha1_file(__DIR__.'/../js/script.js'),0,12) ?>"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php endif; ?>
 <script src="js/scan-photo.js?v=<?= (int)app_release()['version'] ?>"></script>
