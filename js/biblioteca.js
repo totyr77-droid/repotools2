@@ -138,7 +138,7 @@
       const option = document.createElement('option'); option.value = l.id; option.textContent = l.name;
       option.selected = Number(l.id) === viewerId; selector.append(option);
     });
-    get('eanProductName').textContent = product.name || 'Producto sin nombre';
+    const productName=product.name||'Producto sin nombre';get('eanProductName').title=productName;get('eanProductName').replaceChildren();const nameText=document.createElement('span');nameText.className='library-ean-name';nameText.textContent=productName;get('eanProductName').append(nameText);get('libraryEanSwipeArea').dataset.hasCatalog=String(library.products.some(p=>p.reference_name&&p.catalog_name&&p.catalog_name!==p.name));
     get('eanCatalogName').textContent=product.catalog_name||'';
     get('eanCatalogName').hidden=!product.reference_name||!product.catalog_name||product.catalog_name===product.name;
     get('eanValue').textContent = product.ean;
