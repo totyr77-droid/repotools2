@@ -236,8 +236,8 @@ function verCodigo(indice) {
   els.veri.textContent = `${indiceActual} / ${lista.length}`;els.veri.hidden=lista.length<2;document.getElementById('resultSwipeHint').hidden=lista.length<2;document.getElementById('resultNavigation').hidden=lista.length<2;
   els.vers.className = "library-primary";
   els.vera.className = "library-secondary";
-  els.vers.disabled = indiceActual === lista.length;
-  els.vera.disabled = indiceActual === 1;
+  els.vers.disabled = lista.length < 2;
+  els.vera.disabled = lista.length < 2;
   document.getElementById('resultShareStatus').textContent = '';
   els.compartirD.textContent = `Compartir lista completa (${lista.length})`;
   const ean = lista[indiceActual - 1], version = ++viewerRevision, summary = document.getElementById('resultProductSummary'); summary.textContent = 'Buscando producto…';
@@ -248,8 +248,8 @@ function verCodigo(indice) {
 
 function moverResultado(direccion) {
   const nuevoIndice = indiceActual + direccion;
-  if (nuevoIndice < 1 || nuevoIndice > lista.length) return;
-  verCodigo(nuevoIndice);
+  if (!lista.length) return;
+  verCodigo(((nuevoIndice - 1) % lista.length + lista.length) % lista.length + 1);
 }
 
 function cerrarResultados() {

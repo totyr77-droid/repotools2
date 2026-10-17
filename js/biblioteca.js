@@ -144,8 +144,8 @@
     get('eanValue').textContent = product.ean;
     get('eanPosition').hidden=library.products.length<2;get('eanPosition').textContent = `${viewerIndex + 1} de ${library.products.length}`;
     get('librarySwipeHint').hidden = library.products.length < 2;
-    get('previousLibraryEan').disabled = viewerIndex === 0;
-    get('nextLibraryEan').disabled = viewerIndex === library.products.length - 1;
+    get('previousLibraryEan').disabled = library.products.length < 2;
+    get('nextLibraryEan').disabled = library.products.length < 2;
     get('libraryBarcode').replaceChildren();
     try {
       if (!window.JsBarcode) throw new Error('No se pudo cargar el código de barras.');
@@ -237,8 +237,8 @@
   });
   function moveViewer(direction) {
     const library = libraries.find(l => Number(l.id) === viewerId);
-    if (!library || viewerIndex + direction < 0 || viewerIndex + direction >= library.products.length) return;
-    viewerIndex += direction; renderViewer();
+    if (!library?.products.length) return;
+    viewerIndex = (viewerIndex + direction + library.products.length) % library.products.length; renderViewer();
   }
   get('previousLibraryEan').addEventListener('click', () => moveViewer(-1));
   get('nextLibraryEan').addEventListener('click', () => moveViewer(1));

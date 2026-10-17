@@ -594,7 +594,7 @@ body[data-hand=left] .header-contenedor:has(#refreshAppCache) .logo{justify-cont
 #stockProductForm .stock-form-row{gap:8px}
 #stockProductForm .stock-form-row>label>span{margin-bottom:4px}
 #stockProductForm .stock-form-row input,#stockProductForm .stock-form-row select{margin-top:0}
-#stockProductForm .stock-lookup-status{margin:6px 0;padding:7px 9px}
+#stockProductForm .stock-pallet-lookup-notice{margin:6px 0;padding:7px 9px}
 #stockProductForm #stockFixedEan{margin:6px 0}
 #stockProductForm #stockAmountResult{margin:4px 0;font-size:.78rem}
 #stockProductForm #stockProductStatus:empty{display:none}
@@ -638,3 +638,25 @@ body[data-hand] #labelList .stock-pallet-card{padding-inline:12px;align-items:ce
 #printPendingLabels{padding-top:12px}
 #printPendingLabels>.pending-print-count{top:0;right:0;width:24px;min-width:24px;height:16px;line-height:16px;padding:0 2px;font-size:10px;font-variant-numeric:tabular-nums;white-space:nowrap;transition:none}
 #printPendingLabels>.pending-print-count[data-empty=true]{visibility:hidden}
+/* Visor EAN estable y controles completos del lado hábil. */
+#verb #resultProductSummary{height:5em;min-height:5em;flex:none;display:flex;flex-direction:column;justify-content:center;margin:0;width:100%;line-height:1.4}
+#verb #resultProductSummary .product-summary-name{height:2.8em;min-height:2.8em;flex:none;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;text-align:center}
+#verb .results-actions,body[data-hand=left] #verb .results-actions{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+#verb .results-actions>:is(#copyCurrentEan,#shareCurrentEan,#openResultInfo){display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;width:100%;min-width:0;min-height:58px;padding:8px 4px;text-align:center;grid-row:1}
+#verb .results-actions>:is(#copyCurrentEan,#shareCurrentEan,#openResultInfo) svg{width:20px;height:20px;min-width:20px;flex:none;margin:0}
+#verb #copyCurrentEan{grid-column:3}#verb #shareCurrentEan{grid-column:2}#verb #openResultInfo{grid-column:1}
+body[data-hand=left] #verb #copyCurrentEan{grid-column:1}body[data-hand=left] #verb #shareCurrentEan{grid-column:2}body[data-hand=left] #verb #openResultInfo{grid-column:3}
+#stockActiveFilters{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:8px 0;font-size:.85rem;color:#62577e;min-width:0}
+#stockActiveFilters[hidden]{display:none!important}#stockActiveFilters>svg{width:18px;height:18px;flex:none}
+#stockActiveFilters button{border:0;background:transparent;min-height:44px;padding:6px;color:#27187e;font:inherit;max-width:100%;overflow-wrap:anywhere;text-align:start;cursor:pointer}
+#stockActiveFilters .stock-applied-cancel{margin-inline-start:auto;color:#b32338;text-decoration:underline}
+.one-hand-sheet #stockFilters{position:static}.one-hand-sheet #stockFilterPanel{position:static;box-sizing:border-box;width:100%;max-width:100%;margin-top:8px;padding:0;border:0;box-shadow:none;background:transparent}
+.one-hand-sheet #stockFilters[open]>summary{width:fit-content}
+.stock-pallet-lookup-notice{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:max-content;max-width:calc(100vw - 32px);z-index:250;background:#fff;border:1px solid #e1e5ed;border-radius:12px;padding:10px 16px;box-shadow:0 4px 20px #27187e22;pointer-events:none}
+.stock-pallet-lookup-notice:empty{display:none}.stock-pallet-lookup-notice .repotools-loader{position:static!important;min-height:0!important;padding:0!important;background:transparent!important}
+.public-pallet-branch{display:flex;align-items:center;gap:6px}.public-pallet-branch svg{width:18px;height:18px;flex:none}
+#publicPalletMetadata .public-pallet-movement{align-items:baseline}#publicPalletMetadata .public-pallet-movement>span{display:block;min-width:0}#publicPalletMetadata .public-pallet-movement strong{white-space:nowrap;display:inline}
+#publicPalletMetadata .public-pallet-movement strong{display:inline}
+body[data-hand] .one-hand-sheet .stock-find .stock-toolbar:has(#stockFilters[open]){grid-template-columns:minmax(0,1fr)!important}
+body[data-hand] .one-hand-sheet .stock-find .stock-toolbar:has(#stockFilters[open]) .stock-search-label{grid-column:1!important;grid-row:1}
+body[data-hand] .one-hand-sheet .stock-find .stock-toolbar #stockFilters[open]{grid-column:1/-1!important;grid-row:2}

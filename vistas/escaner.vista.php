@@ -81,8 +81,8 @@
       </div>
       <div class="results-actions">
         <button id="copyCurrentEan" class="library-secondary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></svg> Copiar EAN</button>
-<button id="shareCurrentEan" class="library-primary" type="button">Compartir este EAN</button>
-        <button id="openResultInfo" class="library-secondary" type="button" aria-label="Ver información del producto" title="Ver información del producto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg></button>
+<button id="shareCurrentEan" class="library-primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></svg><span>Compartir EAN</span></button>
+        <button id="openResultInfo" class="library-secondary" type="button" aria-label="Ver información del producto" title="Ver información del producto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><span>Información</span></button>
         <button id="compartirD" class="library-secondary" type="button">Compartir lista completa</button>
         <p id="resultShareStatus" class="library-status" role="status"></p>
       </div>

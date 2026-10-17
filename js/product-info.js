@@ -155,7 +155,7 @@
   function renderSummary(container, product) {
     container.replaceChildren();
     if (typeof product === 'string' || !product) { container.textContent = typeof product === 'string' ? product : summary(null); return; }
-    const name = document.createElement('span'); name.className = 'product-summary-name'; name.textContent = displayName(product) || 'Producto sin nombre';
+    const name = document.createElement('span'); name.className = 'product-summary-name'; name.textContent = displayName(product) || 'Producto sin nombre'; name.title=name.textContent;
     const quantity = document.createElement('span'); quantity.className = 'product-summary-quantity'; quantity.textContent = product.quantity || 'Contenido no disponible';
     container.append(name, quantity);
   }
