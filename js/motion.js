@@ -41,7 +41,7 @@
      for(const record of records){const target=record.target;if(target.nodeType!==1||target.closest(ignored))continue;
        if(record.type==='childList'){
          record.addedNodes.forEach(discover);
-         const container=target.closest(panels);if(container&&record.addedNodes.length)reveal(container);
+         const container=target.closest(panels);if(container&&record.addedNodes.length&&!target.closest('#pendingPrintTools'))reveal(container);
        }
        if(record.attributeName==='data-hand'){tracked.forEach((_,group)=>schedule(group));continue;}
        const group=target.closest(groups);if(group)schedule(group);

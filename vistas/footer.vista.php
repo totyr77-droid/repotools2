@@ -107,7 +107,7 @@
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-export.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-export.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-overview.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-overview.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
-<script src="js/motion.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/motion.js?v=<?= substr(sha1_file(__DIR__.'/../js/motion.js'),0,12) ?>"></script>
 
 
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>

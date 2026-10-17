@@ -52,3 +52,5 @@ self.addEventListener('message',event=>{
 // Refresh saved-form tracking and short print link sharing without a version bump.
 
 // Refresh viewport-root mobile navigation placement without changing app version.
+
+// Refresh pending counter updates without replaying the panel entrance animation.

@@ -112,7 +112,7 @@
     $('selectPendingLabels').querySelector('span').textContent=selectingLabels?'Cancelar':'Seleccionar';
     $('selectAllPendingLabels').hidden=$('clearPendingLabels').hidden=$('printPendingLabels').hidden=!selectingLabels;
     $('selectAllPendingLabels').textContent='Todos';
-    const link=$('printPendingLabels');link.querySelector('span').textContent='Imprimir';let badge=link.querySelector('.pending-print-count');if(!badge){badge=document.createElement('small');badge.className='pending-print-count';link.append(badge);}badge.textContent=String(selectedLabels.size);badge.hidden=!selectedLabels.size;link.setAttribute('aria-label','Imprimir '+selectedLabels.size+' etiquetas');
+    const link=$('printPendingLabels');if(link.querySelector('span').textContent!=='Imprimir')link.querySelector('span').textContent='Imprimir';let badge=link.querySelector('.pending-print-count');if(!badge){badge=document.createElement('small');badge.className='pending-print-count';link.append(badge);}if(badge.textContent!==String(selectedLabels.size))badge.textContent=String(selectedLabels.size);badge.hidden=false;badge.dataset.empty=String(!selectedLabels.size);badge.setAttribute('aria-hidden','true');link.setAttribute('aria-label','Imprimir '+selectedLabels.size+' etiquetas');
     link.setAttribute('aria-disabled',String(!selectedLabels.size));link.tabIndex=selectedLabels.size?0:-1;
     if(selectedLabels.size)link.href='etiqueta.php?codigos='+[...selectedLabels].join(',');else link.removeAttribute('href');
     $('labelList').dataset.selecting=String(selectingLabels);

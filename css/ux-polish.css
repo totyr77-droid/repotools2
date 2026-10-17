@@ -633,3 +633,8 @@ body[data-hand] #labelList .stock-pallet-card{padding-inline:12px;align-items:ce
 
 /* Selección múltiple de pendientes: feedback por color, sin encoger tarjetas. */
 #labelList[data-selecting=true] .stock-card,#labelList[data-selecting=true] .stock-card:active{transform:none!important;transition-property:background-color,color,border-color,box-shadow}
+
+/* El contador ocupa siempre el mismo espacio, incluido cero, sin desbordar la barra. */
+#printPendingLabels{padding-top:12px}
+#printPendingLabels>.pending-print-count{top:0;right:0;width:24px;min-width:24px;height:16px;line-height:16px;padding:0 2px;font-size:10px;font-variant-numeric:tabular-nums;white-space:nowrap;transition:none}
+#printPendingLabels>.pending-print-count[data-empty=true]{visibility:hidden}
