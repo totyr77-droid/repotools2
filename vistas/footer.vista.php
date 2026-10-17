@@ -68,7 +68,7 @@
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/pallet-label.js?v=<?= substr(sha1_file(__DIR__.'/../js/pallet-label.js'),0,12) ?>"></script>
-<script src="js/pallet-label-pdf.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/pallet-label-pdf.js?v=<?= substr(sha1_file(__DIR__.'/../js/pallet-label-pdf.js'),0,12) ?>"></script>
 <script src="js/label-files.js?v=<?= (int)app_release()['version'] ?>"></script>
 
 <script src="js/stock-preparation.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-preparation.js'),0,12) ?>"></script>

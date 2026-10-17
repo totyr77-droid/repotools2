@@ -19,7 +19,9 @@
     for(const label of labels){
       const l=RepoPalletLabel.layout(label),cell=l.qr.size/l.n,ops=['q',`${scale} 0 0 ${scale} ${left} ${bottom} cm`,'0 g'];
       const text=(x,y,size,value,isBold=false,width)=>{measure.font=(isBold?'bold ':'')+size+'px Arial';const natural=width?String(value).length*size*.556:measure.measureText(value).width;const target=width||natural;ops.push(`BT /${isBold?'B':'F'} ${size} Tf ${width?width/natural*100:100} Tz 1 0 0 1 ${x-target/2} ${l.height-y} Tm ${literal(value)} Tj ET`);};
-      ops.push(`q ${l.brand.width} 0 0 ${l.brand.height} ${l.brand.x} ${l.height-l.brand.y-l.brand.height} cm /Logo Do Q`);
+      const logoScale=Math.min(l.brand.width/logo.width,l.brand.height/logo.height),logoWidth=logo.width*logoScale,logoHeight=logo.height*logoScale;
+      const logoX=l.brand.x+(l.brand.width-logoWidth)/2,logoY=l.brand.y+(l.brand.height-logoHeight)/2;
+      ops.push(`q ${logoWidth} 0 0 ${logoHeight} ${logoX} ${l.height-logoY-logoHeight} cm /Logo Do Q`);
       text(l.caption.x,l.caption.y,l.caption.size,'Escaneá para consultar este palet');
       for(let y=0;y<l.n;y++)for(let x=0;x<l.n;x++)if(l.matrix.isDark(y,x)){let end=x+1;while(end<l.n&&l.matrix.isDark(y,end))end++;ops.push(`${l.qr.x+x*cell} ${l.height-l.qr.y-(y+1)*cell} ${(end-x)*cell} ${cell} re`);x=end-1;}
       ops.push('f');text(l.code.x,l.code.y,l.code.size,label.code,true,l.code.width);l.footer.forEach((line,i)=>text(l.footerPosition.x,l.footerPosition.y+i*l.footerPosition.step,l.footerPosition.size,line));ops.push('Q');
