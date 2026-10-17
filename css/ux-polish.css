@@ -630,3 +630,6 @@ body[data-hand] #labelList .stock-pallet-card{padding-inline:12px;align-items:ce
 #labelList .stock-pallet-card>svg{display:block;width:20px;height:20px;margin:0;flex:0 0 20px;align-self:center}
 #labelList .stock-pallet-card-content{grid-template-columns:minmax(0,1fr)}
 @media(max-width:768px){body>.repo-mobile-nav{position:fixed;top:auto;bottom:0;left:0;right:0;height:calc(68px + env(safe-area-inset-bottom,0px));margin:0}}
+
+/* Selección múltiple de pendientes: feedback por color, sin encoger tarjetas. */
+#labelList[data-selecting=true] .stock-card,#labelList[data-selecting=true] .stock-card:active{transform:none!important;transition-property:background-color,color,border-color,box-shadow}
