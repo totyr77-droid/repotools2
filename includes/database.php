@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=31;
+const REPOTOOLS_SCHEMA_VERSION=33;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -273,6 +273,11 @@ function initialize_database(PDO $db): void {
         if(!isset($applied[32])){
             $db->exec("CREATE TABLE label_print_links (code TEXT PRIMARY KEY CHECK(length(code)=8), target TEXT NOT NULL UNIQUE)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(32)');
+        }
+        if(!isset($applied[33])){
+            $db->exec("CREATE TABLE scanner_metrics (event_id TEXT PRIMARY KEY, user_id {$ref} NOT NULL REFERENCES users(id) ON DELETE CASCADE, recorded_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP, mode TEXT NOT NULL CHECK(mode IN ('qr','ean')), context TEXT NOT NULL, outcome TEXT NOT NULL CHECK(outcome IN ('confirmed','cancelled','error')), source TEXT NOT NULL, app_version TEXT NOT NULL, browser TEXT NOT NULL, device TEXT NOT NULL, rapid INTEGER NOT NULL CHECK(rapid IN (0,1)), open_ms INTEGER, scan_ms INTEGER NOT NULL, confirm_ms INTEGER, total_ms INTEGER NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL)");
+            $db->exec('CREATE INDEX scanner_metrics_period ON scanner_metrics(recorded_at,mode,app_version)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(33)');
         }
         $db->commit();
     } catch (Throwable $error) {

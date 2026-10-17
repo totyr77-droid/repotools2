@@ -123,7 +123,7 @@
   // Confirma el mismo EAN en fotogramas separados y dentro de una ventana corta.
   function confirmation(validate = validEAN) {
     let code = '', count = 0, first = 0, last = 0, lastFrame = null;
-    return (value, now = performance.now(), frame = null) => {
+    const confirm = (value, now = performance.now(), frame = null) => {
       if (!validate(value)) { code = ''; count = 0; lastFrame=null; return false; }
       if(frame!==null&&frame===lastFrame)return false;lastFrame=frame;
       if (value !== code || now - last > 650 || now - first > 1500) {
@@ -133,6 +133,7 @@
       last = now;
       return ++count >= 3;
     };
+    Object.defineProperty(confirm,'startedAt',{get:()=>count?first:null});return confirm;
   }
 
   // Shared identification engine. Camera/QR decoder and feedback remain in create().
@@ -218,7 +219,7 @@
     const element = document.getElementById(elementId);
     const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status,:scope > #userScannerStatus')||(elementId==='contenedor'?document.getElementById('mainScannerStatus'):null);if(statusArea){statusArea.classList.add('camera-message-area','scanner-status');statusArea.classList.add('camera-message-overlay');}
     let revision = 0, session = null;
-    function metric(current,stage,detail={}){if(stage==='action')current.actionStarted=true;const event={stage,at:performance.now(),elapsed:performance.now()-current.requestedAt,mode:current.isQR?'qr':'ean',...detail};for(const listener of [onMetric,...metricListeners]){try{listener(event);}catch{}}}
+    function metric(current,stage,detail={}){if(stage==='action')current.actionStarted=true;if(stage==='confirmed')current.cycleConfirmed=true;if(stage==='error')current.failed=true;const event={stage,at:performance.now(),elapsed:performance.now()-current.requestedAt,sessionId:current.metricId,cycle:current.metricCycle||0,reader:elementId,kind:current.kind,rapid:Boolean(keepOpen()),mode:current.isQR?'qr':'ean',...detail};for(const listener of [onMetric,...metricListeners]){try{listener(event);}catch{}}}
     const enqueue = cameraTask;
     // Drop concurrent decode requests; never queue old frames behind a slow decoder.
     function serialDecoder(current){
@@ -464,6 +465,7 @@
     async function release(current) {
       if (!current) return;
       if (!current.cleanup) current.cleanup = (async () => {
+        metric(current,'closed',{outcome:current.failed?'error':current.cycleConfirmed?'confirmed':'cancelled'});
         current.accepting = false;current.frameObserver?.disconnect();current.frameAbort?.abort(); current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
         try { if (current.reader.isScanning) await current.reader.stop(); }
@@ -506,7 +508,7 @@
         const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : validEAN;
         if (element.dataset) { element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean'; }
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8], verbose: false });
-        const current = { reader, accepting: true, token, isQR, kind, validate, requestedAt, confirm: confirmation(validate) };metric(current,'camera-request');
+        const current = { reader, metricId:globalThis.crypto?.randomUUID?.()||String(requestedAt)+':'+token, accepting: true, token, isQR, kind, validate, requestedAt, confirm: confirmation(validate) };metric(current,'camera-request');
         serialDecoder(current);session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera', recognizedFrame = null) => {
           code = normalize(code);
@@ -530,14 +532,14 @@
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
-          metric(current,'confirmed',{source});
+          metric(current,'confirmed',{source,confirmationMs:source==='ocr'?null:isQR?0:Math.max(0,performance.now()-(current.confirm.startedAt??performance.now()))});
           current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
           element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
             Promise.resolve().then(()=>{metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR)rememberScanPhoto(code,element);metric(current,'action');return onCode(code);}).then(()=>metric(current,'action-complete')).catch(error=>{if(token===revision&&session===current){onError(error);}}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
               if(token!==revision||session!==current)return;
-              current.confirm=confirmation(validate);current.accepting=true;element.classList.remove('ean-confirmed');
+              current.confirm=confirmation(validate);current.accepting=true;current.cycleConfirmed=false;current.metricCycle=(current.metricCycle||0)+1;metric(current,'ready');element.classList.remove('ean-confirmed');
               try{background(current,accept);current.ocr?.resume();}catch{}
             }).catch(error=>{if(token===revision)onError(error);});
             return;
@@ -575,6 +577,7 @@
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
+          metric(current,'error');
           current.accepting = false;
           await release(current);
           if (token !== revision) return false;

@@ -3,7 +3,7 @@
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
 
-  const tabs=document.querySelector('.reports-tabs');if(tabs)for(const selector of ['[data-moderation-view=general]','#moderationReports','[data-moderation-view=users]','[data-moderation-view=logs]','[data-moderation-view=branches]']){const tab=tabs.querySelector(selector);if(tab)tabs.append(tab);}
+  const tabs=document.querySelector('.reports-tabs');if(tabs)for(const selector of ['[data-moderation-view=general]','#moderationReports','[data-moderation-view=users]','[data-moderation-view=logs]','[data-moderation-view=system]','[data-moderation-view=branches]']){const tab=tabs.querySelector(selector);if(tab)tabs.append(tab);}
   const list = document.getElementById('reportsList'), status = document.getElementById('reportsStatus');
   const dialog = document.getElementById('reviewReportDialog'), details = document.getElementById('reviewReportDetails'), form = document.getElementById('reviewReportForm'), message = document.getElementById('reviewReportStatus');
   const close = document.getElementById('closeReviewReport'), approve = document.getElementById('approveReport'), reject = document.getElementById('rejectReport');
@@ -54,7 +54,7 @@
   page?.onLeave(() => { ++version; ++listVersion; clearPhotos(); });
   async function load() {
     const filterBox=document.getElementById('reportLogFilters');if(filterBox)filterBox.hidden=moderationView!=='logs';
-    const attempt = ++listVersion; const branches=moderationView==='branches';const branchWorkspace=document.getElementById('branchManagement');if(branchWorkspace)branchWorkspace.hidden=!branches;document.dispatchEvent(new CustomEvent('moderation:branches',{detail:branches}));const users=moderationView==='users'; const workspace=document.getElementById('userWorkspace'); if(workspace)workspace.hidden=!users; list.hidden=users||branches; document.getElementById('moderationPagination').hidden=true; if(users||branches){status.textContent='';return;} status.textContent = ''; list.replaceChildren();
+    const attempt = ++listVersion; const branches=moderationView==='branches';const branchWorkspace=document.getElementById('branchManagement');if(branchWorkspace)branchWorkspace.hidden=!branches;document.dispatchEvent(new CustomEvent('moderation:branches',{detail:branches}));const users=moderationView==='users'; const workspace=document.getElementById('userWorkspace'); if(workspace)workspace.hidden=!users; const system=moderationView==='system';const systemWorkspace=document.getElementById('systemWorkspace');if(systemWorkspace)systemWorkspace.hidden=!system;document.dispatchEvent(new CustomEvent('moderation:system',{detail:system}));list.hidden=users||branches||system; document.getElementById('moderationPagination').hidden=true; if(users||branches||system){status.textContent='';return;} status.textContent = ''; list.replaceChildren();
     const finishLoading = window.RepotoolsLoader?.start(list, {type:'skeleton'});
     document.getElementById('moderationPagination').hidden = true;
     try {
@@ -220,7 +220,7 @@
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); }); dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); }); dialog.addEventListener('close', () => { ++version; active = null; clearPhotos(); });
   form.addEventListener('submit', event => { event.preventDefault(); review('approved'); }); reject.addEventListener('click', () => review('rejected'));
-  const savedView=new URL(location.href).searchParams.get('view');const savedTab=queue&&['pending','history','logs','users','branches','general'].includes(savedView)?document.querySelector(`[data-moderation-view=${savedView}]`):null;if(savedTab)savedTab.click();else load();
+  const savedView=new URL(location.href).searchParams.get('view');const savedTab=queue&&['pending','history','logs','users','branches','general','system'].includes(savedView)?document.querySelector(`[data-moderation-view=${savedView}]`):null;if(savedTab)savedTab.click();else load();
   const linkedReport = new URL(location.href).searchParams.get('report');
   if (/^[1-9]\d*$/.test(linkedReport || '')) open(Number(linkedReport));
 })();

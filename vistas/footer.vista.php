@@ -35,6 +35,7 @@
 <script src="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if(!empty($paginaDemo)): ?><script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script><script src="js/guest-demo.js?v=<?= substr(sha1_file(__DIR__.'/../js/guest-demo.js'),0,12) ?>"></script><?php endif; ?>
 <script src="js/loading.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php if(current_user()): ?><script>window.repotoolsScannerMetrics=<?= json_encode(['user'=>(int)current_user()['id'],'csrf'=>csrf_token(),'manager'=>($navRole??'')==='manager','version'=>app_release_label()],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script><?php endif; ?>
 <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;</script><script src="js/stock-offline.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/connectivity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/offline-cache.js?v=<?= substr(sha1_file(__DIR__.'/../js/offline-cache.js'),0,12) ?>"></script><script src="js/offline-sync.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php if (!empty($paginaStock) || !empty($paginaBiblioteca)): ?><link rel="stylesheet" href="css/sync-status.css?v=<?= (int)app_release()['version'] ?>"><script src="js/sync-status.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/library-offline.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/date-time.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -59,7 +60,7 @@
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-management.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/reports-page.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/reports-page.js?v=<?= substr(sha1_file(__DIR__.'/../js/reports-page.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
@@ -107,6 +108,8 @@
 <?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-export.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-export.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-overview.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-overview.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(current_user()): ?><script src="js/scanner-performance.js?v=<?= substr(sha1_file(__DIR__.'/../js/scanner-performance.js'),0,12) ?>"></script><?php endif; ?>
+<?php if(!empty($paginaReportes)&&($navRole??'')==='manager'): ?><link rel="stylesheet" href="css/system-workspace.css?v=<?= substr(sha1_file(__DIR__.'/../css/system-workspace.css'),0,12) ?>"><script src="js/system-workspace.js?v=<?= substr(sha1_file(__DIR__.'/../js/system-workspace.js'),0,12) ?>"></script><?php endif; ?>
 <script src="js/motion.js?v=<?= substr(sha1_file(__DIR__.'/../js/motion.js'),0,12) ?>"></script>
 
 
