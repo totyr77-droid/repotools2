@@ -57,7 +57,8 @@ function valid_csrf(): bool {
 
 function require_account(string $next = 'stock'): void {
     if (!current_user()) {
-        header('Location: cuenta.php?next=' . (in_array($next, ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion'], true) ? $next : 'stock'));
+        $base=rtrim(str_replace('\\','/',dirname($_SERVER['SCRIPT_NAME']??'/index.php')),'/');
+        header('Location: '.$base.'/cuenta.php?next=' . (in_array($next, ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion'], true) ? $next : 'stock'));
         exit;
     }
 }
