@@ -16,7 +16,8 @@ try {
         else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
         $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);
         if ($page===false) throw new CatalogException('La página no es válida.',422);
-        stock_expire($db); $result=branch_public($db,$_GET['token'],$page); $db->commit(); branch_response(200,$result);
+        if(!$uid&&array_intersect(['q','branch','tag','sort'],array_keys($_GET)))throw new CatalogException('Iniciá sesión para usar filtros.',401);
+        stock_expire($db); $result=branch_public($db,$_GET['token'],$page,$uid?:null,array_intersect_key($_GET,array_flip(['q','branch','tag','sort']))); $db->commit(); branch_response(200,$result);
     }
     if (!$uid) throw new CatalogException('Inicia sesión para ver tus sucursales.',401);
     $db=database(); $db->beginTransaction();

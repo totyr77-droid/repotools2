@@ -1,6 +1,12 @@
 {
-  "version": 56,
+  "version": 57,
   "changes": [
+    {
+      "version": 57,
+      "label": "1.52",
+      "date": "2026-10-17",
+      "summary": "Compacta filtros de Stock y compartir, agrega búsqueda autenticada y orden por vencimiento en Stock compartido."
+    },
     {
       "version": 56,
       "label": "1.51",
@@ -294,15 +300,9 @@
       "label": "1.03",
       "date": "2026-10-15",
       "summary": "Versión junto al logo y flotantes con el color del nav principal"
-    },
-    {
-      "version": 7,
-      "label": "1.02",
-      "date": "2026-10-15",
-      "summary": "Sincronización de palets confirmada por producto y unidades, sin perder ni duplicar cargas."
     }
   ],
   "major": 1,
-  "minor": 51,
-  "label": "1.51"
+  "minor": 52,
+  "label": "1.52"
 }
