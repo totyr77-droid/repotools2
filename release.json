@@ -1,6 +1,12 @@
 {
-  "version": 58,
+  "version": 59,
   "changes": [
+    {
+      "version": 59,
+      "label": "1.54",
+      "date": "2026-10-17",
+      "summary": "Los QR abren el informe del palet con acceso explícito a Stock o ingreso, conservando resumen y filtros."
+    },
     {
       "version": 58,
       "label": "1.53",
@@ -294,15 +300,9 @@
       "label": "1.05",
       "date": "2026-10-15",
       "summary": "Inicio con escaneo inferior y lista encima en modo de una mano"
-    },
-    {
-      "version": 9,
-      "label": "1.04",
-      "date": "2026-10-15",
-      "summary": "Tickets de moderación con apertura directa"
     }
   ],
   "major": 1,
-  "minor": 53,
-  "label": "1.53"
+  "minor": 54,
+  "label": "1.54"
 }
