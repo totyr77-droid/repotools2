@@ -10,7 +10,7 @@ $ordered=branch_public($db,$token,0,2);$check($ordered['pallets'][0]['code']==='
 $found=branch_public($db,$token,0,2,['q'=>'único']);$check(count($found['pallets'])===1&&$found['pallets'][0]['code']==='99999999','Busca nombre más allá de primera página');$check(array_sum(array_column($found['summary'],'units'))===1,'Resumen respeta filtro');
 $byCode=branch_public($db,$token,0,2,['q'=>'20000003']);$check(count($byCode['pallets'])===1,'Busca número de palet');
 $byBranch=branch_public($db,$token,0,2,['branch'=>'1']);$check(count($byBranch['pallets'])===12,'Filtra sucursal dentro del enlace');
-$ownTag=branch_public($db,$token,0,1,['tag'=>'Etiqueta privada','branch'=>'2']);$check(count($ownTag['pallets'])===1,'Etiqueta propia combinada con sucursal');
-try{branch_public($db,$token,0,2,['tag'=>'Etiqueta privada']);throw new RuntimeException('No rechazó etiqueta sin rango');}catch(CatalogException $e){$check($e->status===403,'Valida rango vigente');}
-$check($ordered['filters']['tags']===[],'No comparte etiquetas del propietario con otro registrado');
+$db->exec('UPDATE pallet_products SET units=999 WHERE pallet_id='.$ids[4]);$quantity=branch_public($db,$token,0,2,['sort'=>'quantity']);$check($quantity['pallets'][0]['code']==='20000004','Mayor cantidad antes de paginar');
+try{branch_public($db,$token,0,2,['tag'=>'Etiqueta privada']);throw new RuntimeException('No rechazó etiqueta sin rango');}catch(CatalogException $e){$check($e->status===422,'Valida rango vigente');}
+$check(!isset($ordered['filters']['tags'])&&!isset($ordered['filters']['can_tags']),'No ofrece etiquetas en la vista compartida');
 echo "OK: alcance público, búsqueda global antes de paginar, orden vencimiento, resumen filtrado, sucursal y etiquetas personales/rango.\n";

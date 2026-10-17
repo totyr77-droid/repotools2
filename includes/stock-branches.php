@@ -141,15 +141,12 @@ function branch_public(PDO $db,string $token,int $page=0,?int $viewer=null,array
     else { $sql.=' AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=? AND sp.pallet_id=p.id)'; $args[]=$share['id']; }
     $filterOptions=null;
     if($viewer){
-        $baseScope='SELECT p.id'.substr($sql,strpos($sql,' FROM pallets p '));
-        $names=stock_query($db,"SELECT DISTINCT COALESCE(b.id,0) AS id,COALESCE(b.name,'') AS name,COALESCE(b.address,'') AS address".substr($sql,strpos($sql,' FROM pallets p ')).' ORDER BY name,id',$args)->fetchAll();
-        $canTags=stock_is_admin($db,$viewer);$tagNames=[];
-        if($canTags)$tagNames=stock_query($db,"SELECT DISTINCT t.name FROM pallet_user_tags t JOIN pallets own ON own.id=t.pallet_id WHERE t.user_id=? AND (own.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=own.id AND a.user_id=? AND a.status='accepted')) AND t.pallet_id IN ({$baseScope}) ORDER BY t.name",[$viewer,$viewer,$viewer,...$args])->fetchAll(PDO::FETCH_COLUMN);
-        $filterOptions=['branches'=>$names,'tags'=>$tagNames,'can_tags'=>$canTags];
+        $names=stock_query($db,"SELECT DISTINCT COALESCE(b.id,0) AS id,COALESCE(b.name,'') AS name".substr($sql,strpos($sql,' FROM pallets p ')).' ORDER BY name,id',$args)->fetchAll();
+        $filterOptions=['branches'=>$names];
         $q=$filters['q']??'';$place=$filters['branch']??'';$tag=$filters['tag']??'';
-        if(!is_string($q)||mb_strlen($q)>100||!is_string($place)||mb_strlen($place)>160||!is_string($tag)||mb_strlen($tag)>40||!in_array($filters['sort']??'expiry',['expiry','code'],true))throw new CatalogException('Filtro no válido.',422);
+        if(!is_string($q)||mb_strlen($q)>100||!is_string($place)||mb_strlen($place)>160||!is_string($tag)||mb_strlen($tag)>40||!in_array($filters['sort']??'expiry',['expiry','code','quantity'],true))throw new CatalogException('Filtro no válido.',422);
         if($place!==''){if($place!=='__none__'&&(!ctype_digit($place)||filter_var($place,FILTER_VALIDATE_INT)===false))throw new CatalogException('Sucursal no válida.',422);$sql.=' AND COALESCE(p.branch_id,0)=CAST(? AS INTEGER)';$args[]=$place==='__none__'?0:(int)$place;}
-        if($tag!==''){if(!$canTags)throw new CatalogException('No tenés permiso para filtrar etiquetas.',403);$sql.=" AND EXISTS(SELECT 1 FROM pallet_user_tags t WHERE t.pallet_id=p.id AND t.user_id=? AND t.name=? AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')))";array_push($args,$viewer,$tag,$viewer,$viewer);}
+        if($tag!=='')throw new CatalogException('Las etiquetas no están disponibles en esta vista.',422);
         if(trim($q)!==''){$sql.=" AND (p.code LIKE ? OR EXISTS(SELECT 1 FROM pallet_products match_product LEFT JOIN products c ON c.ean=match_product.ean WHERE match_product.pallet_id=p.id AND (LOWER(match_product.name) LIKE ? OR LOWER(c.name) LIKE ? OR LOWER(c.brand) LIKE ? OR match_product.ean LIKE ?)))";$term='%'.mb_strtolower(trim($q)).'%';array_push($args,$term,$term,$term,$term,$term);}
     }
     $summary=[];
@@ -159,13 +156,13 @@ function branch_public(PDO $db,string $token,int $page=0,?int $viewer=null,array
         foreach($totals as $product)$summary[]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','catalog_name','expires','units']));
     }
     $pallets=[];
-    $order=($filters['sort']??'expiry')==='expiry'?"COALESCE((SELECT MIN(NULLIF(exp.expires,'')) FROM pallet_products exp WHERE exp.pallet_id=p.id),'9999-12-31'),p.code,p.id":'p.code,p.id';
+    $order=($filters['sort']??'expiry')==='expiry'?"COALESCE((SELECT MIN(NULLIF(exp.expires,'')) FROM pallet_products exp WHERE exp.pallet_id=p.id),'9999-12-31'),p.code,p.id":(($filters['sort']??'')==='quantity'?'COALESCE((SELECT SUM(qty.units) FROM pallet_products qty WHERE qty.pallet_id=p.id),0) DESC,p.code,p.id':'p.code,p.id');
     $rows=stock_query($db,$sql.' ORDER BY '.$order.' LIMIT 21 OFFSET '.($page*20),$args)->fetchAll();
     $hasMore=count($rows)>20;
     $rows=array_slice($rows,0,20); $products=[];
     if ($rows) {
         $ids=array_column($rows,'id'); $marks=implode(',',array_fill(0,count($ids),'?'));
-        foreach (stock_query($db,"SELECT b.pallet_id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$marks}) ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,b.name,b.id",$ids)->fetchAll() as $product) {
+        foreach (stock_query($db,"SELECT b.pallet_id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$marks}) ORDER BY ".(($filters['sort']??'')==='quantity'?'b.units DESC,':'')."CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,b.name,b.id",$ids)->fetchAll() as $product) {
             $products[$product['pallet_id']][]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','reference_name','catalog_name','expires','units','kind','pack_size']));
         }
     }
