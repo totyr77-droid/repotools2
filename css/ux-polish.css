@@ -624,3 +624,9 @@ body[data-hand=left] .header-contenedor:has(#refreshAppCache) .logo{justify-cont
 .scan-desktop-surface .scan-method-picker form{position:static;inset:auto;min-height:0;height:auto;max-height:none;overflow:visible;margin:0}
 .scan-desktop-surface .scan-method-picker form>p:empty{display:none}
 }
+
+/* Pendientes: mismo eje de icono y texto que el resto de palets. */
+body[data-hand] #labelList .stock-pallet-card{padding-inline:12px;align-items:center}
+#labelList .stock-pallet-card>svg{display:block;width:20px;height:20px;margin:0;flex:0 0 20px;align-self:center}
+#labelList .stock-pallet-card-content{grid-template-columns:minmax(0,1fr)}
+@media(max-width:768px){body>.repo-mobile-nav{position:fixed;top:auto;bottom:0;left:0;right:0;height:calc(68px + env(safe-area-inset-bottom,0px));margin:0}}

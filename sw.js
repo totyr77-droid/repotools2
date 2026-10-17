@@ -50,3 +50,5 @@ self.addEventListener('message',event=>{
 // Refresh printable PDF logo proportions without changing app version.
 
 // Refresh saved-form tracking and short print link sharing without a version bump.
+
+// Refresh viewport-root mobile navigation placement without changing app version.
