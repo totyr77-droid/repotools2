@@ -5,6 +5,8 @@ function stock_icon(string $name): string {
         'search'=>'<circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/>',
         'eye'=>'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12"/><circle cx="12" cy="12" r="3"/>',
         'branch'=>'<path d="M3 10h18l-2-6H5zM4 10v11h16V10M9 21v-7h6v7M8 4v6m8-6v6"/>',
+        'filter'=>'<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
+        'tag'=>'<path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7" cy="7" r="1"/>',
         'qr'=>'<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h3v3h3v3h-6zM21 12v3M12 3v3M12 12h3M12 18v3"/>',
         'chart'=>'<path d="M4 3v18h17M8 16v-4M13 16V8M18 16V5"/>',
         'book'=>'<path d="M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 6v15"/>',
