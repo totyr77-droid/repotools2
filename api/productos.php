@@ -33,12 +33,18 @@ try {
         if (!$canEdit) product_response(403, ['error' => 'No tienes permiso para editar productos.']);
         $revision = filter_var($_POST['revision'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
         if ($revision === false) product_response(422, ['error' => 'Revisa la versión del producto.']);
-        $product = edit_catalog_product($db, $ean, $_POST, $revision, (int) $user['id']);
+        require_once __DIR__.'/../includes/report-storage.php';
+        $jpeg=prepare_report_photo($_FILES['photo_product']??[]);$photoKey=null;$saved=false;
+        try{
+            if($jpeg!==null){$id=bin2hex(random_bytes(16));$uuid=substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20);$photoKey='reports/'.$uuid.'/'.bin2hex(random_bytes(12)).'-product.jpg';report_object('PUT',$photoKey,$jpeg);}
+            $product = edit_catalog_product($db, $ean, $_POST, $revision, (int) $user['id'], null, $photoKey);$saved=true;
+        }finally{if(!$saved&&$photoKey!==null){try{report_object('DELETE',$photoKey);}catch(Throwable $ignored){error_log('Repotools: no se pudo limpiar una foto de edición incompleta.');}}}
     } else {
         $product = lookup_product($db, $ean);
         if ($product && ($_GET['image'] ?? '') === '1') $product = catalog_product_image($db, $product);
     }
-    product_response(200, ['product' => $product, 'can_edit' => $canEdit, 'csrf' => $canEdit ? $csrf : null]);
+    require_once __DIR__.'/../includes/report-storage.php';
+    product_response(200, ['product' => $product, 'can_edit' => $canEdit, 'photos_enabled'=>$canEdit&&report_storage_ready(), 'csrf' => $canEdit ? $csrf : null]);
 } catch (CatalogException $error) {
     product_response($error->status, ['error' => $error->getMessage()]);
 } catch (Throwable $error) {

@@ -19,7 +19,7 @@
           const response = await fetch(`api/productos.php?ean=${encodeURIComponent(ean)}${image ? '&image=1' : ''}`, { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' });
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || 'No pudimos cargar el producto.');
-          access.set(ean, { canEdit: result.can_edit === true, csrf: result.csrf, missing:!result.product, checkedAt:Date.now() });
+          access.set(ean, { canEdit: result.can_edit === true, photosEnabled:result.photos_enabled===true, csrf: result.csrf, missing:!result.product, checkedAt:Date.now() });
           if(result.product)window.RepoOfflineCatalog?.put(Number(window.repotoolsOfflineUser||0),ean,result.product).catch(()=>{});return result.product || null;
         } finally { clearTimeout(timeout); }
       })();
@@ -70,10 +70,11 @@
       return null;
     }
   }
-  async function save(ean, fields, revision) {
+  async function save(ean, fields, revision, photo) {
     const permission = access.get(ean);
     if (!permission?.canEdit) throw new Error('Solo administradores y moderadores pueden editar productos.');
-    const response = await fetch('api/productos.php', { method: 'POST', credentials: 'same-origin', body: new URLSearchParams({ ...fields, ean, revision, csrf: permission.csrf }) });
+    const body=new FormData();for(const [key,value]of Object.entries({...fields,ean,revision,csrf:permission.csrf}))body.set(key,value);if(photo)body.set('photo_product',photo,'product.jpg');
+    const response = await fetch('api/productos.php', { method: 'POST', credentials: 'same-origin', body });
     const result = await response.json();
     if (!response.ok) {
       if (response.status === 409) cache.delete(ean);
@@ -81,7 +82,7 @@
     }
     cache.set(ean, Promise.resolve(result.product));
     cache.delete(ean + ':image');
-    access.set(ean, { canEdit: result.can_edit === true, csrf: result.csrf });
+    access.set(ean, { canEdit: result.can_edit === true, photosEnabled:result.photos_enabled===true, csrf: result.csrf });
     window.dispatchEvent(new CustomEvent('repotools:product-updated', { detail: { ean, product: result.product } }));
     return result.product;
   }
