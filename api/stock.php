@@ -58,7 +58,7 @@ try {
             if (!$uid) throw new CatalogException('Inicia sesión para agregar productos.',401);
             $ean=$_GET['ean'];
             if (!is_string($ean)||!valid_product_ean($ean)) throw new CatalogException('Ingresa un EAN válido.',422);
-            $result=['references'=>stock_query($db,'SELECT kind,pack_size FROM stock_product_references WHERE ean=?',[$ean])->fetchAll()];
+            $result=['references'=>stock_query($db,'SELECT kind,pack_size FROM stock_product_references WHERE ean=?',[$ean])->fetchAll(),'reference_name'=>stock_saved_reference($db,$ean,$uid)];
         } else {
             if (!$uid) throw new CatalogException('Inicia sesión para ver tus palets.',401);
             $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$uid])->fetchColumn();

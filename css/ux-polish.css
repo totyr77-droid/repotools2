@@ -660,3 +660,7 @@ body[data-hand=left] #verb #copyCurrentEan{grid-column:1}body[data-hand=left] #v
 body[data-hand] .one-hand-sheet .stock-find .stock-toolbar:has(#stockFilters[open]){grid-template-columns:minmax(0,1fr)!important}
 body[data-hand] .one-hand-sheet .stock-find .stock-toolbar:has(#stockFilters[open]) .stock-search-label{grid-column:1!important;grid-row:1}
 body[data-hand] .one-hand-sheet .stock-find .stock-toolbar #stockFilters[open]{grid-column:1/-1!important;grid-row:2}
+
+/* La calculadora mide sus filas completas antes de ubicar el panel. */
+.stock-quantity-line>.stock-calculator,.stock-quantity-line>.stock-calculator[popover]{grid-template-rows:24px repeat(5,minmax(44px,max-content));align-content:start}
+.stock-quantity-line>.stock-calculator button{box-sizing:border-box;margin:0}

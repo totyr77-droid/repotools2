@@ -22,6 +22,12 @@ function stock_expire(PDO $db): void {
     $db->exec('UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id IN (SELECT id FROM pallets WHERE released=1)');
     stock_query($db, 'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE pallet_id IS NULL AND reserved_until<=?', [$now]);
 }
+function stock_saved_reference(PDO $db, string $ean, int $user): string {
+    $q=stock_query($db,"SELECT b.name FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.ean=? AND TRIM(b.name)<>'' AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC,b.id DESC LIMIT 1",[$ean,$user,$user]);
+    $name=$q->fetchColumn();if($name!==false)return trim($name);
+    $q=stock_query($db,"SELECT b.name FROM library_products b JOIN libraries l ON l.id=b.library_id WHERE b.ean=? AND l.user_id=? AND TRIM(b.name)<>'' ORDER BY b.id DESC LIMIT 1",[$ean,$user]);
+    $name=$q->fetchColumn();return $name===false?'':trim((string)$name);
+}
 function stock_label(PDO $db, string $code): array {
     if (!preg_match('/^[0-9]{8}$/D', $code)) throw new CatalogException('Ingresa los 8 números del palet.', 422);
     $label = stock_query($db, 'SELECT * FROM pallet_labels WHERE code=?', [$code])->fetch();
@@ -76,7 +82,7 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     if($public||$user===null){
         if(!isset($p['branch'])&&!empty($p['branch_id']))$p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch()?:null;
         $p=array_intersect_key($p,array_flip(['code','available','products','branch','owner_name','updated_at','updated_name']));
-        $p['products']=array_map(static fn($product)=>array_intersect_key($product,array_flip(['ean','name','display_name','reference_name','catalog_name','units','expires'])),$p['products']);
+        $p['products']=array_map(static fn($product)=>array_intersect_key($product,array_flip(['ean','name','display_name','reference_name','catalog_name','units','expires','kind','pack_size'])),$p['products']);
     }
     return $p;
 }
