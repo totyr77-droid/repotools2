@@ -48,3 +48,5 @@ self.addEventListener('message',event=>{
 // Refresh quantity calculator placement and offline spacing without changing app version.
 
 // Refresh printable PDF logo proportions without changing app version.
+
+// Refresh saved-form tracking and short print link sharing without a version bump.

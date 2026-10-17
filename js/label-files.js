@@ -6,8 +6,9 @@
     if(!codes.length||codes.length>100||codes.some(code=>!/^\d{8}$/.test(code)))throw Error('Seleccioná entre 1 y 100 etiquetas válidas.');
     const url=new URL('etiqueta.php',document.baseURI);url.searchParams.set('codigos',codes.join(','));
     if(['repotools.online','www.repotools.online'].includes(url.hostname)){url.hostname='repotools.online';url.protocol='https:';}
-    if(navigator.share){try{await navigator.share({title:'Etiquetas de palets · Repotools',url:url.href});return 'Enlace de etiquetas compartido.';}catch(error){if(error.name==='AbortError')throw error;}}
-    try{await navigator.clipboard.writeText(url.href);return 'Enlace de etiquetas copiado.';}catch{throw Error('No pudimos compartir el enlace. Abrí las etiquetas y copiá la dirección del navegador.');}
+    const link=window.RepoShareLinks?await RepoShareLinks.url('e',codes.join(','),window.repotoolsLabelCsrf||window.repotoolsStock?.csrf||'',url.href):url.href;
+    if(navigator.share){try{await navigator.share({title:'Etiquetas de palets · Repotools',url:link});return 'Enlace de etiquetas compartido.';}catch(error){if(error.name==='AbortError')throw error;}}
+    try{await navigator.clipboard.writeText(link);return 'Enlace de etiquetas copiado.';}catch{throw Error('No pudimos compartir el enlace. Abrí las etiquetas y copiá la dirección del navegador.');}
   };
   // Prebuilt single PDF preserves the native share gesture and includes every label.
   labels.shareFiles=async files=>{

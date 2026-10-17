@@ -270,6 +270,10 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX pallet_user_tags_name ON pallet_user_tags(user_id,name,pallet_id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(31)');
         }
+        if(!isset($applied[32])){
+            $db->exec("CREATE TABLE label_print_links (code TEXT PRIMARY KEY CHECK(length(code)=8), target TEXT NOT NULL UNIQUE)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(32)');
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) $db->rollBack();
