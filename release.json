@@ -1,6 +1,12 @@
 {
-  "version": 59,
+  "version": 60,
   "changes": [
+    {
+      "version": 60,
+      "label": "1.55",
+      "date": "2026-10-17",
+      "summary": "Acceso a Stock según mano hábil e ingreso para filtros con retorno al informe actualizado del palet."
+    },
     {
       "version": 59,
       "label": "1.54",
@@ -294,15 +300,9 @@
       "label": "1.06",
       "date": "2026-10-15",
       "summary": "Vencimientos al final de los accesos de Stock"
-    },
-    {
-      "version": 10,
-      "label": "1.05",
-      "date": "2026-10-15",
-      "summary": "Inicio con escaneo inferior y lista encima en modo de una mano"
     }
   ],
   "major": 1,
-  "minor": 54,
-  "label": "1.54"
+  "minor": 55,
+  "label": "1.55"
 }

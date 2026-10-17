@@ -7,7 +7,7 @@ require_once __DIR__.'/includes/referrals.php';
 require_once __DIR__.'/includes/email-verification.php';
 $referralsEnabled=referrals_enabled();
 $register = ($_GET['mode'] ?? '') === 'registro';
-$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion'], true) ? $_GET['next'] : '';
+$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion', 'palet'], true) ? $_GET['next'] : '';
 $error = $_SESSION['logout_error'] ?? '';
 unset($_SESSION['logout_error']);
 $invitation=$_SESSION['referral_invitation']??null;
@@ -29,6 +29,7 @@ function account_icon(string $name): string {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$paths[$name].'</svg>';
 }
 function account_destination(string $next): string {
+    if($next==='palet'){ $code=$_SESSION['pending_report_code']??'';unset($_SESSION['pending_report_code']);return is_string($code)&&preg_match('/^[0-9]{8}$/D',$code)?'palet.php?codigo='.rawurlencode($code):'index.php'; }
     if($next==='stock'&&is_string($_SESSION['pending_label_codes']??null)){ $codes=$_SESSION['pending_label_codes'];unset($_SESSION['pending_label_codes']);if(preg_match('/^[0-9]{8}(?:,[0-9]{8}){0,99}$/D',$codes))return 'etiqueta.php?codigos='.rawurlencode($codes); }
     $target=$next==='moderacion'?'reportes.php?queue=1':($next?$next.'.php':'index.php');
     if ($next==='stock' && preg_match('/^[0-9]{8}$/D',$_SESSION['pending_stock_code']??'')) {
