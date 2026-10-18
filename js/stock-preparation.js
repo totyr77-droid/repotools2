@@ -18,7 +18,7 @@
   async function prepare(data){
     latest=data;const version=++generation;controller?.abort();const activeController=controller=new AbortController(),signal=activeController.signal;
     const manifest=data.pallets||[],pending=[];let ready=0;
-    const save=async complete=>{if(left||version!==generation)return;const saved=await RepoOfflineView.save('stock',{pallets:manifest,warning_days:data.warning_days,offline_preparation:{total:manifest.length,ready,complete}});if(saved===false)throw Error('No pudimos guardar la copia local');};
+    const save=async complete=>{if(left||version!==generation)return;const saved=await RepoOfflineView.save('stock',{pallets:manifest,tags:data.tags||[],warning_days:data.warning_days,offline_preparation:{total:manifest.length,ready,complete}});if(saved===false)throw Error('No pudimos guardar la copia local');};
     try{
       for(const p of manifest){const local=await store.cached(p.code);if(left||version!==generation)return;if(local&&Number(local.pallet.id)===Number(p.id)&&Number(local.pallet.revision)===Number(p.revision)&&local.at>Date.now()-86400000)ready++;else pending.push(p);}
       // Revoked/deleted entries leave the read cache, never the operation queue.

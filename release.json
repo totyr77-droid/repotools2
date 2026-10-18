@@ -1,6 +1,12 @@
 {
-  "version": 80,
+  "version": 81,
   "changes": [
+    {
+      "version": 81,
+      "label": "1.76",
+      "date": "2026-10-18",
+      "summary": "Conserva búsqueda, filtros y borradores de Stock al pasar offline, con resultados locales y sin duplicar cargas."
+    },
     {
       "version": 80,
       "label": "1.75",
@@ -294,15 +300,9 @@
       "label": "1.27",
       "date": "2026-10-16",
       "summary": "QR directo a Stock, metadatos visibles y sucursales/compartir corregidos."
-    },
-    {
-      "version": 31,
-      "label": "1.26",
-      "date": "2026-10-16",
-      "summary": "Correo y verificación más claros, Biblioteca discreta y Stock compacto."
     }
   ],
   "major": 1,
-  "minor": 75,
-  "label": "1.75"
+  "minor": 76,
+  "label": "1.76"
 }
