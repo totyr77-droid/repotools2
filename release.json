@@ -1,6 +1,12 @@
 {
-  "version": 66,
+  "version": 67,
   "changes": [
+    {
+      "version": 67,
+      "label": "1.62",
+      "date": "2026-10-18",
+      "summary": "Demo de Biblioteca desplegable con ingreso, controles de mercadería compactos y búsqueda con cancelar integrado."
+    },
     {
       "version": 66,
       "label": "1.61",
@@ -294,15 +300,9 @@
       "label": "1.13",
       "date": "2026-10-15",
       "summary": "Compartir por sucursal más compacto, con edición de palets desplegable y formulario siempre accesible."
-    },
-    {
-      "version": 17,
-      "label": "1.12",
-      "date": "2026-10-15",
-      "summary": "Escáner QR más ágil, análisis adaptativo sin colas, zoom real y etiquetas operativas menos densas."
     }
   ],
   "major": 1,
-  "minor": 61,
-  "label": "1.61"
+  "minor": 62,
+  "label": "1.62"
 }
