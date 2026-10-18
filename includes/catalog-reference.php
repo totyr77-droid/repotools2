@@ -31,3 +31,20 @@ function catalog_reference_insert(PDO $db,int $user,array $permit,array $movemen
     $insert=stock_query($db,"INSERT INTO products(ean,name,source,updated_by) VALUES(?,?,'stock_reference',?) ON CONFLICT(ean) DO NOTHING",[$permit['ean'],$permit['name'],$user]);
     if(!$insert->rowCount())return false;stock_query($db,'DELETE FROM product_lookup_state WHERE ean=?',[$permit['ean']]);return true;
 }
+
+// Independent transaction after confirmed Stock: catalog failure cannot undo merchandise.
+function catalog_reference_sync(PDO $db,int $user,array $result): bool {
+    if($db->inTransaction()||($result['confirmation']['action']??'')!=='save_product'||empty($result['confirmation']['committed']))return false;
+    try {
+        $db->beginTransaction();
+        $pallet=stock_editable($db,(int)$result['id'],$user);
+        if(($pallet['code']??'')!==($result['code']??'')){$db->rollBack();return false;}
+        $row=stock_query($db,'SELECT ean,name FROM pallet_products WHERE id=? AND pallet_id=?',[(int)$result['movement']['product_id'],(int)$result['id']])->fetch();
+        if(!$row||$row['ean']!==($result['movement']['ean']??'')||!valid_product_ean($row['ean'])||mb_strlen(trim($row['name']??''))<2){$db->rollBack();return false;}
+        $saved=catalog_reference_insert($db,$user,['code'=>$result['code'],'ean'=>$row['ean'],'name'=>$row['name']],$result);
+        $db->commit();return $saved;
+    } catch(Throwable $error) {
+        if($db->inTransaction())$db->rollBack();
+        error_log('Repotools catalog reference sync: '.get_class($error));return false;
+    }
+}

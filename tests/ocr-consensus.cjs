@@ -4,3 +4,5 @@ c=context.create();c('17309735',1,0);c(null,2,500);assert.equal(c('17309735',3,6
 c=context.create();c('17309735',1,0);c('00001234',2,100);assert.equal(c('17309735',3,200),false);assert.equal(c('17309735',4,300),false);assert.equal(c('17309735',5,400),true,'Different number resets consensus');
 c=context.create();c('17309735',1,0);assert.equal(c('17309735',1,100),false);assert.equal(c('17309735',2,150),false);assert.equal(c('17309735',3,160),false);assert.equal(c('17309735',4,250),true,'Distinct frames and minimum spacing remain required');
 console.log('OK: OCR retains brief misses, expires after650ms, resets for another number and requires3 distinct spaced frames.');
+
+c=context.create();c('00001234',1,0);assert.equal(c.progress(0),1);c(null,2,100);assert.equal(c.progress(100),1);c('00001234',3,200);assert.equal(c.progress(200),2);c('00001234',4,300);assert.equal(c.progress(300),3);assert.equal(c.progress(951),0);

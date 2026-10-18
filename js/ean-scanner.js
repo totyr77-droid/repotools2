@@ -133,6 +133,7 @@
       last = now;
       return ++count >= 3;
     };
+    confirm.progress=(now=performance.now())=>count&&now-last<=650&&now-first<=1500?Math.min(count,3):0;
     Object.defineProperty(confirm,'startedAt',{get:()=>count?first:null});return confirm;
   }
 
@@ -162,7 +163,8 @@
   function ocrConsensus() {
     const valid=value=>/^\d{8}$/.test(value||''),confirm=confirmation(valid);
     // An unreadable frame is a missed detection, just as with EAN. Age is checked on the next valid read.
-    return (value,frame,now=performance.now())=>valid(value)?confirm(value,now,frame):false;
+    const read=(value,frame,now=performance.now())=>valid(value)?confirm(value,now,frame):false;
+    read.progress=confirm.progress;return read;
   }
   function ocrCandidate(data) {
     const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
@@ -265,7 +267,7 @@ function palletNumberRegion(image){
           const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y+=lineOffset-canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
           viewport?.track({x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},fullWidth,fullHeight);
         }else viewport?.reset();
-        if (candidate) { lockedRegion=region?{region,width:fullWidth,height:fullHeight,at:performance.now()}:null;lockedAngle=angle;nextDelay=80;status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
+        if (candidate) { lockedRegion=region?{region,width:fullWidth,height:fullHeight,at:performance.now()}:null;lockedAngle=angle;nextDelay=80;const confirmed=confirm(candidate.code, stamp);status(false,confirm.progress()); if (confirmed) accept(candidate.code, 'ocr'); }
         else {lockedRegion=null;lockedAngle=null;nextDelay=350;confirm(null, stamp);}
       } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
       finally { busy = false; if (disposed) { clearCanvases(); } else schedule(); }
@@ -645,7 +647,7 @@ function palletNumberRegion(image){
           }
           metric(current,'confirmed',{source,confirmationMs:source==='ocr'?null:isQR?0:Math.max(0,performance.now()-(current.confirm.startedAt??performance.now()))});
           current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
-          element.classList.add('ean-confirmed'); onStatus('Código confirmado.');
+          element.classList.add('ean-confirmed'); onStatus(source==='ocr'?'Número confirmado · 3/3':'Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
             Promise.resolve().then(()=>{metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR)rememberScanPhoto(code,element);metric(current,'action');return onCode(code);}).then(()=>metric(current,'action-complete')).catch(error=>{if(token===revision&&session===current){onError(error);}}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
@@ -684,7 +686,7 @@ function palletNumberRegion(image){
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, (unavailable,count) => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Número detectado · '+count+'/3'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 650); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {

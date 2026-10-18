@@ -17,3 +17,16 @@ $proof=catalog_reference_prepare($db,1,$input,1000);$permit=catalog_reference_ta
 try{catalog_reference_prepare($db,2,$input,1000);throw new RuntimeException('unauthorized accepted');}catch(CatalogException $e){ref_check($e->status===403,'ownership');}
 stock_query($db,"UPDATE product_lookup_state SET state='pending' WHERE ean=?",[$input['ean']]);try{catalog_reference_prepare($db,1,$input,1000);throw new RuntimeException('unverified API accepted');}catch(CatalogException $e){ref_check($e->status===409,'missing must be definitive');}
 echo "OK: authoritative missing lookup, timed one-use permit, user/payload/original-time checks, catalog+stock transaction, rollback, conflict no overwrite and no TOP/reward/edit events.\n";
+
+$db->beginTransaction();$result=stock_save_product($db,1,$input);$db->commit();
+$result['confirmation']=['action'=>'save_product','committed'=>true];
+$db->exec("CREATE TRIGGER fail_reference BEFORE INSERT ON products BEGIN SELECT RAISE(FAIL,'catalog unavailable'); END");
+ref_check(!catalog_reference_sync($db,1,$result),'catalog failure isolated');
+ref_check((int)stock_query($db,'SELECT units FROM pallet_products WHERE id=?',[$result['movement']['product_id']])->fetchColumn()===3,'stock survives catalog failure');
+$db->exec('DROP TRIGGER fail_reference');
+ref_check(catalog_reference_sync($db,1,$result),'offline reference retry');
+ref_check(catalog_product($db,$input['ean'])['name']===$input['name'],'offline reference name');
+ref_check(!catalog_reference_sync($db,1,$result),'replay never overwrites');
+ref_check(!catalog_reference_sync($db,2,$result),'foreign account denied');
+ref_check((int)stock_query($db,'SELECT units FROM pallet_products WHERE id=?',[$result['movement']['product_id']])->fetchColumn()===3,'retry never adds units');
+echo "OK: offline reference, independent failure, retry, no overwrite, authorization and unchanged stock.\n";
