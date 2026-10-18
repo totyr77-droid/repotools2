@@ -4,12 +4,12 @@
   if(!config&&document.body.classList.contains('offline-shell'))try{const snapshot=JSON.parse(localStorage.getItem('repotools-offline-view')||'null');if(Number(snapshot?.user)>0&&/^\d{1,3}\.\d{2}$/.test(snapshot.metricsVersion||'')&&Math.max(snapshot.stock?.at||0,snapshot.libraries?.at||0)>Date.now()-7*86400000)config={user:Number(snapshot.user),csrf:'',version:snapshot.metricsVersion,manager:snapshot.metricsManager===true};}catch{}
   if(!config?.user||!window.RepoEANScanner)return;
   const page=window.RepoNavigation?.page,key='repotools:scanner-metrics:'+config.user;
-  const sessions=new Map();let memory=[],timer,persistTimer,pendingRecords=[],inFlight=false,left=false;
+  const sessions=new Map(),deliveries=new Map();let memory=[],timer,persistTimer,pendingRecords=[],inFlight=false,left=false;
   const read=()=>{try{const value=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(value)?value.slice(-100):[];}catch{return memory;}};
   const save=rows=>{memory=rows.slice(-100);try{localStorage.setItem(key,JSON.stringify(memory));}catch{}};
   const browser=()=>{const ua=navigator.userAgent;return /Edg\//.test(ua)?'edge':/Firefox|FxiOS/.test(ua)?'firefox':/Chrome|CriOS/.test(ua)?'chrome':/Safari/.test(ua)?'safari':'other';};
   const device=()=>/iPad|Tablet/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1)?'tablet':/Mobile/.test(navigator.userAgent)?'mobile':'desktop';
-  const context=reader=>reader==='offlineReader'?'offline':reader==='contenedor'?'home':reader==='stockReader'?'stock':reader==='libraryReader'?'library':/user/i.test(reader)?'users':/relay/i.test(reader)?'relay':'other';
+  const context=reader=>reader==='offlineReader'?'offline':reader==='contenedor'?'home':reader==='stockReader'||/^viewReader/.test(reader)?'stock':reader==='libraryReader'?'library':/user/i.test(reader)?'users':/relay/i.test(reader)?'relay':'other';
   const ms=value=>Math.max(0,Math.round(value));
   function schedule(delay=1500){clearTimeout(timer);if(!left)timer=setTimeout(flush,delay);}
   function commit(){clearTimeout(persistTimer);if(pendingRecords.length)save([...read(),...pendingRecords.splice(0)]);}
@@ -40,17 +40,21 @@
     if(!event.sessionId)return;
     let state=sessions.get(event.sessionId);
     if(event.stage==='camera-request'){state={started:event.at,cycle:0};sessions.set(event.sessionId,state);}
+    if(event.stage==='action-complete'){
+      const delivery=deliveries.get(event.sessionId);deliveries.delete(event.sessionId);
+      if(delivery&&config.manager){const value={at:Date.now(),version:config.version,mode:delivery.mode,scan_ms:delivery.scan_ms,action_ms:ms(event.at-delivery.at)};try{localStorage.setItem('repotools:scanner-last-action:'+config.user,JSON.stringify(value));}catch{} }
+    }
     if(!state)return;
     if((event.stage==='first-frame'||event.stage==='camera-open')&&state.ready==null){state.open=event.elapsed;state.ready=event.at;if(document.hidden)state.hiddenAt=event.at;}
     if(event.stage==='camera-capabilities'){state.width=Number.isInteger(event.width)?event.width:0;state.height=Number.isInteger(event.height)?event.height:0;}
     if(event.stage==='ready'){state.cycle=event.cycle;state.ready=event.at;state.firstDecoded=null;state.recorded=false;state.paused=0;state.hiddenRanges=[];state.hiddenAt=document.hidden?event.at:null;}
     if(event.stage==='decoded'&&state.firstDecoded==null)state.firstDecoded=event.at;
-    if(event.stage==='confirmed')record(state,event,'confirmed');
+    if(event.stage==='confirmed'){record(state,event,'confirmed');if(config.manager){for(const [id,d]of deliveries)if(event.at-d.at>60000)deliveries.delete(id);if(deliveries.size>100)deliveries.clear();deliveries.set(event.sessionId,{at:event.at,mode:event.mode,scan_ms:ms(event.at-(state.ready??state.started)-(state.paused||0))});}}
     if(event.stage==='closed'){if(!state.recorded)record(state,event,event.outcome==='error'?'error':'cancelled');sessions.delete(event.sessionId);}
   });
   const visibility=()=>{const now=performance.now();for(const state of sessions.values()){if(state.recorded||state.ready==null)continue;if(document.hidden&&state.hiddenAt==null)state.hiddenAt=now;else if(!document.hidden&&state.hiddenAt!=null){state.paused=(state.paused||0)+Math.max(0,now-state.hiddenAt);(state.hiddenRanges||=[]).push([state.hiddenAt,now]);state.hiddenAt=null;}}};document.addEventListener('visibilitychange',visibility);
   const online=()=>flush(),hide=()=>flush();
   window.addEventListener('online',online);window.addEventListener('pagehide',hide);
-  page?.onLeave(()=>{left=true;clearTimeout(timer);stop();flush();window.removeEventListener('online',online);window.removeEventListener('pagehide',hide);document.removeEventListener('visibilitychange',visibility);});
+  page?.onLeave(()=>{left=true;clearTimeout(timer);deliveries.clear();stop();flush();window.removeEventListener('online',online);window.removeEventListener('pagehide',hide);document.removeEventListener('visibilitychange',visibility);});
   schedule(2000);
 })();

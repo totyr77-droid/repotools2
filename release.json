@@ -1,6 +1,12 @@
 {
-  "version": 63,
+  "version": 64,
   "changes": [
+    {
+      "version": 64,
+      "label": "1.59",
+      "date": "2026-10-18",
+      "summary": "Rescata QR en perspectiva, reduce esperas OCR y mejora métricas de Sistema con mediana, P90 y acción local."
+    },
     {
       "version": 63,
       "label": "1.58",
@@ -294,15 +300,9 @@
       "label": "1.10",
       "date": "2026-10-15",
       "summary": "Lista 1: cámara vertical, etiquetas PDF, calculadora compacta y mejoras de PC"
-    },
-    {
-      "version": 14,
-      "label": "1.09",
-      "date": "2026-10-15",
-      "summary": "Offline completo, sincronización protegida y enlace PC–celular más ágil"
     }
   ],
   "major": 1,
-  "minor": 58,
-  "label": "1.58"
+  "minor": 59,
+  "label": "1.59"
 }

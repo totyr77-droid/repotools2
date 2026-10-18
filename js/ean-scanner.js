@@ -182,6 +182,14 @@
     if (!context) return { dispose() {}, resume() {}, reset() {} };
 
     const source=document.createElement('canvas'),sourceContext=source.getContext('2d'),probe=document.createElement('canvas'),probeContext=probe.getContext('2d',{willReadFrequently:true});let angleIndex=0,lockedAngle=null,nextDelay=550;
+    function normalizeDimFrame(){
+      if(!probeContext||!sourceContext)return;
+      const scale=Math.min(1,160/Math.max(source.width,source.height));probe.width=Math.max(1,Math.round(source.width*scale));probe.height=Math.max(1,Math.round(source.height*scale));probeContext.drawImage(source,0,0,probe.width,probe.height);
+      const values=probeContext.getImageData(0,0,probe.width,probe.height).data,hist=new Uint32Array(256);for(let i=0;i<values.length;i+=4)hist[Math.round((values[i]+values[i+1]+values[i+2])/3)]++;
+      let count=0,white=255;for(let i=0;i<256;i++){count+=hist[i];if(count>=probe.width*probe.height*.95){white=i;break;}}
+      if(white<60||white>=180)return;
+      const gain=Math.min(2.8,255/white),image=sourceContext.getImageData(0,0,source.width,source.height),pixels=image.data;for(let i=0;i<pixels.length;i+=4){pixels[i]*=gain;pixels[i+1]*=gain;pixels[i+2]*=gain;}sourceContext.putImageData(image,0,0);
+    }
     // Ink moments estimate the number-line angle; uncertain images keep the sweep fallback.
     function orientation(){
       if(!probeContext)return 0;
@@ -189,13 +197,15 @@
       probe.width=Math.max(1,Math.round(source.width*scale));probe.height=Math.max(1,Math.round(source.height*scale));
       probeContext.drawImage(source,0,0,probe.width,probe.height);
       const data=probeContext.getImageData(0,0,probe.width,probe.height).data;
+      const levels=new Uint32Array(256);for(let i=0;i<data.length;i+=4)levels[Math.round((data[i]+data[i+1]+data[i+2])/3)]++;
+      let cumulative=0,low=0,high=255;for(let i=0;i<256;i++){cumulative+=levels[i];if(cumulative>=probe.width*probe.height*.1){low=i;break;}}cumulative=0;for(let i=0;i<256;i++){cumulative+=levels[i];if(cumulative>=probe.width*probe.height*.9){high=i;break;}}const inkLimit=Math.max(5,Math.min(100,low-(high-low)*.6));
       let n=0,x=0,y=0,xx=0,yy=0,xy=0;
       for(let j=0;j<probe.height;j++)for(let i=0;i<probe.width;i++){
         const k=(j*probe.width+i)*4;
-        if((data[k]+data[k+1]+data[k+2])/3>100)continue;
+        if((data[k]+data[k+1]+data[k+2])/3>inkLimit)continue;
         n++;x+=i;y+=j;xx+=i*i;yy+=j*j;xy+=i*j;
       }
-      if(n<20)return 0;
+      if(n<20||n>probe.width*probe.height*.45)return 0;
       xx-=x*x/n;yy-=y*y/n;xy-=x*y/n;
       return Math.hypot(xx-yy,2*xy)/(xx+yy)>.55?-Math.atan2(2*xy,xx-yy)*90/Math.PI:0;
     }
@@ -218,6 +228,7 @@
         const frame = visibleFrame(video), scale = Math.min(1, 1280 / frame.width,1920/Math.max(frame.width,frame.height));
         const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
         source.width=Math.round(frame.width*scale);source.height=Math.round(frame.height*scale);sourceContext.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,source.width,source.height);
+        normalizeDimFrame();
         const offsets=[0,180,90,-90,30,-30,60,-60],angle=lockedAngle??orientation()+offsets[angleIndex++%offsets.length],radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
         canvas.width=Math.ceil(Math.abs(source.width*cos)+Math.abs(source.height*sin));canvas.height=Math.ceil(Math.abs(source.width*sin)+Math.abs(source.height*cos));context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.save();context.translate(canvas.width/2,canvas.height/2);context.rotate(radians);context.drawImage(source,-source.width/2,-source.height/2);context.restore();
         const analysisStarted=performance.now();
@@ -228,13 +239,14 @@
           const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y-=canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
           viewport?.track({x0:Math.max(0,Math.min(...points.map(p=>p.x))),y0:Math.max(0,Math.min(...points.map(p=>p.y))),x1:Math.min(source.width,Math.max(...points.map(p=>p.x))),y1:Math.min(source.height,Math.max(...points.map(p=>p.y)))},source.width,source.height);
         }else viewport?.reset();
-        if (candidate) { lockedAngle=angle;nextDelay=180;status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
+        if (candidate) { lockedAngle=angle;nextDelay=80;status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
         else {lockedAngle=null;nextDelay=350;confirm(null, stamp);}
       } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
       finally { busy = false; if (disposed) { clearCanvases(); } else schedule(); }
     }
     schedule();
     return {
+      hasCandidate(){return !disposed&&lockedAngle!==null;},
       reset() { confirm = ocrConsensus();lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
       resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
       dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { clearCanvases(); try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
@@ -404,6 +416,44 @@
         if (Math.abs(angle - axis) < 7) angle = axis;
         return { angle, crop: .7, centerX: xMass / mass / probe.width, centerY: yMass / mass / probe.height };
       }
+      // Optional rescue for a bright label seen as a trapezoid. Native decoding stays first.
+      let rectMask=null,rectQueue=null;
+      function rectifyLabel(video,frame){
+        if(!probeContext)return false;
+        const ratio=Math.min(1,320/Math.max(frame.width,frame.height));probe.width=Math.round(frame.width*ratio);probe.height=Math.round(frame.height*ratio);
+        probeContext.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,probe.width,probe.height);
+        const image=probeContext.getImageData(0,0,probe.width,probe.height),pixels=image.data,w=probe.width,h=probe.height,mask=rectMask?.length===w*h?rectMask:(rectMask=new Uint8Array(w*h)),queue=rectQueue?.length===w*h?rectQueue:(rectQueue=new Int32Array(w*h));let best=null;
+        const highlights=new Uint32Array(256);for(let i=0;i<pixels.length;i+=4)highlights[Math.min(pixels[i],pixels[i+1],pixels[i+2])]++;
+        let accumulated=0,bright=255;for(let i=0;i<256;i++){accumulated+=highlights[i];if(accumulated>=mask.length*.995){bright=i;break;}}const paperLimit=Math.max(70,Math.min(225,bright-12));
+        for(let i=0;i<mask.length;i++){const k=i*4;mask[i]=Math.min(pixels[k],pixels[k+1],pixels[k+2])>paperLimit?1:0;}
+        for(let i=0;i<mask.length;i++){
+          if(!mask[i])continue;let head=0,tail=1;queue[0]=i;mask[i]=0;let minSum=Infinity,maxSum=-Infinity,minDiff=Infinity,maxDiff=-Infinity,quad=[];
+          while(head<tail){const index=queue[head++],x=index%w,y=(index/w)|0,sum=x+y,diff=x-y;
+            if(sum<minSum){minSum=sum;quad[0]={x,y};}if(diff>maxDiff){maxDiff=diff;quad[1]={x,y};}if(sum>maxSum){maxSum=sum;quad[2]={x,y};}if(diff<minDiff){minDiff=diff;quad[3]={x,y};}
+            if(x&&mask[index-1]){mask[index-1]=0;queue[tail++]=index-1;}
+            if(x+1<w&&mask[index+1]){mask[index+1]=0;queue[tail++]=index+1;}
+            if(y&&mask[index-w]){mask[index-w]=0;queue[tail++]=index-w;}
+            if(y+1<h&&mask[index+w]){mask[index+w]=0;queue[tail++]=index+w;}
+          }
+          if(tail<200||tail>mask.length*.75||best&&tail<=best.area)continue;
+          const edges=quad.map((q,j)=>Math.hypot(q.x-quad[(j+1)%4].x,q.y-quad[(j+1)%4].y));
+          if(Math.min(...edges)<18||Math.max(...edges)>Math.min(...edges)*5)continue;
+          best={area:tail,quad};
+        }
+        if(!best)return false;
+        const [a,b,c,d]=best.quad,dx1=b.x-c.x,dx2=d.x-c.x,dx3=a.x-b.x+c.x-d.x,dy1=b.y-c.y,dy2=d.y-c.y,dy3=a.y-b.y+c.y-d.y,det=dx1*dy2-dx2*dy1;
+        if(Math.abs(det)<1)return false;
+        const g=(dx3*dy2-dx2*dy3)/det,k=(dx1*dy3-dx3*dy1)/det,A=b.x-a.x+g*b.x,B=d.x-a.x+k*d.x,D=b.y-a.y+g*b.y,E=d.y-a.y+k*d.y;
+        const scale=Math.min(1,960/Math.max(frame.width,frame.height)),sw=Math.round(frame.width*scale),sh=Math.round(frame.height*scale);
+        canvas.width=sw;canvas.height=sh;context.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,sw,sh);
+        const src=context.getImageData(0,0,sw,sh),size=Math.max(160,Math.min(lowPower?480:640,Math.round(Math.max(...best.quad.map((q,j)=>Math.hypot(q.x-best.quad[(j+1)%4].x,q.y-best.quad[(j+1)%4].y)))/ratio*scale))),out=context.createImageData(size,size);
+        for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+          const u=x/(size-1),v=y/(size-1),den=g*u+k*v+1,sx=Math.round((A*u+B*v+a.x)/den/w*sw),sy=Math.round((D*u+E*v+a.y)/den/h*sh),dest=(y*size+x)*4;
+          if(!Number.isFinite(sx+sy)||sx<0||sy<0||sx>=sw||sy>=sh){out.data[dest]=out.data[dest+1]=out.data[dest+2]=255;}else{const from=(sy*sw+sx)*4;out.data[dest]=src.data[from];out.data[dest+1]=src.data[from+1];out.data[dest+2]=src.data[from+2];}out.data[dest+3]=255;
+        }
+        canvas.width=canvas.height=size;context.putImageData(out,0,0);return true;
+      }
+      let lastRectify=-Infinity;
       let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false, lastFrame=null,lastQuagga=-Infinity,attempts=0;
       const lowPower=Number(window.navigator?.hardwareConcurrency||8)<=4;
       if(typeof current.reader.pause==='function'){try{current.reader.pause(false);if(current.reader.scannerPausedUiElement)current.reader.scannerPausedUiElement.style.display='none';current.exclusive=true;}catch{}}
@@ -419,7 +469,7 @@
       }
       if(current.isQR)detailTimer=setTimeout(offerDetail,1800);
       serialDecoder(current);
-      const dispose = () => { if (disposed) return; disposed = true;clearTimeout(detailTimer);detailButton?.remove(); canvas.width = canvas.height = probe.width = probe.height = 0; };
+      const dispose = () => { if (disposed) return; disposed = true;rectMask=rectQueue=null;clearTimeout(detailTimer);detailButton?.remove(); canvas.width = canvas.height = probe.width = probe.height = 0; };
       current.disposeBackground = () => {clearTimeout(detailTimer);detailButton?.remove();clearTimeout(current.backgroundTimer); if (!running) dispose(); };
       async function analyze() {
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
@@ -431,6 +481,10 @@
           running = true;lastFrame=video.currentTime;
           try {
             const frame = visibleFrame(video);
+            if(current.isQR&&!current.ocr?.hasCandidate?.()&&started-(current.cameraReadyAt??current.requestedAt)>900&&started-lastRectify>1100){
+              lastRectify=started;
+              if(rectifyLabel(video,frame)){metric(current,'perspective-attempt',{width:canvas.width,height:canvas.height});const result=await decoder.decodeRobustlyAsync(canvas);if(current.validate(result.text))accept(result.text,'background',lastFrame);return;}
+            }
             manualRequest=Boolean(current.requestDetail);const detailed=current.requestDetail||(++attempts%(lowPower&&current.isQR?3:4)===(lowPower&&current.isQR?2:0)&&started-(current.cameraReadyAt??current.requestedAt)>(lowPower?350:500));current.requestDetail=false;
             const adaptive = current.isQR ? { angle: 0, crop: 1, detailed } : lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video, frame) : null);
             if (!current.isQR && window.Quagga?.decodeSingle && !adaptive && started-lastQuagga>1200) {
@@ -599,7 +653,7 @@
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>1500 && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?1500:1000) && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {

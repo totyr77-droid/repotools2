@@ -7,7 +7,18 @@
   const node=(tag,text,parent,className)=>{const n=doc.createElement(tag);if(text!=null)n.textContent=text;if(className)n.className=className;parent.append(n);return n;};
   const contexts={home:'Inicio',stock:'Stock',library:'Biblioteca',users:'Usuarios',relay:'Celular conectado',offline:'Sin conexión',other:'Otro'},devices={mobile:'Celular',tablet:'Tablet',desktop:'PC'},browsers={safari:'Safari',chrome:'Chrome',edge:'Edge',firefox:'Firefox',other:'Otro'};
   const source={camera:'Cámara',background:'Análisis de imagen',ocr:'OCR',none:'Sin lectura'},outcome={confirmed:'Confirmado',cancelled:'Cerrado sin lectura',error:'Error de cámara'};
-  async function load(){
+  function lastAction(){
+    const target=doc.getElementById('systemDelivery');if(!target)return;
+    try{
+      const key='repotools:scanner-last-action:'+window.repotoolsScannerMetrics?.user,value=JSON.parse(localStorage.getItem(key)||'null'),age=Date.now()-value?.at;
+      target.hidden=!(value&&['qr','ean'].includes(value.mode)&&Number.isFinite(value.scan_ms)&&Number.isFinite(value.action_ms)&&age>=0&&age<7*86400000);
+      if(target.hidden){if(value)localStorage.removeItem(key);return;}
+      target.textContent='Última acción en este dispositivo · '+value.mode.toUpperCase()+': lectura '+seconds(value.scan_ms)+' · confirmación a acción completada '+seconds(value.action_ms)+'.';
+      target.title=new Date(value.at).toLocaleString('es-AR')+(value.version?' · v'+value.version:'');
+    }catch{target.hidden=true;}
+  }
+  lastAction();
+  async function load(){lastAction();
     controller?.abort();controller=new AbortController();const current=++revision;
     status.textContent='Consultando rendimiento…';doc.getElementById('refreshSystem').disabled=true;
     try{
@@ -21,7 +32,7 @@
         status.textContent='';
         const totals=node('p',null,summary);node('strong',(stats.confirmed||0)+' lecturas confirmadas',totals);node('span',' · '+(stats.cancelled||0)+' cerrados sin lectura · '+(stats.errors||0)+' errores de cámara',totals);
         node('p','Apertura promedio: '+seconds(stats.avg_open_ms)+' · Confirmación desde primera detección: '+seconds(stats.avg_confirm_ms),summary,'system-hint');
-        for(const group of data.groups){const row=node('div',null,summary,'system-group');node('strong',group.mode.toUpperCase()+' · v'+group.app_version,row);const detail=node('span',null,row);node('strong',seconds(group.avg_scan_ms),detail);node('small',' promedio · '+(group.confirmed||0)+' lecturas',detail);}
+        for(const group of data.groups){const row=node('div',null,summary,'system-group');node('strong',group.mode.toUpperCase()+' · v'+group.app_version,row);const detail=node('span',null,row),center=node('span',null,detail);node('strong',seconds(group.median_scan_ms),center);node('small',' mediana · '+(group.confirmed||0)+' lecturas',center);node('small','P90 '+seconds(group.p90_scan_ms)+' · promedio '+seconds(group.avg_scan_ms),detail).title='P90: al menos 9 de cada 10 lecturas tardaron ese tiempo o menos.';}
       }
       for(const item of data.items){
         const row=node('article',null,records,'system-record'),heading=node('div',null,row,'system-record-heading');
