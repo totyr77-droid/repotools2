@@ -160,14 +160,9 @@
     } catch { return null; }
   }
   function ocrConsensus() {
-    let code = '', count = 0, lastFrame = null, lastTime = 0;
-    return (value, frame, now = performance.now()) => {
-      if (!/^\d{8}$/.test(value || '')) { code = ''; count = 0; return false; }
-      if (frame === lastFrame) return false;
-      lastFrame = frame;
-      if (value !== code || now - lastTime > 12000) { code = value; count = 0; }
-      lastTime = now; return ++count === 3;
-    };
+    const valid=value=>/^\d{8}$/.test(value||''),confirm=confirmation(valid);
+    // An unreadable frame is a missed detection, just as with EAN. Age is checked on the next valid read.
+    return (value,frame,now=performance.now())=>valid(value)?confirm(value,now,frame):false;
   }
   function ocrCandidate(data) {
     const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));

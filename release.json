@@ -1,6 +1,12 @@
 {
-  "version": 78,
+  "version": 79,
   "changes": [
+    {
+      "version": 79,
+      "label": "1.74",
+      "date": "2026-10-18",
+      "summary": "El OCR conserva coincidencias durante pérdidas breves de lectura, con los mismos límites temporales de confirmación del EAN."
+    },
     {
       "version": 78,
       "label": "1.73",
@@ -294,15 +300,9 @@
       "label": "1.25",
       "date": "2026-10-15",
       "summary": "Registros con título de acción y detalle al tocar la tarjeta."
-    },
-    {
-      "version": 29,
-      "label": "1.24",
-      "date": "2026-10-15",
-      "summary": "Botón de calculadora unido y alineado al campo de cantidad."
     }
   ],
   "major": 1,
-  "minor": 73,
-  "label": "1.73"
+  "minor": 74,
+  "label": "1.74"
 }
