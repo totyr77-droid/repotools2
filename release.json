@@ -1,6 +1,12 @@
 {
-  "version": 68,
+  "version": 69,
   "changes": [
+    {
+      "version": 69,
+      "label": "1.64",
+      "date": "2026-10-18",
+      "summary": "Stock demo abre un detalle de palet simplificado, con búsqueda y acciones similares a la cuenta real."
+    },
     {
       "version": 68,
       "label": "1.63",
@@ -294,15 +300,9 @@
       "label": "1.15",
       "date": "2026-10-15",
       "summary": "Biblioteca recupera su barra compacta de una mano; Stock conserva su distribución."
-    },
-    {
-      "version": 19,
-      "label": "1.14",
-      "date": "2026-10-15",
-      "summary": "Stock recupera la distribución previa de acciones en modo de una mano."
     }
   ],
   "major": 1,
-  "minor": 63,
-  "label": "1.63"
+  "minor": 64,
+  "label": "1.64"
 }
