@@ -1,6 +1,12 @@
 {
-  "version": 60,
+  "version": 61,
   "changes": [
+    {
+      "version": 61,
+      "label": "1.56",
+      "date": "2026-10-18",
+      "summary": "Corrige buscadores e iconos de consulta, centra carga e ingreso a filtros desde enlaces de Stock sin controles vacíos."
+    },
     {
       "version": 60,
       "label": "1.55",
@@ -294,15 +300,9 @@
       "label": "1.07",
       "date": "2026-10-15",
       "summary": "Integración de beta: sincronización segura y mejoras de navegación"
-    },
-    {
-      "version": 11,
-      "label": "1.06",
-      "date": "2026-10-15",
-      "summary": "Vencimientos al final de los accesos de Stock"
     }
   ],
   "major": 1,
-  "minor": 55,
-  "label": "1.55"
+  "minor": 56,
+  "label": "1.56"
 }
