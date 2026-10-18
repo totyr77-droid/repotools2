@@ -65,3 +65,17 @@
 .demo-collection .demo-product{border:0;border-radius:0;border-top:1px solid #edf0f5;margin:0;padding:12px 0}
 .demo-collection .demo-product button{color:#b52a3b;background:#fff0f2}
 @'@ | Out-Null
+/* Palets de demo: apertura nativa estable, también desde sucursal y contador. */
+.demo-palets-title{display:flex;align-items:center;gap:7px;margin:14px 0 8px;font-size:1.15rem}
+.demo-pallets{align-items:start}
+.demo-pallet-group{display:block;box-sizing:border-box}
+.demo-pallet-group>summary{display:grid;gap:7px;min-height:44px;list-style:none;cursor:pointer}
+.demo-pallet-group>summary::-webkit-details-marker{display:none}
+.demo-pallet-group>summary>span{display:flex;align-items:center;gap:7px;font-size:.875rem}
+.demo-pallet-group>summary .demo-pallet-title{font-size:1rem}
+.demo-pallet-group[open] .demo-pallet-title>svg:last-child{rotate:0deg}
+.demo-pallet-group .demo-product{border:0;border-top:1px solid #edf0f5;border-radius:0;padding:12px 0;margin:0;flex-wrap:nowrap}
+.demo-pallet-group .demo-product .demo-expiry{display:inline-block;margin-top:6px}
+.demo-pallet-group .demo-product button{background:#eeebf7;color:#27197f}
+.guest-demo[data-demo-section=stock]>.demo-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.guest-demo[data-demo-section=stock]>.demo-tools>button{min-width:0;width:100%;padding:7px 5px;font-size:.8rem;line-height:1.2}
