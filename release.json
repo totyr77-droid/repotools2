@@ -1,6 +1,12 @@
 {
-  "version": 64,
+  "version": 65,
   "changes": [
+    {
+      "version": 65,
+      "label": "1.60",
+      "date": "2026-10-18",
+      "summary": "Permite buscar mercadería en Stock por la descripción del palet, combinada con sucursal y etiqueta."
+    },
     {
       "version": 64,
       "label": "1.59",
@@ -294,15 +300,9 @@
       "label": "1.11",
       "date": "2026-10-15",
       "summary": "Interfaz compacta, teclado móvil, palets con scroll interno, eliminación múltiple y enlaces cortos compatibles."
-    },
-    {
-      "version": 15,
-      "label": "1.10",
-      "date": "2026-10-15",
-      "summary": "Lista 1: cámara vertical, etiquetas PDF, calculadora compacta y mejoras de PC"
     }
   ],
   "major": 1,
-  "minor": 59,
-  "label": "1.59"
+  "minor": 60,
+  "label": "1.60"
 }
