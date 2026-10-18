@@ -1,6 +1,12 @@
 {
-  "version": 62,
+  "version": 63,
   "changes": [
+    {
+      "version": 63,
+      "label": "1.58",
+      "date": "2026-10-18",
+      "summary": "Entrega lecturas sin espera artificial y endereza números de palet inclinados, verticales o invertidos conservando confirmaciones."
+    },
     {
       "version": 62,
       "label": "1.57",
@@ -294,15 +300,9 @@
       "label": "1.09",
       "date": "2026-10-15",
       "summary": "Offline completo, sincronización protegida y enlace PC–celular más ágil"
-    },
-    {
-      "version": 13,
-      "label": "1.08",
-      "date": "2026-10-15",
-      "summary": "Lista 1 completa: Ajustes, Stock, tablets, etiquetas y escáner estable"
     }
   ],
   "major": 1,
-  "minor": 57,
-  "label": "1.57"
+  "minor": 58,
+  "label": "1.58"
 }

@@ -171,17 +171,38 @@
   function ocrCandidate(data) {
     const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
     const rows = lines.length ? lines : [{ text: data.text, confidence: data.confidence }];
+    const numbers=rows.filter(r=>/^\s*(?:\d\s*){8}$/.test(r.text||'')).map(r=>r.text.replace(/\s/g,''));
+    if(new Set(numbers).size>1)return null;
     const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
     return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
   }
-  function palletOCR(element, active, accept, status, viewport, canAnalyze = () => true) {
+  function palletOCR(element, active, accept, status, viewport, canAnalyze = () => true,onAnalysis=()=>{}) {
     let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus();
     const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
     if (!context) return { dispose() {}, resume() {}, reset() {} };
 
-    function schedule() { if (!disposed) timer = setTimeout(read, 550); }
+    const source=document.createElement('canvas'),sourceContext=source.getContext('2d'),probe=document.createElement('canvas'),probeContext=probe.getContext('2d',{willReadFrequently:true});let angleIndex=0,lockedAngle=null,nextDelay=550;
+    // Ink moments estimate the number-line angle; uncertain images keep the sweep fallback.
+    function orientation(){
+      if(!probeContext)return 0;
+      const scale=Math.min(1,320/Math.max(source.width,source.height));
+      probe.width=Math.max(1,Math.round(source.width*scale));probe.height=Math.max(1,Math.round(source.height*scale));
+      probeContext.drawImage(source,0,0,probe.width,probe.height);
+      const data=probeContext.getImageData(0,0,probe.width,probe.height).data;
+      let n=0,x=0,y=0,xx=0,yy=0,xy=0;
+      for(let j=0;j<probe.height;j++)for(let i=0;i<probe.width;i++){
+        const k=(j*probe.width+i)*4;
+        if((data[k]+data[k+1]+data[k+2])/3>100)continue;
+        n++;x+=i;y+=j;xx+=i*i;yy+=j*j;xy+=i*j;
+      }
+      if(n<20)return 0;
+      xx-=x*x/n;yy-=y*y/n;xy-=x*y/n;
+      return Math.hypot(xx-yy,2*xy)/(xx+yy)>.55?-Math.atan2(2*xy,xx-yy)*90/Math.PI:0;
+    }
+    function clearCanvases(){for(const surface of [canvas,source,probe])surface.width=surface.height=0;}
+    function schedule(delay=nextDelay) { if (!disposed) timer = setTimeout(read, delay); }
     async function read() {
-      if (disposed || busy) return; if (document.hidden || !active() || !canAnalyze()) { schedule(); return; }
+      if (disposed || busy) return; if (document.hidden || !active() || !canAnalyze()) { schedule(550); return; }
       const video = element.querySelector('video');
       if (!video?.videoWidth || video.readyState < 2 || video.currentTime === lastFrame) { schedule(); return; }
       busy = true;
@@ -194,24 +215,29 @@
           await worker.setParameters({ tessedit_char_whitelist: '0123456789', tessedit_pageseg_mode: '11' });
         }
         if (!active() || disposed) return;
-        const frame = visibleFrame(video), scale = Math.min(1, 1280 / frame.width);
+        const frame = visibleFrame(video), scale = Math.min(1, 1280 / frame.width,1920/Math.max(frame.width,frame.height));
         const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
-        canvas.width = Math.round(frame.width * scale); canvas.height = Math.round(frame.height * scale);
-        context.drawImage(video, frame.x, frame.y, frame.width, frame.height, 0, 0, canvas.width, canvas.height);
-        const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
+        source.width=Math.round(frame.width*scale);source.height=Math.round(frame.height*scale);sourceContext.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,source.width,source.height);
+        const offsets=[0,180,90,-90,30,-30,60,-60],angle=lockedAngle??orientation()+offsets[angleIndex++%offsets.length],radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
+        canvas.width=Math.ceil(Math.abs(source.width*cos)+Math.abs(source.height*sin));canvas.height=Math.ceil(Math.abs(source.width*sin)+Math.abs(source.height*cos));context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.save();context.translate(canvas.width/2,canvas.height/2);context.rotate(radians);context.drawImage(source,-source.width/2,-source.height/2);context.restore();
+        const analysisStarted=performance.now();
+        const result = await worker.recognize(canvas, {rotateAuto:false}, { text: true, blocks: true });
         if (disposed || !active()) return;
-        const candidate = ocrCandidate(result.data);
-        viewport?.track(candidate?.box, canvas.width, canvas.height);
-        if (candidate) { status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
-        else confirm(null, stamp);
+        const candidate = ocrCandidate(result.data);onAnalysis({angle,matched:Boolean(candidate),costMs:performance.now()-analysisStarted});
+        if(candidate?.box){
+          const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y-=canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
+          viewport?.track({x0:Math.max(0,Math.min(...points.map(p=>p.x))),y0:Math.max(0,Math.min(...points.map(p=>p.y))),x1:Math.min(source.width,Math.max(...points.map(p=>p.x))),y1:Math.min(source.height,Math.max(...points.map(p=>p.y)))},source.width,source.height);
+        }else viewport?.reset();
+        if (candidate) { lockedAngle=angle;nextDelay=180;status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
+        else {lockedAngle=null;nextDelay=350;confirm(null, stamp);}
       } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
-      finally { busy = false; if (disposed) { canvas.width = canvas.height = 0; } else schedule(); }
+      finally { busy = false; if (disposed) { clearCanvases(); } else schedule(); }
     }
     schedule();
     return {
-      reset() { confirm = ocrConsensus(); viewport?.reset(); },
+      reset() { confirm = ocrConsensus();lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
       resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
-      dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { canvas.width = canvas.height = 0; try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
+      dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { clearCanvases(); try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
     };
   }
 
@@ -546,7 +572,7 @@
           }
           enqueue(async () => {
             if(token!==revision)return;
-            metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR)rememberScanPhoto(code,element); await new Promise(resolve => setTimeout(resolve, 180)); await release(current);
+            metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR)rememberScanPhoto(code,element); await release(current);
             if (token === revision) Promise.resolve().then(() => { if (token === revision) {metric(current,'action');return onCode(code);} }).then(()=>{if(current.actionStarted)metric(current,'action-complete');}).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };
@@ -573,7 +599,7 @@
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>1500 && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy);
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>1500 && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
