@@ -737,3 +737,17 @@ body[data-hand] #palletDialog .stock-product-actions>.stock-delete,.demo-merchan
 #publicStockShare .public-share-title-row h1{margin:0}
 #publicShareStatus.public-report-status{margin:0;padding:3px 7px;border:0;border-radius:6px;font-size:.72rem;line-height:1.3}
 .public-share-heading #refreshPublicShare>svg{width:20px;height:20px;overflow:visible}
+/* Compact report metadata and explicit search/filter cancellation. */
+.public-report-meta{flex-wrap:nowrap;gap:6px}
+.public-report-meta>p{flex:0 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.public-report-meta>p>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}
+#publicShareDescription:empty{display:none}
+#publicShareDescription:not(:empty)::before{content:'•';margin-right:6px}
+.public-stock-tools .public-stock-search>.public-search-action{flex-basis:30px;min-width:30px;width:30px;padding:5px;color:#27197f;cursor:pointer}
+.public-stock-search input::-webkit-search-cancel-button{display:none}
+.public-filter-clear{grid-column:1/-1;justify-self:end;margin:0;min-height:36px;padding:4px 0;background:transparent;border:0;color:#a52c45;text-decoration:underline;cursor:pointer;font:inherit;font-size:.82rem}
+.public-filter-clear[hidden]{display:none!important}
+.stock-filter-popover #publicStockFilterFields{gap:8px}
+.stock-filter-popover #publicStockFilterFields label{margin:0;display:grid;gap:4px;font-size:.82rem}
+.stock-filter-popover #publicStockFilterFields select{min-height:44px;margin:0;width:100%;box-sizing:border-box;font:inherit}
+#stockFilterPanel>label>svg{width:20px;height:20px;display:block;margin-bottom:6px;color:#62577e}
