@@ -75,3 +75,11 @@ body.offline-shell main.app-page-enter{animation:none!important;transform:none!i
 
 /* Misma altura completa que la calculadora online. */
 #offlineCalculator{gap:4px}
+.offline-save-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.offline-save-actions>button{min-width:0;min-height:44px;margin:0;padding:8px 6px;font-size:.85rem;line-height:1.2}
+.offline-save-actions:has(#offlineSaveAndScan[hidden])>.primary{grid-column:1/-1}
+.offline-save-actions>.primary{grid-column:2;grid-row:1}
+.offline-save-actions>#offlineSaveAndScan{grid-column:1;grid-row:1}
+body[data-hand=left] .offline-save-actions>.primary{grid-column:1}
+body[data-hand=left] .offline-save-actions>#offlineSaveAndScan{grid-column:2}
+body[data-hand] .offline-save-actions:has(#offlineSaveAndScan[hidden])>.primary{grid-column:1/-1}

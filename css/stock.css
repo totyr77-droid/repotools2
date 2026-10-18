@@ -250,3 +250,12 @@ body[data-hand=left] .stock-quantity-line>.stock-calculator-disclosure>summary{b
 #pasteStockEan svg{width:20px;height:20px}
 body[data-hand=left] #pasteStockEan{left:1px;right:auto;border-radius:9px 0 0 9px}
 body[data-hand=left] #stockEanInput{padding-left:52px;padding-right:12px}
+.stock-product-save-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.stock-product-save-actions>button{min-width:0;min-height:44px;margin:0;padding:8px 6px;font-size:.85rem;line-height:1.2}
+.stock-product-save-actions>#reloadStockProduct{grid-column:1/-1}
+.stock-product-save-actions:has(#saveAndScanStockProduct[hidden])>#saveStockProduct{grid-column:1/-1}
+.stock-product-save-actions>#saveStockProduct{grid-column:2;grid-row:1}
+.stock-product-save-actions>#saveAndScanStockProduct{grid-column:1;grid-row:1}
+body[data-hand=left] .stock-product-save-actions>#saveStockProduct{grid-column:1}
+body[data-hand=left] .stock-product-save-actions>#saveAndScanStockProduct{grid-column:2}
+body[data-hand] .stock-product-save-actions:has(#saveAndScanStockProduct[hidden])>#saveStockProduct{grid-column:1/-1}
