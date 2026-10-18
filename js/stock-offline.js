@@ -22,6 +22,12 @@
     async put(row){return transact('libraryLoads','readwrite',s=>s.put(operation(row,user)));},
     async remove(key){return transact('libraryLoads','readwrite',s=>s.delete(key));}
   });
+  // Inicio and the offline shell share one list per account, including an empty list.
+  window.RepoEANList=user=>{
+    const key='repotools-offline-codes-'+(Number(user)||'guest'),migration='repotools:ean-list-migrated';
+    const normalize=rows=>{const seen=new Set();return (Array.isArray(rows)?rows:[]).map(row=>typeof row==='string'?{ean:row,name:''}:row).filter(row=>row&&RepoEANScanner.validEAN(row.ean)&&!seen.has(row.ean)&&seen.add(row.ean)).map(row=>({ean:row.ean,name:typeof row.name==='string'?row.name:''}));};
+    return {read(){let rows=[];try{rows=normalize(JSON.parse(localStorage.getItem(key)||'[]'));if(!localStorage.getItem(migration)){const legacy=localStorage.getItem('lista');if(legacy!==null){let values;try{values=JSON.parse(legacy);}catch{values=legacy.split(',');}if(Array.isArray(values)){const names=new Map(rows.map(row=>[row.ean,row.name]));rows=normalize(values).map(row=>({...row,name:names.get(row.ean)||row.name}));localStorage.setItem(key,JSON.stringify(rows));}}localStorage.setItem(migration,'1');}}catch{}return rows;},save(rows){const clean=normalize(rows);localStorage.setItem(key,JSON.stringify(clean));localStorage.setItem(migration,'1');return clean;}};
+  };
   window.RepoOfflineCatalog={
     async put(user,ean,product){if(!user||!product)return;const row={key:user+':'+ean,user,ean,at:Date.now(),product:{name:product.name||'',brand:product.brand||'',quantity:product.quantity||''}};await transact('catalog','readwrite',s=>s.put(row));const rows=(await transact('catalog','readonly',s=>s.getAll())).filter(r=>r.user===user).sort((a,b)=>b.at-a.at);for(const old of rows.slice(500))await transact('catalog','readwrite',s=>s.delete(old.key));},
     async get(user,ean,metadata=false){const row=await transact('catalog','readonly',s=>s.get(user+':'+ean));return row&&row.at>Date.now()-30*86400000?(metadata?{product:row.product,at:row.at}:row.product):null;}

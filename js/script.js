@@ -32,7 +32,7 @@ const els = {
   cantidadBox: document.querySelector(".cantidadbox")
 };
 
-const STORAGE_KEY = "lista";
+const eanList = window.RepoEANList(Number(window.repotoolsOfflineUser||0));
 const EAN = /^(?:\d{8}|\d{13})$/;
 const urlActual = new URL(window.location.href);
 const urlOriginal = `${urlActual.origin}${urlActual.pathname}`;
@@ -124,22 +124,12 @@ function bindEventos() {
 }
 
 function cargarLista() {
-  const guardado = localStorage.getItem(STORAGE_KEY);
-
-  if (!guardado) return [];
-
-  try {
-    const parseado = JSON.parse(guardado);
-    if (Array.isArray(parseado)) return limpiarLista(parseado);
-  } catch (error) {
-    return limpiarLista(guardado.split(","));
-  }
-
-  return [];
+  return eanList.read().map(row=>row.ean);
 }
 
 function guardarLista() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+  const names=new Map(eanList.read().map(row=>[row.ean,row.name]));
+  eanList.save(lista.map(ean=>({ean,name:names.get(ean)||''})));
 }
 
 function limpiarLista(valores) {
