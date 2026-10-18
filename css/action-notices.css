@@ -17,3 +17,4 @@
 /* Timing feedback is passive and never intercepts scanner controls. */
 .repotools-send-toast.repo-toast[data-notice-key=scanner-performance]{pointer-events:none;font-size:.8rem;padding:8px 10px}
 .repo-toast[data-notice-key=scanner-performance]>.repo-toast-close{display:none}
+.repo-toast{touch-action:pan-x}

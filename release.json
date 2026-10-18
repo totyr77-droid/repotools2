@@ -1,6 +1,12 @@
 {
-  "version": 69,
+  "version": 70,
   "changes": [
+    {
+      "version": 70,
+      "label": "1.65",
+      "date": "2026-10-18",
+      "summary": "Corrige cierre y gesto de avisos sobre modales, compacta nombre y selección al compartir y ajusta colores de mercadería."
+    },
     {
       "version": 69,
       "label": "1.64",
@@ -294,15 +300,9 @@
       "label": "1.16",
       "date": "2026-10-15",
       "summary": "Invitaciones desplegables con cierre recordado y acceso directo desde notificaciones."
-    },
-    {
-      "version": 20,
-      "label": "1.15",
-      "date": "2026-10-15",
-      "summary": "Biblioteca recupera su barra compacta de una mano; Stock conserva su distribución."
     }
   ],
   "major": 1,
-  "minor": 64,
-  "label": "1.64"
+  "minor": 65,
+  "label": "1.65"
 }
