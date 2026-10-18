@@ -1,6 +1,12 @@
 {
-  "version": 82,
+  "version": 83,
   "changes": [
+    {
+      "version": 83,
+      "label": "1.78",
+      "date": "2026-10-18",
+      "summary": "Referencias independientes de cajas y bultos sin conexión"
+    },
     {
       "version": 82,
       "label": "1.77",
@@ -294,15 +300,9 @@
       "label": "1.29",
       "date": "2026-10-16",
       "summary": "Demos más claras, TOPs de escaneadores/reportadores/referidos y filtros y acciones adaptados a la mano."
-    },
-    {
-      "version": 33,
-      "label": "1.28",
-      "date": "2026-10-16",
-      "summary": "Copia individual de EAN, acciones de enlaces según mano y vistas públicas compactas con propietario y resumen en tabla."
     }
   ],
   "major": 1,
-  "minor": 77,
-  "label": "1.77"
+  "minor": 78,
+  "label": "1.78"
 }

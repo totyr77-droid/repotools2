@@ -30,3 +30,12 @@ ref_check(!catalog_reference_sync($db,1,$result),'replay never overwrites');
 ref_check(!catalog_reference_sync($db,2,$result),'foreign account denied');
 ref_check((int)stock_query($db,'SELECT units FROM pallet_products WHERE id=?',[$result['movement']['product_id']])->fetchColumn()===3,'retry never adds units');
 echo "OK: offline reference, independent failure, retry, no overwrite, authorization and unchanged stock.\n";
+
+foreach(['boxes'=>12,'packs'=>36] as $kind=>$size){
+    $load=[...$input,'ean'=>'5901234123457','kind'=>$kind,'pack_size'=>$size,'amount'=>2];
+    $db->beginTransaction();stock_save_product($db,1,$load);$db->commit();
+}
+$refs=stock_query($db,"SELECT kind,pack_size FROM stock_product_references WHERE ean=? ORDER BY kind",['5901234123457'])->fetchAll();
+ref_check(count($refs)===2&&(int)$refs[0]['pack_size']===12&&(int)$refs[1]['pack_size']===36,'box and pack references independent');
+ref_check((int)stock_query($db,'SELECT units FROM pallet_products WHERE ean=?',['5901234123457'])->fetchColumn()===96,'two boxes plus two packs convert exactly');
+echo "OK: separate box/pack sizes and exact units.\n";
