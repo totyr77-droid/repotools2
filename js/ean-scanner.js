@@ -183,14 +183,14 @@ function palletNumberRegion(image){
       const width=x1-x0+1,height=y1-y0+1;if(height>=6&&height<h*.17&&width>=2&&width<height*2.4&&height<width*5&&tail>=8&&tail/(width*height)>.13)parts.push({x0,x1,y0,y1,width,height,x:(x0+x1)/2,y:(y0+y1)/2});
     }
     if(parts.length>500)continue;parts.sort((a,b)=>a.x-b.x);
-    for(const seed of parts){const neighbors=parts.filter(p=>Math.abs(p.y-seed.y)<seed.height*.8&&p.height>seed.height*.62&&p.height<seed.height*1.6);
+    const baselines=new Set();for(const seed of parts)for(const slopeGuess of [0,-.8,-.6,-.4,-.2,.2,.4,.6,.8]){const intercept=Math.round((seed.y-slopeGuess*seed.x)/Math.max(3,seed.height*.3)),key=slopeGuess+':'+Math.round(seed.height/8)+':'+intercept;if(baselines.has(key))continue;baselines.add(key);const neighbors=parts.filter(p=>Math.abs(p.y-seed.y-slopeGuess*(p.x-seed.x))<seed.height*.45&&p.height>seed.height*.62&&p.height<seed.height*1.6);
       for(let start=0;start+8<=neighbors.length;start++){const row=neighbors.slice(start,start+8),x0=row[0].x0,x1=row[7].x1,width=x1-x0,heights=row.map(p=>p.height).sort((a,b)=>a-b),height=heights[4];if(width/height<4||width/height>16)continue;
-        if(start>0&&row[0].x0-neighbors[start-1].x1<height*1.3||start+8<neighbors.length&&neighbors[start+8].x0-row[7].x1<height*1.3)continue;const gaps=row.slice(1).map((p,i)=>p.x0-row[i].x1);if(gaps.some(g=>g<0||g>height*1.3))continue;
-        const mx=row.reduce((s,p)=>s+p.x,0)/8,my=row.reduce((s,p)=>s+p.y,0)/8,xx=row.reduce((s,p)=>s+(p.x-mx)**2,0),slope=row.reduce((s,p)=>s+(p.x-mx)*(p.y-my),0)/xx,error=Math.sqrt(row.reduce((s,p)=>s+(p.y-my-slope*(p.x-mx))**2,0)/8);if(Math.abs(slope)>.6||error>height*.18)continue;
+        if(start>0&&row[0].x0-neighbors[start-1].x1<height*1.3||start+8<neighbors.length&&neighbors[start+8].x0-row[7].x1<height*1.3)continue;const gaps=row.slice(1).map((p,i)=>p.x0-row[i].x1);if(gaps.some(g=>g<-(Math.abs(slopeGuess)>.1?height*.35:0)||g>height*1.3))continue;
+        const mx=row.reduce((s,p)=>s+p.x,0)/8,my=row.reduce((s,p)=>s+p.y,0)/8,xx=row.reduce((s,p)=>s+(p.x-mx)**2,0),slope=row.reduce((s,p)=>s+(p.x-mx)*(p.y-my),0)/xx,error=Math.sqrt(row.reduce((s,p)=>s+(p.y-my-slope*(p.x-mx))**2,0)/8);if(Math.abs(slope)>.85||error>height*.18)continue;
         rowsFound.push({y:my,height});
         // A QR-like ink field above the eight aligned glyphs identifies our printed layout.
         let ink=0,total=0;for(let y=Math.max(0,Math.round(my-height*5));y<my-height;y++)for(let x=x0;x<=x1;x++){ink+=gray[y*w+x]<threshold?1:0;total++;}const density=ink/total;if(density<.08||density>.7)continue;
-        const score=error/height+Math.abs(width/height-8)*.015;if(!best||score<best.score)best={x0:Math.max(0,x0-height*.4),y0:Math.max(0,Math.min(...row.map(p=>p.y0))-height*.4),x1:Math.min(w,x1+height*.4),y1:Math.min(h,Math.max(...row.map(p=>p.y1))+height*.4),angle:-Math.atan(slope)*180/Math.PI,score};
+        const score=error/height+Math.abs(width/height-8)*.015;if(!best||score<best.score)best={x0:Math.max(0,x0-height*.4),y0:Math.max(0,Math.min(...row.map(p=>p.y0))-height*.4),x1:Math.min(w,x1+height*.4),y1:Math.min(h,Math.max(...row.map(p=>p.y1))+height*.4),angle:-Math.atan(slope)*180/Math.PI,centerX:mx,centerY:my,glyphHeight:height,score};
       }
     }
   }
@@ -199,8 +199,8 @@ function palletNumberRegion(image){
 }
 
   function palletOCR(element, active, accept, status, viewport, canAnalyze = () => true,onAnalysis=()=>{}) {
-    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus(),pageMode='11';
-    const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
+    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus(),pageMode='11',lockedRegion=null;
+    const canvas = document.createElement('canvas'), context = canvas.getContext('2d'),lineCanvas=document.createElement('canvas'),lineContext=lineCanvas.getContext('2d');
     if (!context) return { dispose() {}, resume() {}, reset() {} };
 
     const source=document.createElement('canvas'),sourceContext=source.getContext('2d'),probe=document.createElement('canvas'),probeContext=probe.getContext('2d',{willReadFrequently:true});let angleIndex=0,lockedAngle=null,nextDelay=550;
@@ -231,7 +231,7 @@ function palletNumberRegion(image){
       xx-=x*x/n;yy-=y*y/n;xy-=x*y/n;
       return Math.hypot(xx-yy,2*xy)/(xx+yy)>.55?-Math.atan2(2*xy,xx-yy)*90/Math.PI:0;
     }
-    function clearCanvases(){for(const surface of [canvas,source,probe])surface.width=surface.height=0;}
+    function clearCanvases(){for(const surface of [canvas,source,probe,lineCanvas])surface.width=surface.height=0;}
     function schedule(delay=nextDelay) { if (!disposed) timer = setTimeout(read, delay); }
     async function read() {
       if (disposed || busy) return; if (document.hidden || !active() || !canAnalyze()) { schedule(550); return; }
@@ -251,28 +251,29 @@ function palletNumberRegion(image){
         const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
         source.width=Math.round(frame.width*scale);source.height=Math.round(frame.height*scale);sourceContext.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,source.width,source.height);
         normalizeDimFrame();
-        const fullWidth=source.width,fullHeight=source.height;let cropX=0,cropY=0,cropScale=1,region=null;
-        if(probeContext){const ratio=Math.min(1,640/Math.max(source.width,source.height));probe.width=Math.round(source.width*ratio);probe.height=Math.round(source.height*ratio);probeContext.drawImage(source,0,0,probe.width,probe.height);region=palletNumberRegion(probeContext.getImageData(0,0,probe.width,probe.height));if(region){cropX=region.x0/ratio;cropY=region.y0/ratio;const width=(region.x1-region.x0)/ratio,height=(region.y1-region.y0)/ratio;cropScale=Math.min(3,800/width);canvas.width=Math.round(width*cropScale);canvas.height=Math.round(height*cropScale);context.drawImage(source,cropX,cropY,width,height,0,0,canvas.width,canvas.height);source.width=canvas.width;source.height=canvas.height;sourceContext.drawImage(canvas,0,0);}}
+        const fullWidth=source.width,fullHeight=source.height;let cropX=0,cropY=0,cropScale=1,region=null,regionRatio=1;
+        if(probeContext){const ratio=Math.min(1,640/Math.max(source.width,source.height));if(lockedRegion&&performance.now()-lockedRegion.at<650&&lockedRegion.width===fullWidth&&lockedRegion.height===fullHeight){region=lockedRegion.region;}else{probe.width=Math.round(source.width*ratio);probe.height=Math.round(source.height*ratio);probeContext.drawImage(source,0,0,probe.width,probe.height);region=palletNumberRegion(probeContext.getImageData(0,0,probe.width,probe.height));}if(region){regionRatio=ratio;cropX=region.x0/ratio;cropY=region.y0/ratio;const width=(region.x1-region.x0)/ratio,height=(region.y1-region.y0)/ratio;cropScale=Math.min(3,600/width);canvas.width=Math.round(width*cropScale);canvas.height=Math.round(height*cropScale);context.drawImage(source,cropX,cropY,width,height,0,0,canvas.width,canvas.height);source.width=canvas.width;source.height=canvas.height;sourceContext.drawImage(canvas,0,0);}}
         const mode=region?'7':'11';if(mode!==pageMode){await worker.setParameters({tessedit_pageseg_mode:mode});pageMode=mode;}if(disposed||!active())return;
         const offsets=[0,180,90,-90,30,-30,60,-60],angle=region?.angle??lockedAngle??orientation()+offsets[angleIndex++%offsets.length],radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
         canvas.width=region?source.width:Math.ceil(Math.abs(source.width*cos)+Math.abs(source.height*sin));canvas.height=region?source.height:Math.ceil(Math.abs(source.width*sin)+Math.abs(source.height*cos));context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.save();context.translate(canvas.width/2,canvas.height/2);context.rotate(radians);context.drawImage(source,-source.width/2,-source.height/2);context.restore();
+        let ocrSurface=canvas,lineOffset=0;if(region&&lineContext){const centerX=(region.centerX/regionRatio-cropX)*cropScale-source.width/2,centerY=(region.centerY/regionRatio-cropY)*cropScale-source.height/2,lineHeight=Math.ceil(region.glyphHeight/regionRatio*cropScale*1.7);lineOffset=Math.max(0,Math.round(canvas.height/2+centerX*sin+centerY*cos-lineHeight/2));lineCanvas.width=canvas.width;lineCanvas.height=Math.max(1,Math.min(lineHeight,canvas.height-lineOffset));lineContext.drawImage(canvas,0,lineOffset,canvas.width,lineCanvas.height,0,0,lineCanvas.width,lineCanvas.height);ocrSurface=lineCanvas;}
         const analysisStarted=performance.now();
-        const result = await worker.recognize(canvas, {rotateAuto:false}, { text: true, blocks: true });
+        const result = await worker.recognize(ocrSurface, {rotateAuto:false}, { text: true, blocks: true });
         if (disposed || !active()) return;
         const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),costMs:performance.now()-analysisStarted});
         if(candidate?.box){
-          const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y-=canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
+          const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y+=lineOffset-canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
           viewport?.track({x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},fullWidth,fullHeight);
         }else viewport?.reset();
-        if (candidate) { lockedAngle=angle;nextDelay=80;status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
-        else {lockedAngle=null;nextDelay=350;confirm(null, stamp);}
+        if (candidate) { lockedRegion=region?{region,width:fullWidth,height:fullHeight,at:performance.now()}:null;lockedAngle=angle;nextDelay=80;status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
+        else {lockedRegion=null;lockedAngle=null;nextDelay=350;confirm(null, stamp);}
       } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
       finally { busy = false; if (disposed) { clearCanvases(); } else schedule(); }
     }
     schedule();
     return {
       hasCandidate(){return !disposed&&lockedAngle!==null;},
-      reset() { confirm = ocrConsensus();lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
+      reset() { confirm = ocrConsensus();lockedRegion=null;lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
       resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
       dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { clearCanvases(); try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
     };
