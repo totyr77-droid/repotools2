@@ -1,6 +1,12 @@
 {
-  "version": 74,
+  "version": 75,
   "changes": [
+    {
+      "version": 75,
+      "label": "1.70",
+      "date": "2026-10-18",
+      "summary": "Mejora el rescate local de QR inclinados con un segundo motor, sin enviar imágenes y conservando validaciones."
+    },
     {
       "version": 74,
       "label": "1.69",
@@ -294,15 +300,9 @@
       "label": "1.21",
       "date": "2026-10-15",
       "summary": "Calculadora compacta integrada al campo de cantidad y adaptada a la mano hábil."
-    },
-    {
-      "version": 25,
-      "label": "1.20",
-      "date": "2026-10-15",
-      "summary": "Trece mejoras: selección segura de palets, privacidad pública, listas cortas, teclado móvil, correos y Ajustes/TOPs."
     }
   ],
   "major": 1,
-  "minor": 69,
-  "label": "1.69"
+  "minor": 70,
+  "label": "1.70"
 }

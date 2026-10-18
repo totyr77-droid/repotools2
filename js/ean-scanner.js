@@ -137,6 +137,7 @@
   }
 
   // Shared identification engine. Camera/QR decoder and feedback remain in create().
+  const qrRescueURL=(()=>{try{return new URL('qr-rescue-worker.js',document.currentScript?.src||new URL('js/ean-scanner.js',window.location.href)).href;}catch{return 'js/qr-rescue-worker.js';}})();
   const ocrBase = (() => { try { return new URL('vendor/ocr/', document.currentScript?.src || new URL('js/ean-scanner.js', window.location.href)).href; } catch { return 'js/vendor/ocr/'; } })();
   let ocrLibrary;
   function loadOCR() {
@@ -453,6 +454,11 @@
         }
         canvas.width=canvas.height=size;context.putImageData(out,0,0);return true;
       }
+      let rescueWorker,rescueReady=false,rescueFailed=false,rescuePending=null,rescueInitTimer,rescueSequence=0,rescueLast=-Infinity;
+      function stopRescue(){clearTimeout(rescueInitTimer);rescueWorker?.terminate();rescueWorker=null;rescueReady=false;if(rescuePending){clearTimeout(rescuePending.timer);rescuePending.resolve(null);rescuePending=null;}}
+      function startRescue(){if(rescueWorker||rescueFailed||typeof Worker!=='function')return;try{rescueWorker=new Worker(qrRescueURL);rescueInitTimer=setTimeout(()=>{rescueFailed=true;stopRescue();},12000);rescueWorker.onmessage=event=>{const value=event.data;if(value?.type==='ready'){clearTimeout(rescueInitTimer);rescueReady=true;metric(current,'qr-rescue-ready');return;}if(value?.type==='unavailable'){rescueFailed=true;stopRescue();return;}if(value?.type!=='result'||!rescuePending||value.id!==rescuePending.id)return;const pending=rescuePending;rescuePending=null;clearTimeout(pending.timer);const codes=Array.isArray(value.codes)?[...new Set(value.codes.filter(code=>typeof code==='string'&&current.validate(code)))]:[];metric(current,'qr-rescue-analysis',{costMs:performance.now()-pending.started,matched:codes.length===1});pending.resolve(codes.length===1?{text:codes[0]}:null);};rescueWorker.onerror=event=>{event.preventDefault?.();rescueFailed=true;stopRescue();};}catch{rescueFailed=true;stopRescue();}}
+      const rescueWarmup=current.isQR?setTimeout(()=>{if(current.accepting&&session===current&&!document.hidden&&canAccept())startRescue();},450):null;
+      async function decodeImage(surface){const original=current.isQR&&rescueReady?surface.getContext('2d').getImageData(0,0,surface.width,surface.height):null;try{return await decoder.decodeRobustlyAsync(surface);}catch(error){if(!current.isQR||!current.accepting||session!==current||document.hidden||!canAccept()||performance.now()-(current.cameraReadyAt??current.requestedAt)<650)throw error;startRescue();if(!rescueReady||rescuePending||performance.now()-rescueLast<350)throw error;rescueLast=performance.now();const image=original||surface.getContext('2d').getImageData(0,0,surface.width,surface.height),id=++rescueSequence;const result=await new Promise(resolve=>{rescuePending={id,resolve,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});if(result&&current.accepting&&session===current&&!document.hidden&&canAccept())return result;throw error;}}
       let lastRectify=-Infinity;
       let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false, lastFrame=null,lastQuagga=-Infinity,attempts=0;
       const lowPower=Number(window.navigator?.hardwareConcurrency||8)<=4;
@@ -465,12 +471,12 @@
         if(Math.max(frame.width,frame.height)<=(lowPower?640:960))return;
         detailButton=document.createElement('button');detailButton.type='button';detailButton.className='ean-camera-detail';
         detailButton.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8V3h5m8 0h5v5M3 16v5h5m8 0h5v-5"/><circle cx="12" cy="12" r="4"/></svg><span>Analizar detalle</span>';
-        detailButton.addEventListener('click',()=>{if(!current.accepting||!canAccept())return;current.requestDetail=true;detailButton.disabled=true;detailButton.setAttribute('aria-busy','true');detailButton.querySelector('span').textContent='Analizando…';metric(current,'detail-request');});element.append(detailButton);
+        detailButton.addEventListener('click',()=>{if(!current.accepting||!canAccept())return;startRescue();current.requestDetail=true;detailButton.disabled=true;detailButton.setAttribute('aria-busy','true');detailButton.querySelector('span').textContent='Analizando…';metric(current,'detail-request');});element.append(detailButton);
       }
       if(current.isQR)detailTimer=setTimeout(offerDetail,1800);
       serialDecoder(current);
-      const dispose = () => { if (disposed) return; disposed = true;rectMask=rectQueue=null;clearTimeout(detailTimer);detailButton?.remove(); canvas.width = canvas.height = probe.width = probe.height = 0; };
-      current.disposeBackground = () => {clearTimeout(detailTimer);detailButton?.remove();clearTimeout(current.backgroundTimer); if (!running) dispose(); };
+      const dispose = () => { if (disposed) return; disposed = true;clearTimeout(rescueWarmup);stopRescue();rectMask=rectQueue=null;clearTimeout(detailTimer);detailButton?.remove(); canvas.width = canvas.height = probe.width = probe.height = 0; };
+      current.disposeBackground = () => {clearTimeout(rescueWarmup);stopRescue();clearTimeout(detailTimer);detailButton?.remove();clearTimeout(current.backgroundTimer); if (!running) dispose(); };
       async function analyze() {
         if (!current.accepting || session !== current || current.token !== revision) { dispose(); return; }
         // No supplemental JPEG/OCR work while the page is in the background.
@@ -483,7 +489,7 @@
             const frame = visibleFrame(video);
             if(current.isQR&&!current.ocr?.hasCandidate?.()&&started-(current.cameraReadyAt??current.requestedAt)>900&&started-lastRectify>1100){
               lastRectify=started;
-              if(rectifyLabel(video,frame)){metric(current,'perspective-attempt',{width:canvas.width,height:canvas.height});const result=await decoder.decodeRobustlyAsync(canvas);if(current.validate(result.text))accept(result.text,'background',lastFrame);return;}
+              if(rectifyLabel(video,frame)){metric(current,'perspective-attempt',{width:canvas.width,height:canvas.height});const result=await decodeImage(canvas);if(current.validate(result.text))accept(result.text,'background',lastFrame);return;}
             }
             manualRequest=Boolean(current.requestDetail);const detailed=current.requestDetail||(++attempts%(lowPower&&current.isQR?3:4)===(lowPower&&current.isQR?2:0)&&started-(current.cameraReadyAt??current.requestedAt)>(lowPower?350:500));current.requestDetail=false;
             const adaptive = current.isQR ? { angle: 0, crop: 1, detailed } : lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video, frame) : null);
@@ -525,7 +531,7 @@
             const clipHeight = Math.min(frame.y + frame.height, sourceY + sourceHeight) - clipY;
             context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.save(); context.translate(canvas.width / 2, canvas.height / 2); context.rotate(radians); context.drawImage(video, clipX, clipY, clipWidth, clipHeight, -width / 2 + (clipX - sourceX) * scale, -height / 2 + (clipY - sourceY) * scale, clipWidth * scale, clipHeight * scale); context.restore();
             if (current.accepting && current.token === revision) {
-              const result = await decoder.decodeRobustlyAsync(canvas);
+              const result = await decodeImage(canvas);
               const code = result.text;metric(current,'decoded',{source:'background',width:canvas.width,height:canvas.height,detail:Boolean(profile.detailed),costMs:performance.now()-started});
               if (current.validate(code)) { lastProfile = profile; accept(code, 'background',lastFrame); } else lastProfile = null;
             }
