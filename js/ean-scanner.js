@@ -177,8 +177,34 @@
     const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
     return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
   }
+function palletNumberRegion(image){
+  const {data,width:w,height:h}=image,gray=new Uint8Array(w*h),hist=new Uint32Array(256);for(let i=0;i<gray.length;i++){gray[i]=Math.round((data[i*4]+data[i*4+1]+data[i*4+2])/3);hist[gray[i]]++;}
+  let sum=0,white=255;for(let i=0;i<256;i++){sum+=hist[i];if(sum>=gray.length*.98){white=i;break;}}
+  let best=null;const rowsFound=[];const mask=new Uint8Array(w*h),queue=new Int32Array(w*h);
+  for(const fraction of [.55,.68,.8]){
+    const threshold=Math.max(30,Math.min(165,white*fraction));for(let i=0;i<mask.length;i++)mask[i]=gray[i]<threshold?1:0;
+    const parts=[];for(let i=0;i<mask.length;i++){if(!mask[i])continue;let head=0,tail=1;queue[0]=i;mask[i]=0;let x0=w,x1=0,y0=h,y1=0;
+      while(head<tail){const p=queue[head++],x=p%w,y=(p/w)|0;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);if(x&&mask[p-1]){mask[p-1]=0;queue[tail++]=p-1;}if(x+1<w&&mask[p+1]){mask[p+1]=0;queue[tail++]=p+1;}if(y&&mask[p-w]){mask[p-w]=0;queue[tail++]=p-w;}if(y+1<h&&mask[p+w]){mask[p+w]=0;queue[tail++]=p+w;}}
+      const width=x1-x0+1,height=y1-y0+1;if(height>=6&&height<h*.17&&width>=2&&width<height*2.4&&height<width*5&&tail>=8&&tail/(width*height)>.13)parts.push({x0,x1,y0,y1,width,height,x:(x0+x1)/2,y:(y0+y1)/2});
+    }
+    if(parts.length>500)continue;parts.sort((a,b)=>a.x-b.x);
+    for(const seed of parts){const neighbors=parts.filter(p=>Math.abs(p.y-seed.y)<seed.height*.8&&p.height>seed.height*.62&&p.height<seed.height*1.6);
+      for(let start=0;start+8<=neighbors.length;start++){const row=neighbors.slice(start,start+8),x0=row[0].x0,x1=row[7].x1,width=x1-x0,heights=row.map(p=>p.height).sort((a,b)=>a-b),height=heights[4];if(width/height<4||width/height>16)continue;
+        if(start>0&&row[0].x0-neighbors[start-1].x1<height*1.3||start+8<neighbors.length&&neighbors[start+8].x0-row[7].x1<height*1.3)continue;const gaps=row.slice(1).map((p,i)=>p.x0-row[i].x1);if(gaps.some(g=>g<0||g>height*1.3))continue;
+        const mx=row.reduce((s,p)=>s+p.x,0)/8,my=row.reduce((s,p)=>s+p.y,0)/8,xx=row.reduce((s,p)=>s+(p.x-mx)**2,0),slope=row.reduce((s,p)=>s+(p.x-mx)*(p.y-my),0)/xx,error=Math.sqrt(row.reduce((s,p)=>s+(p.y-my-slope*(p.x-mx))**2,0)/8);if(Math.abs(slope)>.6||error>height*.18)continue;
+        rowsFound.push({y:my,height});
+        // A QR-like ink field above the eight aligned glyphs identifies our printed layout.
+        let ink=0,total=0;for(let y=Math.max(0,Math.round(my-height*5));y<my-height;y++)for(let x=x0;x<=x1;x++){ink+=gray[y*w+x]<threshold?1:0;total++;}const density=ink/total;if(density<.08||density>.7)continue;
+        const score=error/height+Math.abs(width/height-8)*.015;if(!best||score<best.score)best={x0:Math.max(0,x0-height*.4),y0:Math.max(0,Math.min(...row.map(p=>p.y0))-height*.4),x1:Math.min(w,x1+height*.4),y1:Math.min(h,Math.max(...row.map(p=>p.y1))+height*.4),angle:-Math.atan(slope)*180/Math.PI,score};
+      }
+    }
+  }
+  if(best&&rowsFound.some(row=>row.height>(best.y1-best.y0)*.4&&Math.abs(row.y-(best.y0+best.y1)/2)>row.height*1.5))return null;
+  return best;
+}
+
   function palletOCR(element, active, accept, status, viewport, canAnalyze = () => true,onAnalysis=()=>{}) {
-    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus();
+    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus(),pageMode='11';
     const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
     if (!context) return { dispose() {}, resume() {}, reset() {} };
 
@@ -230,15 +256,18 @@
         const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
         source.width=Math.round(frame.width*scale);source.height=Math.round(frame.height*scale);sourceContext.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,source.width,source.height);
         normalizeDimFrame();
-        const offsets=[0,180,90,-90,30,-30,60,-60],angle=lockedAngle??orientation()+offsets[angleIndex++%offsets.length],radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
-        canvas.width=Math.ceil(Math.abs(source.width*cos)+Math.abs(source.height*sin));canvas.height=Math.ceil(Math.abs(source.width*sin)+Math.abs(source.height*cos));context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.save();context.translate(canvas.width/2,canvas.height/2);context.rotate(radians);context.drawImage(source,-source.width/2,-source.height/2);context.restore();
+        const fullWidth=source.width,fullHeight=source.height;let cropX=0,cropY=0,cropScale=1,region=null;
+        if(probeContext){const ratio=Math.min(1,640/Math.max(source.width,source.height));probe.width=Math.round(source.width*ratio);probe.height=Math.round(source.height*ratio);probeContext.drawImage(source,0,0,probe.width,probe.height);region=palletNumberRegion(probeContext.getImageData(0,0,probe.width,probe.height));if(region){cropX=region.x0/ratio;cropY=region.y0/ratio;const width=(region.x1-region.x0)/ratio,height=(region.y1-region.y0)/ratio;cropScale=Math.min(3,800/width);canvas.width=Math.round(width*cropScale);canvas.height=Math.round(height*cropScale);context.drawImage(source,cropX,cropY,width,height,0,0,canvas.width,canvas.height);source.width=canvas.width;source.height=canvas.height;sourceContext.drawImage(canvas,0,0);}}
+        const mode=region?'7':'11';if(mode!==pageMode){await worker.setParameters({tessedit_pageseg_mode:mode});pageMode=mode;}if(disposed||!active())return;
+        const offsets=[0,180,90,-90,30,-30,60,-60],angle=region?.angle??lockedAngle??orientation()+offsets[angleIndex++%offsets.length],radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
+        canvas.width=region?source.width:Math.ceil(Math.abs(source.width*cos)+Math.abs(source.height*sin));canvas.height=region?source.height:Math.ceil(Math.abs(source.width*sin)+Math.abs(source.height*cos));context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.save();context.translate(canvas.width/2,canvas.height/2);context.rotate(radians);context.drawImage(source,-source.width/2,-source.height/2);context.restore();
         const analysisStarted=performance.now();
         const result = await worker.recognize(canvas, {rotateAuto:false}, { text: true, blocks: true });
         if (disposed || !active()) return;
-        const candidate = ocrCandidate(result.data);onAnalysis({angle,matched:Boolean(candidate),costMs:performance.now()-analysisStarted});
+        const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),costMs:performance.now()-analysisStarted});
         if(candidate?.box){
           const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y-=canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
-          viewport?.track({x0:Math.max(0,Math.min(...points.map(p=>p.x))),y0:Math.max(0,Math.min(...points.map(p=>p.y))),x1:Math.min(source.width,Math.max(...points.map(p=>p.x))),y1:Math.min(source.height,Math.max(...points.map(p=>p.y)))},source.width,source.height);
+          viewport?.track({x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},fullWidth,fullHeight);
         }else viewport?.reset();
         if (candidate) { lockedAngle=angle;nextDelay=80;status(); if (confirm(candidate.code, stamp)) accept(candidate.code, 'ocr'); }
         else {lockedAngle=null;nextDelay=350;confirm(null, stamp);}
@@ -659,7 +688,7 @@
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?1500:1000) && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, unavailable => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Confirmando número del palet…'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 1800); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {

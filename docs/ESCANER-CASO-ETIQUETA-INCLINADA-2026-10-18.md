@@ -30,3 +30,13 @@ Regresiones: 27 lecturas sintéticas positivas de QR/EAN/giros/poca luz aprobada
 No se incorporan capturas, códigos reales ni sus resultados privados en Git. Evidencias privadas se conservan solo en tmp.
 
 Reversión: retirar helper y llamadas de rescate de js/ean-scanner.js, worker y directorio vendor versionado; retirar sus tres entradas de ASSETS en sw.js y publicar una versión superior. Conservar OCR, inventario, colas y enlaces. La nueva descarga WASM es de aproximadamente 967 kB sin comprimir; permanece cacheada localmente y se prepara también para uso offline.
+
+## Lectura del número inferior (v1.72)
+
+La nueva captura reportada con v1.71 tampoco entregaba resultado en tres repeticiones locales de 12 segundos. Se añadió localización de ocho componentes alineados con un campo de tinta similar al QR encima, recorte del renglón y corrección de su inclinación. El OCR usa modo de una línea solo cuando localiza este diseño; conserva análisis completo y barrido de giros si no lo localiza. Empieza a intentar antes, sin esperar el descifrado del QR. No se infiere el número por el diseño: siempre se reconoce el texto y se exige confianza mínima 80 y el mismo resultado en tres fotogramas distintos.
+
+Reproducción final de la nueva captura: 3/3 lecturas correctas por OCR, 2,10 / 2,62 / 2,53 s; mediana 2,53 s. Antes: 0/3. Son tiempos de reproducción local en Chrome, no mediciones de cámara física ni garantía de reconocimiento instantáneo. La captura privada y los identificadores permanecen únicamente en tmp. No se ha vuelto a probar la segunda captura anterior y sigue pendiente de validación.
+
+Se impide recortar un prefijo de ocho cifras dentro de una fila más larga; varias filas candidatas de tamaño comparable devuelven al análisis completo. Las regiones con excesivos componentes conservan el fallback. Se conserva transformación de coordenadas para el seguimiento visual. Pruebas: pallet-number-region (diseño real de QR, EAN largo, dos filas y número sin QR), scanner-identification, scanner-scheduling, ean-scanner y service-worker-offline aprobadas. Benchmark seleccionado: 21/21 lecturas de OCR/giros/ceros iniciales, QR y EAN; 6/6 rechazos de números ambiguos o longitud inválida. Sin cambios en inventario, permisos, API ni red externa.
+
+Reversión: restaurar js/ean-scanner.js desde v1.71, retirando localizador, recorte, modo OCR de una línea y adelanto de inicio; publicar una versión superior. Conservar worker QR/WASM de v1.70 y datos del usuario. Pendiente validar sensor y latencia en iPhone bajo las condiciones reales de trabajo.
