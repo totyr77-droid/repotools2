@@ -751,3 +751,16 @@ body[data-hand] #palletDialog .stock-product-actions>.stock-delete,.demo-merchan
 .stock-filter-popover #publicStockFilterFields label{margin:0;display:grid;gap:4px;font-size:.82rem}
 .stock-filter-popover #publicStockFilterFields select{min-height:44px;margin:0;width:100%;box-sizing:border-box;font:inherit}
 #stockFilterPanel>label>svg{width:20px;height:20px;display:block;margin-bottom:6px;color:#62577e}
+/* Applied filters share one compact row with their clear action. */
+#publicStockTools{row-gap:4px;margin:6px 0}
+.public-applied-filters{grid-column:1/-1;display:flex;align-items:center;gap:8px;min-width:0;margin:0}
+.public-applied-filters[hidden]{display:none!important}
+.public-applied-values{display:flex;align-items:center;gap:5px;min-width:0;flex:1}
+.public-applied-value{display:flex;align-items:center;gap:4px;min-width:0;min-height:36px;padding:3px 0;border:0;background:transparent;color:#27197f;font:inherit;font-size:.8rem;cursor:pointer}
+.public-applied-value svg{width:17px;height:17px;flex:none}
+.public-applied-value span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.public-applied-separator{color:#62577e;flex:none}
+.public-applied-filters .public-filter-clear{flex:none;min-height:36px;font-size:.8rem;padding:3px 0}
+body[data-hand="left"] .public-applied-filters{flex-direction:row-reverse}
+#publicStockTools>#publicStockSearchStatus{grid-column:1/-1;margin:0;font-size:.82rem}
+#publicStockTools+#publicSharePallets{margin-top:8px}

@@ -1,6 +1,12 @@
 {
-  "version": 77,
+  "version": 78,
   "changes": [
+    {
+      "version": 78,
+      "label": "1.73",
+      "date": "2026-10-18",
+      "summary": "Muestra sucursal y orden aplicados en el informe compartido, con edición directa y menos espacio entre búsqueda y palets."
+    },
     {
       "version": 77,
       "label": "1.72",
@@ -294,15 +300,9 @@
       "label": "1.24",
       "date": "2026-10-15",
       "summary": "Botón de calculadora unido y alineado al campo de cantidad."
-    },
-    {
-      "version": 28,
-      "label": "1.23",
-      "date": "2026-10-15",
-      "summary": "Selección múltiple solo en Pendientes y apertura directa en Mis palets."
     }
   ],
   "major": 1,
-  "minor": 72,
-  "label": "1.72"
+  "minor": 73,
+  "label": "1.73"
 }
