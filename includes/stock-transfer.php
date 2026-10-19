@@ -4,6 +4,7 @@ require_once __DIR__.'/stock.php';
 function stock_transfer_preview(PDO $db,int $user,array $input): array {
     if(!isset($input['pallet_id'])||is_array($input['pallet_id'])||!preg_match('/^[1-9][0-9]{0,14}$/D',(string)$input['pallet_id']))throw new CatalogException('El palet de origen no es válido.',422);
     $source=stock_editable($db,(int)($input['pallet_id']??0),$user);
+    if((int)$source['owner_id']!==$user)throw new CatalogException('Solo el propietario puede transferir este palet o su mercadería.',403);
     $mode=$input['mode']??'';if(!in_array($mode,['pallet','user'],true))throw new CatalogException('Elegí el destino de la transferencia.',422);
     $rows=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? ORDER BY id',[$source['id']])->fetchAll();
     $result=['mode'=>$mode,'source_id'=>(int)$source['id'],'source_code'=>$source['code'],'source_revision'=>(int)$source['revision'],'products'=>count($rows),'units'=>array_sum(array_column($rows,'units'))];

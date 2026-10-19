@@ -28,3 +28,5 @@ Solo online. Se impide transferir si este dispositivo tiene cargas pendientes de
 ## Reversión
 
 Restaurar archivos de esta entrega al padre y publicar versión superior deshabilita UI/acciones nuevas. No revierte transferencias confirmadas. Recuperar datos requiere un traslado inverso o intervención auditada con revisión de movimientos posteriores y cantidades; nunca borrar recibos/historial para repetir operaciones.
+
+Restricción v1.43: ambas transferencias requieren ser propietario del origen. Acceso compartido, vínculo de sucursal o rango global no sustituyen la propiedad. Validación en preview y confirmación, además del botón oculto. Destino conserva validación de edición/reserva vigente.

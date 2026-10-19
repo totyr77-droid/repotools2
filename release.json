@@ -1,6 +1,12 @@
 {
-  "version": 47,
+  "version": 48,
   "changes": [
+    {
+      "version": 48,
+      "label": "1.43",
+      "date": "2026-10-19",
+      "summary": "Restringir toda transferencia al propietario del palet"
+    },
     {
       "version": 47,
       "label": "1.42",
@@ -281,6 +287,6 @@
     }
   ],
   "major": 1,
-  "minor": 42,
-  "label": "1.42"
+  "minor": 43,
+  "label": "1.43"
 }
