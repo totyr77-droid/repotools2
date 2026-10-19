@@ -1,6 +1,12 @@
 {
-  "version": 33,
+  "version": 34,
   "changes": [
+    {
+      "version": 34,
+      "label": "1.29",
+      "date": "2026-10-19",
+      "summary": "Ordenar búsqueda, filtros y etiquetas de coincidencias"
+    },
     {
       "version": 33,
       "label": "1.28",
@@ -197,6 +203,6 @@
     }
   ],
   "major": 1,
-  "minor": 28,
-  "label": "1.28"
+  "minor": 29,
+  "label": "1.29"
 }
