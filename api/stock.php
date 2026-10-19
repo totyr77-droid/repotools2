@@ -2,6 +2,7 @@
 require_once __DIR__.'/../includes/auth.php';
 require_once __DIR__.'/../includes/stock.php';
 require_once __DIR__.'/../includes/pallet-activity.php';
+require_once __DIR__.'/../includes/stock-transfer.php';
 require_once __DIR__.'/../includes/audit.php';
 require_once __DIR__.'/../includes/catalog-reference.php';
 header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); header('X-Content-Type-Options: nosniff');
@@ -77,9 +78,10 @@ try {
         if(isset($_POST['offline_created']))try{audit_time((int)$_POST['offline_created']);}catch(InvalidArgumentException $e){throw new CatalogException($e->getMessage(),422);}
         if(($_POST['action']??'')==='deduct_product')stock_editable($db,(int)($_POST['pallet_id']??0),$uid);
         $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
+        $transferPayload=($_POST['action']??'')==='transfer_commit'?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','mode','target_code','email','source_revision','target_revision','target_id','target_user']))):null;
         $deductPayload=($_POST['action']??'')==='deduct_product'?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','product_id','revision','amount','kind','pack_size']))):null;
         $offlinePayload=isset($_POST['offline_owner'])?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','code','product_id','ean','name','amount','kind','pack_size','expires']))):null;
-        if ($cached!==false) { $previous=json_decode($cached,true);if($deductPayload!==null&&isset($previous['_deduct_payload'])&&!hash_equals($previous['_deduct_payload'],$deductPayload))throw new CatalogException('Esta operación ya está confirmada. Revisá la cantidad actual antes de otra resta.',409);unset($previous['_deduct_payload']);if($offlinePayload!==null&&isset($previous['_offline_payload'])&&!hash_equals($previous['_offline_payload'],$offlinePayload))throw new CatalogException('Esta operación ya fue enviada con otros datos. Conservamos la carga para revisar.',409);unset($previous['_offline_payload']);if($offlinePayload!==null){if(!isset(json_decode($cached,true)['_offline_payload']))throw new CatalogException('No pudimos verificar la confirmación antigua. Conservamos la carga para revisar.',409);$previous=stock_offline_confirmation($db,$previous,$key,$uid);}$previous['user_id']=$uid;$previous['csrf']=$csrf;$db->commit();if(isset($previous['confirmation']))$previous['confirmation']['committed']=true;if($offlinePayload!==null)$previous['catalog_reference_saved']=catalog_reference_sync($db,$uid,$previous)||!empty($previous['catalog_reference_saved']);stock_response(200,$previous); }
+        if ($cached!==false) { $previous=json_decode($cached,true);if($transferPayload!==null&&(!isset($previous['_transfer_payload'])||!hash_equals($previous['_transfer_payload'],$transferPayload)))throw new CatalogException('Esta confirmación corresponde a otra transferencia. Revisá el destino.',409);if($deductPayload!==null&&isset($previous['_deduct_payload'])&&!hash_equals($previous['_deduct_payload'],$deductPayload))throw new CatalogException('Esta operación ya está confirmada. Revisá la cantidad actual antes de otra resta.',409);unset($previous['_deduct_payload'],$previous['_transfer_payload']);if($offlinePayload!==null&&isset($previous['_offline_payload'])&&!hash_equals($previous['_offline_payload'],$offlinePayload))throw new CatalogException('Esta operación ya fue enviada con otros datos. Conservamos la carga para revisar.',409);unset($previous['_offline_payload']);if($offlinePayload!==null){if(!isset(json_decode($cached,true)['_offline_payload']))throw new CatalogException('No pudimos verificar la confirmación antigua. Conservamos la carga para revisar.',409);$previous=stock_offline_confirmation($db,$previous,$key,$uid);}$previous['user_id']=$uid;$previous['csrf']=$csrf;$db->commit();if(isset($previous['confirmation']))$previous['confirmation']['committed']=true;if($offlinePayload!==null)$previous['catalog_reference_saved']=catalog_reference_sync($db,$uid,$previous)||!empty($previous['catalog_reference_saved']);stock_response(200,$previous); }
         $action=$_POST['action']??''; $id=(int)($_POST['pallet_id']??0); $result=[];
         $tracks=in_array($action,['claim','import','save_product','delete_product','description','delete','invite','accept','decline','revoke','leave'],true);
         $historyId=$id;
@@ -87,6 +89,8 @@ try {
         $historyBefore=$tracks&&$historyId?pallet_activity_snapshot($db,$historyId):null;
         $auditBefore=$historyBefore?audit_from_activity($historyBefore):audit_pallet($db,$historyId);$historyAfter=null;
         switch($action) {
+            case 'transfer_preview': $result=['preview'=>stock_transfer_preview($db,$uid,$_POST)];break;
+            case 'transfer_commit': $result=stock_transfer_commit($db,$uid,$_POST);break;
             case 'generate':
                 $count=filter_var($_POST['count']??1,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>100]]);
                 if (!$count) throw new CatalogException('Elige entre 1 y 100 etiquetas.',422);
@@ -189,9 +193,9 @@ try {
             stock_query($db,'INSERT INTO pallet_admin_events(user_id,pallet_id,code,action,details) VALUES(?,?,?,?,?)',[$uid,$id?:null,$target?:'',(string)$action,json_encode($details,JSON_UNESCAPED_UNICODE)]);
         }
         if(!in_array($action,['preferences','delete_many','tag'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id))),$_POST);
-        $result['ok']=true;if($deductPayload!==null)$result['_deduct_payload']=$deductPayload;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
+        $result['ok']=true;if($transferPayload!==null)$result['_transfer_payload']=$transferPayload;if($deductPayload!==null)$result['_deduct_payload']=$deductPayload;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }
     if($method==='POST' && $offlinePayload!==null)$result=stock_offline_confirmation($db,$result,$key,$uid);
-    $db->commit();if(isset($result['confirmation']))$result['confirmation']['committed']=true;if($method==='POST'&&$offlinePayload!==null)$result['catalog_reference_saved']=catalog_reference_sync($db,$uid,$result)||!empty($result['catalog_reference_saved']);unset($result['_offline_payload'],$result['_deduct_payload']); $result['csrf']=$csrf; $result['user_id']=$uid; stock_response(200,$result);
+    $db->commit();if(isset($result['confirmation']))$result['confirmation']['committed']=true;if($method==='POST'&&$offlinePayload!==null)$result['catalog_reference_saved']=catalog_reference_sync($db,$uid,$result)||!empty($result['catalog_reference_saved']);unset($result['_offline_payload'],$result['_deduct_payload'],$result['_transfer_payload']); $result['csrf']=$csrf; $result['user_id']=$uid; stock_response(200,$result);
 } catch(CatalogException $error) { if($db?->inTransaction())$db->rollBack();if($db&&$method==='POST')audit_denied($db,(int)$uid,(string)($_POST['action']??'stock'),is_string($_POST['operation_key']??null)?$_POST['operation_key']:bin2hex(random_bytes(16)),$error->status,$_POST); stock_response($error->status,['error'=>$error->getMessage()]); }
 catch(Throwable $error) { if($db?->inTransaction())$db->rollBack(); error_log('Repotools stock error: '.get_class($error).' code='.$error->getCode()); stock_response(503,['error'=>'No pudimos guardar el palet. Tu formulario sigue disponible para reintentar.']); }
