@@ -4,3 +4,5 @@
 .company-branches-heading h2{display:flex;align-items:center;gap:6px}.company-manager .team-inline label{flex:1;min-width:0}
 
 .company-delete-dialog{width:min(430px,calc(100vw - 32px));box-sizing:border-box;padding:20px;border:0;border-radius:20px}.company-delete-dialog h2{font-size:1.2rem;margin:0 0 10px;color:#27197f}.company-delete-dialog p{line-height:1.45;margin:0 0 16px}.company-delete-confirm{background:#ba2737!important}.company-delete-dialog .company-form-actions{flex-wrap:wrap}
+
+.company-manager .company-home{display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:8px 12px;border-radius:10px;background:#eeebf7;font-size:.9rem}.company-manager #teamSetup{background:#fff;border:1px solid #e1deeb;border-radius:12px;padding:12px}.company-assignment-tabs{display:flex;gap:4px;padding:4px;background:#eeebf7;border-radius:10px;margin-bottom:12px}.company-assignment-tabs button{display:flex;align-items:center;justify-content:center;gap:6px;flex:1;border:0;border-radius:8px;padding:8px;color:#27197f;background:transparent;font:inherit}.company-assignment-tabs button[aria-selected=true]{background:#27197f;color:white}

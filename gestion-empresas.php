@@ -8,7 +8,7 @@ if(!team_can_assign(database(),(int)current_user()['id'])){http_response_code(40
 $paginaGestionEmpresas=true;$publicPageTitle='Empresas y sucursales';include 'vistas/header.vista.php';
 ?>
 <main class="library-main team-page company-manager" data-company-manager data-csrf="<?= escape(csrf_token()) ?>">
-<div class="team-page-title"><h1><?= stock_icon('branch') ?>Empresas y sucursales</h1><a href="index.php">Inicio</a></div>
+<div class="team-page-title"><h1><?= stock_icon('branch') ?>Empresas y sucursales</h1><a href="index.php" class="library-secondary company-home"><?= stock_icon('home') ?>Inicio</a></div>
 <p class="team-hint">Gestión de Repotools · El responsable administra los accesos de su equipo.</p>
 <p id="companyStatus" role="status" hidden></p>
 <div class="company-toolbar"><label class="company-search"><?= stock_icon('search') ?><input id="companySearch" type="search" placeholder="Empresa, responsable o sucursal" aria-label="Buscar empresas" maxlength="100"></label><button type="button" class="library-primary" id="companyNew"><?= stock_icon('plus') ?>Asignar empresa</button><button type="button" class="team-text" id="companyRefresh" aria-label="Actualizar empresas" title="Actualizar empresas"><?= stock_icon('refresh') ?></button></div>

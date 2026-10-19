@@ -114,23 +114,22 @@ function team_overview(PDO $db,int $user,int $branch,int $cursor=0): array {
     return ['members'=>$members,'pallets'=>$pallets,'next_cursor'=>$more?(int)end($pallets)['id']:null,'events'=>$events,'movements'=>$movements,'invites'=>$invites];
 }
 
-// Called inside the Stock write transaction/lock, after CSRF validation.
-function team_delete_branch(PDO $db,int $user,int $branch,int $revision): void {
-    if(team_require($db,$user,$branch)!=='admin')throw new CatalogException('Solo el administrador de la sucursal puede eliminarla.',403);
+// Remove only the company link; the shared directory and stock remain intact.
+function team_unlink_branch(PDO $db,int $user,int $branch,int $revision): void {
+    if(team_require($db,$user,$branch)!=='admin')throw new CatalogException('Solo el administrador de la sucursal puede desvincularla.',403);
     $before=stock_query($db,'SELECT * FROM stock_branches WHERE id=?',[$branch])->fetch();
-    if(!$before||(int)$before['revision']!==$revision)throw new CatalogException('La sucursal cambió. Actualizá antes de eliminarla.',409);
+    if(!$before||(int)$before['revision']!==$revision)throw new CatalogException('La sucursal cambió. Actualizá antes de desvincularla.',409);
     $workspace=stock_query($db,'SELECT w.id,w.name,w.owner_id FROM branch_workspace_locations l JOIN branch_workspaces w ON w.id=l.workspace_id WHERE l.branch_id=?',[$branch])->fetch();
     require_once __DIR__.'/stock-branches.php';
-    // Keep team audit records after removing the directory entry and its FK children.
-    $events=stock_query($db,'SELECT * FROM branch_team_events WHERE branch_id=? ORDER BY id',[$branch])->fetchAll();
-    foreach($events as $event)stock_query($db,'INSERT INTO branch_events(actor_id,branch_id,branch_name,action,before_data,after_data,created_at) VALUES(?,?,?,?,?,?,?)',[(int)$event['actor_id'],$branch,$before['name'],'team_'.$event['action'],json_encode($event,JSON_UNESCAPED_UNICODE),'{}',$event['created_at']]);
-    branch_event($db,$user,'branch_deleted',$before,null);
-    stock_query($db,'UPDATE pallets SET branch_id=NULL,revision=revision+1,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE branch_id=?',[$user,$branch]);
-    stock_query($db,'UPDATE stock_shares SET active=0,branch_id=NULL WHERE branch_id=?',[$branch]);
-    foreach(['branch_team_active','branch_team_invites','branch_team_members','branch_team_events','branch_workspace_locations'] as $table)stock_query($db,'DELETE FROM '.$table.' WHERE branch_id=?',[$branch]);
-    stock_query($db,'DELETE FROM stock_branches WHERE id=?',[$branch]);
+    team_event($db,$user,$branch,'branch_unlinked');branch_event($db,$user,'branch_unlinked',$before,$before);
+    stock_query($db,'UPDATE branch_team_members SET active=0,revision=revision+1 WHERE branch_id=? AND active=1',[$branch]);
+    stock_query($db,'UPDATE branch_team_invites SET revoked=1 WHERE branch_id=?',[$branch]);
+    stock_query($db,'DELETE FROM branch_team_active WHERE branch_id=?',[$branch]);
+    stock_query($db,'DELETE FROM branch_workspace_locations WHERE branch_id=?',[$branch]);
     if($workspace&&!stock_query($db,'SELECT 1 FROM branch_workspace_locations WHERE workspace_id=?',[$workspace['id']])->fetchColumn()){
         stock_query($db,'DELETE FROM branch_workspaces WHERE id=?',[$workspace['id']]);
-        stock_query($db,'INSERT INTO branch_events(actor_id,branch_name,action,before_data,after_data) VALUES(?,?,?,?,?)',[$user,$workspace['name'],'workspace_deleted',json_encode($workspace,JSON_UNESCAPED_UNICODE),json_encode(['reason'=>'last_branch_deleted'],JSON_UNESCAPED_UNICODE)]);
+        stock_query($db,'INSERT INTO branch_events(actor_id,branch_name,action,before_data,after_data) VALUES(?,?,?,?,?)',[$user,$workspace['name'],'workspace_deleted',json_encode($workspace,JSON_UNESCAPED_UNICODE),json_encode(['reason'=>'last_branch_unlinked'],JSON_UNESCAPED_UNICODE)]);
     }
 }
+// Compatibility for old clients: this action no longer deletes the directory entry.
+function team_delete_branch(PDO $db,int $user,int $branch,int $revision): void {team_unlink_branch($db,$user,$branch,$revision);}

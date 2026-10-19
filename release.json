@@ -1,6 +1,12 @@
 {
-  "version": 23,
+  "version": 24,
   "changes": [
+    {
+      "version": 24,
+      "label": "1.19",
+      "date": "2026-10-19",
+      "summary": "Desvincular sucursal sin borrar directorio y ordenar asignación por pestañas"
+    },
     {
       "version": 23,
       "label": "1.18",
@@ -137,6 +143,6 @@
     }
   ],
   "major": 1,
-  "minor": 18,
-  "label": "1.18"
+  "minor": 19,
+  "label": "1.19"
 }

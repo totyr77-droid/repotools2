@@ -46,3 +46,13 @@ Borrar una sucursal desde Mi equipo ahora retira también su empresa si era la �
 El panel permite Actualizar empresas y reconsulta al volver a la ventana visible, salvo que haya cambios en edición. Una empresa eliminada por otra cuenta desaparece del listado y del detalle; se conserva el aislamiento de respuestas tardías.
 
 Validación adicional: pruebas PHP con denegación de administrador empresarial/usuario, firma obsoleta, rollback, empresa vacía/con sucursales, revocación y conservación de directorio/inventario/enlaces/auditoría; UI cancelar/confirmar y eliminación de última sucursal por otra cuenta con actualización manager. stock-watch y SW conservados. Reversión de código al padre de entrega y nueva versión; recuperar una empresa efectivamente eliminada requiere respaldo o nueva asignación/autorización (no se restauran vínculos revocados automáticamente).
+
+## Corrección v1.19: desvincular, no borrar directorio
+
+La acción de Mi equipo pasa a Desvincular sucursal. Solo retira branch_workspace_locations y revoca miembros/invitaciones/selecciones del equipo. Conserva stock_branches, ubicación y mercadería de palets, enlaces públicos y eventos. API unlink_branch; delete_branch queda como alias seguro para clientes anteriores, sin borrado físico. Último vínculo puede retirar el contenedor empresarial vacío, conservando siempre directorio. Asignarla otra vez no restaura autorizaciones antiguas.
+
+Se corrigió la interpretación anterior de Eliminar sucursal. Recuperación puntual autorizada por el usuario: ficha desde auditoría y las ubicaciones verificadas de palets cuyo timestamp/actor coincidía exactamente con el borrado y que seguían sin cambios posteriores. Sin modificar cantidades, cuentas o accesos; operación registrada en auditoría. No se reactivaron enlaces públicos anulados por la implementación anterior porque no se conserva una correspondencia inequívoca; se deben generar nuevos si hacen falta.
+
+La recuperación se encontró en la base principal de Neon. No asumir aislamiento de datos de beta por el nombre de la rama Git: revisar DATABASE_URL del servicio antes de futuras pruebas con datos reales. No se cambiaron credenciales ni configuración del alojamiento.
+
+Panelmanager: Inicio usa acceso secundario con SVG home; asignación en bloque blanco con pestañas Empresa/Sucursal y validación antes de avanzar. Formulario compartido conserva funcionamiento en Mi equipo. PHP/UI ambos flujos y SW aprobados, incluyendo re-asignación sin resucitar permisos y conservación de ubicaciones/enlaces. Reversión de UI desde padre; conservar corrección de desvinculación (no reinstalar borrado físico). Main sigue v1.79 de logos.

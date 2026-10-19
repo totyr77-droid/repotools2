@@ -31,7 +31,8 @@ try {
                     $workspace=(int)stock_query($db,'INSERT INTO branch_workspaces(owner_id,name) VALUES(?,?) RETURNING id',[$owner,$name])->fetchColumn();
                 }
                 team_attach($db,$uid,$workspace,$branch);$result['workspace_id']=$workspace;break;
-            case 'delete_branch':team_delete_branch($db,$uid,$branch,(int)($_POST['revision']??0));break;
+            case 'unlink_branch':
+            case 'delete_branch':team_unlink_branch($db,$uid,$branch,(int)($_POST['revision']??0));break;
             case 'select':team_select($db,$uid,$branch);break;
             case 'invite':$result['token']=team_invite($db,$uid,$branch,$_POST['role']??'');break;
             case 'accept':team_accept($db,$uid,$_POST['token']??'');break;

@@ -50,16 +50,16 @@ $eventCount=(int)stock_query($db,'SELECT COUNT(*) FROM branch_team_events WHERE 
 $db->beginTransaction();team_delete_branch($db,1,$branch,1);$db->rollBack();
 team_check(team_role($db,3,$branch)==='operator','rollback restores membership');
 $db->beginTransaction();team_delete_branch($db,1,$branch,1);$db->commit();
-team_check(!stock_query($db,'SELECT 1 FROM stock_branches WHERE id=?',[$branch])->fetchColumn(),'branch deleted');
+team_check((bool)stock_query($db,'SELECT 1 FROM stock_branches WHERE id=?',[$branch])->fetchColumn(),'directory retained');
 team_check(count(team_locations($db,1))===1,'other branch retained');
 team_check(team_role($db,3,$branch)===''&&team_active($db,3)===0,'members lose access');
 team_denied(fn()=>team_accept($db,5,$deleteInvite),410);
-team_check((int)stock_query($db,'SELECT COUNT(*) FROM branch_events WHERE branch_id=? AND action LIKE ?',[$branch,'team_%'])->fetchColumn()===$eventCount,'audit preserved');
+team_check((int)stock_query($db,'SELECT COUNT(*) FROM branch_team_events WHERE branch_id=? AND action<>?',[$branch,'branch_unlinked'])->fetchColumn()===$eventCount,'audit preserved');
 $kept=stock_detail($db,'00123456',4);team_check($kept['can_edit'],'owner still edits');
 team_check((int)stock_query($db,'SELECT owner_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===4,'owner retained on deletion');
-team_check(stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===null,'pallet unassigned');
+team_check((int)stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===$branch,'pallet stays located');
 team_check((int)stock_query($db,'SELECT SUM(units) FROM pallet_products WHERE pallet_id=?',[$p['id']])->fetchColumn()===24,'inventory retained on deletion');
-team_check((int)stock_query($db,'SELECT active FROM stock_shares WHERE token=?',[str_repeat('a',64)])->fetchColumn()===0,'branch share disabled');
+team_check((int)stock_query($db,'SELECT active FROM stock_shares WHERE token=?',[str_repeat('a',64)])->fetchColumn()===1,'branch share retained');stock_query($db,"UPDATE users SET role='manager' WHERE id=6");team_attach($db,6,$workspace,$branch);team_check(team_role($db,3,$branch)==='','reattach does not restore revoked operator');$db->beginTransaction();team_unlink_branch($db,1,$branch,1);$db->commit();
 
 team_check((bool)stock_query($db,'SELECT 1 FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn(),'company retained while another branch exists');
 $db->beginTransaction();team_delete_branch($db,1,(int)$second['id'],1);$db->commit();team_check(!stock_query($db,'SELECT 1 FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn(),'last branch removes empty company');

@@ -34,7 +34,7 @@ $paginaEquipo=true;$publicPageTitle='Mi equipo';include 'vistas/header.vista.php
 <section class="team-section"><h2>Últimos movimientos</h2><div id="teamMovements"></div><details><summary>Accesos y asignaciones</summary><div id="teamEvents"></div></details></section>
 </div>
 <p id="teamOperatorHint" hidden>Podés trabajar con los palets desde Escanear palet en Inicio. El encargado consulta el inventario completo.</p>
-<button type="button" class="team-text team-danger" id="teamDeleteBranch" hidden>Eliminar sucursal</button>
+<button type="button" class="team-text team-danger" id="teamDeleteBranch" hidden>Desvincular sucursal</button>
 <button type="button" class="team-text team-danger" id="teamLeave" hidden>Desvincularme de esta sucursal</button>
 <?php include __DIR__.'/vistas/branch-team-assignment.vista.php'; ?><dialog id="teamConfirm" class="stock-dialog"><h2 id="teamConfirmTitle">Quitar acceso</h2><p id="teamConfirmText"></p><div class="team-inline"><button type="button" class="library-secondary" id="teamConfirmCancel">Cancelar</button><button type="button" class="library-primary" id="teamConfirmYes">Confirmar</button></div></dialog>
 </main>
