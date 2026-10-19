@@ -77,6 +77,7 @@
 <script src="js/stock-preparation.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-preparation.js'),0,12) ?>"></script>
 <script src="js/date-keypad.js?v=<?= substr(sha1_file(__DIR__.'/../js/date-keypad.js'),0,12) ?>"></script>
 <script src="js/product-view-tools.js?v=<?= substr(sha1_file(__DIR__.'/../js/product-view-tools.js'),0,12) ?>"></script>
+<script src="js/stock-live.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/stock.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock.js'),0,12) ?>"></script>
 <script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/public-pallet.js?v=<?= (int)app_release()['version'] ?>"></script>

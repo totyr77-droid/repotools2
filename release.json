@@ -1,6 +1,12 @@
 {
-  "version": 14,
+  "version": 15,
   "changes": [
+    {
+      "version": 15,
+      "label": "1.10",
+      "date": "2026-10-19",
+      "summary": "Beta: referencia inmediata al repetir EAN y palets abiertos actualizados entre cuentas"
+    },
     {
       "version": 14,
       "label": "1.09",
@@ -83,6 +89,6 @@
     }
   ],
   "major": 1,
-  "minor": 9,
-  "label": "1.09"
+  "minor": 10,
+  "label": "1.10"
 }

@@ -55,7 +55,12 @@ try {
             $result['items']=array_map('stock_product_names',$result['items']);
             $result['has_more']=count($result['items'])>200;$result['items']=array_slice($result['items'],0,200);
         }
-        elseif (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid,($_GET['public']??'')==='1')];
+        elseif (isset($_GET['watch'])) {
+            if(!$uid)throw new CatalogException('Ingresá para actualizar el palet.',401);
+            if(!is_string($_GET['watch'])||!is_string($_GET['stamp']??''))throw new CatalogException('Consulta de palet no válida.',422);
+            $result=stock_watch($db,$_GET['watch'],$uid,$_GET['stamp']??'');
+        }
+        elseif (isset($_GET['code'])) $result=$uid&&($_GET['public']??'')!=='1'?stock_watch($db,(string)$_GET['code'],$uid):['pallet'=>stock_detail($db,(string)$_GET['code'],$uid,($_GET['public']??'')==='1')];
         elseif (isset($_GET['ean'])) {
             if (!$uid) throw new CatalogException('Inicia sesión para agregar productos.',401);
             $ean=$_GET['ean'];
