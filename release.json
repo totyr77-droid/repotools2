@@ -1,6 +1,12 @@
 {
-  "version": 40,
+  "version": 41,
   "changes": [
+    {
+      "version": 41,
+      "label": "1.36",
+      "date": "2026-10-19",
+      "summary": "Completar tarjetas de palets del equipo con información de stock"
+    },
     {
       "version": 40,
       "label": "1.35",
@@ -239,6 +245,6 @@
     }
   ],
   "major": 1,
-  "minor": 35,
-  "label": "1.35"
+  "minor": 36,
+  "label": "1.36"
 }
