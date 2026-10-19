@@ -1,6 +1,12 @@
 {
-  "version": 64,
+  "version": 65,
   "changes": [
+    {
+      "version": 65,
+      "label": "1.60",
+      "date": "2026-10-19",
+      "summary": "Mapa de seguridad con punto compacto y zona del radio permitido."
+    },
     {
       "version": 64,
       "label": "1.59",
@@ -294,15 +300,9 @@
       "label": "1.11",
       "date": "2026-10-19",
       "summary": "Identidad oficial: logos SVG e iconos PWA violetas"
-    },
-    {
-      "version": 15,
-      "label": "1.10",
-      "date": "2026-10-19",
-      "summary": "Beta: referencia inmediata al repetir EAN y palets abiertos actualizados entre cuentas"
     }
   ],
   "major": 1,
-  "minor": 59,
-  "label": "1.59"
+  "minor": 60,
+  "label": "1.60"
 }
