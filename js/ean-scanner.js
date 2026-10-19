@@ -121,19 +121,20 @@
   }
 
   // Confirma el mismo EAN en fotogramas separados y dentro de una ventana corta.
-  function confirmation(validate = validEAN) {
+  function confirmation(validate = validEAN, timing = () => 650) {
+    const gap = () => Math.max(650,Math.min(1000,Number(timing())||650));
     let code = '', count = 0, first = 0, last = 0, lastFrame = null;
     const confirm = (value, now = performance.now(), frame = null) => {
       if (!validate(value)) { code = ''; count = 0; lastFrame=null; return false; }
       if(frame!==null&&frame===lastFrame)return false;lastFrame=frame;
-      if (value !== code || now - last > 650 || now - first > 1500) {
+      if (value !== code || now - last > gap() || now - first > gap()*2+200) {
         code = value; count = 1; first = last = now; return false;
       }
       if (now - last < 60) return false;
       last = now;
       return ++count >= 3;
     };
-    confirm.progress=(now=performance.now())=>count&&now-last<=650&&now-first<=1500?Math.min(count,3):0;
+    confirm.progress=(now=performance.now())=>count&&now-last<=gap()&&now-first<=gap()*2+200?Math.min(count,3):0;
     Object.defineProperty(confirm,'startedAt',{get:()=>count?first:null});return confirm;
   }
 
@@ -520,9 +521,9 @@ function palletNumberRegion(image){
             }
             manualRequest=Boolean(current.requestDetail);const detailed=current.requestDetail||(++attempts%(lowPower&&current.isQR?3:4)===(lowPower&&current.isQR?2:0)&&started-(current.cameraReadyAt??current.requestedAt)>(lowPower?350:500));current.requestDetail=false;
             const adaptive = current.isQR ? { angle: 0, crop: 1, detailed } : lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video, frame) : null);
-            // A successful fallback needs new frames inside the 650 ms confirmation window.
+            // A successful fallback needs new frames inside the adaptive confirmation window.
             // Orientation hints must not starve this independent decoder.
-            if (!current.isQR && window.Quagga?.decodeSingle && started-lastQuagga>(quaggaCandidate?180:900)) {
+            if (!current.isQR && window.Quagga?.decodeSingle && started-lastQuagga>(quaggaCandidate?100:900)) {
               // Localiza barras y su orientación en una sola imagen. El canvas
               // y las cajas del localizador permanecen fuera de la interfaz.
               const scale = Math.min(1, 1920 / Math.max(frame.width, frame.height));
@@ -569,7 +570,7 @@ function palletNumberRegion(image){
           finally {
             running = false;if(detailButton&&manualRequest){detailButton.disabled=false;detailButton.removeAttribute('aria-busy');detailButton.querySelector('span').textContent='Analizar detalle';}
             if (!current.accepting || session !== current || current.token !== revision) dispose();
-            else {const cost=performance.now()-started;metric(current,'analysis',{costMs:cost,width:canvas.width,height:canvas.height});current.backgroundTimer=setTimeout(analyze,Math.max(50,Math.min(quaggaCandidate?180:600,cost*(lastProfile&&!current.isQR ? .4 : lowPower ? 2 : 1.2))));}
+            else {const cost=performance.now()-started;current.analysisCost=current.analysisCost===undefined?cost:current.analysisCost*.5+cost*.5;metric(current,'analysis',{costMs:cost,width:canvas.width,height:canvas.height});current.backgroundTimer=setTimeout(analyze,Math.max(50,Math.min(quaggaCandidate?100:600,cost*(lastProfile&&!current.isQR ? .4 : lowPower ? 2 : 1.2))));}
           }
           return;
         }
@@ -624,7 +625,7 @@ function palletNumberRegion(image){
         const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : code => validEAN(code)||Boolean(window.RepoTeamInvitation?.token(code));
         if (element.dataset) { element.classList.add('repo-camera-viewport'); element.dataset.recognition = isQR ? 'qr' : 'ean'; }
         const reader = new window.Html5Qrcode(elementId, { formatsToSupport: isQR ? [formats.QR_CODE] : [formats.EAN_13, formats.EAN_8, formats.QR_CODE], verbose: false });
-        const current = { reader, metricId:globalThis.crypto?.randomUUID?.()||String(requestedAt)+':'+token, accepting: true, token, isQR, kind, validate, requestedAt, confirm: confirmation(validate) };metric(current,'camera-request');
+        const current = { reader, metricId:globalThis.crypto?.randomUUID?.()||String(requestedAt)+':'+token, accepting: true, token, isQR, kind, validate, requestedAt, confirm: confirmation(validate,()=>isQR?650:((current.analysisCost||0)+100)*2) };metric(current,'camera-request');
         serialDecoder(current);session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera', recognizedFrame = null) => {
           code = normalize(code);
@@ -655,7 +656,7 @@ function palletNumberRegion(image){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
             Promise.resolve().then(()=>{metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR&&validEAN(code))rememberScanPhoto(code,element);metric(current,'action');return onCode(code);}).then(()=>metric(current,'action-complete')).catch(error=>{if(token===revision&&session===current){onError(error);}}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
               if(token!==revision||session!==current)return;
-              current.confirm=confirmation(validate);current.accepting=true;current.cycleConfirmed=false;current.metricCycle=(current.metricCycle||0)+1;metric(current,'ready');element.classList.remove('ean-confirmed');
+              current.confirm=confirmation(validate,()=>isQR?650:((current.analysisCost||0)+100)*2);current.accepting=true;current.cycleConfirmed=false;current.metricCycle=(current.metricCycle||0)+1;metric(current,'ready');element.classList.remove('ean-confirmed');
               try{background(current,accept);current.ocr?.resume();}catch{}
             }).catch(error=>{if(token===revision)onError(error);});
             return;
@@ -708,3 +709,4 @@ function palletNumberRegion(image){
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
   window.RepoEANScanner = { observe(listener){if(typeof listener!=='function')throw TypeError('Observer required');metricListeners.add(listener);return()=>metricListeners.delete(listener);}, create, rawCreate, validEAN, confirmation, palletIdentifier, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
 })();
+
