@@ -1,6 +1,12 @@
 {
-  "version": 16,
+  "version": 17,
   "changes": [
+    {
+      "version": 17,
+      "label": "1.12",
+      "date": "2026-10-19",
+      "summary": "Apple Touch Icon con fondo violeta oficial"
+    },
     {
       "version": 16,
       "label": "1.11",
@@ -95,6 +101,6 @@
     }
   ],
   "major": 1,
-  "minor": 11,
-  "label": "1.11"
+  "minor": 12,
+  "label": "1.12"
 }
