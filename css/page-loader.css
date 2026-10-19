@@ -4,3 +4,5 @@ html.is-loading #repotoolsPageLoader{opacity:1;visibility:visible;pointer-events
 #repotoolsPageLoader img{width:80px;height:80px;object-fit:contain;animation:rt-loader-pulse 1.2s ease-in-out infinite}
 @keyframes rt-loader-pulse{0%,100%{opacity:.65}50%{opacity:1}}
 @media(prefers-reduced-motion:reduce){#repotoolsPageLoader{transition:none}#repotoolsPageLoader img{animation:none}}
+
+#repotoolsPageLoader{box-sizing:border-box;height:100dvh}#repotoolsPageLoader img{height:auto;aspect-ratio:988/600;display:block;margin:0;flex:none}#repotoolsPageLoader>span{display:block;margin:0;padding:0;line-height:1.4}

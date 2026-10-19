@@ -1,6 +1,12 @@
 {
-  "version": 35,
+  "version": 36,
   "changes": [
+    {
+      "version": 36,
+      "label": "1.31",
+      "date": "2026-10-19",
+      "summary": "Centrar carga inicial y renovar aviso Consultando palet"
+    },
     {
       "version": 35,
       "label": "1.30",
@@ -209,6 +215,6 @@
     }
   ],
   "major": 1,
-  "minor": 30,
-  "label": "1.30"
+  "minor": 31,
+  "label": "1.31"
 }
