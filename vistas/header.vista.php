@@ -47,7 +47,8 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <meta name="description" content="<?= escape($previewDescription) ?>">
     <meta name="keywords" content="repositores, escaneo de codigos de barras, gestion de stock, inventario, productos, logistica, scanner de codigos, administracion de inventario, manejo de stock">
     <meta name="robots" content="index, follow">
-    <link rel="icon" href="img/brand/repotools-icon-violeta-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="img/brand/repotools-beta-favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="img/brand/repotools-beta-favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#27197F">
     <link rel="apple-touch-icon" href="img/brand/apple-touch-icon-180x180.png" sizes="180x180">

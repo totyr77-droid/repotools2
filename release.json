@@ -1,6 +1,12 @@
 {
-  "version": 54,
+  "version": 55,
   "changes": [
+    {
+      "version": 55,
+      "label": "1.50",
+      "date": "2026-10-19",
+      "summary": "Favicon B para identificar beta"
+    },
     {
       "version": 54,
       "label": "1.49",
@@ -294,15 +300,9 @@
       "label": "1.01",
       "date": "2026-10-14",
       "summary": "Guías QR más finas y transparentes en la cámara de Stock."
-    },
-    {
-      "version": 5,
-      "label": "1.00",
-      "date": "2026-10-14",
-      "summary": "Controles flotantes uniformes, contador de reportes separado y versiones 1.00."
     }
   ],
   "major": 1,
-  "minor": 49,
-  "label": "1.49"
+  "minor": 50,
+  "label": "1.50"
 }
