@@ -4,7 +4,7 @@ Solo rama desarrollo y servicio repotools-desarrollo.onrender.com. Main y su bas
 
 ## Uso
 
-Con la cuenta habitual, Inicio → Mi equipo (también Ajustes → Accesos). Administrar una sucursal permite crear el primer equipo y su sucursal o seleccionar una entrada creada por esa cuenta. Desde una sucursal administrada se añade otra al mismo espacio. No requiere otro correo, cuenta o rango global.
+Con la cuenta habitual, Inicio → Mi equipo (también Ajustes → Accesos). Desde beta1.08 solo el rango general manager puede asignar una empresa a una persona por su correo existente, crear/seleccionar sucursal y añadir sucursales a empresas ya asignadas. La persona responsable conserva su rango general y recibe administración del equipo; no puede autoasignarse nuevas empresas. No requiere otra cuenta.
 
 Roles propios del vínculo, independientes de users.role:
 
@@ -22,7 +22,7 @@ Encargado/administrador ven palets paginados de treinta, unidades, propietario p
 
 ## Autorización del directorio
 
-Agregar una sucursal al directorio no crea vínculo empresarial. Un espacio solo puede habilitar entradas creadas por su propia cuenta y sin otro equipo asignado. No existe toma de control de una sucursal ajena por coincidencia de nombre, ni por rango general de moderación. Para delegar otra sucursal ya gestionada se usan invitaciones. Verificar/transferir administración de entradas ajenas todavía no está implementado.
+Agregar una sucursal al directorio no crea vínculo empresarial. Solo un manager de Repotools puede habilitar entradas libres de otro equipo y asignarlas a una empresa. Administrador general, administrador de equipo, encargado y operador no reciben ese permiso. La comprobación consulta users.role vigente en servidor, también al crear el vínculo interno. No se permite reasignar una sucursal que ya tenga equipo. Transferir una empresa ya asignada sigue pendiente. El campo descriptivo Empresa/agencia del perfil no concede vínculos ni permisos empresariales.
 
 ## Implementación y validación
 
@@ -35,3 +35,5 @@ Marcas, listas Excel, transferencia/varios administradores, archivo de equipos, 
 ## Reversión
 
 Publicar un commit posterior en desarrollo que retire integración de equipo de Inicio/Ajustes, página/API/módulo y las ampliaciones team_role en stock_detail/stock_editable/pallet_activity_list. Conservar tablas35 y registros para no perder vínculos/historial; no borrar inventario, colas ni credenciales. Si se revierte el código, los permisos de equipo desaparecen y los personales siguen vigentes. No bajar el contador de versión de caché ni fusionar a main sin autorización. Antes de una futura fusión revisar que35 no colisione con otra migración de main y excluir siempre distintivo BETA.
+
+Beta1.08: validación branch-team.php incluye rechazo por administrador general, administrador de equipo/encargado/operador y pérdida de rango manager; branch-team-ui prueba asignación por correo a otra cuenta sin alterar su rango, ocultación del formulario y403 al intentar crear/añadir porAPI. No migraciones nuevas ni cambios a vínculos existentes. Reversión selectiva de política team_can_assign/team_attach, API y formulario desde4aaa0f6, publicar versión beta posterior; conservar empresas/asignaciones/historial.

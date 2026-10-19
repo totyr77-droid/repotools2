@@ -3,10 +3,11 @@ require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../inclu
 function team_check($ok,string $message):void{if(!$ok)throw new RuntimeException($message);}
 function team_denied(callable $work,int $status):void{try{$work();}catch(CatalogException $error){team_check($error->status===$status,$error->getMessage());return;}throw new RuntimeException('Expected '.$status);}
 $db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($db);initialize_database($db);
-foreach(['Admin','Encargado','Operador','Dueño','Ajeno'] as $i=>$name)stock_query($db,'INSERT INTO users(name,public_name,email,password_hash) VALUES(?,?,?,?)',[$name,$name,'user'.$i.'@example.invalid','unused']);
+foreach(['Admin','Encargado','Operador','Dueño','Ajeno','Staff'] as $i=>$name)stock_query($db,'INSERT INTO users(name,public_name,email,password_hash) VALUES(?,?,?,?)',[$name,$name,'user'.$i.'@example.invalid','unused']);
+stock_query($db,"UPDATE users SET role='manager' WHERE id=6");
 $b=branch_save($db,1,['name'=>'Sucursal A','address'=>'Calle 1','locality'=>'Ciudad','province'=>'Provincia'])['branch'];$branch=(int)$b['id'];
 $foreign=branch_save($db,5,['name'=>'Sucursal B','address'=>'Calle 2','locality'=>'Ciudad','province'=>'Provincia'])['branch'];
-$workspace=(int)stock_query($db,'INSERT INTO branch_workspaces(owner_id,name) VALUES(1,?) RETURNING id',['Equipo'])->fetchColumn();team_attach($db,1,$workspace,$branch);
+$workspace=(int)stock_query($db,'INSERT INTO branch_workspaces(owner_id,name) VALUES(1,?) RETURNING id',['Equipo'])->fetchColumn();team_attach($db,6,$workspace,$branch);
 team_denied(fn()=>team_attach($db,1,$workspace,(int)$foreign['id']),403);team_denied(fn()=>team_attach($db,5,$workspace,(int)$foreign['id']),403);
 team_check(team_role($db,1,$branch)==='admin','business admin');team_check(!stock_is_admin($db,1),'business rank never grants platform admin');
 $manager=team_invite($db,1,$branch,'manager');team_accept($db,2,$manager);team_denied(fn()=>team_accept($db,5,$manager),410);
@@ -36,6 +37,7 @@ team_select($db,4,0);team_denied(fn()=>team_scan($db,4,'00123456',$branch),409);
 $expired=team_invite($db,1,$branch,'operator');stock_query($db,'UPDATE branch_team_invites SET expires=? WHERE token_hash=?',[time()-1,hash('sha256',$expired)]);team_denied(fn()=>team_accept($db,5,$expired),410);
 team_denied(fn()=>team_revoke($db,2,$branch,1,1),403);team_denied(fn()=>team_revoke($db,2,$branch,2,1),403);
 team_revoke($db,1,$branch,2,1);team_check(team_role($db,2,$branch)==='','manager revocation');
-$second=branch_save($db,1,['name'=>'Sucursal C','address'=>'Calle 3','locality'=>'Ciudad','province'=>'Provincia'])['branch'];team_attach($db,1,$workspace,(int)$second['id']);team_check(count(team_locations($db,1))===2,'admin switches multiple branches');team_denied(fn()=>team_select($db,3,(int)$second['id']),403);team_check(count(team_locations($db,3))===1,'operator sees only authorized branch');
+$second=branch_save($db,1,['name'=>'Sucursal C','address'=>'Calle 3','locality'=>'Ciudad','province'=>'Provincia'])['branch'];team_attach($db,6,$workspace,(int)$second['id']);team_check(count(team_locations($db,1))===2,'admin switches multiple branches');team_denied(fn()=>team_select($db,3,(int)$second['id']),403);team_check(count(team_locations($db,3))===1,'operator sees only authorized branch');
 stock_query($db,"UPDATE users SET role='administrador' WHERE id=1");team_denied(fn()=>branch_delete($db,1,['id'=>$branch,'revision'=>1]),409);
-echo "OK: independent business ranks, creator-only setup, one-use/expired invitations, scan assignment, retained owner, exact units, scoped overview, revocation, new authorization and foreign branch protection.\n";
+team_denied(fn()=>team_require_assignment($db,1),403);team_denied(fn()=>team_require_assignment($db,2),403);team_denied(fn()=>team_require_assignment($db,3),403);team_check(team_can_assign($db,6),'only platform manager');stock_query($db,"UPDATE users SET role='administrador' WHERE id=6");team_denied(fn()=>team_require_assignment($db,6),403);
+echo "OK: independent business ranks, manager-only company assignment, one-use/expired invitations, scan assignment, retained owner, exact units, scoped overview, revocation, new authorization and foreign branch protection.\n";

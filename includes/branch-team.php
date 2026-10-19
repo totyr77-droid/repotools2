@@ -3,6 +3,12 @@ declare(strict_types=1);
 require_once __DIR__.'/stock.php';
 
 // Business permissions are independent of users.role (catalog moderation).
+function team_can_assign(PDO $db,int $user): bool {
+    return stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn()==='manager';
+}
+function team_require_assignment(PDO $db,int $user): void {
+    if(!team_can_assign($db,$user))throw new CatalogException('Solo un manager de Repotools puede asignar empresas y sus sucursales.',403);
+}
 function team_role(PDO $db,int $user,int $branch): string {
     if(!$user||!$branch)return '';
     $owner=stock_query($db,'SELECT w.owner_id FROM branch_workspace_locations l JOIN branch_workspaces w ON w.id=l.workspace_id WHERE l.branch_id=?',[$branch])->fetchColumn();
@@ -30,13 +36,15 @@ function team_select(PDO $db,int $user,int $branch): void {
     stock_query($db,'INSERT INTO branch_team_active(user_id,branch_id) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET branch_id=excluded.branch_id',[$user,$branch]);
 }
 function team_attach(PDO $db,int $user,int $workspace,int $branch): void {
-    if((int)stock_query($db,'SELECT owner_id FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn()!==$user)throw new CatalogException('Solo el administrador puede añadir sucursales.',403);
+    team_require_assignment($db,$user);
+    $owner=(int)stock_query($db,'SELECT owner_id FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn();
+    if(!$owner)throw new CatalogException('La empresa no está disponible.',404);
     $directory=stock_query($db,'SELECT owner_id FROM stock_branches WHERE id=?',[$branch])->fetchColumn();
-    // A directory entry is not proof of authority. Never take over another creator's entry.
-    if((int)$directory!==$user)throw new CatalogException('Solo podés habilitar sucursales creadas por tu cuenta. Una sucursal de otra persona requiere autorización.',403);
+    if($directory===false)throw new CatalogException('La sucursal no está disponible.',404);
     if(stock_query($db,'SELECT 1 FROM branch_workspace_locations WHERE branch_id=?',[$branch])->fetchColumn())throw new CatalogException('Esta sucursal ya tiene un equipo.',409);
     stock_query($db,'INSERT INTO branch_workspace_locations(branch_id,workspace_id) VALUES(?,?)',[$branch,$workspace]);
-    team_event($db,$user,$branch,'team_created');team_select($db,$user,$branch);
+    team_event($db,$user,$branch,'company_assigned',$owner);
+    if(!team_active($db,$owner))team_select($db,$owner,$branch);
 }
 function team_invite(PDO $db,int $user,int $branch,string $role): string {
     $actor=team_require($db,$user,$branch,true);

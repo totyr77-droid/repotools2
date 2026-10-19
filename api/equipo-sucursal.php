@@ -18,13 +18,17 @@ try {
         switch($action){
             case 'create':
             case 'add_branch':
+                team_require_assignment($db,$uid);
                 $workspace=(int)($_POST['workspace_id']??0);
-                if($action==='add_branch'&&(int)stock_query($db,'SELECT owner_id FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn()!==$uid)throw new CatalogException('Solo el administrador puede añadir sucursales.',403);
+                if($action==='add_branch'&&!stock_query($db,'SELECT 1 FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn())throw new CatalogException('La empresa no está disponible.',404);
                 if(!$branch){$saved=branch_save($db,$uid,array_intersect_key($_POST,array_flip(['name','address','locality','province'])));$branch=(int)$saved['branch']['id'];}
                 if($action==='create'){
-                    if((int)stock_query($db,'SELECT COUNT(*) FROM branch_workspaces WHERE owner_id=?',[$uid])->fetchColumn()>=20)throw new CatalogException('Ya tenés el máximo de espacios.',422);
+                    $email=trim($_POST['owner_email']??$user['email']);
+                    $owner=(int)stock_query($db,'SELECT id FROM users WHERE LOWER(email)=LOWER(?)',[$email])->fetchColumn();
+                    if(!$owner)throw new CatalogException('La persona responsable debe tener una cuenta. Revisá su correo.',422);
+                    if((int)stock_query($db,'SELECT COUNT(*) FROM branch_workspaces WHERE owner_id=?',[$owner])->fetchColumn()>=20)throw new CatalogException('Ya tenés el máximo de espacios.',422);
                     $name=catalog_text($_POST['workspace_name']??'',100);if($name==='')$name=(string)stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branch])->fetchColumn();
-                    $workspace=(int)stock_query($db,'INSERT INTO branch_workspaces(owner_id,name) VALUES(?,?) RETURNING id',[$uid,$name])->fetchColumn();
+                    $workspace=(int)stock_query($db,'INSERT INTO branch_workspaces(owner_id,name) VALUES(?,?) RETURNING id',[$owner,$name])->fetchColumn();
                 }
                 team_attach($db,$uid,$workspace,$branch);break;
             case 'select':team_select($db,$uid,$branch);break;
@@ -47,9 +51,11 @@ try {
         $db->commit();
     }
     $locations=team_locations($db,$uid);$active=team_active($db,$uid);
-    $result+=['locations'=>$locations,'active'=>$active,'csrf'=>$csrf,'ok'=>true];
+    $canAssign=team_can_assign($db,$uid);
+    $result+=['locations'=>$locations,'active'=>$active,'csrf'=>$csrf,'ok'=>true,'can_assign_company'=>$canAssign];
     if($method==='GET'){
-        $result['available']=stock_query($db,'SELECT b.id,b.name,b.address FROM stock_branches b WHERE b.owner_id=? AND NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200',[$uid])->fetchAll();
+        $result['available']=$canAssign?stock_query($db,'SELECT b.id,b.name,b.address FROM stock_branches b WHERE NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200')->fetchAll():[];
+        $result['assignable_workspaces']=$canAssign?stock_query($db,'SELECT w.id,w.name,u.public_name AS owner_name FROM branch_workspaces w JOIN users u ON u.id=w.owner_id ORDER BY w.name,w.id LIMIT 200')->fetchAll():[];
         $branch=(int)($_GET['branch_id']??$active);$role=$branch?team_role($db,$uid,$branch):'';
         if(isset($_GET['branch_id'])&&!$role)throw new CatalogException('Tu vínculo no está activo.',403);
         if(in_array($role,['admin','manager'],true))$result['overview']=team_overview($db,$uid,$branch,max(0,(int)($_GET['cursor']??0)));
