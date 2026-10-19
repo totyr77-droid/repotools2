@@ -1,6 +1,12 @@
 {
-  "version": 83,
+  "version": 84,
   "changes": [
+    {
+      "version": 84,
+      "label": "1.79",
+      "date": "2026-10-19",
+      "summary": "Logos oficiales SVG e iconos PWA violetas"
+    },
     {
       "version": 83,
       "label": "1.78",
@@ -294,15 +300,9 @@
       "label": "1.30",
       "date": "2026-10-16",
       "summary": "Correcciones de enlaces, fechas, menú de Biblioteca, sucursales según mano y presentación de TOPs."
-    },
-    {
-      "version": 34,
-      "label": "1.29",
-      "date": "2026-10-16",
-      "summary": "Demos más claras, TOPs de escaneadores/reportadores/referidos y filtros y acciones adaptados a la mano."
     }
   ],
   "major": 1,
-  "minor": 78,
-  "label": "1.78"
+  "minor": 79,
+  "label": "1.79"
 }

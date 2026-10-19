@@ -36,7 +36,7 @@ let browser;
     const oldQR=new QRCode(document.createElement('div'),{text:'https://www.repotools.online/palet.php?codigo=12345678',width:256,height:256,correctLevel:QRCode.CorrectLevel.M});return {oldModules:oldQR._oQRCode.getModuleCount(),newModules:RepoPalletLabel.layout({code:'12345678',activated:1}).n,width:img.width,height:img.height,black,dataURL:result.dataURL,svg:RepoPalletLabel.vector({code:'12345678',activated:1})};
   });
   assert.equal(data.width,2480);assert.equal(data.height,3508);assert.ok(data.black>20000,'Actual horizontal logo is visible in black');
-  const logo=fs.readFileSync('img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-2048w.png').toString('base64');
+  const logo=fs.readFileSync('img/brand/repotools-horizontal-transparente.svg').toString('base64');
   assert.ok(!data.svg.includes('lengthAdjust=')&&!data.svg.includes('textLength='),'Digits are not compressed or stretched');
   assert.ok(data.svg.includes(logo),'Uses specified original logo, embedded in vector');
   const bounds=await page.evaluate(svg=>{
