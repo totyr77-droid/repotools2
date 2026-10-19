@@ -1,6 +1,12 @@
 {
-  "version": 84,
+  "version": 85,
   "changes": [
+    {
+      "version": 85,
+      "label": "1.80",
+      "date": "2026-10-19",
+      "summary": "Corregir posición de búsqueda, filtros y etiquetas de palets"
+    },
     {
       "version": 84,
       "label": "1.79",
@@ -294,15 +300,9 @@
       "label": "1.31",
       "date": "2026-10-16",
       "summary": "La cantidad de producto abre la calculadora al tocarla, sin teclado del celular."
-    },
-    {
-      "version": 35,
-      "label": "1.30",
-      "date": "2026-10-16",
-      "summary": "Correcciones de enlaces, fechas, menú de Biblioteca, sucursales según mano y presentación de TOPs."
     }
   ],
   "major": 1,
-  "minor": 79,
-  "label": "1.79"
+  "minor": 80,
+  "label": "1.80"
 }
