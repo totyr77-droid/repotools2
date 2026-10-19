@@ -23,3 +23,7 @@
 .team-account-dialog [hidden]{display:none!important}
 
 .team-account-dialog form>label{margin:0!important}.team-account-dialog form>.team-hint{margin:0}.team-account-dialog .library-primary{display:inline-flex;align-items:center;justify-content:center;gap:7px}.team-account-dialog #teamInviteResult .team-inline{gap:8px;flex-wrap:wrap}
+
+#teamConfirm{position:fixed;inset:0;margin:auto;width:min(430px,calc(100vw - 24px));height:fit-content;max-width:calc(100vw - 24px);max-height:calc(var(--dialog-visible-height,100dvh) - 24px);box-sizing:border-box;overflow:auto}#teamConfirm .team-inline{justify-content:flex-end;gap:8px}body[data-hand=left] #teamConfirm .team-inline{flex-direction:row-reverse}.team-pending{display:inline-flex;align-items:center;gap:7px}#teamPendingDialog .team-row small{line-height:1.4}
+
+.team-account-dialog form>label.team-invite-role{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}.team-invite-role>select{margin:0}#teamInviteForm .user-qr-input{border:1px solid #ded9e9;border-radius:10px;overflow:hidden;background:#fff;box-sizing:border-box;gap:0}#teamInviteForm .user-qr-input:focus-within{outline:2px solid #887abd;outline-offset:2px}#teamInviteForm .user-qr-input>input{margin:0;border:0;border-radius:0;outline:0;box-shadow:none}#teamInviteForm .user-qr-input>button{box-sizing:border-box;align-self:stretch;border-radius:0;border-left:1px solid #ded9e9;background:#f0edf8}body[data-hand=left] #teamInviteForm .user-qr-input>button{border-left:0;border-right:1px solid #ded9e9}
