@@ -487,7 +487,7 @@ function palletNumberRegion(image){
       const rescueWarmup=current.isQR?setTimeout(()=>{if(current.accepting&&session===current&&!document.hidden&&canAccept())startRescue();},450):null;
       async function decodeImage(surface){const original=current.isQR&&rescueReady?surface.getContext('2d').getImageData(0,0,surface.width,surface.height):null;try{return await decoder.decodeRobustlyAsync(surface);}catch(error){if(!current.isQR||!current.accepting||session!==current||document.hidden||!canAccept()||performance.now()-(current.cameraReadyAt??current.requestedAt)<650)throw error;startRescue();if(!rescueReady||rescuePending||performance.now()-rescueLast<350)throw error;rescueLast=performance.now();const image=original||surface.getContext('2d').getImageData(0,0,surface.width,surface.height),id=++rescueSequence;const result=await new Promise(resolve=>{rescuePending={id,resolve,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});if(result&&current.accepting&&session===current&&!document.hidden&&canAccept())return result;throw error;}}
       let lastRectify=-Infinity;
-      let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false, lastFrame=null,lastQuagga=-Infinity,attempts=0;
+      let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false, lastFrame=null,lastQuagga=-Infinity,quaggaCandidate=false,attempts=0;
       const lowPower=Number(window.navigator?.hardwareConcurrency||8)<=4;
       if(typeof current.reader.pause==='function'){try{current.reader.pause(false);if(current.reader.scannerPausedUiElement)current.reader.scannerPausedUiElement.style.display='none';current.exclusive=true;}catch{}}
       let detailButton,detailTimer,manualRequest=false;
@@ -520,7 +520,9 @@ function palletNumberRegion(image){
             }
             manualRequest=Boolean(current.requestDetail);const detailed=current.requestDetail||(++attempts%(lowPower&&current.isQR?3:4)===(lowPower&&current.isQR?2:0)&&started-(current.cameraReadyAt??current.requestedAt)>(lowPower?350:500));current.requestDetail=false;
             const adaptive = current.isQR ? { angle: 0, crop: 1, detailed } : lastProfile ?? (probeAttempt++ % 2 === 0 ? locate(video, frame) : null);
-            if (!current.isQR && window.Quagga?.decodeSingle && !adaptive && started-lastQuagga>1200) {
+            // A successful fallback needs new frames inside the 650 ms confirmation window.
+            // Orientation hints must not starve this independent decoder.
+            if (!current.isQR && window.Quagga?.decodeSingle && started-lastQuagga>(quaggaCandidate?180:900)) {
               // Localiza barras y su orientación en una sola imagen. El canvas
               // y las cajas del localizador permanecen fuera de la interfaz.
               const scale = Math.min(1, 1920 / Math.max(frame.width, frame.height));
@@ -530,7 +532,8 @@ function palletNumberRegion(image){
               try {
                 result = await window.Quagga.decodeSingle({ src: canvas.toDataURL('image/jpeg', .92), inputStream: { size: 0 }, locate: true, locator: { halfSample: false, patchSize: 'small' }, decoder: { readers: ['ean_reader', 'ean_8_reader'] }, numOfWorkers: 0 });
               } catch { /* El decodificador alternativo sigue disponible. */ }
-              if (validEAN(result?.codeResult?.code)) {
+              quaggaCandidate=validEAN(result?.codeResult?.code);
+              if (quaggaCandidate) {
                 if (Array.isArray(result.box) && result.box.length >= 4 && result.box.every(p=>Array.isArray(p)&&p.length>=2&&p.every(Number.isFinite))) {
                   current.viewport?.track({x0:Math.min(...result.box.map(p=>p[0])),y0:Math.min(...result.box.map(p=>p[1])),x1:Math.max(...result.box.map(p=>p[0])),y1:Math.max(...result.box.map(p=>p[1]))},canvas.width,canvas.height);
                 }
@@ -566,7 +569,7 @@ function palletNumberRegion(image){
           finally {
             running = false;if(detailButton&&manualRequest){detailButton.disabled=false;detailButton.removeAttribute('aria-busy');detailButton.querySelector('span').textContent='Analizar detalle';}
             if (!current.accepting || session !== current || current.token !== revision) dispose();
-            else {const cost=performance.now()-started;metric(current,'analysis',{costMs:cost,width:canvas.width,height:canvas.height});current.backgroundTimer=setTimeout(analyze,Math.max(50,Math.min(600,cost*(lastProfile&&!current.isQR ? .4 : lowPower ? 2 : 1.2))));}
+            else {const cost=performance.now()-started;metric(current,'analysis',{costMs:cost,width:canvas.width,height:canvas.height});current.backgroundTimer=setTimeout(analyze,Math.max(50,Math.min(quaggaCandidate?180:600,cost*(lastProfile&&!current.isQR ? .4 : lowPower ? 2 : 1.2))));}
           }
           return;
         }

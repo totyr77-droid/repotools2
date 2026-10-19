@@ -1,6 +1,12 @@
 {
-  "version": 61,
+  "version": 62,
   "changes": [
+    {
+      "version": 62,
+      "label": "1.57",
+      "date": "2026-10-19",
+      "summary": "Corrige confirmación del lector EAN alternativo en envases difíciles."
+    },
     {
       "version": 61,
       "label": "1.56",
@@ -294,15 +300,9 @@
       "label": "1.08",
       "date": "2026-10-19",
       "summary": "Beta: asignación de empresas exclusiva de managers, con responsable por correo"
-    },
-    {
-      "version": 12,
-      "label": "1.07",
-      "date": "2026-10-19",
-      "summary": "Beta: equipos de sucursal, permisos e invitaciones con la misma cuenta"
     }
   ],
   "major": 1,
-  "minor": 56,
-  "label": "1.56"
+  "minor": 57,
+  "label": "1.57"
 }
