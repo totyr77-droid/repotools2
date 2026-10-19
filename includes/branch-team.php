@@ -24,7 +24,7 @@ function team_event(PDO $db,int $user,int $branch,string $action,?int $target=nu
     stock_query($db,'INSERT INTO branch_team_events(branch_id,actor_id,action,target_id,pallet_id) VALUES(?,?,?,?,?)',[$branch,$user,$action,$target,$pallet]);
 }
 function team_locations(PDO $db,int $user): array {
-    return stock_query($db,"SELECT b.id,b.name,b.address,w.id AS workspace_id,w.name AS workspace_name,CASE WHEN w.owner_id=? THEN 'admin' ELSE m.role END AS role FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id JOIN branch_workspaces w ON w.id=l.workspace_id LEFT JOIN branch_team_members m ON m.branch_id=b.id AND m.user_id=? AND m.active=1 WHERE w.owner_id=? OR m.user_id IS NOT NULL ORDER BY w.name,b.name,b.id",[$user,$user,$user])->fetchAll();
+    return stock_query($db,"SELECT b.id,b.name,b.address,b.revision,w.id AS workspace_id,w.name AS workspace_name,CASE WHEN w.owner_id=? THEN 'admin' ELSE m.role END AS role FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id JOIN branch_workspaces w ON w.id=l.workspace_id LEFT JOIN branch_team_members m ON m.branch_id=b.id AND m.user_id=? AND m.active=1 WHERE w.owner_id=? OR m.user_id IS NOT NULL ORDER BY w.name,b.name,b.id",[$user,$user,$user])->fetchAll();
 }
 function team_active(PDO $db,int $user): int {
     $branch=(int)stock_query($db,'SELECT branch_id FROM branch_team_active WHERE user_id=?',[$user])->fetchColumn();
@@ -112,4 +112,20 @@ function team_overview(PDO $db,int $user,int $branch,int $cursor=0): array {
     $invites=stock_query($db,'SELECT token_hash,role,expires FROM branch_team_invites WHERE branch_id=? AND revoked=0 AND used_by IS NULL AND expires>? ORDER BY expires DESC',[$branch,time()])->fetchAll();
     $movements=pallet_activity_present($db,$rows);foreach($movements as $index=>&$movement)$movement['code']=$rows[$index]['code'];unset($movement);
     return ['members'=>$members,'pallets'=>$pallets,'next_cursor'=>$more?(int)end($pallets)['id']:null,'events'=>$events,'movements'=>$movements,'invites'=>$invites];
+}
+
+// Called inside the Stock write transaction/lock, after CSRF validation.
+function team_delete_branch(PDO $db,int $user,int $branch,int $revision): void {
+    if(team_require($db,$user,$branch)!=='admin')throw new CatalogException('Solo el administrador de la sucursal puede eliminarla.',403);
+    $before=stock_query($db,'SELECT * FROM stock_branches WHERE id=?',[$branch])->fetch();
+    if(!$before||(int)$before['revision']!==$revision)throw new CatalogException('La sucursal cambió. Actualizá antes de eliminarla.',409);
+    require_once __DIR__.'/stock-branches.php';
+    // Keep team audit records after removing the directory entry and its FK children.
+    $events=stock_query($db,'SELECT * FROM branch_team_events WHERE branch_id=? ORDER BY id',[$branch])->fetchAll();
+    foreach($events as $event)stock_query($db,'INSERT INTO branch_events(actor_id,branch_id,branch_name,action,before_data,after_data,created_at) VALUES(?,?,?,?,?,?,?)',[(int)$event['actor_id'],$branch,$before['name'],'team_'.$event['action'],json_encode($event,JSON_UNESCAPED_UNICODE),'{}',$event['created_at']]);
+    branch_event($db,$user,'branch_deleted',$before,null);
+    stock_query($db,'UPDATE pallets SET branch_id=NULL,revision=revision+1,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE branch_id=?',[$user,$branch]);
+    stock_query($db,'UPDATE stock_shares SET active=0,branch_id=NULL WHERE branch_id=?',[$branch]);
+    foreach(['branch_team_active','branch_team_invites','branch_team_members','branch_team_events','branch_workspace_locations'] as $table)stock_query($db,'DELETE FROM '.$table.' WHERE branch_id=?',[$branch]);
+    stock_query($db,'DELETE FROM stock_branches WHERE id=?',[$branch]);
 }

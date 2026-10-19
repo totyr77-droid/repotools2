@@ -34,6 +34,7 @@ $paginaEquipo=true;$publicPageTitle='Mi equipo';include 'vistas/header.vista.php
 <section class="team-section"><h2>Últimos movimientos</h2><div id="teamMovements"></div><details><summary>Accesos y asignaciones</summary><div id="teamEvents"></div></details></section>
 </div>
 <p id="teamOperatorHint" hidden>Podés trabajar con los palets desde Escanear palet en Inicio. El encargado consulta el inventario completo.</p>
+<button type="button" class="team-text team-danger" id="teamDeleteBranch" hidden>Eliminar sucursal</button>
 <button type="button" class="team-text team-danger" id="teamLeave" hidden>Desvincularme de esta sucursal</button>
 <details class="team-section" id="teamSetup" hidden><summary>Asignar empresa</summary><p>Asignación exclusiva de managers de Repotools. La persona responsable usa su cuenta habitual.</p>
 <form id="teamCreateForm"><label>Empresa<select id="teamAssignWorkspace"><option value="0">Nueva empresa</option></select></label><label id="teamOwnerLabel">Correo de la persona responsable<input name="owner_email" type="email" maxlength="254" value="<?= escape(current_user()['email']) ?>" required></label><label id="teamWorkspaceLabel">Nombre de la empresa <small>(opcional)</small><input name="workspace_name" maxlength="100" placeholder="Ej.: Mi equipo"></label><label>Sucursal<select name="branch_id" id="teamDirectory"><option value="0">Crear una sucursal</option></select></label>

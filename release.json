@@ -1,6 +1,12 @@
 {
-  "version": 18,
+  "version": 19,
   "changes": [
+    {
+      "version": 19,
+      "label": "1.14",
+      "date": "2026-10-19",
+      "summary": "Administrador de sucursal puede eliminarla conservando mercadería"
+    },
     {
       "version": 18,
       "label": "1.13",
@@ -107,6 +113,6 @@
     }
   ],
   "major": 1,
-  "minor": 13,
-  "label": "1.13"
+  "minor": 14,
+  "label": "1.14"
 }

@@ -12,7 +12,7 @@ team_denied(fn()=>team_attach($db,1,$workspace,(int)$foreign['id']),403);team_de
 team_check(team_role($db,1,$branch)==='admin','business admin');team_check(!stock_is_admin($db,1),'business rank never grants platform admin');
 $manager=team_invite($db,1,$branch,'manager');team_accept($db,2,$manager);team_denied(fn()=>team_accept($db,5,$manager),410);
 team_denied(fn()=>team_invite($db,2,$branch,'manager'),403);$operator=team_invite($db,2,$branch,'operator');team_accept($db,3,$operator);
-team_check(team_active($db,3)===$branch,'active branch');team_denied(fn()=>team_overview($db,3,$branch),403);team_denied(fn()=>team_select($db,5,$branch),403);
+team_denied(fn()=>team_delete_branch($db,2,$branch,1),403);team_check(team_active($db,3)===$branch,'active branch');team_denied(fn()=>team_overview($db,3,$branch),403);team_denied(fn()=>team_select($db,5,$branch),403);
 team_denied(fn()=>team_invite($db,3,$branch,'operator'),403);
 stock_query($db,'INSERT INTO pallet_labels(code,reserved_by,reserved_until) VALUES(?,4,?)',['00123456',time()+86400]);$p=stock_claim($db,'00123456',4);
 team_denied(fn()=>stock_editable($db,(int)$p['id'],3),403);
@@ -40,4 +40,25 @@ team_revoke($db,1,$branch,2,1);team_check(team_role($db,2,$branch)==='','manager
 $second=branch_save($db,1,['name'=>'Sucursal C','address'=>'Calle 3','locality'=>'Ciudad','province'=>'Provincia'])['branch'];team_attach($db,6,$workspace,(int)$second['id']);team_check(count(team_locations($db,1))===2,'admin switches multiple branches');team_denied(fn()=>team_select($db,3,(int)$second['id']),403);team_check(count(team_locations($db,3))===1,'operator sees only authorized branch');
 stock_query($db,"UPDATE users SET role='administrador' WHERE id=1");team_denied(fn()=>branch_delete($db,1,['id'=>$branch,'revision'=>1]),409);
 team_denied(fn()=>team_require_assignment($db,1),403);team_denied(fn()=>team_require_assignment($db,2),403);team_denied(fn()=>team_require_assignment($db,3),403);team_check(team_can_assign($db,6),'only platform manager');stock_query($db,"UPDATE users SET role='administrador' WHERE id=6");team_denied(fn()=>team_require_assignment($db,6),403);
+// Deleting a team branch must not delete another person's stock or another location.
+$deleteInvite=team_invite($db,1,$branch,'operator');
+stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=?',[$branch,$p['id']]);
+team_denied(fn()=>team_delete_branch($db,3,$branch,1),403);
+team_denied(fn()=>team_delete_branch($db,6,$branch,1),403);
+team_denied(fn()=>team_delete_branch($db,1,$branch,999),409);
+$eventCount=(int)stock_query($db,'SELECT COUNT(*) FROM branch_team_events WHERE branch_id=?',[$branch])->fetchColumn();
+$db->beginTransaction();team_delete_branch($db,1,$branch,1);$db->rollBack();
+team_check(team_role($db,3,$branch)==='operator','rollback restores membership');
+$db->beginTransaction();team_delete_branch($db,1,$branch,1);$db->commit();
+team_check(!stock_query($db,'SELECT 1 FROM stock_branches WHERE id=?',[$branch])->fetchColumn(),'branch deleted');
+team_check(count(team_locations($db,1))===1,'other branch retained');
+team_check(team_role($db,3,$branch)===''&&team_active($db,3)===0,'members lose access');
+team_denied(fn()=>team_accept($db,5,$deleteInvite),410);
+team_check((int)stock_query($db,'SELECT COUNT(*) FROM branch_events WHERE branch_id=? AND action LIKE ?',[$branch,'team_%'])->fetchColumn()===$eventCount,'audit preserved');
+$kept=stock_detail($db,'00123456',4);team_check($kept['can_edit'],'owner still edits');
+team_check((int)stock_query($db,'SELECT owner_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===4,'owner retained on deletion');
+team_check(stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===null,'pallet unassigned');
+team_check((int)stock_query($db,'SELECT SUM(units) FROM pallet_products WHERE pallet_id=?',[$p['id']])->fetchColumn()===24,'inventory retained on deletion');
+team_check((int)stock_query($db,'SELECT active FROM stock_shares WHERE token=?',[str_repeat('a',64)])->fetchColumn()===0,'branch share disabled');
+
 echo "OK: independent business ranks, manager-only company assignment, one-use/expired invitations, scan assignment, retained owner, exact units, scoped overview, revocation, new authorization and foreign branch protection.\n";
