@@ -6,3 +6,5 @@ html.is-loading #repotoolsPageLoader{opacity:1;visibility:visible;pointer-events
 @media(prefers-reduced-motion:reduce){#repotoolsPageLoader{transition:none}#repotoolsPageLoader img{animation:none}}
 
 #repotoolsPageLoader{box-sizing:border-box;height:100dvh}#repotoolsPageLoader img{height:auto;aspect-ratio:988/600;display:block;margin:0;flex:none}#repotoolsPageLoader>span{display:block;margin:0;padding:0;line-height:1.4}
+
+#repotoolsPageLoader img{animation:none}#repotoolsPageLoader>.page-loader-progress{height:3px;width:88px;position:relative;overflow:hidden;border-radius:3px;background:#ffffff40}#repotoolsPageLoader>.page-loader-progress::after{content:"";position:absolute;inset:0 auto 0 0;width:40%;background:#fff;border-radius:3px;animation:rt-page-progress 1s ease-in-out infinite alternate}@keyframes rt-page-progress{to{transform:translateX(150%)}}@media(prefers-reduced-motion:reduce){#repotoolsPageLoader>.page-loader-progress::after{animation:none}}

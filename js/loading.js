@@ -37,7 +37,7 @@
       }
       const mark = document.createElement('span'); mark.className = 'repotools-loader-mark'; mark.setAttribute('aria-hidden', 'true');
       for (let i = 0; i < (type === 'skeleton' ? 3 : 5); i++) { const bar = document.createElement('i'); bar.style.setProperty('--loader-index', i); mark.append(bar); }
-      if(target.classList.contains('stock-pallet-lookup-notice')){const brand=document.createElement('span');brand.className='repotools-loader-brand';brand.setAttribute('aria-hidden','true');node.append(brand,text,mark);}else node.append(mark,text);
+      if(target.classList.contains('stock-pallet-lookup-notice')){const brand=document.createElement('span');brand.className='repotools-loader-brand';brand.setAttribute('aria-hidden','true');const box=document.createElement('span');box.className='repotools-loader-box';box.append(text,mark);node.append(brand,box);}else node.append(mark,text);
       if (positioned) target.style.position = 'relative';
       if (!button) target.classList.add('repotools-loading-host');
       (type === 'fullscreen' ? document.documentElement : target).append(node);

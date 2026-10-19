@@ -10,7 +10,7 @@
       overlay = document.createElement('div'); overlay.id = 'repotoolsPageLoader';
       overlay.setAttribute('role', 'status'); overlay.setAttribute('aria-label', 'Cargando');
       const image = document.createElement('img'); image.src = window.repotoolsLoaderLogo; image.alt = ''; image.width = image.height = 80;
-      const label = document.createElement('span'); label.textContent = 'Cargando...'; overlay.append(image, label);
+      const label = document.createElement('span'); label.textContent = 'Cargando...'; const progress=document.createElement('span');progress.className='page-loader-progress';progress.setAttribute('aria-hidden','true');overlay.append(image,label,progress);
       root.append(overlay);
     }
     return overlay;

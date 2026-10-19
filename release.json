@@ -1,6 +1,12 @@
 {
-  "version": 87,
+  "version": 88,
   "changes": [
+    {
+      "version": 88,
+      "label": "1.83",
+      "date": "2026-10-19",
+      "summary": "RT estático y barra de carga global blanca"
+    },
     {
       "version": 87,
       "label": "1.82",
@@ -294,15 +300,9 @@
       "label": "1.34",
       "date": "2026-10-16",
       "summary": "Los botones de carga y la calculadora respetan la mano también en modo normal; derecha por defecto."
-    },
-    {
-      "version": 38,
-      "label": "1.33",
-      "date": "2026-10-16",
-      "summary": "Pegar EAN dentro del campo, búsqueda visible y avance cómodo de vencimiento a descripción y cantidad."
     }
   ],
   "major": 1,
-  "minor": 82,
-  "label": "1.82"
+  "minor": 83,
+  "label": "1.83"
 }
