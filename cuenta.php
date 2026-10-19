@@ -119,8 +119,8 @@ include __DIR__ . '/vistas/header.vista.php';
 
     </section>
     <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2>
-    <?php require_once __DIR__.'/includes/branch-team.php';$accountTeamLocations=team_locations(database(),(int)current_user()['id']); ?>
-    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><?php if($accountTeamLocations): ?><a href="sucursales.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Mi equipo</a><?php if(team_can_assign(database(),(int)current_user()['id'])): ?><a href="gestion-empresas.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Empresas y sucursales</a><?php endif;endif; ?>
+    <?php require_once __DIR__.'/includes/branch-team.php';$accountTeamLocations=team_locations(database(),(int)current_user()['id']);$accountTeamInvites=team_incoming(database(),(int)current_user()['id']); ?>
+    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><?php if($accountTeamLocations||$accountTeamInvites): ?><a href="sucursales.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Mi equipo</a><?php if($accountTeamLocations&&team_can_assign(database(),(int)current_user()['id'])): ?><a href="gestion-empresas.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Empresas y sucursales</a><?php endif;endif; ?>
     <a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>

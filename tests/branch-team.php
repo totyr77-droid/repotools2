@@ -28,6 +28,7 @@ $manager=team_invite($db,1,$branch,'manager');team_accept($db,2,$manager);team_d
 team_denied(fn()=>team_invite($db,2,$branch,'manager'),403);$operator=team_invite($db,2,$branch,'operator');team_accept($db,3,$operator);
 team_denied(fn()=>team_change_role($db,2,$branch,3,'manager',1),403);team_denied(fn()=>team_delete_branch($db,2,$branch,1),403);team_check(team_active($db,3)===$branch,'active branch');team_denied(fn()=>team_overview($db,3,$branch),403);team_denied(fn()=>team_select($db,5,$branch),403);
 team_denied(fn()=>team_invite($db,3,$branch,'operator'),403);
+stock_query($db,'INSERT INTO pallet_labels(code,reserved_by,reserved_until) VALUES(?,3,?)',['00223344',time()+86400]);$personal=stock_claim($db,'00223344',3);team_check(stock_query($db,'SELECT branch_id FROM pallets WHERE code=?',['00223344'])->fetchColumn()===null,'Stock claim ignores the active team branch');
 stock_query($db,'INSERT INTO pallet_labels(code,reserved_by,reserved_until) VALUES(?,4,?)',['00123456',time()+86400]);$p=stock_claim($db,'00123456',4);
 team_denied(fn()=>stock_editable($db,(int)$p['id'],3),403);
 stock_query($db,'INSERT INTO stock_shares(owner_id,token,branch_id,title) VALUES(4,?,?,?)',[str_repeat('a',64),$branch,'Consulta']);
