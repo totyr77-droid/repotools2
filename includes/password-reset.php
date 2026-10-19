@@ -17,6 +17,7 @@ function reset_password(PDO $db,string $token,string $password): bool {
         $db->prepare('UPDATE users SET password_hash=?,auth_version=auth_version+1 WHERE id=?')->execute([password_hash($password,PASSWORD_DEFAULT),$user]);
         $db->prepare('DELETE FROM password_resets WHERE user_id=?')->execute([$user]);
         $s=$db->prepare('SELECT email FROM users WHERE id=?');$s->execute([$user]);$email=$s->fetchColumn();
+        require_once __DIR__.'/audit.php';$version=(int)audit_q($db,'SELECT auth_version FROM users WHERE id=?',[$user])->fetchColumn();audit_event($db,(int)$user,'password_recovered','recovery:'.$user.':'.$version,['category'=>'users'],[],['auth_version'=>$version]);
         $db->commit();try{if($email && !account_security_email($email))error_log('Repotools: no se pudo enviar el aviso de cambio de contrase?a.');}catch(Throwable $e){error_log('Repotools: fall? el aviso de cambio de contrase?a.');}return true;
     } catch(Throwable $e) {if($db->inTransaction())$db->rollBack();throw $e;}
 }

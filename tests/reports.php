@@ -54,6 +54,8 @@ if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
     $db->exec('DROP TRIGGER test_reward_failure');
 }
 check_report(review_product_report($db, $mod, (int) $report['id'], $review)['status'] === 'approved', 'Acepta el reporte.');
+$photoKey=catalog_approved_photo($db,$ean);check_report($photoKey!==null,'La aprobación publica la foto.');
+$photoPointer=$db->prepare('SELECT object_key FROM catalog_photos WHERE ean=?');$photoPointer->execute([$ean]);check_report($photoPointer->fetchColumn()===$photoKey,'Aprobación actualiza el mismo registro que edición directa.');
 $stmt=$db->prepare('SELECT after_data FROM product_edits WHERE ean=? ORDER BY id DESC LIMIT 1');$stmt->execute([$report['ean']]);
 check_report((int)(json_decode($stmt->fetchColumn(),true)['reviewed_report_id']??0)===(int)$report['id'],'Auditoría vincula aprobación sin perder cambio de ficha.');
 

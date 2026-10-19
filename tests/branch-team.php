@@ -1,0 +1,41 @@
+<?php
+require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../includes/branch-team.php';require_once __DIR__.'/../includes/stock-branches.php';
+function team_check($ok,string $message):void{if(!$ok)throw new RuntimeException($message);}
+function team_denied(callable $work,int $status):void{try{$work();}catch(CatalogException $error){team_check($error->status===$status,$error->getMessage());return;}throw new RuntimeException('Expected '.$status);}
+$db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($db);initialize_database($db);
+foreach(['Admin','Encargado','Operador','Dueño','Ajeno'] as $i=>$name)stock_query($db,'INSERT INTO users(name,public_name,email,password_hash) VALUES(?,?,?,?)',[$name,$name,'user'.$i.'@example.invalid','unused']);
+$b=branch_save($db,1,['name'=>'Sucursal A','address'=>'Calle 1','locality'=>'Ciudad','province'=>'Provincia'])['branch'];$branch=(int)$b['id'];
+$foreign=branch_save($db,5,['name'=>'Sucursal B','address'=>'Calle 2','locality'=>'Ciudad','province'=>'Provincia'])['branch'];
+$workspace=(int)stock_query($db,'INSERT INTO branch_workspaces(owner_id,name) VALUES(1,?) RETURNING id',['Equipo'])->fetchColumn();team_attach($db,1,$workspace,$branch);
+team_denied(fn()=>team_attach($db,1,$workspace,(int)$foreign['id']),403);team_denied(fn()=>team_attach($db,5,$workspace,(int)$foreign['id']),403);
+team_check(team_role($db,1,$branch)==='admin','business admin');team_check(!stock_is_admin($db,1),'business rank never grants platform admin');
+$manager=team_invite($db,1,$branch,'manager');team_accept($db,2,$manager);team_denied(fn()=>team_accept($db,5,$manager),410);
+team_denied(fn()=>team_invite($db,2,$branch,'manager'),403);$operator=team_invite($db,2,$branch,'operator');team_accept($db,3,$operator);
+team_check(team_active($db,3)===$branch,'active branch');team_denied(fn()=>team_overview($db,3,$branch),403);team_denied(fn()=>team_select($db,5,$branch),403);
+team_denied(fn()=>team_invite($db,3,$branch,'operator'),403);
+stock_query($db,'INSERT INTO pallet_labels(code,reserved_by,reserved_until) VALUES(?,4,?)',['00123456',time()+86400]);$p=stock_claim($db,'00123456',4);
+team_denied(fn()=>stock_editable($db,(int)$p['id'],3),403);
+stock_query($db,'INSERT INTO stock_shares(owner_id,token,branch_id,title) VALUES(4,?,?,?)',[str_repeat('a',64),$branch,'Consulta']);
+$scan=team_scan($db,3,'00123456',$branch);team_check($scan['assigned']&&$scan['pallet']['can_edit'],'scan auto assigns and grants access');
+team_check((int)stock_query($db,'SELECT owner_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===4,'owner retained');
+team_check(!team_scan($db,3,'00123456',$branch)['assigned'],'repeat scan is idempotent');
+team_check((int)stock_query($db,"SELECT COUNT(*) FROM branch_team_events WHERE action='pallet_assigned'")->fetchColumn()===1,'single assignment event');
+team_check((int)stock_query($db,'SELECT COUNT(*) FROM stock_share_exclusions')->fetchColumn()===1,'automatic assignment does not publish through old shares');
+team_denied(fn()=>stock_editable($db,(int)$p['id'],3,true),403);
+stock_save_product($db,3,['pallet_id'=>$p['id'],'ean'=>'96385074','name'=>'Producto','amount'=>2,'kind'=>'boxes','pack_size'=>12,'expires'=>'']);
+team_check((int)team_overview($db,2,$branch)['pallets'][0]['units']===24,'manager sees all units');
+team_check(stock_detail($db,'00123456',1)['can_edit'],'admin works with merchandise');
+$stale=team_invite($db,2,$branch,'operator');team_revoke($db,2,$branch,3,1);
+team_check(team_active($db,3)===0,'revocation clears active branch');team_check(!stock_detail($db,'00123456',3)['can_edit'],'revocation effective on detail');
+team_denied(fn()=>stock_editable($db,(int)$p['id'],3),403);team_denied(fn()=>team_accept($db,3,$stale),410);team_denied(fn()=>team_scan($db,3,'00123456',$branch),409);
+team_check(stock_detail($db,'00123456',4)['can_edit'],'owner independent of team');
+$again=team_invite($db,2,$branch,'operator');team_accept($db,3,$again);team_check(team_role($db,3,$branch)==='operator','fresh authorization restores');
+stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=?',[$foreign['id'],$p['id']]);team_denied(fn()=>team_scan($db,3,'00123456',$branch),403);
+team_check((int)stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===(int)$foreign['id'],'foreign branch never moved');
+team_select($db,4,0);team_denied(fn()=>team_scan($db,4,'00123456',$branch),409);
+$expired=team_invite($db,1,$branch,'operator');stock_query($db,'UPDATE branch_team_invites SET expires=? WHERE token_hash=?',[time()-1,hash('sha256',$expired)]);team_denied(fn()=>team_accept($db,5,$expired),410);
+team_denied(fn()=>team_revoke($db,2,$branch,1,1),403);team_denied(fn()=>team_revoke($db,2,$branch,2,1),403);
+team_revoke($db,1,$branch,2,1);team_check(team_role($db,2,$branch)==='','manager revocation');
+$second=branch_save($db,1,['name'=>'Sucursal C','address'=>'Calle 3','locality'=>'Ciudad','province'=>'Provincia'])['branch'];team_attach($db,1,$workspace,(int)$second['id']);team_check(count(team_locations($db,1))===2,'admin switches multiple branches');team_denied(fn()=>team_select($db,3,(int)$second['id']),403);team_check(count(team_locations($db,3))===1,'operator sees only authorized branch');
+stock_query($db,"UPDATE users SET role='administrador' WHERE id=1");team_denied(fn()=>branch_delete($db,1,['id'=>$branch,'revision'=>1]),409);
+echo "OK: independent business ranks, creator-only setup, one-use/expired invitations, scan assignment, retained owner, exact units, scoped overview, revocation, new authorization and foreign branch protection.\n";

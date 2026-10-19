@@ -20,7 +20,9 @@ try {
         if (!$share) library_response(404, ['error' => 'El enlace no está disponible.']);
         $stmt = $db->prepare('SELECT library_id FROM library_imports WHERE user_id = ? AND source_library_id = ?');
         $stmt->execute([$userId, $share['source_library_id']]);
-        library_response(200, ['collection' => $share['collection'], 'alreadyAdded' => (bool) $stmt->fetchColumn() || (int) $share['owner_id'] === $userId]);
+        $existingId = (int)$stmt->fetchColumn();
+        if ((int)$share['owner_id'] === $userId) $existingId = (int)$share['source_library_id'];
+        library_response(200, ['collection' => $share['collection'], 'alreadyAdded' => $existingId > 0, 'libraryId' => $existingId]);
     }
     if ($method === 'POST') {
         $action = $_POST['action'] ?? '';

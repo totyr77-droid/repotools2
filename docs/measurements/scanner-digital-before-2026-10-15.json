@@ -1,0 +1,108 @@
+{
+  "source": "tmp/scanner-before-1.11.js",
+  "environment": "Chrome headless desktop, 960x1280 canvas captureStream 15fps; synthetic motion/perspective; not real camera/device/height",
+  "summary": [
+    {
+      "scene": "qr-small-motion",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 504.40000000596046,
+      "p95Ms": 621,
+      "medianToneMs": 314.79999999701977
+    },
+    {
+      "scene": "qr-digital-zoom-motion",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 473.3999999910593,
+      "p95Ms": 495.29999999701977,
+      "medianToneMs": 276.1000000089407
+    }
+  ],
+  "records": [
+    {
+      "scene": "qr-small-motion",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 172.59999999403954,
+      "firstObservedFrameMs": 256.3999999910593,
+      "visibleToActionMs": 621,
+      "visibleToToneMs": 432.40000000596046,
+      "metrics": [],
+      "taskMs": 905.458,
+      "taskPercent": 76.86400679117148,
+      "heapBytes": 4345220
+    },
+    {
+      "scene": "qr-small-motion",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 2,
+      "firstObservedFrameMs": 46,
+      "visibleToActionMs": 501.20000000298023,
+      "visibleToToneMs": 314.79999999701977,
+      "metrics": [],
+      "taskMs": 244.89699999999993,
+      "taskPercent": 42.739441535776606,
+      "heapBytes": 3241340
+    },
+    {
+      "scene": "qr-small-motion",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 2.0999999940395355,
+      "firstObservedFrameMs": 53.5,
+      "visibleToActionMs": 504.40000000596046,
+      "visibleToToneMs": 308.29999999701977,
+      "metrics": [],
+      "taskMs": 222.77499999999995,
+      "taskPercent": 37.88690476190476,
+      "heapBytes": 3946940
+    },
+    {
+      "scene": "qr-digital-zoom-motion",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 2.6000000089406967,
+      "firstObservedFrameMs": 40.5,
+      "visibleToActionMs": 473.3999999910593,
+      "visibleToToneMs": 270,
+      "metrics": [],
+      "taskMs": 169.721,
+      "taskPercent": 30.470556552962297,
+      "heapBytes": 3311544
+    },
+    {
+      "scene": "qr-digital-zoom-motion",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 3.2000000029802322,
+      "firstObservedFrameMs": 56.599999994039536,
+      "visibleToActionMs": 495.29999999701977,
+      "visibleToToneMs": 293.70000000298023,
+      "metrics": [],
+      "taskMs": 221.3179999999999,
+      "taskPercent": 37.63911564625848,
+      "heapBytes": 3688132
+    },
+    {
+      "scene": "qr-digital-zoom-motion",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 3.2000000029802322,
+      "firstObservedFrameMs": 65.79999999701977,
+      "visibleToActionMs": 470.1000000089407,
+      "visibleToToneMs": 276.1000000089407,
+      "metrics": [],
+      "taskMs": 224.56599999999983,
+      "taskPercent": 40.97919708029194,
+      "heapBytes": 3374284
+    }
+  ]
+}

@@ -174,3 +174,6 @@ Conserva A4 horizontal y PDF, adapta quiet zone del QR según módulos, elimina 
 
 ## 2026-10-13 — Offline inteligente (desarrollo)
 Conectividad comprobada, indicador compacto, sincronizador reutilizado en todas las secciones, reintentos y mutex entre pestañas. Biblioteca gana ledger idempotente y revisión explícita de referencias; Stock protege cargas offline y contenido de claves repetidas. Copias sanitizadas, aislamiento al cambiar cuenta, shell y OCR preparado. Alcance/pruebas/reversión: docs/OFFLINE-INTELIGENTE.md; validación física Safari pendiente.
+
+
+Entrega pública autorizada — 2026-10-14: se integra desarrollo completo en main, conservando etiquetas A4 vertical de la última entrega y las mejoras QR/EAN/offline/Stock/avisos. La etiqueta BETA y su CSS se excluyen de main; desarrollo los conserva. Conflictos con la publicación anterior f7c6003 resueltos con la versión funcional más reciente; documentación de impresión previa conservada. Pruebas y reversión en docs/INTEGRACION-MAIN-2026-10-14.md.

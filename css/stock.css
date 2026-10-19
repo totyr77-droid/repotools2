@@ -178,11 +178,6 @@ body[data-hand="left"] .account-panel-auth .account-password-field input {paddin
 .pending-print-tools button,.pending-print-tools a{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 12px;margin:0;text-decoration:none;font-size:.85rem;border-radius:10px}
 .pending-print-tools svg{width:20px;height:20px;flex:none}
 .pending-print-tools a[aria-disabled=true]{opacity:.45;cursor:default;pointer-events:none}
-#labelList[data-selecting=true] .stock-card{position:relative;padding-inline-end:46px}
-#labelList[data-selecting=true] .stock-card::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:22px;height:22px;border:1px solid #b6afcd;border-radius:6px;background:white}
-#labelList[data-selecting=true] .stock-card[aria-pressed=true]{border-color:#27187e;background:#efedf8}
-#labelList[data-selecting=true] .stock-card[aria-pressed=true]::after{border-color:#27187e;background:#27187e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='m5 12 4 4 10-10'/%3E%3C/svg%3E") center/18px no-repeat}
-@media(max-width:768px) and (pointer:coarse){body[data-hand=left] .pending-print-tools{flex-direction:row-reverse;justify-content:flex-end}body[data-hand=left] #labelList[data-selecting=true] .stock-card{padding-inline-start:46px;padding-inline-end:14px}body[data-hand=left] #labelList[data-selecting=true] .stock-card::after{left:12px;right:auto}}
 #palletDialog .stock-metadata{margin:0 0 12px;padding:10px;gap:8px}#palletDialog .library-heading{margin-bottom:12px}#palletTools{position:sticky;bottom:0;z-index:3;margin:12px 0 0;padding:10px 0 max(8px,env(safe-area-inset-bottom,0px));background:#fff;gap:8px;flex-wrap:wrap;border-top:1px solid #edf0f5}#palletTools .pallet-branch-action{order:0!important;margin-left:0;margin-right:0}#scanStockProduct{width:auto;min-width:0;min-height:44px;font-size:.85rem}#deductStockProduct{min-height:44px;font-size:.85rem;background:#fff0f2;color:#b52a3b}#palletTools .library-settings-menu:not([popover]){top:auto;bottom:calc(100% + 6px)}.stock-movement-link{padding:0;border:0;background:transparent;color:#27187e;font:inherit;font-weight:600;text-align:inherit;cursor:pointer;min-height:24px}#palletActivity{margin:8px 0 0;padding-top:0;border-top:0}#palletActivity .stock-history-open{margin-top:0}.stock-deduct-dialog{width:min(580px,calc(100vw - 24px))}#deductRemaining{min-height:22px;margin:8px 0}#deductFields[hidden]{display:none!important}@media(max-width:600px){#palletTools{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center}#scanStockProduct,#deductStockProduct{grid-column:1/-1;justify-self:stretch}#palletTools .pallet-branch-action{justify-self:end}#palletTools .pallet-branch-action button{width:100%}#palletTools:has(#scanStockProduct[hidden]) .library-settings{grid-column:auto!important}}
 @media(max-width:600px) and (pointer:coarse){body[data-hand=right] #palletTools{grid-template-columns:minmax(0,1fr) 48px}body[data-hand=right] #palletTools .library-settings{grid-column:2;grid-row:3;justify-self:end}body[data-hand=right] #palletTools .pallet-branch-action{grid-column:1;grid-row:3;justify-self:start;max-width:100%}body[data-hand=right] #palletTools:has(#deductStockProduct[hidden]) .library-settings,body[data-hand=right] #palletTools:has(#deductStockProduct[hidden]) .pallet-branch-action{grid-row:2}body[data-hand=right] #palletTools:has(#scanStockProduct[hidden]) .library-settings,body[data-hand=right] #palletTools:has(#scanStockProduct[hidden]) .pallet-branch-action{grid-row:1}}
 .stock-metadata-movement{display:flex;align-items:flex-start;gap:10px;line-height:1.5;min-height:44px;min-width:0;width:100%;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;text-align:inherit;cursor:pointer}.stock-metadata-movement>span{flex:1;min-width:0;overflow-wrap:anywhere}.stock-metadata-movement strong{color:#27187e}
@@ -215,3 +210,52 @@ body[data-hand] #palletTools.stock-toolbar{flex-direction:row!important}
 #palletMetadata{grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);padding:6px 8px;gap:6px;font-size:.74rem}#palletMetadata>p{min-width:0;margin:0;line-height:1.3}#palletMetadata .stock-metadata-movement{line-height:1.3;gap:6px}#palletMetadata svg{width:18px;height:18px;flex:none}
 
 #palletDialog #palletMetadata{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);align-items:start;gap:8px;margin-bottom:10px}#palletMetadata>p,#palletMetadata .stock-metadata-movement{display:flex;align-items:flex-start;gap:8px;width:100%;min-width:0;box-sizing:border-box}#palletMetadata>p>span,#palletMetadata .stock-metadata-movement>span{min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.4}#palletMetadata strong{margin-bottom:2px}#palletDialog .library-heading>div{min-width:0;flex:1}#palletDialog .stock-heading-branch{display:flex;align-items:flex-start;gap:6px;margin:4px 0 0;font-size:.8rem;color:#68627c;line-height:1.35;overflow-wrap:anywhere}#palletDialog .stock-heading-branch[hidden]{display:none}#palletDialog .stock-heading-branch svg{width:18px;height:18px;flex:none}
+
+.generated-label-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;max-height:45dvh;overflow:auto}.generated-label-grid figure{margin:0;text-align:center;font-size:.8rem}.generated-label-grid .stock-label-preview{width:100%;max-width:180px;margin:0 auto 6px;border-radius:4px}#generatedLabels .library-dialog-actions{position:sticky;bottom:0;background:white;padding-top:12px;display:flex;flex-wrap:wrap;gap:8px}#generatedLabels .library-dialog-actions>*{min-height:44px;margin:0;display:inline-flex;align-items:center;gap:6px}
+
+.stock-local-preparation{display:block;margin-top:6px;color:#626b7a;font-size:.75rem}.stock-local-preparation[data-error=true]{color:#795b08}
+@media(max-width:768px) and (pointer:coarse){.stock-quantity-line .stock-calculator[popover]{grid-template-rows:44px repeat(4,minmax(44px,1fr)) 44px;gap:4px;padding:8px}.stock-quantity-line .stock-calculator button{min-height:44px;font-size:1.05rem}}
+@media(min-width:1024px) and (hover:hover) and (pointer:fine){.stock-calculator-disclosure{display:none}#stockProductDialog{width:min(900px,calc(100vw - 48px))}#stockProductForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px;align-items:start}#stockProductForm>p,#stockProductForm>.library-dialog-actions,#stockProductForm>button[type=submit]{grid-column:1/-1}#stockProductForm button[type=submit]{position:sticky;bottom:0}}
+#generatedLabels .generated-label-grid{display:flex;justify-content:center;align-items:center;max-height:none;overflow:hidden}#generatedLabels .stock-label-preview{width:auto;max-width:100%;height:min(42dvh,420px);max-height:42dvh;object-fit:contain;margin:0}#generatedLabels .generated-label-navigation{display:flex;justify-content:center;align-items:center;gap:16px;margin:8px 0;font-size:.85rem}#generatedLabels .generated-label-navigation button{min-width:44px;min-height:44px;background:#eeebf7;color:#27187e;border:0;border-radius:10px;font-size:24px}#generatedLabels .library-dialog-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#generatedLabels .library-dialog-actions>*{width:100%;justify-content:center;white-space:normal;font-size:.85rem;padding:8px;box-sizing:border-box}#generateDialog:has(#generatedLabels:not([hidden])){width:min(620px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto}
+#generatedLabels .library-dialog-actions svg{width:20px;height:20px;flex:none}#generatedLabels .library-dialog-actions>*{min-height:52px}#generatedLabels .generated-label-navigation button:disabled{opacity:.4}
+@media(min-width:1024px) and (hover:hover) and (pointer:fine){#stockProductForm{grid-template-areas:'ean ean' 'lookup lookup' 'expiry name' 'presentation amount' 'total total' 'status status' 'actions actions'}#stockEanLabel,#stockFixedEan{grid-area:ean}#stockLookupStatus{grid-area:lookup}#stockProductForm>label:has(#stockExpiry){grid-area:expiry}#stockProductForm>label:has(#stockProductName){grid-area:name}#stockProductForm>.stock-form-row{grid-area:presentation}#stockProductForm>.stock-form-row:has(#stockPackLabel[hidden]){grid-template-columns:1fr}#stockProductForm>label:has(#stockAmount){grid-area:amount}#stockAmountResult{grid-area:total}#stockProductStatus{grid-area:status}#stockProductForm>.library-dialog-actions{grid-area:actions}}
+
+@media(any-pointer:coarse){.stock-calculator-disclosure{display:block}}
+
+/* Quantity keypad: anchored overlay, no form layout displacement. */
+.stock-quantity-line{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:8px}
+.stock-quantity-line>.stock-calculator,.stock-quantity-line>.stock-calculator[popover]{position:fixed;inset:auto;margin:0;display:grid;width:280px;max-width:calc(100vw - 16px);height:auto;overflow:auto;padding:8px;gap:4px;grid-template-rows:repeat(5,44px);border:1px solid #e2dded;border-radius:12px;background:#fff;box-shadow:0 3px 12px #17203320;box-sizing:border-box;z-index:6;color:#27197F;overscroll-behavior:contain}
+.stock-quantity-line>.stock-calculator[hidden]{display:none}
+.stock-quantity-line>.stock-calculator button{min-height:44px;height:44px;padding:4px;font-size:1rem;color:#27197F}
+.stock-quantity-line>.stock-calculator .stock-calculator-done,.stock-quantity-line>.stock-calculator button[data-calc="="],.stock-quantity-line>.stock-calculator button[data-calc-deduct="="]{background:#27197F;color:white}
+.stock-quantity-line>input{grid-column:1;grid-row:1;width:100%;box-sizing:border-box}
+.stock-quantity-line>.stock-calculator-disclosure{display:block;grid-column:2;grid-row:1;order:0}
+body[data-hand=left] .stock-quantity-line{grid-template-columns:44px minmax(0,1fr)}
+body[data-hand=left] .stock-quantity-line>input{grid-column:2}
+body[data-hand=left] .stock-quantity-line>.stock-calculator-disclosure{grid-column:1}
+
+/* Quantity input and calculator trigger form a single aligned control. */
+.stock-quantity-line{grid-template-columns:minmax(0,1fr) 48px;gap:0;border:1px solid #b6afcd;border-radius:9px;background:#fff}
+.stock-quantity-line:focus-within{border-color:#27197F;box-shadow:0 0 0 2px #27197F18}
+.stock-quantity-line>input{height:48px;min-height:48px;margin:0;border:0;border-radius:8px 0 0 8px}
+.stock-quantity-line>input:focus{outline:0;box-shadow:none}
+.stock-quantity-line>.stock-calculator-disclosure{height:48px;min-height:48px;margin:0}
+.stock-quantity-line>.stock-calculator-disclosure>summary{width:48px;height:48px;min-height:48px;margin:0;padding:12px;border:0;border-left:1px solid #e2dded;border-radius:0 8px 8px 0;color:#27197F}
+body[data-hand=left] .stock-quantity-line{grid-template-columns:48px minmax(0,1fr)}
+body[data-hand=left] .stock-quantity-line>input{border-radius:0 8px 8px 0}
+body[data-hand=left] .stock-quantity-line>.stock-calculator-disclosure>summary{border-left:0;border-right:1px solid #e2dded;border-radius:8px 0 0 8px}
+.stock-ean-paste{position:relative;display:block;min-width:0;width:100%}
+#stockEanInput{width:100%;padding-right:52px;box-sizing:border-box;min-height:48px;margin:0}
+#pasteStockEan{position:absolute;right:1px;top:1px;width:46px;height:46px;min-height:44px;padding:12px;border:0;border-radius:0 9px 9px 0;margin:0;background:#eeebf7;color:#27197f}
+#pasteStockEan svg{width:20px;height:20px}
+body[data-hand=left] #pasteStockEan{left:1px;right:auto;border-radius:9px 0 0 9px}
+body[data-hand=left] #stockEanInput{padding-left:52px;padding-right:12px}
+.stock-product-save-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.stock-product-save-actions>button{min-width:0;min-height:44px;margin:0;padding:8px 6px;font-size:.85rem;line-height:1.2}
+.stock-product-save-actions>#reloadStockProduct{grid-column:1/-1}
+.stock-product-save-actions:has(#saveAndScanStockProduct[hidden])>#saveStockProduct{grid-column:1/-1}
+.stock-product-save-actions>#saveStockProduct{grid-column:2;grid-row:1}
+.stock-product-save-actions>#saveAndScanStockProduct{grid-column:1;grid-row:1}
+body[data-hand=left] .stock-product-save-actions>#saveStockProduct{grid-column:1}
+body[data-hand=left] .stock-product-save-actions>#saveAndScanStockProduct{grid-column:2}
+body[data-hand] .stock-product-save-actions:has(#saveAndScanStockProduct[hidden])>#saveStockProduct{grid-column:1/-1}

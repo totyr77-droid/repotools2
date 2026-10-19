@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/report-storage.php';
+require_once __DIR__.'/audit.php';
 
 // Forwarded IPs are diagnostic metadata, never the identity used for a block.
 function report_client_ip(array $server): string {
@@ -58,6 +59,7 @@ function report_set_block(PDO $db, array $actor, int $id, bool $blocked): array 
             else $db->prepare('DELETE FROM report_blocks WHERE user_id = ?')->execute([$target['id']]);
             $db->prepare('INSERT INTO report_block_events(user_id, actor_id, action) VALUES (?, ?, ?)')->execute([$target['id'], $actor['id'], $blocked ? 'blocked' : 'unblocked']);
         }
+        audit_event($db,(int)$actor['id'],$blocked?'blocked':'unblocked','block:'.$id.':'.bin2hex(random_bytes(8)),['category'=>'roles','target_user'=>(int)$target['id']],[],['blocked'=>$blocked]);
         $db->commit(); return report_detail($db, $id, 'user:' . $actor['id'], true);
     } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
 }
@@ -180,7 +182,8 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
         if ($decision === 'approved') {
             $revision = filter_var($input['revision'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
             if ($revision === false) throw new CatalogException('Revisa la versión actual del producto.', 422);
-            edit_catalog_product($db, $report['ean'], report_fields($input), $revision, (int) $user['id'], $id);
+            $photo=$db->prepare("SELECT object_key FROM report_photos WHERE report_id=? AND kind='product'");$photo->execute([$id]);
+            $reviewedProduct=edit_catalog_product($db, $report['ean'], report_fields($input), $revision, (int) $user['id'], $id, $photo->fetchColumn()?:null);
             if ($report['user_id'] !== null) $db->prepare('INSERT INTO report_rewards (report_id, user_id) VALUES (?, ?) ON CONFLICT(report_id) DO NOTHING')->execute([$id, $report['user_id']]);
         }
         $db->prepare('UPDATE product_reports SET status = ?, reviewed_by = ?, review_note = ?, reviewed_at = CURRENT_TIMESTAMP WHERE id = ? AND status = ?')->execute([$decision, $user['id'], trim($note), $id, 'pending']);
@@ -189,6 +192,7 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
             $body = 'EAN ' . $report['ean'] . ($decision === 'approved' ? ' · Actualizamos el producto.' : ' · ' . trim($note));
             $db->prepare('INSERT INTO notifications (user_id, event_key, type, title, body, report_id) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(event_key) DO NOTHING')->execute([$report['user_id'], 'report:' . $id . ':' . $decision, 'report_review', $title, $body, $id]);
         }
+        audit_event($db,(int)$user['id'],$decision,'report:'.$id,['category'=>'roles','ean'=>$report['ean'],'target_user'=>$report['user_id']],['status'=>$report['status'],'product'=>$report['current']??[]],['status'=>$decision,'product'=>$reviewedProduct??$report['current']??[],'proposal'=>$report['proposed']??[],'note'=>trim($note)],'confirmed',null,1);
         $db->commit(); return report_detail($db, $id, 'user:' . $user['id'], true);
     } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
 }

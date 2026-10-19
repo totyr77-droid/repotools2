@@ -1,0 +1,21 @@
+const assert=require('node:assert/strict'),{chromium}=require('../tmp/ui-check/node_modules/playwright');
+(async()=>{const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});try{
+ const page=await browser.newPage();let calls=0,failBatch=2,revision=1;
+ await page.route('http://localhost/**',async route=>{const url=new URL(route.request().url());if(!url.searchParams.has('offline_codes'))return route.fulfill({contentType:'text/html',body:'<main><div id="stockOverview"></div></main>'});calls++;if(calls===failBatch)return route.fulfill({status:503,body:'{}'});const pallets=url.searchParams.get('offline_codes').split(',').map(code=>({id:Number(code)-10000000+1,code,revision,available:false,products:[{id:1,pallet_id:Number(code)-10000000+1,ean:'96385074',units:84,revision:1}]}));return route.fulfill({contentType:'application/json',body:JSON.stringify({user_id:1,pallets})});});
+ await page.goto('http://localhost/');await page.evaluate(()=>{window.repotoolsOfflineUser=1;window.RepoOfflinePreparation=Promise.resolve(true);});
+ await page.evaluate(()=>new Promise((resolve,reject)=>{const request=indexedDB.open('repotools-stock-offline',3);request.onupgradeneeded=()=>{for(const name of ['loads','palets','libraryLoads','catalog','sent','leases'])request.result.createObjectStore(name,{keyPath:'key'});};request.onsuccess=()=>{const db=request.result,tx=db.transaction('loads','readwrite');tx.objectStore('loads').put({key:'existing-v3',user:2,state:'pending',data:{code:'12345678'}});tx.oncomplete=()=>{db.close();resolve();};};request.onerror=reject;}));
+ for(const file of ['stock-offline','offline-cache','stock-preparation'])await page.addScriptTag({path:'js/'+file+'.js'});
+ assert.equal(await page.evaluate(async()=> (await RepoStockOffline(2).list()).length),1,'Upgrade preserves existing queue');
+ const manifest=Array.from({length:12},(_,i)=>({id:i+1,code:String(10000000+i),revision:1}));
+ await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest,warning_days:30});
+ assert.equal(calls,2);assert.equal(await page.evaluate(async()=> (await RepoOfflineStorage.getView(1,'stock')).data.offline_preparation.complete),false);
+ failBatch=0;await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest,warning_days:30});assert.equal(calls,4,'Resume only missing seven pallets');
+ assert.equal(await page.evaluate(async()=> (await RepoOfflineStorage.getView(1,'stock')).data.offline_preparation.ready),12);
+ await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest,warning_days:30});assert.equal(calls,4,'Unchanged revisions use local snapshots');
+ revision=2;manifest[0].revision=2;await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest,warning_days:30});assert.equal(calls,5);
+ await page.evaluate(async()=>{const store=RepoStockOffline(1);await store.put({key:'pending-fixture',data:{code:'10000011',pallet_id:12},state:'pending'});});
+ await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest.slice(0,11),warning_days:30});
+ assert.equal(await page.evaluate(async()=>!!await RepoStockOffline(1).cached('10000011')),false);assert.equal(await page.evaluate(async()=> (await RepoStockOffline(1).list()).length),1);
+ await page.evaluate(()=>RepoOfflineStorage.clearPrivate(1));assert.equal(await page.evaluate(async()=> (await RepoStockOffline(1).list()).length),1);assert.equal(await page.evaluate(async()=>!!await RepoOfflineStorage.getView(1,'stock')),false);
+ console.log('OK: whole authorized manifest, five-pallet batches, interrupted preparation/resume, revisions, revoked read cache and pending preservation.');
+}finally{await browser.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

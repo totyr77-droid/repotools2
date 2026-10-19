@@ -91,6 +91,7 @@ function branch_assign(PDO $db,int $user,array $input): void {
 function branch_delete(PDO $db,int $user,array $input): void {
     if (!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden eliminar sucursales.',403);
     $id=(int)($input['id']??0); branch_owned($db,$id,$user);
+    if(stock_query($db,'SELECT 1 FROM branch_workspace_locations WHERE branch_id=?',[$id])->fetchColumn())throw new CatalogException('Esta sucursal tiene un equipo activo. No puede eliminarse desde el directorio.',409);
     if ((int)stock_query($db,'SELECT revision FROM stock_branches WHERE id=?',[$id])->fetchColumn()!==(int)($input['revision']??0)) throw new CatalogException('La sucursal cambió. Vuelve a abrirla.',409);
     stock_query($db,'UPDATE pallets SET branch_id=NULL,revision=revision+1 WHERE branch_id=?',[$id]);
     stock_query($db,'UPDATE stock_shares SET active=0,branch_id=NULL WHERE branch_id=?',[$id]);
@@ -130,15 +131,25 @@ function branch_share_create(PDO $db,int $user,array $input): array {
     if($branchId)branch_share_exclusions($db,$user,['id'=>$id,'excluded_ids'=>json_encode($excluded)]);
     return ['share'=>['id'=>$id,'token'=>$token,'title'=>$title,'branch_id'=>$branchId?:null]];
 }
-function branch_public(PDO $db,string $token,int $page=0): array {
+function branch_public(PDO $db,string $token,int $page=0,?int $viewer=null,array $filters=[]): array {
     if (!stock_share_token_valid($token)) throw new CatalogException('El enlace no está disponible.',404);
     $share=stock_query($db,'SELECT * FROM stock_shares WHERE token=? AND active=1',[$token])->fetch();
     if (!$share) throw new CatalogException('Este enlace fue desactivado o no existe.',404);
     $branch=$share['branch_id']?branch_owned($db,(int)$share['branch_id'],(int)$share['owner_id']):null;
-    $sql='SELECT p.id,p.code,p.description,p.updated_at,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,a.name AS updated_name,a.public_name AS updated_public_name,a.id AS updated_user_id,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p JOIN users u ON u.id=p.owner_id JOIN users a ON a.id=p.updated_by LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
+    $sql='SELECT p.id,p.code,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
     $args=[$share['owner_id']];
     if ($branch) { $sql.=' AND p.branch_id=? AND NOT EXISTS(SELECT 1 FROM stock_share_exclusions x WHERE x.share_id=? AND x.pallet_id=p.id)'; $args[]=$branch['id'];$args[]=$share['id']; }
     else { $sql.=' AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=? AND sp.pallet_id=p.id)'; $args[]=$share['id']; }
+    $filterOptions=null;
+    if($viewer){
+        $names=stock_query($db,"SELECT DISTINCT COALESCE(b.id,0) AS id,COALESCE(b.name,'') AS name".substr($sql,strpos($sql,' FROM pallets p ')).' ORDER BY name,id',$args)->fetchAll();
+        $filterOptions=['branches'=>$names];
+        $q=$filters['q']??'';$place=$filters['branch']??'';$tag=$filters['tag']??'';
+        if(!is_string($q)||mb_strlen($q)>100||!is_string($place)||mb_strlen($place)>160||!is_string($tag)||mb_strlen($tag)>40||!in_array($filters['sort']??'expiry',['expiry','code','quantity'],true))throw new CatalogException('Filtro no válido.',422);
+        if($place!==''){if($place!=='__none__'&&(!ctype_digit($place)||filter_var($place,FILTER_VALIDATE_INT)===false))throw new CatalogException('Sucursal no válida.',422);$sql.=' AND COALESCE(p.branch_id,0)=CAST(? AS INTEGER)';$args[]=$place==='__none__'?0:(int)$place;}
+        if($tag!=='')throw new CatalogException('Las etiquetas no están disponibles en esta vista.',422);
+        if(trim($q)!==''){$sql.=" AND (p.code LIKE ? OR EXISTS(SELECT 1 FROM pallet_products match_product LEFT JOIN products c ON c.ean=match_product.ean WHERE match_product.pallet_id=p.id AND (LOWER(match_product.name) LIKE ? OR LOWER(c.name) LIKE ? OR LOWER(c.brand) LIKE ? OR match_product.ean LIKE ?)))";$term='%'.mb_strtolower(trim($q)).'%';array_push($args,$term,$term,$term,$term,$term);}
+    }
     $summary=[];
     if($page===0){
         $scope='SELECT p.id'.substr($sql,strpos($sql,' FROM pallets p '));
@@ -146,19 +157,20 @@ function branch_public(PDO $db,string $token,int $page=0): array {
         foreach($totals as $product)$summary[]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','catalog_name','expires','units']));
     }
     $pallets=[];
-    $rows=stock_query($db,$sql.' ORDER BY p.code,p.id LIMIT 21 OFFSET '.($page*20),$args)->fetchAll();
+    $order=($filters['sort']??'expiry')==='expiry'?"COALESCE((SELECT MIN(NULLIF(exp.expires,'')) FROM pallet_products exp WHERE exp.pallet_id=p.id),'9999-12-31'),p.code,p.id":(($filters['sort']??'')==='quantity'?'COALESCE((SELECT SUM(qty.units) FROM pallet_products qty WHERE qty.pallet_id=p.id),0) DESC,p.code,p.id':'p.code,p.id');
+    $rows=stock_query($db,$sql.' ORDER BY '.$order.' LIMIT 21 OFFSET '.($page*20),$args)->fetchAll();
     $hasMore=count($rows)>20;
-    $rows=array_map('stock_public_identity',array_slice($rows,0,20)); $products=[];
+    $rows=array_slice($rows,0,20); $products=[];
     if ($rows) {
         $ids=array_column($rows,'id'); $marks=implode(',',array_fill(0,count($ids),'?'));
-        foreach (stock_query($db,"SELECT b.pallet_id,b.ean,b.name,b.expires,b.units,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$marks}) ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,b.name,b.id",$ids)->fetchAll() as $product) {
-            $products[$product['pallet_id']][]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','reference_name','catalog_name','expires','units']));
+        foreach (stock_query($db,"SELECT b.pallet_id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$marks}) ORDER BY ".(($filters['sort']??'')==='quantity'?'b.units DESC,':'')."CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,b.name,b.id",$ids)->fetchAll() as $product) {
+            $products[$product['pallet_id']][]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','reference_name','catalog_name','expires','units','kind','pack_size']));
         }
     }
     foreach ($rows as $row) {
         $branchInfo=$row['branch_name']===null?null:['name'=>$row['branch_name'],'address'=>$row['branch_address'],'locality'=>$row['branch_locality'],'province'=>$row['branch_province'],'description'=>$row['branch_description']];
-        $updated=(new DateTimeImmutable($row['updated_at'],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
-        $pallets[]=['code'=>$row['code'],'description'=>$row['description'],'branch'=>$branchInfo,'owner_name'=>$row['owner_name'],'owner_company'=>$row['owner_company'],'updated_at'=>$updated,'updated_name'=>$row['updated_name'],'products'=>$products[$row['id']]??[]];
+        $pallets[]=['code'=>$row['code'],'branch'=>$branchInfo,'products'=>$products[$row['id']]??[]];
     }
-    return ['title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page,'summary'=>$summary];
+    $result=['owner_name'=>get_public_user_name(stock_query($db,'SELECT id,name,public_name FROM users WHERE id=?',[(int)$share['owner_id']])->fetch()?:['id'=>(int)$share['owner_id']]),'title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page,'summary'=>$summary];
+    if($filterOptions!==null)$result['filters']=$filterOptions;return $result;
 }

@@ -19,7 +19,7 @@
           const response = await fetch(`api/productos.php?ean=${encodeURIComponent(ean)}${image ? '&image=1' : ''}`, { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' });
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || 'No pudimos cargar el producto.');
-          access.set(ean, { canEdit: result.can_edit === true, csrf: result.csrf });
+          access.set(ean, { canEdit: result.can_edit === true, photosEnabled:result.photos_enabled===true, csrf: result.csrf, missing:!result.product, checkedAt:Date.now() });
           if(result.product)window.RepoOfflineCatalog?.put(Number(window.repotoolsOfflineUser||0),ean,result.product).catch(()=>{});return result.product || null;
         } finally { clearTimeout(timeout); }
       })();
@@ -70,10 +70,11 @@
       return null;
     }
   }
-  async function save(ean, fields, revision) {
+  async function save(ean, fields, revision, photo) {
     const permission = access.get(ean);
     if (!permission?.canEdit) throw new Error('Solo administradores y moderadores pueden editar productos.');
-    const response = await fetch('api/productos.php', { method: 'POST', credentials: 'same-origin', body: new URLSearchParams({ ...fields, ean, revision, csrf: permission.csrf }) });
+    const body=new FormData();for(const [key,value]of Object.entries({...fields,ean,revision,csrf:permission.csrf}))body.set(key,value);if(photo)body.set('photo_product',photo,'product.jpg');
+    const response = await fetch('api/productos.php', { method: 'POST', credentials: 'same-origin', body });
     const result = await response.json();
     if (!response.ok) {
       if (response.status === 409) cache.delete(ean);
@@ -81,7 +82,7 @@
     }
     cache.set(ean, Promise.resolve(result.product));
     cache.delete(ean + ':image');
-    access.set(ean, { canEdit: result.can_edit === true, csrf: result.csrf });
+    access.set(ean, { canEdit: result.can_edit === true, photosEnabled:result.photos_enabled===true, csrf: result.csrf });
     window.dispatchEvent(new CustomEvent('repotools:product-updated', { detail: { ean, product: result.product } }));
     return result.product;
   }
@@ -154,12 +155,21 @@
   function renderSummary(container, product) {
     container.replaceChildren();
     if (typeof product === 'string' || !product) { container.textContent = typeof product === 'string' ? product : summary(null); return; }
-    const name = document.createElement('span'); name.className = 'product-summary-name'; name.textContent = displayName(product) || 'Producto sin nombre';
+    const name = document.createElement('span'); name.className = 'product-summary-name'; name.textContent = displayName(product) || 'Producto sin nombre'; name.title=name.textContent;
     const quantity = document.createElement('span'); quantity.className = 'product-summary-quantity'; quantity.textContent = product.quantity || 'Contenido no disponible';
     container.append(name, quantity);
   }
   function referenceName(product) {
     return [displayName(product), (product?.quantity || '').trim()].filter(Boolean).join(' ');
   }
+  const referenceJobs=new Map(),referenceControls=new Set();let referenceLeft=false;
+  const networkIsSlow=()=>{const connection=navigator.connection;return navigator.onLine===false||connection?.saveData===true||['slow-2g','2g','3g'].includes(connection?.effectiveType)||(Number(connection?.rtt)>800);};
+  function stageReference(key,data,csrf){const lookup=access.get(data.ean);if(referenceLeft||data.action!=='save_product'||Number(data.product_id)!==0||!data.name?.trim()||!lookup?.missing||Date.now()-lookup.checkedAt>600000||networkIsSlow())return;
+    const job={data:{ean:data.ean,name:data.name,code:data.code},created:Date.now(),promise:null};referenceJobs.set(key,job);
+    job.promise=(async()=>{let controller;try{const health=await Promise.race([window.RepoConnectivity?.check({force:true,timeoutMs:1200}),new Promise(resolve=>setTimeout(()=>resolve(null),1250))]);if(referenceLeft||!health||health.kind!=='online'||health.latencyMs===null||health.latencyMs>1000||networkIsSlow())return '';controller=new AbortController();referenceControls.add(controller);const timer=setTimeout(()=>controller.abort(),1200);try{const response=await fetch('api/productos.php',{method:'POST',credentials:'same-origin',cache:'no-store',signal:controller.signal,body:new URLSearchParams({action:'stock_reference_prepare',operation_key:key,csrf,client_at:job.created,...job.data})});const result=await response.json();return response.ok&&typeof result.permit==='string'?result.permit:'';}finally{clearTimeout(timer);}}catch{return '';}finally{if(controller)referenceControls.delete(controller);}})();setTimeout(()=>{if(referenceJobs.get(key)===job)referenceJobs.delete(key);},10000);
+  }
+  async function takeReference(row){const job=referenceJobs.get(row.key);referenceJobs.delete(row.key);if(!job||referenceLeft||row.deferred||row.offline_wait||row.attempts||row.data?.action!=='save_product'||networkIsSlow())return '';for(const field of ['ean','name','code'])if(job.data[field]!==row.data[field])return '';const permit=await job.promise;return referenceLeft||networkIsSlow()?'':permit;}
+  page?.onLeave(()=>{referenceLeft=true;referenceJobs.clear();for(const control of referenceControls)control.abort();});
+  window.RepoCatalogReference={stage:stageReference,take:takeReference};
   window.RepoProductInfo = { get, show, summary, renderSummary, displayName, referenceName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
 })();

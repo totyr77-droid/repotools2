@@ -27,3 +27,6 @@ Consultar [ARCHITECTURE.md](ARCHITECTURE.md) para el estado actual y [CHANGELOG.
 
 ## Offline inteligente — validación pendiente en campo
 Implementación progresiva en desarrollo: shell, copias autorizadas, colas compartidas, reintentos y conflictos. Probar Safari físico, red móvil lenta/intermitente y retención de IndexedDB. La lista EAN offline aún es separada de Inicio online; evaluar unificación por identidad sin perder listas existentes. Ver docs/OFFLINE-INTELIGENTE.md.
+
+## Equipos de sucursal en beta — 18/10/2026
+Primera implementación en desarrollo: roles por vínculo, varias sucursales por espacio, invitaciones, sucursal activa, escaneo/asignación y consulta de equipo. Ver docs/EQUIPOS-SUCURSAL-BETA.md. Validar en beta con cuentas ficticias antes de autorizar main. Marcas queda como próxima etapa, todavía por definir. Edición offline, uso de pendientes y generación mediante reserva de códigos permanecen propuestas pospuestas.

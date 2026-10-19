@@ -26,6 +26,8 @@ function catalog_text($value, int $max): string {
     return is_string($value) ? mb_substr(trim($value), 0, $max) : '';
 }
 function catalog_approved_photo(PDO $db, string $ean): ?string {
+    $direct=$db->prepare('SELECT object_key FROM catalog_photos WHERE ean=?');$direct->execute([$ean]);
+    if($key=$direct->fetchColumn())return $key;
     $stmt = $db->prepare("SELECT p.object_key FROM report_photos p JOIN product_reports r ON r.id = p.report_id WHERE r.ean = ? AND r.status = 'approved' AND p.kind = 'product' ORDER BY r.reviewed_at DESC, r.id DESC LIMIT 1");
     $stmt->execute([$ean]); return $stmt->fetchColumn() ?: null;
 }
@@ -140,7 +142,7 @@ function can_edit_catalog(PDO $db, ?array $user): bool {
     return in_array($stmt->fetchColumn(), ['manager', 'administrador', 'moderador'], true);
 }
 
-function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision, int $userId, ?int $reviewedReportId = null): array {
+function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision, int $userId, ?int $reviewedReportId = null, ?string $photoKey = null): array {
     if (!valid_product_ean($ean)) throw new CatalogException('El EAN no es válido.', 422);
     $values = [];
     foreach (['name' => 120, 'quantity' => 80, 'brand' => 160, 'category' => 240, 'packaging' => 240] as $field => $max) {
@@ -162,9 +164,12 @@ function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision
             $stmt->execute([...array_values($values), $userId, $ean]);
         }
         if ($stmt->rowCount() !== 1) throw new CatalogException('Otra persona modificó esta ficha. Revisa la versión actual antes de guardar.', 409);
+        if($photoKey!==null)$db->prepare('INSERT INTO catalog_photos(ean,object_key) VALUES(?,?) ON CONFLICT(ean) DO UPDATE SET object_key=excluded.object_key')->execute([$ean,$photoKey]);
         $product = catalog_product($db, $ean);
+        if($photoKey!==null)$product['photo_changed']=true;
         $db->prepare('INSERT INTO product_edits (ean, user_id, before_data, after_data) VALUES (?, ?, ?, ?)')->execute([$ean, $userId, json_encode($before, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), json_encode($reviewedReportId===null?$product:[...$product,'reviewed_report_id'=>$reviewedReportId], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)]);
         $db->prepare('DELETE FROM product_lookup_state WHERE ean = ?')->execute([$ean]);
+        if($reviewedReportId===null){require_once __DIR__.'/audit.php';audit_event($db,$userId,'edited','catalog:'.$ean.':'.$product['revision'],['category'=>'movements','ean'=>$ean],$before??[],$product,'confirmed',null,1);}
         if ($ownTransaction) $db->commit();
         return $product;
     } catch (Throwable $error) { if ($ownTransaction && $db->inTransaction()) $db->rollBack(); throw $error; }

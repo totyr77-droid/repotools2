@@ -13,3 +13,8 @@
 
 /* The bell is closest to the dominant hand; desktop keeps its usual order. */
 @media(max-width:768px) and (pointer:coarse){body[data-hand=left] .notification-control>#openNotifications{order:-1}body[data-hand=right] .notification-control>#openNotifications{order:1}}
+
+/* Timing feedback is passive and never intercepts scanner controls. */
+.repotools-send-toast.repo-toast[data-notice-key=scanner-performance]{pointer-events:none;font-size:.8rem;padding:8px 10px}
+.repo-toast[data-notice-key=scanner-performance]>.repo-toast-close{display:none}
+.repo-toast{touch-action:pan-x}

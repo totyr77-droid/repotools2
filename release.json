@@ -1,6 +1,12 @@
 {
-  "version": 11,
+  "version": 12,
   "changes": [
+    {
+      "version": 12,
+      "label": "1.07",
+      "date": "2026-10-19",
+      "summary": "Beta: equipos de sucursal, permisos e invitaciones con la misma cuenta"
+    },
     {
       "version": 11,
       "label": "1.06",
@@ -65,6 +71,6 @@
     }
   ],
   "major": 1,
-  "minor": 6,
-  "label": "1.06"
+  "minor": 7,
+  "label": "1.07"
 }

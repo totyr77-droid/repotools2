@@ -30,6 +30,7 @@ try {
         $stats=array_map('intval',array_merge($stats,$expiry->fetch()));
         report_response(200,['stats'=>$stats,'roles'=>$db->query('SELECT role,COUNT(*) AS total FROM users GROUP BY role ORDER BY role')->fetchAll(),'csrf'=>$csrf]);
     }
+    if($method==='GET'&&($_GET['view']??'')==='logs'){require_once __DIR__.'/../includes/audit-read.php';$input=$_GET;$filter=$input['filter']??'';if(!is_string($filter))throw new CatalogException('Filtro no válido.',422);if($filter!==''&&isset(report_log_filters()[$filter])){$d=report_log_filters()[$filter];if(empty($input['category']))$input['category']=$d['type']==='user_role'?'roles':($d['type']==='user_profile'?'users':($d['type']==='pallet_admin'?'movements':($d['type']==='branch'?'movements':'')));if(isset($d['action']))$input['action']=$d['action'];if($filter==='branches')$input['family']='branch_';}report_response(200,audit_read($db,(int)$user['id'],$input)+['csrf'=>$csrf]);}
     if ($method === 'GET' && in_array($_GET['view'] ?? '', ['history', 'logs'], true)) {
         if (!$audit) throw new CatalogException('Solo administradores y managers pueden consultar esta sección.', 403);
         $page = filter_var($_GET['page'] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 10000]]);

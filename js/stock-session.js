@@ -1,0 +1,3 @@
+(()=>{'use strict';window.RepoStockSession=user=>{user=Number(user);const key='repotools:stock-session:v1:'+user;let warned=false;
+function read(){try{const value=JSON.parse(sessionStorage.getItem(key)||'null');return user>0&&value?.user===user&&value.at>Date.now()-2*3600000?value:null;}catch{return null;}}
+return {read,patch(value){if(user<1)return false;try{sessionStorage.setItem(key,JSON.stringify({...read(),...value,user,at:Date.now()}));return true;}catch{if(!warned){warned=true;window.RepoToast?.('No pudimos conservar esta sesión en el dispositivo.',{kind:'warning'});}return false;}},clear(){try{sessionStorage.removeItem(key);}catch{}}};};})();

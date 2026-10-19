@@ -15,6 +15,10 @@ if ($method === 'POST' && !$user) product_response(401, ['error' => 'Inicia sesi
 if ($method === 'POST' && !valid_csrf()) product_response(403, ['error' => 'La sesión venció. Recarga la página.']);
 $ean = $method === 'GET' ? ($_GET['ean'] ?? '') : ($_POST['ean'] ?? '');
 if (!is_string($ean) || !valid_product_ean($ean)) product_response(422, ['error' => 'El EAN no es válido.']);
+if($method==='POST'&&($_POST['action']??'')==='stock_reference_prepare'){
+    require_once __DIR__.'/../includes/catalog-reference.php';
+    try{$result=catalog_reference_prepare(database(),(int)$user['id'],$_POST);session_write_close();product_response(200,$result);}catch(CatalogException $error){product_response($error->status,['error'=>$error->getMessage()]);}catch(Throwable $error){product_response(503,['error'=>'No pudimos preparar la referencia.']);}
+}
 $csrf = csrf_token();
 session_write_close();
 try {
@@ -29,12 +33,18 @@ try {
         if (!$canEdit) product_response(403, ['error' => 'No tienes permiso para editar productos.']);
         $revision = filter_var($_POST['revision'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
         if ($revision === false) product_response(422, ['error' => 'Revisa la versión del producto.']);
-        $product = edit_catalog_product($db, $ean, $_POST, $revision, (int) $user['id']);
+        require_once __DIR__.'/../includes/report-storage.php';
+        $jpeg=prepare_report_photo($_FILES['photo_product']??[]);$photoKey=null;$saved=false;
+        try{
+            if($jpeg!==null){$id=bin2hex(random_bytes(16));$uuid=substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20);$photoKey='reports/'.$uuid.'/'.bin2hex(random_bytes(12)).'-product.jpg';report_object('PUT',$photoKey,$jpeg);}
+            $product = edit_catalog_product($db, $ean, $_POST, $revision, (int) $user['id'], null, $photoKey);$saved=true;
+        }finally{if(!$saved&&$photoKey!==null){try{report_object('DELETE',$photoKey);}catch(Throwable $ignored){error_log('Repotools: no se pudo limpiar una foto de edición incompleta.');}}}
     } else {
         $product = lookup_product($db, $ean);
         if ($product && ($_GET['image'] ?? '') === '1') $product = catalog_product_image($db, $product);
     }
-    product_response(200, ['product' => $product, 'can_edit' => $canEdit, 'csrf' => $canEdit ? $csrf : null]);
+    require_once __DIR__.'/../includes/report-storage.php';
+    product_response(200, ['product' => $product, 'can_edit' => $canEdit, 'photos_enabled'=>$canEdit&&report_storage_ready(), 'csrf' => $canEdit ? $csrf : null]);
 } catch (CatalogException $error) {
     product_response($error->status, ['error' => $error->getMessage()]);
 } catch (Throwable $error) {

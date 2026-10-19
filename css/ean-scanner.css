@@ -72,3 +72,21 @@
 .repo-camera-guide[hidden]{display:none!important}
 
 .repo-pallet-qr-guide{border:0;border-radius:0;color:white;opacity:.5}.repo-pallet-qr-guide>svg{width:100%;height:100%;display:block;filter:none}.repo-pallet-number-guide{position:absolute;left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;text-align:center;color:white;box-sizing:border-box;border:1px solid #ffffff80;border-radius:6px;padding:0 8px 4px;background:transparent;opacity:.6}.repo-pallet-number-guide>span{display:block;font:32px/1 monospace;letter-spacing:5px}.repo-pallet-number-guide>small{display:block;font-size:10px;line-height:1.2;text-shadow:0 1px 2px #000}.repo-camera-viewport.ean-detecting .repo-pallet-qr-guide{color:#facc15}.repo-camera-viewport.ean-confirmed .repo-pallet-qr-guide{color:#23c55e}
+
+[aria-pressed=true] .torch-off-mark{display:none}
+
+.ean-camera-controls .ean-camera-zoom{width:auto;min-width:132px;display:flex;flex-direction:row;padding:0;gap:0;height:44px;border-radius:24px}.ean-camera-zoom .ean-zoom-step{width:44px;min-width:44px;height:44px;min-height:44px;border:0;border-radius:50%;padding:0;background:transparent;color:white;font-size:24px;touch-action:none}.ean-camera-zoom .ean-zoom-step:disabled{opacity:.35}.ean-camera-zoom input[hidden]{display:none!important}.ean-camera-zoom-value{min-width:44px;text-align:center;font-size:12px}.ean-camera-zoom-shortcuts{bottom:52px}
+
+.library-scanner-dialog .camera-message-area{display:block!important;box-sizing:border-box;block-size:4.05em;min-block-size:4.05em;line-height:1.35;margin:4px 0 8px;overflow:auto;overflow-wrap:anywhere;overscroll-behavior:contain;font-size:.85rem;scrollbar-width:thin}
+/* Shared compact vertical zoom; actual range and serialized camera updates remain unchanged. */
+.ean-camera-controls .ean-camera-zoom{width:44px;min-width:44px;height:auto;display:flex;flex-direction:column;gap:0;padding:0;border:0;background:rgba(0,0,0,.32);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:22px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.ean-camera-zoom input[type=range]{display:block!important;writing-mode:vertical-lr;direction:rtl;width:44px;height:100px;min-height:0;accent-color:white;cursor:pointer}
+.ean-camera-zoom .ean-camera-zoom-value{min-width:0;line-height:24px;font-size:11px}.ean-camera-zoom .ean-zoom-step{font-size:22px}.ean-camera-zoom-shortcuts{display:none!important}
+.ean-reader>.camera-message-overlay{position:absolute!important;z-index:4;top:8px;left:8px;right:8px;block-size:2.7em!important;min-block-size:2.7em!important;max-height:2.7em;margin:0!important;padding:4px 8px;border:0;border-radius:6px;background:rgba(0,0,0,.56);color:white;text-align:center;font-size:.8rem;line-height:1.25;pointer-events:none;overflow:hidden}
+
+.ean-camera-zoom input[type=range]{height:clamp(24px,12dvh,100px)}
+
+.ean-camera-detail{position:absolute;bottom:max(10px,env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:9;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;max-width:calc(100% - 120px);padding:8px 10px;border:1px solid #ffffff55;border-radius:10px;background:#17122bd9;color:white;font:inherit;font-size:.75rem;white-space:nowrap;touch-action:manipulation}.ean-camera-detail svg{width:18px;height:18px;flex:none}.ean-camera-detail:disabled{opacity:.65}.ean-camera-detail:focus-visible{outline:2px solid white;outline-offset:3px}
+
+/* Camera controls remain legible when the label fills the frame with white. */
+.repo-camera-viewport .ean-camera-light,.repo-camera-viewport .ean-camera-manual{background:#17122b99;color:#fff}

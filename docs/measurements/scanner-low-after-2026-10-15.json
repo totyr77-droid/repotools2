@@ -1,0 +1,3236 @@
+{
+  "source": "js/ean-scanner.js",
+  "environment": "Chrome headless desktop, 960x1280 canvas captureStream 15fps; synthetic motion/perspective; not real camera/device/height",
+  "summary": [
+    {
+      "scene": "qr-front",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 856.0999999940395,
+      "p95Ms": 1007.6999999880791,
+      "medianToneMs": 654.2999999970198
+    },
+    {
+      "scene": "qr-tilt",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 811.2000000029802,
+      "p95Ms": 913.6000000089407,
+      "medianToneMs": 610.4000000059605
+    },
+    {
+      "scene": "qr-below",
+      "correct": 0,
+      "total": 3,
+      "medianMs": null,
+      "p95Ms": null,
+      "medianToneMs": null
+    },
+    {
+      "scene": "qr-far",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 936.2000000029802,
+      "p95Ms": 956.4000000059605,
+      "medianToneMs": 695
+    },
+    {
+      "scene": "qr-pulse",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 846.1000000089407,
+      "p95Ms": 863.7999999970198,
+      "medianToneMs": 608.2000000029802
+    },
+    {
+      "scene": "qr-zoom-motion",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 854.5,
+      "p95Ms": 874.8999999910593,
+      "medianToneMs": 599.1000000089407
+    },
+    {
+      "scene": "qr-offcenter",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 716.5,
+      "p95Ms": 804.7999999970198,
+      "medianToneMs": 499.5
+    },
+    {
+      "scene": "ean8-motion",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 970.1000000089407,
+      "p95Ms": 979.7999999970198,
+      "medianToneMs": 688.7000000029802
+    },
+    {
+      "scene": "ean13-motion",
+      "correct": 3,
+      "total": 3,
+      "medianMs": 824.2000000029802,
+      "p95Ms": 880.2999999970198,
+      "medianToneMs": 584.8999999910593
+    }
+  ],
+  "records": [
+    {
+      "scene": "qr-front",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 307.1000000089407,
+      "firstObservedFrameMs": 547.1000000089407,
+      "visibleToActionMs": 1007.6999999880791,
+      "visibleToToneMs": 812,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 624.9000000059605,
+          "elapsed": 187.20000000298023,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 648.7000000029802,
+          "elapsed": 211,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 739.7000000029802,
+          "elapsed": 302.09999999403954,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 982.7000000029802,
+          "elapsed": 545,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 1161.0999999940395,
+          "elapsed": 723.3999999910593,
+          "mode": "qr",
+          "costMs": 126.09999999403954,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 1774.7999999970198,
+          "elapsed": 1337.0999999940395,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 308.79999999701977
+        },
+        {
+          "stage": "decoded",
+          "at": 1781.5,
+          "elapsed": 1343.7999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 1781.5999999940395,
+          "elapsed": 1343.8999999910593,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 1785.4000000059605,
+          "elapsed": 1347.7000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 1795.5,
+          "elapsed": 1357.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 1990.9000000059605,
+          "elapsed": 1553.2000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 1991.0999999940395,
+          "elapsed": 1553.3999999910593,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 1537.575,
+      "taskPercent": 82.09156433529098,
+      "heapBytes": 3791796
+    },
+    {
+      "scene": "qr-front",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 13.5,
+      "firstObservedFrameMs": 105.80000001192093,
+      "visibleToActionMs": 856.0999999940395,
+      "visibleToToneMs": 654.2999999970198,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 2063.2999999970198,
+          "elapsed": 1.5999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 2070.4000000059605,
+          "elapsed": 8.700000002980232,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 2074.0999999940395,
+          "elapsed": 12.399999991059303,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 2167.2999999970198,
+          "elapsed": 105.59999999403954,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 2277.2000000029802,
+          "elapsed": 215.5,
+          "mode": "qr",
+          "costMs": 75.5,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 2818.5,
+          "elapsed": 756.7999999970198,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 274.40000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 2819,
+          "elapsed": 757.2999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 2819,
+          "elapsed": 757.2999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 2820.7000000029802,
+          "elapsed": 759,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 2821.7000000029802,
+          "elapsed": 760,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 3023.5,
+          "elapsed": 961.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 3023.7000000029802,
+          "elapsed": 962,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 731.9320000000002,
+      "taskPercent": 71.19961089494166,
+      "heapBytes": 4281752
+    },
+    {
+      "scene": "qr-front",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 32,
+      "firstObservedFrameMs": 274.8999999910593,
+      "visibleToActionMs": 733.2000000029802,
+      "visibleToToneMs": 516.2000000029802,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 3118.5,
+          "elapsed": 2.5999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 3138.5,
+          "elapsed": 22.599999994039536,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 3145.2999999970198,
+          "elapsed": 29.399999991059303,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "analysis",
+          "at": 3367.4000000059605,
+          "elapsed": 251.5,
+          "mode": "qr",
+          "costMs": 109,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "first-frame",
+          "at": 3390.5999999940395,
+          "elapsed": 274.69999998807907,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "decoded",
+          "at": 3901.7000000029802,
+          "elapsed": 785.7999999970198,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 284.29999999701977
+        },
+        {
+          "stage": "decoded",
+          "at": 3903.0999999940395,
+          "elapsed": 787.1999999880791,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 3903.0999999940395,
+          "elapsed": 787.1999999880791,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 3904.7999999970198,
+          "elapsed": 788.8999999910593,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 3907,
+          "elapsed": 791.0999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 4123.9000000059605,
+          "elapsed": 1008,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 4124,
+          "elapsed": 1008.0999999940395,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 853.4789999999997,
+      "taskPercent": 77.30788043478258,
+      "heapBytes": 4792432
+    },
+    {
+      "scene": "qr-tilt",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 22.200000002980232,
+      "firstObservedFrameMs": 134.70000000298023,
+      "visibleToActionMs": 802.5999999940395,
+      "visibleToToneMs": 574.7999999970198,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 4211.29999999702,
+          "elapsed": 1.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 4224.5,
+          "elapsed": 14.700000002980232,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 4230.79999999702,
+          "elapsed": 21.100000008940697,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 4344.0999999940395,
+          "elapsed": 134.29999999701977,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 4455.29999999702,
+          "elapsed": 245.5,
+          "mode": "qr",
+          "costMs": 70.69999998807907,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 4912.29999999702,
+          "elapsed": 702.6000000089407,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 281.3999999910593
+        },
+        {
+          "stage": "decoded",
+          "at": 4914.5999999940395,
+          "elapsed": 704.7999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 4914.5999999940395,
+          "elapsed": 704.7999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 4916.9000000059605,
+          "elapsed": 707.1000000089407,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 4919.5,
+          "elapsed": 709.7000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 5147.20000000298,
+          "elapsed": 937.4000000059605,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 5147.29999999702,
+          "elapsed": 937.5,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 865.7250000000003,
+      "taskPercent": 85.63056379821961,
+      "heapBytes": 5344956
+    },
+    {
+      "scene": "qr-tilt",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 17.299999997019768,
+      "firstObservedFrameMs": 118.3999999910593,
+      "visibleToActionMs": 913.6000000089407,
+      "visibleToToneMs": 645.1000000089407,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 5208.5999999940395,
+          "elapsed": 0.3999999910593033,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 5217.4000000059605,
+          "elapsed": 9.200000002980232,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 5223.9000000059605,
+          "elapsed": 15.700000002980232,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 5326.20000000298,
+          "elapsed": 118,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 5479,
+          "elapsed": 270.79999999701977,
+          "mode": "qr",
+          "costMs": 95.79999999701977,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 5958.70000000298,
+          "elapsed": 750.5,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 277.1000000089407
+        },
+        {
+          "stage": "decoded",
+          "at": 5960.4000000059605,
+          "elapsed": 752.2000000029802,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 5960.4000000059605,
+          "elapsed": 752.2000000029802,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 5962.29999999702,
+          "elapsed": 754.0999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 5971.9000000059605,
+          "elapsed": 763.7000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 6239.79999999702,
+          "elapsed": 1031.5999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 6240.5,
+          "elapsed": 1032.2999999970198,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 894.5220000000003,
+      "taskPercent": 81.84098810612994,
+      "heapBytes": 4868648
+    },
+    {
+      "scene": "qr-tilt",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 21.5,
+      "firstObservedFrameMs": 115.1000000089407,
+      "visibleToActionMs": 811.2000000029802,
+      "visibleToToneMs": 610.4000000059605,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 6328.5999999940395,
+          "elapsed": 1,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 6338.20000000298,
+          "elapsed": 10.600000008940697,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 6347.5,
+          "elapsed": 19.900000005960464,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 6442.5,
+          "elapsed": 114.90000000596046,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 6583,
+          "elapsed": 255.40000000596046,
+          "mode": "qr",
+          "costMs": 82.40000000596046,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 7044.5,
+          "elapsed": 716.9000000059605,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 254
+        },
+        {
+          "stage": "decoded",
+          "at": 7047.9000000059605,
+          "elapsed": 720.3000000119209,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 7047.9000000059605,
+          "elapsed": 720.4000000059605,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 7050.70000000298,
+          "elapsed": 723.1000000089407,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 7053.29999999702,
+          "elapsed": 725.7000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 7254,
+          "elapsed": 926.4000000059605,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 7254,
+          "elapsed": 926.4000000059605,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 885.4349999999993,
+      "taskPercent": 88.3667664670658,
+      "heapBytes": 3764508
+    },
+    {
+      "scene": "qr-below",
+      "repeat": 0,
+      "correct": false,
+      "delivered": null,
+      "openMs": 17.299999997019768,
+      "firstObservedFrameMs": 130.29999999701977,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 7328.70000000298,
+          "elapsed": 0.7000000029802322,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 7337,
+          "elapsed": 9,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 7342,
+          "elapsed": 14,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 7457.70000000298,
+          "elapsed": 129.70000000298023,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 7601.9000000059605,
+          "elapsed": 273.90000000596046,
+          "mode": "qr",
+          "costMs": 107.70000000298023,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 8080.5999999940395,
+          "elapsed": 752.5999999940395,
+          "mode": "qr",
+          "costMs": 246.8999999910593,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 8765.90000000596,
+          "elapsed": 1437.9000000059605,
+          "mode": "qr",
+          "costMs": 125.40000000596046,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 9188.79999999702,
+          "elapsed": 1860.7999999970198,
+          "mode": "qr",
+          "costMs": 99.8999999910593,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 9659.59999999404,
+          "elapsed": 2331.5999999940395,
+          "mode": "qr",
+          "costMs": 267.8999999910593,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 10349.29999999702,
+          "elapsed": 3021.2999999970198,
+          "mode": "qr",
+          "costMs": 146.8999999910593,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 10734.5,
+          "elapsed": 3406.5,
+          "mode": "qr",
+          "costMs": 66.70000000298023,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 11204.79999999702,
+          "elapsed": 3876.7999999970198,
+          "mode": "qr",
+          "costMs": 296.09999999403954,
+          "width": 960,
+          "height": 1280
+        }
+      ],
+      "taskMs": 3498.335,
+      "taskPercent": 81.90903769608991,
+      "heapBytes": 4241140
+    },
+    {
+      "scene": "qr-below",
+      "repeat": 1,
+      "correct": false,
+      "delivered": null,
+      "openMs": 28.5,
+      "firstObservedFrameMs": 220.5,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 11598.90000000596,
+          "elapsed": 1,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 11615.20000000298,
+          "elapsed": 17.299999997019768,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 11623,
+          "elapsed": 25.099999994039536,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "analysis",
+          "at": 11789.29999999702,
+          "elapsed": 191.3999999910593,
+          "mode": "qr",
+          "costMs": 52.5,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "first-frame",
+          "at": 11817.40000000596,
+          "elapsed": 219.59999999403954,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 11989.09999999404,
+          "elapsed": 391.19999998807907,
+          "mode": "qr",
+          "costMs": 93.59999999403954,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 12303.79999999702,
+          "elapsed": 705.8999999910593,
+          "mode": "qr",
+          "costMs": 53.29999999701977,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 12523.09999999404,
+          "elapsed": 925.1999999880791,
+          "mode": "qr",
+          "costMs": 99.3999999910593,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 13081.79999999702,
+          "elapsed": 1483.8999999910593,
+          "mode": "qr",
+          "costMs": 280.09999999403954,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 13730.29999999702,
+          "elapsed": 2132.3999999910593,
+          "mode": "qr",
+          "costMs": 81.5,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 14099.20000000298,
+          "elapsed": 2501.2999999970198,
+          "mode": "qr",
+          "costMs": 75.29999999701977,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 14531.90000000596,
+          "elapsed": 2934,
+          "mode": "qr",
+          "costMs": 246.20000000298023,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 15249,
+          "elapsed": 3651.0999999940395,
+          "mode": "qr",
+          "costMs": 113.40000000596046,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 15565.40000000596,
+          "elapsed": 3967.5,
+          "mode": "qr",
+          "costMs": 61.1000000089407,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 15987.90000000596,
+          "elapsed": 4390,
+          "mode": "qr",
+          "costMs": 261.30000001192093,
+          "width": 960,
+          "height": 1280
+        }
+      ],
+      "taskMs": 3475.363,
+      "taskPercent": 77.41953664513254,
+      "heapBytes": 3473360
+    },
+    {
+      "scene": "qr-below",
+      "repeat": 2,
+      "correct": false,
+      "delivered": null,
+      "openMs": 29.700000002980232,
+      "firstObservedFrameMs": 142.59999999403954,
+      "visibleToActionMs": null,
+      "visibleToToneMs": null,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 16106,
+          "elapsed": 1.7999999970197678,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 16124.09999999404,
+          "elapsed": 19.899999991059303,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 16131.90000000596,
+          "elapsed": 27.700000002980232,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 16245.90000000596,
+          "elapsed": 141.70000000298023,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 16399.70000000298,
+          "elapsed": 295.5,
+          "mode": "qr",
+          "costMs": 98.20000000298023,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 16869.29999999702,
+          "elapsed": 765.0999999940395,
+          "mode": "qr",
+          "costMs": 246.70000000298023,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 17460.09999999404,
+          "elapsed": 1355.8999999910593,
+          "mode": "qr",
+          "costMs": 89.79999999701977,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 17749,
+          "elapsed": 1644.7999999970198,
+          "mode": "qr",
+          "costMs": 63.900000005960464,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 18183.20000000298,
+          "elapsed": 2079,
+          "mode": "qr",
+          "costMs": 252.40000000596046,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 18806,
+          "elapsed": 2701.7999999970198,
+          "mode": "qr",
+          "costMs": 90.70000000298023,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 19066,
+          "elapsed": 2961.7999999970198,
+          "mode": "qr",
+          "costMs": 62.599999994039536,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "analysis",
+          "at": 19494.70000000298,
+          "elapsed": 3390.5,
+          "mode": "qr",
+          "costMs": 244.90000000596046,
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 20109.09999999404,
+          "elapsed": 4004.8999999910593,
+          "mode": "qr",
+          "costMs": 96.69999998807907,
+          "width": 480,
+          "height": 640
+        }
+      ],
+      "taskMs": 3230.3799999999983,
+      "taskPercent": 76.08054639660853,
+      "heapBytes": 5273892
+    },
+    {
+      "scene": "qr-far",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 19.599999994039536,
+      "firstObservedFrameMs": 115.29999999701977,
+      "visibleToActionMs": 936.2000000029802,
+      "visibleToToneMs": 695.7000000029802,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 20364.59999999404,
+          "elapsed": 3.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 20373,
+          "elapsed": 11.900000005960464,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 20378.59999999404,
+          "elapsed": 17.5,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 20476.09999999404,
+          "elapsed": 115,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 20620.09999999404,
+          "elapsed": 259,
+          "mode": "qr",
+          "costMs": 80.3999999910593,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 21166.79999999702,
+          "elapsed": 805.7000000029802,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 287.1000000089407
+        },
+        {
+          "stage": "decoded",
+          "at": 21167.29999999702,
+          "elapsed": 806.2000000029802,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 21167.29999999702,
+          "elapsed": 806.2000000029802,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 21169.40000000596,
+          "elapsed": 808.3000000119209,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 21172.09999999404,
+          "elapsed": 811,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 21412.20000000298,
+          "elapsed": 1051.1000000089407,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 21412.40000000596,
+          "elapsed": 1051.300000011921,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 847.3159999999993,
+      "taskPercent": 75.31697777777772,
+      "heapBytes": 3637928
+    },
+    {
+      "scene": "qr-far",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 15.799999997019768,
+      "firstObservedFrameMs": 127.59999999403954,
+      "visibleToActionMs": 956.4000000059605,
+      "visibleToToneMs": 695,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 21494.59999999404,
+          "elapsed": 0.5999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 21502.70000000298,
+          "elapsed": 8.700000002980232,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 21508.20000000298,
+          "elapsed": 14.200000002980232,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 21621.59999999404,
+          "elapsed": 127.59999999403954,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 21750.5,
+          "elapsed": 256.5,
+          "mode": "qr",
+          "costMs": 77.79999999701977,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 22310.29999999702,
+          "elapsed": 816.2999999970198,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 249.8999999910593
+        },
+        {
+          "stage": "decoded",
+          "at": 22311.5,
+          "elapsed": 817.5,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 22311.5,
+          "elapsed": 817.5,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 22313.79999999702,
+          "elapsed": 819.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 22316.79999999702,
+          "elapsed": 822.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 22578.20000000298,
+          "elapsed": 1084.2000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 22578.20000000298,
+          "elapsed": 1084.2000000029802,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 776.7660000000021,
+      "taskPercent": 66.84733218588659,
+      "heapBytes": 3642276
+    },
+    {
+      "scene": "qr-far",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 17.5,
+      "firstObservedFrameMs": 145.20000000298023,
+      "visibleToActionMs": 786.5999999940395,
+      "visibleToToneMs": 591.7999999970198,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 22658.5,
+          "elapsed": 1.0999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 22668.40000000596,
+          "elapsed": 11,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 22673.79999999702,
+          "elapsed": 16.399999991059303,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 22802,
+          "elapsed": 144.69999998807907,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 22923.5,
+          "elapsed": 266.09999999403954,
+          "mode": "qr",
+          "costMs": 82,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 23388.79999999702,
+          "elapsed": 731.3999999910593,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 255.3999999910593
+        },
+        {
+          "stage": "decoded",
+          "at": 23390.5,
+          "elapsed": 733.0999999940395,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 23390.5,
+          "elapsed": 733.0999999940395,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 23393,
+          "elapsed": 735.5999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 23394.40000000596,
+          "elapsed": 737,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 23588.90000000596,
+          "elapsed": 931.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 23589,
+          "elapsed": 931.5999999940395,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 840.879000000001,
+      "taskPercent": 81.00953757225444,
+      "heapBytes": 3953872
+    },
+    {
+      "scene": "qr-pulse",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 13.900000005960464,
+      "firstObservedFrameMs": 110.20000000298023,
+      "visibleToActionMs": 863.7999999970198,
+      "visibleToToneMs": 672.7999999970198,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 23714.5,
+          "elapsed": 1.2000000029802322,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 23723.20000000298,
+          "elapsed": 9.900000005960464,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 23726.5,
+          "elapsed": 13.200000002980232,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 23823.29999999702,
+          "elapsed": 110,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 23981.40000000596,
+          "elapsed": 268.1000000089407,
+          "mode": "qr",
+          "costMs": 115.1000000089407,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 24490.40000000596,
+          "elapsed": 777.1000000089407,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 231.90000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 24491.90000000596,
+          "elapsed": 778.7999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 24492.09999999404,
+          "elapsed": 778.7999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 24494.79999999702,
+          "elapsed": 781.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 24496.29999999702,
+          "elapsed": 783,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 24686.90000000596,
+          "elapsed": 973.6000000089407,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 24687.29999999702,
+          "elapsed": 974,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 884.5050000000008,
+      "taskPercent": 83.44386792452838,
+      "heapBytes": 3739384
+    },
+    {
+      "scene": "qr-pulse",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 12.799999997019768,
+      "firstObservedFrameMs": 81.40000000596046,
+      "visibleToActionMs": 598,
+      "visibleToToneMs": 390.5,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 24748.09999999404,
+          "elapsed": 0.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 24755.29999999702,
+          "elapsed": 7.700000002980232,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 24759.79999999702,
+          "elapsed": 12.200000002980232,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 24828.90000000596,
+          "elapsed": 81.30000001192093,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 24930.70000000298,
+          "elapsed": 183.1000000089407,
+          "mode": "qr",
+          "costMs": 53.400000005960464,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 25215,
+          "elapsed": 467.40000000596046,
+          "mode": "qr",
+          "source": "background",
+          "width": 480,
+          "height": 640,
+          "detail": false,
+          "costMs": 117.59999999403954
+        },
+        {
+          "stage": "decoded",
+          "at": 25216,
+          "elapsed": 468.40000000596046,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 25216,
+          "elapsed": 468.40000000596046,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 25217.5,
+          "elapsed": 469.90000000596046,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 25219.59999999404,
+          "elapsed": 472,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 25427.09999999404,
+          "elapsed": 679.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 25427.09999999404,
+          "elapsed": 679.5,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 582.3779999999986,
+      "taskPercent": 78.80622462787531,
+      "heapBytes": 3989584
+    },
+    {
+      "scene": "qr-pulse",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 57.69999998807907,
+      "firstObservedFrameMs": 133.8999999910593,
+      "visibleToActionMs": 846.1000000089407,
+      "visibleToToneMs": 608.2000000029802,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 25514.40000000596,
+          "elapsed": 0.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 25556.79999999702,
+          "elapsed": 42.8999999910593,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 25569.70000000298,
+          "elapsed": 55.79999999701977,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 25647.59999999404,
+          "elapsed": 133.69999998807907,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 25788.29999999702,
+          "elapsed": 274.3999999910593,
+          "mode": "qr",
+          "costMs": 77.8999999910593,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 26247.79999999702,
+          "elapsed": 733.8999999910593,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 232.79999999701977
+        },
+        {
+          "stage": "decoded",
+          "at": 26249.5,
+          "elapsed": 735.5999999940395,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 26249.5,
+          "elapsed": 735.5999999940395,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 26252.70000000298,
+          "elapsed": 738.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 26256,
+          "elapsed": 742.0999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 26493.70000000298,
+          "elapsed": 979.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 26493.90000000596,
+          "elapsed": 980,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 854.4359999999997,
+      "taskPercent": 80.00337078651683,
+      "heapBytes": 3773304
+    },
+    {
+      "scene": "qr-zoom-motion",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 18,
+      "firstObservedFrameMs": 110.19999998807907,
+      "visibleToActionMs": 854.5,
+      "visibleToToneMs": 599.1000000089407,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 26585.59999999404,
+          "elapsed": 1.199999988079071,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 26596.90000000596,
+          "elapsed": 12.5,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 26601.40000000596,
+          "elapsed": 17,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 26694.59999999404,
+          "elapsed": 110.19999998807907,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 26825.40000000596,
+          "elapsed": 241,
+          "mode": "qr",
+          "costMs": 73.90000000596046,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 27288.5,
+          "elapsed": 704.0999999940395,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 262.40000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 27290.29999999702,
+          "elapsed": 705.8999999910593,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 27290.29999999702,
+          "elapsed": 705.8999999910593,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 27292.40000000596,
+          "elapsed": 708,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 27294,
+          "elapsed": 709.5999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 27549.29999999702,
+          "elapsed": 964.8999999910593,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 27549.29999999702,
+          "elapsed": 964.8999999910593,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 925.256000000001,
+      "taskPercent": 88.7110258868649,
+      "heapBytes": 4373768
+    },
+    {
+      "scene": "qr-zoom-motion",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 18.200000002980232,
+      "firstObservedFrameMs": 114.40000000596046,
+      "visibleToActionMs": 874.8999999910593,
+      "visibleToToneMs": 635.7999999970198,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 27633.09999999404,
+          "elapsed": 0.3999999910593033,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 27640.29999999702,
+          "elapsed": 7.5999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 27649.5,
+          "elapsed": 16.799999997019768,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 27746.20000000298,
+          "elapsed": 113.5,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 27878.79999999702,
+          "elapsed": 246.09999999403954,
+          "mode": "qr",
+          "costMs": 76.5,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 28376.5,
+          "elapsed": 743.7999999970198,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 295.20000000298023
+        },
+        {
+          "stage": "decoded",
+          "at": 28378.40000000596,
+          "elapsed": 745.7000000029802,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 28378.40000000596,
+          "elapsed": 745.7000000029802,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 28379.79999999702,
+          "elapsed": 747.0999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 28383,
+          "elapsed": 750.2999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 28621.5,
+          "elapsed": 988.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 28622.29999999702,
+          "elapsed": 989.5999999940395,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 928.7509999999984,
+      "taskPercent": 86.79915887850451,
+      "heapBytes": 4264956
+    },
+    {
+      "scene": "qr-zoom-motion",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 14.399999991059303,
+      "firstObservedFrameMs": 79.20000000298023,
+      "visibleToActionMs": 768.5,
+      "visibleToToneMs": 554,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 28694.20000000298,
+          "elapsed": 1.0999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 28701.29999999702,
+          "elapsed": 8.099999994039536,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 28706.20000000298,
+          "elapsed": 13,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 28772.20000000298,
+          "elapsed": 79,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 28888.09999999404,
+          "elapsed": 194.8999999910593,
+          "mode": "qr",
+          "costMs": 69.09999999403954,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 29321,
+          "elapsed": 627.7999999970198,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 223.29999999701977
+        },
+        {
+          "stage": "decoded",
+          "at": 29322.59999999404,
+          "elapsed": 629.3999999910593,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 29322.59999999404,
+          "elapsed": 629.3999999910593,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 29325,
+          "elapsed": 631.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 29326.40000000596,
+          "elapsed": 633.2000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 29540.90000000596,
+          "elapsed": 847.7000000029802,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 29541.09999999404,
+          "elapsed": 847.8999999910593,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 781.8100000000002,
+      "taskPercent": 85.81888035126237,
+      "heapBytes": 4234964
+    },
+    {
+      "scene": "qr-offcenter",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 21,
+      "firstObservedFrameMs": 106.80000001192093,
+      "visibleToActionMs": 510.09999999403954,
+      "visibleToToneMs": 312.09999999403954,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 29599.79999999702,
+          "elapsed": 0.5999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 29606.20000000298,
+          "elapsed": 7,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 29613.79999999702,
+          "elapsed": 14.599999994039536,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 29705.70000000298,
+          "elapsed": 106.5,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 29796.90000000596,
+          "elapsed": 197.70000000298023,
+          "mode": "qr",
+          "costMs": 46.5,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 30012.5,
+          "elapsed": 413.29999999701977,
+          "mode": "qr",
+          "source": "background",
+          "width": 480,
+          "height": 640,
+          "detail": false,
+          "costMs": 104.1000000089407
+        },
+        {
+          "stage": "decoded",
+          "at": 30013.59999999404,
+          "elapsed": 414.3999999910593,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 30013.79999999702,
+          "elapsed": 414.59999999403954,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 30015.5,
+          "elapsed": 416.29999999701977,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 30018.20000000298,
+          "elapsed": 419,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 30216,
+          "elapsed": 616.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 30216,
+          "elapsed": 616.7999999970198,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 514.9509999999999,
+      "taskPercent": 76.74381520119223,
+      "heapBytes": 4499284
+    },
+    {
+      "scene": "qr-offcenter",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 12.200000002980232,
+      "firstObservedFrameMs": 120.5,
+      "visibleToActionMs": 804.7999999970198,
+      "visibleToToneMs": 560.0999999940395,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 30281.79999999702,
+          "elapsed": 0.5999999940395355,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 30288.20000000298,
+          "elapsed": 7,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 30291.90000000596,
+          "elapsed": 10.700000002980232,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 30401.5,
+          "elapsed": 120.3999999910593,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 30530.40000000596,
+          "elapsed": 249.20000000298023,
+          "mode": "qr",
+          "costMs": 89.70000000298023,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 30956.29999999702,
+          "elapsed": 675.0999999940395,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 238.79999999701977
+        },
+        {
+          "stage": "decoded",
+          "at": 30957.5,
+          "elapsed": 676.2999999970198,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 30957.59999999404,
+          "elapsed": 676.3999999910593,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 30958.59999999404,
+          "elapsed": 677.3999999910593,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 30961.79999999702,
+          "elapsed": 680.5999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 31206.20000000298,
+          "elapsed": 925,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 31206.5,
+          "elapsed": 925.2999999970198,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 786.2930000000006,
+      "taskPercent": 78.9450803212852,
+      "heapBytes": 3761096
+    },
+    {
+      "scene": "qr-offcenter",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "17309735",
+      "openMs": 16.5,
+      "firstObservedFrameMs": 117.09999999403954,
+      "visibleToActionMs": 716.5,
+      "visibleToToneMs": 499.5,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 31295.90000000596,
+          "elapsed": 1,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-open",
+          "at": 31303.79999999702,
+          "elapsed": 8.899999991059303,
+          "mode": "qr"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 31309.70000000298,
+          "elapsed": 14.799999997019768,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 31411.70000000298,
+          "elapsed": 116.79999999701977,
+          "mode": "qr",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "analysis",
+          "at": 31525.59999999404,
+          "elapsed": 230.69999998807907,
+          "mode": "qr",
+          "costMs": 66.19999998807907,
+          "width": 480,
+          "height": 640
+        },
+        {
+          "stage": "decoded",
+          "at": 31905.40000000596,
+          "elapsed": 610.5,
+          "mode": "qr",
+          "source": "background",
+          "width": 960,
+          "height": 1280,
+          "detail": true,
+          "costMs": 233.70000000298023
+        },
+        {
+          "stage": "decoded",
+          "at": 31906.90000000596,
+          "elapsed": 612,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 31906.90000000596,
+          "elapsed": 612,
+          "mode": "qr",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 31908.70000000298,
+          "elapsed": 613.7999999970198,
+          "mode": "qr"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 31911.5,
+          "elapsed": 616.5999999940395,
+          "mode": "qr"
+        },
+        {
+          "stage": "action",
+          "at": 32128.29999999702,
+          "elapsed": 833.3999999910593,
+          "mode": "qr"
+        },
+        {
+          "stage": "action-complete",
+          "at": 32128.5,
+          "elapsed": 833.5999999940395,
+          "mode": "qr"
+        }
+      ],
+      "taskMs": 726.3760000000019,
+      "taskPercent": 80.52949002217316,
+      "heapBytes": 3728028
+    },
+    {
+      "scene": "ean8-motion",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "96385074",
+      "openMs": 10.799999997019768,
+      "firstObservedFrameMs": 35,
+      "visibleToActionMs": 979.7999999970198,
+      "visibleToToneMs": 727.9000000059605,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 32184.09999999404,
+          "elapsed": 0.3999999910593033,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-open",
+          "at": 32191.79999999702,
+          "elapsed": 8.099999994039536,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 32193.70000000298,
+          "elapsed": 10,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 32218.40000000596,
+          "elapsed": 34.79999999701977,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "decoded",
+          "at": 32522.5,
+          "elapsed": 338.79999999701977,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 197.5
+        },
+        {
+          "stage": "decoded",
+          "at": 32524.70000000298,
+          "elapsed": 341,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 32525.79999999702,
+          "elapsed": 342.09999999403954,
+          "mode": "ean",
+          "costMs": 201.09999999403954,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 32822.40000000596,
+          "elapsed": 638.7000000029802,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 117
+        },
+        {
+          "stage": "decoded",
+          "at": 32823,
+          "elapsed": 639.2999999970198,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 32823.90000000596,
+          "elapsed": 640.2000000029802,
+          "mode": "ean",
+          "costMs": 118.70000000298023,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 32939.09999999404,
+          "elapsed": 755.3999999910593,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 62.099999994039536
+        },
+        {
+          "stage": "decoded",
+          "at": 32939.40000000596,
+          "elapsed": 755.7000000029802,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 32939.59999999404,
+          "elapsed": 755.8999999910593,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 32943.09999999404,
+          "elapsed": 759.3999999910593,
+          "mode": "ean"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 32946.70000000298,
+          "elapsed": 763,
+          "mode": "ean"
+        },
+        {
+          "stage": "action",
+          "at": 33198.40000000596,
+          "elapsed": 1014.7000000029802,
+          "mode": "ean"
+        },
+        {
+          "stage": "action-complete",
+          "at": 33198.59999999404,
+          "elapsed": 1014.8999999910593,
+          "mode": "ean"
+        }
+      ],
+      "taskMs": 917.4839999999982,
+      "taskPercent": 83.5595628415299,
+      "heapBytes": 3861508
+    },
+    {
+      "scene": "ean8-motion",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "96385074",
+      "openMs": 14.799999997019768,
+      "firstObservedFrameMs": 39.3999999910593,
+      "visibleToActionMs": 852,
+      "visibleToToneMs": 611.7000000029802,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 33280.5,
+          "elapsed": 1.0999999940395355,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-open",
+          "at": 33290.29999999702,
+          "elapsed": 10.899999991059303,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 33293.09999999404,
+          "elapsed": 13.699999988079071,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 33318.40000000596,
+          "elapsed": 39,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "decoded",
+          "at": 33566.20000000298,
+          "elapsed": 286.79999999701977,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 158.40000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 33566.40000000596,
+          "elapsed": 287,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 33566.79999999702,
+          "elapsed": 287.3999999910593,
+          "mode": "ean",
+          "costMs": 158.90000000596046,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 33766.70000000298,
+          "elapsed": 487.29999999701977,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 92.6000000089407
+        },
+        {
+          "stage": "decoded",
+          "at": 33767.09999999404,
+          "elapsed": 487.69999998807907,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 33767.29999999702,
+          "elapsed": 487.8999999910593,
+          "mode": "ean",
+          "costMs": 93.20000000298023,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 33925,
+          "elapsed": 645.5999999940395,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 72.70000000298023
+        },
+        {
+          "stage": "decoded",
+          "at": 33925.09999999404,
+          "elapsed": 645.6999999880791,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 33925.40000000596,
+          "elapsed": 646,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 33928.20000000298,
+          "elapsed": 648.7999999970198,
+          "mode": "ean"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 33930.29999999702,
+          "elapsed": 650.8999999910593,
+          "mode": "ean"
+        },
+        {
+          "stage": "action",
+          "at": 34170.59999999404,
+          "elapsed": 891.1999999880791,
+          "mode": "ean"
+        },
+        {
+          "stage": "action-complete",
+          "at": 34170.59999999404,
+          "elapsed": 891.1999999880791,
+          "mode": "ean"
+        }
+      ],
+      "taskMs": 710.9400000000007,
+      "taskPercent": 76.2811158798284,
+      "heapBytes": 4210552
+    },
+    {
+      "scene": "ean8-motion",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "96385074",
+      "openMs": 14.400000005960464,
+      "firstObservedFrameMs": 43.20000000298023,
+      "visibleToActionMs": 970.1000000089407,
+      "visibleToToneMs": 688.7000000029802,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 34207.79999999702,
+          "elapsed": 0.7000000029802322,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-open",
+          "at": 34217.5,
+          "elapsed": 10.400000005960464,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 34220.20000000298,
+          "elapsed": 13.100000008940697,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 34249.79999999702,
+          "elapsed": 42.70000000298023,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "decoded",
+          "at": 34571.5,
+          "elapsed": 364.40000000596046,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 216.90000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 34571.90000000596,
+          "elapsed": 364.80000001192093,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 34573.20000000298,
+          "elapsed": 366.1000000089407,
+          "mode": "ean",
+          "costMs": 218.6000000089407,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 34781.09999999404,
+          "elapsed": 574,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 79
+        },
+        {
+          "stage": "decoded",
+          "at": 34781.40000000596,
+          "elapsed": 574.3000000119209,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 34781.79999999702,
+          "elapsed": 574.7000000029802,
+          "mode": "ean",
+          "costMs": 79.5,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 34934.79999999702,
+          "elapsed": 727.7000000029802,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 74.8999999910593
+        },
+        {
+          "stage": "decoded",
+          "at": 34935.29999999702,
+          "elapsed": 728.2000000029802,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 34935.29999999702,
+          "elapsed": 728.2000000029802,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 34937.20000000298,
+          "elapsed": 730.1000000089407,
+          "mode": "ean"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 34939,
+          "elapsed": 731.9000000059605,
+          "mode": "ean"
+        },
+        {
+          "stage": "action",
+          "at": 35220.20000000298,
+          "elapsed": 1013.1000000089407,
+          "mode": "ean"
+        },
+        {
+          "stage": "action-complete",
+          "at": 35220.40000000596,
+          "elapsed": 1013.3000000119209,
+          "mode": "ean"
+        }
+      ],
+      "taskMs": 873.6330000000016,
+      "taskPercent": 82.49603399433443,
+      "heapBytes": 4009448
+    },
+    {
+      "scene": "ean13-motion",
+      "repeat": 0,
+      "correct": true,
+      "delivered": "7790895000997",
+      "openMs": 15.200000002980232,
+      "firstObservedFrameMs": 64.70000000298023,
+      "visibleToActionMs": 824.2000000029802,
+      "visibleToToneMs": 585.7000000029802,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 35286.59999999404,
+          "elapsed": 0.5,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-open",
+          "at": 35296.5,
+          "elapsed": 10.400000005960464,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 35299.79999999702,
+          "elapsed": 13.700000002980232,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 35350.79999999702,
+          "elapsed": 64.70000000298023,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "decoded",
+          "at": 35595.59999999404,
+          "elapsed": 309.5,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 176
+        },
+        {
+          "stage": "decoded",
+          "at": 35596.09999999404,
+          "elapsed": 310,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 35596.70000000298,
+          "elapsed": 310.6000000089407,
+          "mode": "ean",
+          "costMs": 177.1000000089407,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 35777.79999999702,
+          "elapsed": 491.70000000298023,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 73.29999999701977
+        },
+        {
+          "stage": "decoded",
+          "at": 35778,
+          "elapsed": 491.90000000596046,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 35778.29999999702,
+          "elapsed": 492.20000000298023,
+          "mode": "ean",
+          "costMs": 73.79999999701977,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 35930.09999999404,
+          "elapsed": 644,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 67.3999999910593
+        },
+        {
+          "stage": "decoded",
+          "at": 35930.5,
+          "elapsed": 644.5,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 35930.70000000298,
+          "elapsed": 644.6000000089407,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 35933.09999999404,
+          "elapsed": 647,
+          "mode": "ean"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 35936.70000000298,
+          "elapsed": 650.6000000089407,
+          "mode": "ean"
+        },
+        {
+          "stage": "action",
+          "at": 36174.79999999702,
+          "elapsed": 888.7000000029802,
+          "mode": "ean"
+        },
+        {
+          "stage": "action-complete",
+          "at": 36175,
+          "elapsed": 888.9000000059605,
+          "mode": "ean"
+        }
+      ],
+      "taskMs": 773.2470000000013,
+      "taskPercent": 81.9117584745764,
+      "heapBytes": 3947216
+    },
+    {
+      "scene": "ean13-motion",
+      "repeat": 1,
+      "correct": true,
+      "delivered": "7790895000997",
+      "openMs": 12,
+      "firstObservedFrameMs": 42.79999999701977,
+      "visibleToActionMs": 803.2000000029802,
+      "visibleToToneMs": 561.7000000029802,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 36224.70000000298,
+          "elapsed": 0.7999999970197678,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-open",
+          "at": 36232.70000000298,
+          "elapsed": 8.799999997019768,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 36234.5,
+          "elapsed": 10.799999997019768,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 36266.70000000298,
+          "elapsed": 42.79999999701977,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "decoded",
+          "at": 36491.70000000298,
+          "elapsed": 267.79999999701977,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 134.40000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 36492.09999999404,
+          "elapsed": 268.29999999701977,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 36492.59999999404,
+          "elapsed": 268.69999998807907,
+          "mode": "ean",
+          "costMs": 135.1000000089407,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 36666.5,
+          "elapsed": 442.59999999403954,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 75.40000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 36666.90000000596,
+          "elapsed": 443,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 36666.90000000596,
+          "elapsed": 443,
+          "mode": "ean",
+          "costMs": 75.80000001192093,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 36821.90000000596,
+          "elapsed": 598,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 70.90000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 36822.5,
+          "elapsed": 599.6999999880791,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 36823.79999999702,
+          "elapsed": 599.8999999910593,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 36826.29999999702,
+          "elapsed": 602.3999999910593,
+          "mode": "ean"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 36828.90000000596,
+          "elapsed": 605,
+          "mode": "ean"
+        },
+        {
+          "stage": "action",
+          "at": 37069.79999999702,
+          "elapsed": 845.8999999910593,
+          "mode": "ean"
+        },
+        {
+          "stage": "action-complete",
+          "at": 37069.90000000596,
+          "elapsed": 846,
+          "mode": "ean"
+        }
+      ],
+      "taskMs": 680.9779999999996,
+      "taskPercent": 76.25733482642772,
+      "heapBytes": 4272348
+    },
+    {
+      "scene": "ean13-motion",
+      "repeat": 2,
+      "correct": true,
+      "delivered": "7790895000997",
+      "openMs": 13,
+      "firstObservedFrameMs": 32.1000000089407,
+      "visibleToActionMs": 880.2999999970198,
+      "visibleToToneMs": 584.8999999910593,
+      "metrics": [
+        {
+          "stage": "camera-request",
+          "at": 37111.5,
+          "elapsed": 0.4000000059604645,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-open",
+          "at": 37118.40000000596,
+          "elapsed": 7.300000011920929,
+          "mode": "ean"
+        },
+        {
+          "stage": "camera-capabilities",
+          "at": 37121.29999999702,
+          "elapsed": 10.200000002980232,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280,
+          "zoom": null,
+          "focusContinuous": false,
+          "torch": false
+        },
+        {
+          "stage": "first-frame",
+          "at": 37143.09999999404,
+          "elapsed": 32.1000000089407,
+          "mode": "ean",
+          "width": 960,
+          "height": 1280
+        },
+        {
+          "stage": "decoded",
+          "at": 37368.79999999702,
+          "elapsed": 257.70000000298023,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 134.29999999701977
+        },
+        {
+          "stage": "decoded",
+          "at": 37368.90000000596,
+          "elapsed": 257.80000001192093,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 37369.59999999404,
+          "elapsed": 258.5,
+          "mode": "ean",
+          "costMs": 134.90000000596046,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 37563,
+          "elapsed": 451.90000000596046,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 98.90000000596046
+        },
+        {
+          "stage": "decoded",
+          "at": 37563.5,
+          "elapsed": 452.5,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "analysis",
+          "at": 37563.79999999702,
+          "elapsed": 452.70000000298023,
+          "mode": "ean",
+          "costMs": 99.70000000298023,
+          "width": 672,
+          "height": 896
+        },
+        {
+          "stage": "decoded",
+          "at": 37724.20000000298,
+          "elapsed": 613.1000000089407,
+          "mode": "ean",
+          "source": "background",
+          "width": 672,
+          "height": 896,
+          "detail": false,
+          "costMs": 70.1000000089407
+        },
+        {
+          "stage": "decoded",
+          "at": 37724.40000000596,
+          "elapsed": 613.3000000119209,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "confirmed",
+          "at": 37724.5,
+          "elapsed": 613.4000000059605,
+          "mode": "ean",
+          "source": "background"
+        },
+        {
+          "stage": "feedback-request",
+          "at": 37726,
+          "elapsed": 614.9000000059605,
+          "mode": "ean"
+        },
+        {
+          "stage": "tone-scheduled",
+          "at": 37728.40000000596,
+          "elapsed": 617.3000000119209,
+          "mode": "ean"
+        },
+        {
+          "stage": "action",
+          "at": 38023.59999999404,
+          "elapsed": 912.5,
+          "mode": "ean"
+        },
+        {
+          "stage": "action-complete",
+          "at": 38023.70000000298,
+          "elapsed": 912.6000000089407,
+          "mode": "ean"
+        }
+      ],
+      "taskMs": 722.4439999999994,
+      "taskPercent": 75.49049111807726,
+      "heapBytes": 3976720
+    }
+  ]
+}

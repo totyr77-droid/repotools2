@@ -1,10 +1,11 @@
+const {setStockQuantity}=require('./helpers/stock-quantity.cjs');
 const {chromium}=require('../tmp/ui-check/node_modules/playwright');
 const {spawn,spawnSync}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict');
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'stock-offline-')),env={...process.env,DATABASE_URL:'',REPOTOOLS_REQUIRE_DATABASE_URL:'0',REPOTOOLS_DB_PATH:path.join(dir,'db.sqlite')},php='C:/xampp/php/php.exe',base='http://127.0.0.1:18891';
 const seed=spawnSync(php,['-r',`require 'includes/database.php';$db=database();foreach(['Juan','Otro'] as $name)$db->prepare('INSERT INTO users(name,email,password_hash) VALUES(?,?,?)')->execute([$name,strtolower($name).'@example.invalid',password_hash('test-password-123',PASSWORD_DEFAULT)]);$db->exec("INSERT INTO pallets(code,owner_id,prepared_until,activated,updated_by) VALUES('50527167',1,0,1,1)");$db->exec("INSERT INTO pallet_labels(code,pallet_id) VALUES('50527167',1)");`],{env,encoding:'utf8'});assert.equal(seed.status,0,seed.stderr);
 const server=spawn(php,['-S','127.0.0.1:18891','-t',process.cwd()],{env,stdio:'ignore'});let browser;
 async function login(page,name){await page.goto(base+'/cuenta.php');await page.locator('[name=email]').fill(name+'@example.invalid');await page.locator('[name=password]').fill('test-password-123');await page.locator('button[type=submit]').first().click();await page.waitForURL('**/index.php');}
-async function add(page,amount){await page.locator('#scanStockProduct').click();await page.locator('#stockProductDialog').waitFor();await page.locator('#stockEanInput').fill('96385074');await page.locator('#stockProductName').fill('Agua');await page.locator('#stockAmount').fill(String(amount));await page.locator('#stockProductForm button[type=submit]').click();await page.locator('#stockProductDialog').waitFor({state:'hidden'});}
+async function add(page,amount){await page.locator('#scanStockProduct').click();await page.locator('#stockProductDialog').waitFor();await page.locator('#stockEanInput').fill('96385074');await page.locator('#stockProductName').fill('Agua');await setStockQuantity(page,String(amount));await page.locator('#stockProductForm button[type=submit]').click();await page.locator('#stockProductDialog').waitFor({state:'hidden'});}
 
 (async()=>{
 for(let i=0;i<40;i++){try{await fetch(base);break;}catch{await new Promise(r=>setTimeout(r,100));}}

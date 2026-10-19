@@ -20,7 +20,7 @@ function account_security_update(PDO $db, array $user, string $current, ?string 
         if ($version===false) throw new RuntimeException('Tu sesión cambió. Vuelve a ingresar.');
         $db->prepare('DELETE FROM password_resets WHERE user_id=?')->execute([$user['id']]);
         $db->prepare('DELETE FROM login_attempts WHERE key=?')->execute([$key]);
+        require_once __DIR__.'/audit.php';audit_event($db,(int)$user['id'],$password===null?'sessions_revoked':'password_changed','security:'.$user['id'].':'.$version,['category'=>'users'],['auth_version'=>(int)$row['auth_version']],['auth_version'=>(int)$version]);
         $db->commit();return (int)$version;
     } catch(Throwable $e) {if($db->inTransaction())$db->rollBack();throw $e;}
 }
-

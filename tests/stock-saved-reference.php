@@ -1,0 +1,20 @@
+<?php
+require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../includes/stock.php';
+$db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($db);
+foreach(['Uno','Dos'] as $name)$db->prepare('INSERT INTO users(name,email,password_hash) VALUES(?,?,?)')->execute([$name,strtolower($name).'@example.invalid','test-only']);
+$db->exec("INSERT INTO libraries(user_id,name) VALUES(1,'Propia'),(2,'Ajena');INSERT INTO library_products(library_id,ean,name) VALUES(1,'96385074','Mi referencia guardada'),(2,'4006381333931','Referencia ajena')");
+$check=static function($condition,$message){if(!$condition)throw new RuntimeException($message);};
+$check(stock_saved_reference($db,'96385074',1)==='Mi referencia guardada','Recupera Biblioteca propia');
+$check(stock_saved_reference($db,'4006381333931',1)==='','No expone Biblioteca ajena');
+$db->prepare('INSERT INTO pallet_labels(code,reserved_by,reserved_until) VALUES(?,2,?)')->execute(['12345678',time()+86400]);$p=stock_claim($db,'12345678',2);stock_save_product($db,2,['pallet_id'=>$p['id'],'ean'=>'96385074','name'=>'Nombre del palet compartido','amount'=>1,'expires'=>'']);
+$check(stock_saved_reference($db,'96385074',1)==='Mi referencia guardada','No recupera palet ajeno');
+$db->prepare("INSERT INTO pallet_access(pallet_id,user_id,status) VALUES(?,1,'pending')")->execute([$p['id']]);
+$check(stock_saved_reference($db,'96385074',1)==='Mi referencia guardada','Invitación pendiente no concede acceso');
+$db->prepare("UPDATE pallet_access SET status='accepted' WHERE pallet_id=?")->execute([$p['id']]);
+$check(stock_saved_reference($db,'96385074',1)==='Nombre del palet compartido','Aceptado puede reutilizar nombre del palet');
+$db->prepare("UPDATE pallet_products SET units=24,kind='boxes',pack_size=12 WHERE pallet_id=?")->execute([$p['id']]);
+$public=stock_detail($db,'12345678',null,true);
+$check($public['products'][0]['kind']==='boxes'&&(int)$public['products'][0]['pack_size']===12,'Vista pública conserva presentación para calcular cajas');
+$db->prepare('UPDATE pallets SET released=1 WHERE id=?')->execute([$p['id']]);
+$check(stock_saved_reference($db,'96385074',1)==='Mi referencia guardada','Palet liberado no se usa');
+echo "OK: referencia propia, permisos de palet/Biblioteca, invitación pendiente/aceptada y palet liberado.\n";

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__.'/../includes/auth.php';
 require_once __DIR__.'/../includes/stock-branches.php';
+require_once __DIR__.'/../includes/audit.php';
 header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); header('X-Content-Type-Options: nosniff');
 function branch_response(int $status,array $data): void { http_response_code($status); echo json_encode($data,JSON_UNESCAPED_UNICODE); exit; }
 $user=current_user(); $uid=(int)($user['id']??0); $method=$_SERVER['REQUEST_METHOD'];
@@ -15,7 +16,8 @@ try {
         else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
         $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);
         if ($page===false) throw new CatalogException('La página no es válida.',422);
-        stock_expire($db); $result=branch_public($db,$_GET['token'],$page); $db->commit(); branch_response(200,$result);
+        if(!$uid&&array_intersect(['q','branch','tag','sort'],array_keys($_GET)))throw new CatalogException('Iniciá sesión para usar filtros.',401);
+        stock_expire($db); $result=branch_public($db,$_GET['token'],$page,$uid?:null,array_intersect_key($_GET,array_flip(['q','branch','tag','sort']))); $db->commit(); branch_response(200,$result);
     }
     if (!$uid) throw new CatalogException('Inicia sesión para ver tus sucursales.',401);
     $db=database(); $db->beginTransaction();
@@ -35,6 +37,7 @@ try {
         $assignmentHash=in_array($_POST['action']??'',['assign','prepare'],true)?hash('sha256',json_encode(array_map(fn($field)=>(string)($_POST[$field]??''),['action','code','pallet_id','revision','branch_id','share_pallet']))):null;
         $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
         if ($cached!==false) { $result=json_decode($cached,true);if($assignmentHash&&($result['_assignment_hash']??null)!==$assignmentHash)throw new CatalogException('La selección cambió. Volvé a abrir la sucursal antes de guardar.',409);if($assignmentHash){$assigned=stock_editable($db,(int)($result['id']??$_POST['pallet_id']??0),$uid,true);if((int)$assigned['owner_id']!==$uid)throw new CatalogException('Solo el propietario puede asignar la sucursal.',403);}unset($result['_assignment_hash']);$db->commit(); branch_response(200,$result); }
+        $auditBefore=audit_pallet($db,(int)($_POST['pallet_id']??0));if(in_array($_POST['action']??'',['save','delete'],true))$auditBefore=stock_query($db,'SELECT id,name,address,locality,province,description,latitude,longitude FROM stock_branches WHERE id=?',[(int)($_POST['id']??0)])->fetch()?:[];
         switch ($_POST['action']??'') {
             case 'prepare':
                 $branchId=(int)($_POST['branch_id']??0);
@@ -55,6 +58,7 @@ try {
             default: throw new CatalogException('Acción no válida.',422);
         }
         if(isset($result['branch'])) $result['branch']=array_intersect_key($result['branch'],array_flip(['id','name','address','locality','province','description','revision','latitude','longitude']));
+        $action=(string)($_POST['action']??'');$after=audit_pallet($db,(int)($result['id']??$_POST['pallet_id']??0));if(in_array($action,['save','delete'],true))$after=stock_query($db,'SELECT id,name,address,locality,province,description,latitude,longitude FROM stock_branches WHERE id=?',[(int)($result['branch']['id']??$_POST['id']??0)])->fetch()?:[];$auditAction=$action==='save'?($auditBefore?'branch_updated':'branch_created'):($action==='delete'?'branch_deleted':'branch_'.$action);if($action!=='favorite'&&empty($result['reused'])&&!($action==='assign'&&$auditBefore===$after))audit_event($db,$uid,$auditAction,$key,['category'=>in_array($action,['share','revoke','share_exclusions'],true)?'links':'movements','branch_id'=>in_array($action,['save','delete'],true)?($after['id']??$auditBefore['id']??null):((int)($after['branch_id']??$_POST['branch_id']??0)?:null),'pallet_id'=>$after['id']??null,'code'=>$after['code']??''],$auditBefore,$after?:array_intersect_key($_POST,array_flip(['id','name','address','locality','province','description','branch_id','excluded_ids'])),'confirmed',null,$auditBefore===$after&&$action==='assign'?0:1,($action==='assign'||$action==='prepare')&&(int)($auditBefore['branch_id']??0)!==(int)($after['branch_id']??0)?array_sum(array_column($after['products']??[],'units')):0);
         $result['ok']=true; $result['csrf']=$csrf;
         stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($assignmentHash?$result+['_assignment_hash'=>$assignmentHash]:$result,JSON_UNESCAPED_UNICODE)]);
     } elseif (isset($_GET['manage'])) {
@@ -62,6 +66,7 @@ try {
     } else {
         $result=['can_manage_branches'=>stock_is_admin($db,$uid),'branches'=>stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.revision,b.latitude,b.longitude, COALESCE(pref.favorite,0) AS favorite, COALESCE(pref.last_used,0) AS last_used, COALESCE(pref.use_count,0) AS use_count, (SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.owner_id=? AND p.released=0 AND p.activated=1) AS pallet_count FROM stock_branches b LEFT JOIN user_branch_preferences pref ON pref.branch_id=b.id AND pref.user_id=? ORDER BY LOWER(b.name),b.id',[$uid,$uid])->fetchAll(),'shares'=>stock_query($db,'SELECT s.id,s.token,s.title,s.branch_id,s.created_at,(SELECT COUNT(*) FROM pallets p WHERE p.owner_id=s.owner_id AND p.released=0 AND p.activated=1 AND ((s.branch_id IS NOT NULL AND p.branch_id=s.branch_id AND NOT EXISTS(SELECT 1 FROM stock_share_exclusions x WHERE x.share_id=s.id AND x.pallet_id=p.id)) OR (s.branch_id IS NULL AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=s.id AND sp.pallet_id=p.id)))) AS pallet_count FROM stock_shares s WHERE s.owner_id=? AND s.active=1 ORDER BY s.id DESC',[$uid])->fetchAll(),'pallets'=>stock_query($db,'SELECT id,code,description,branch_id,revision,activated FROM pallets WHERE owner_id=? AND released=0 ORDER BY updated_at DESC,id DESC',[$uid])->fetchAll(),'csrf'=>$csrf];
     }
+    if($method==='GET'&&!isset($_GET['token'])&&!isset($_GET['manage'])){$result['can_filter_tags']=stock_is_admin($db,$uid);$result['tags']=stock_user_tags($db,$uid);}
     if(isset($result['shares'])){ $excluded=stock_query($db,'SELECT x.share_id,x.pallet_id FROM stock_share_exclusions x JOIN stock_shares s ON s.id=x.share_id WHERE s.owner_id=? AND s.active=1',[$uid])->fetchAll();foreach($result['shares'] as &$share){$share['excluded_ids']=array_map('intval',array_column(array_filter($excluded,fn($x)=>(int)$x['share_id']===(int)$share['id']),'pallet_id'));}unset($share);}
     $db->commit(); branch_response(200,$result);
 } catch(CatalogException $e) { if($db?->inTransaction())$db->rollBack(); branch_response($e->status,['error'=>$e->getMessage()]); }

@@ -85,6 +85,13 @@ check_catalog(catalog_approved_photo($db, $photoEan) === null, 'Una foto rechaza
 $db->prepare("UPDATE product_reports SET status = 'approved', reviewed_at = CURRENT_TIMESTAMP WHERE id = ?")->execute([$reportId]);
 $localImage = catalog_product_image($db, $withImage);
 check_catalog($localImage['image_source'] === 'repotools' && $localImage['name'] === $ours['name'] && catalog_approved_photo($db, $photoEan) === 'test-product-photo', 'Foto aprobada tiene prioridad y conserva los datos locales.');
+$currentRevision=catalog_product($db,$photoEan)['revision'];
+edit_catalog_product($db,$photoEan,$fields,$currentRevision,$roles['moderador'],null,'direct-photo');
+check_catalog(catalog_approved_photo($db,$photoEan)==='direct-photo','Foto directa reemplaza la aprobada antigua.');
+expect_catalog_error(fn()=>edit_catalog_product($db,$photoEan,$fields,$currentRevision,$roles['moderador'],null,'stale-photo'),409);
+check_catalog(catalog_approved_photo($db,$photoEan)==='direct-photo','Conflicto no reemplaza la foto.');
+edit_catalog_product($db,$photoEan,$fields,$currentRevision+1,$roles['moderador']);
+check_catalog(catalog_approved_photo($db,$photoEan)==='direct-photo','Editar texto conserva la foto.');
 $failure = catalog_product_image($db, catalog_product($db, $retryEan), fn() => throw new CatalogException('Timeout'));
 check_catalog($failure['name'] === 'Seguro', 'La API de fotos no puede ocultar la ficha local.');
 echo "OK: catálogo, permisos, conflictos, foto aprobada prioritaria y foto externa sin reemplazar datos locales.\n";

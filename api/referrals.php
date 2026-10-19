@@ -3,14 +3,14 @@ require_once __DIR__.'/../includes/auth.php';require_once __DIR__.'/../includes/
 header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');
 try{
     if(!referrals_enabled())throw new ReferralError('Referidos todavía no está habilitado en este entorno.',503);
-    $user=current_user();$uid=(int)($user['id']??0);$db=database();referral_maintenance($db);$method=$_SERVER['REQUEST_METHOD'];
+    $user=current_user();$uid=(int)($user['id']??0);$db=database();$method=$_SERVER['REQUEST_METHOD'];
     if(!in_array($method,['GET','POST'],true))throw new ReferralError('Solicitud no válida.',405);
     if($method==='POST'){
         if(!$uid)throw new ReferralError('Ingresá para continuar.',401);if(!valid_csrf())throw new ReferralError('La sesión del formulario venció. Recargá la página.',403);
         if(($_POST['action']??'')==='resend'){$result=referral_issue($db,$uid);if(!empty($result['needed'])&&empty($result['sent']))throw new ReferralError('No pudimos enviar el correo. Tu invitación sigue pendiente; intentá más tarde.',503);}
         elseif(($_POST['action']??'')==='decision'){referral_decide($db,$uid,(int)($_POST['id']??0),(string)($_POST['state']??''),(string)($_POST['reason']??''),(int)($_POST['revision']??-1));$result=['saved'=>true];}
         else throw new ReferralError('Solicitud no válida.');
-    }elseif(isset($_GET['admin'])){
+    }elseif(isset($_GET['link'])){if(!$uid)throw new ReferralError('Ingresá para continuar.',401);$code=referral_code($db,$uid);$result=['mine'=>['code'=>$code,'link'=>referral_origin().'/r/'.$code]];}elseif(isset($_GET['mine'])){if(!$uid)throw new ReferralError('Ingresá para continuar.',401);$result=['mine'=>referral_stats($db,$uid)];}elseif(isset($_GET['admin'])){
         if(!$uid)throw new ReferralError('Ingresá para continuar.',401);referral_admin($db,$uid);referral_maintenance($db);
         $conditions=[];$params=[];$state=$_GET['state']??'';if($state!==''){if(!in_array($state,['pending','validated','review','rejected'],true))throw new ReferralError('Estado no válido.');$conditions[]='r.state=?';$params[]=$state;}
         if(!empty($_GET['referrer'])){$conditions[]='r.referrer_id=?';$params[]=(int)$_GET['referrer'];}

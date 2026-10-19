@@ -36,3 +36,14 @@
 @media(min-width:900px){.account-panel-profile .settings-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px 48px}.settings-preferences{grid-column:2;grid-row:1/span 2}.settings-access{grid-column:1}}
 @media(max-width:768px) and (pointer:coarse){body[data-hand=left] .settings-toggle,body[data-hand=left] #stockPreferences{flex-direction:row-reverse}body[data-hand=left] .settings-toggle-name{flex-direction:row-reverse}body[data-hand=left] .settings-group>h2,body[data-hand=left] .settings-hint{text-align:right}body[data-hand=left] .settings-group h3{justify-content:flex-end}body[data-hand=left] .settings-group .account-shortcuts a{flex-direction:row-reverse;justify-content:flex-start}}
 @media(prefers-reduced-motion:reduce){.settings-toggle-track,.settings-toggle-track::after{transition:none}}
+/* Settings use one hierarchy, including the security heading. */
+.account-panel-profile .settings-group>h2,.account-panel-profile .account-security>h2{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:.78rem;line-height:1.4;text-transform:uppercase;letter-spacing:.06em;color:#626b7a;font-weight:600}
+.account-panel-profile .account-security>h2::before{display:none}
+.settings-toggle-name>svg{width:20px;height:20px;flex:0 0 20px}
+.account-panel-profile .settings-toggle-name{line-height:1.35;flex:1}
+.account-panel-profile .settings-toggle-control{flex:none}
+
+.account-panel-profile .settings-profile .account-security{max-width:none;margin-top:20px;padding-top:0;border:0}.account-panel-profile .settings-profile .account-security-actions{grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.account-panel-profile .settings-layout{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}.settings-profile,.settings-preferences,.settings-access{grid-column:auto;grid-row:auto}}
+
+.settings-security{margin:0!important;padding:0!important;border:0!important;grid-column:1/-1}.settings-security .account-security-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:8px}body[data-hand=left] .settings-group>h2,body[data-hand=left] .settings-hint{text-align:left}body[data-hand=left] .settings-group h3{justify-content:flex-start}

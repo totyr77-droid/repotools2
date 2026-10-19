@@ -93,7 +93,7 @@
     get('libraryProducts').replaceChildren();
     if (!library) return;
     get('collectionTitle').textContent = library.name;
-    get('collectionTitle').title = library.name;
+    get('collectionTitle').title = library.name;get('collectionTitle').classList.add('section-icon-title');get('collectionTitle').style.setProperty('--title-icon', 'url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8"><path d="m12 3 10 5-10 5L2 8l10-5M2 12l10 5 10-5M2 16l10 5 10-5"/></svg>')+'")');
     get('shareLibrary').hidden = library.products.length < 1; get('shareLibrary').disabled = busy || get('shareLibrary').hidden;
     get('shareLibrary').title = 'Compartir colección';
     if (!library.products.length) {
@@ -138,20 +138,20 @@
       const option = document.createElement('option'); option.value = l.id; option.textContent = l.name;
       option.selected = Number(l.id) === viewerId; selector.append(option);
     });
-    get('eanProductName').textContent = product.name || 'Producto sin nombre';
+    const productName=product.name||'Producto sin nombre';get('eanProductName').title=productName;get('eanProductName').replaceChildren();const nameText=document.createElement('span');nameText.className='library-ean-name';nameText.textContent=productName;get('eanProductName').append(nameText);get('libraryEanSwipeArea').dataset.hasCatalog=String(library.products.some(p=>p.reference_name&&p.catalog_name&&p.catalog_name!==p.name));
     get('eanCatalogName').textContent=product.catalog_name||'';
     get('eanCatalogName').hidden=!product.reference_name||!product.catalog_name||product.catalog_name===product.name;
     get('eanValue').textContent = product.ean;
-    get('eanPosition').textContent = `${viewerIndex + 1} de ${library.products.length}`;
+    get('eanPosition').hidden=library.products.length<2;get('eanPosition').textContent = `${viewerIndex + 1} de ${library.products.length}`;
     get('librarySwipeHint').hidden = library.products.length < 2;
-    get('previousLibraryEan').disabled = viewerIndex === 0;
-    get('nextLibraryEan').disabled = viewerIndex === library.products.length - 1;
+    get('previousLibraryEan').disabled = library.products.length < 2;
+    get('nextLibraryEan').disabled = library.products.length < 2;
     get('libraryBarcode').replaceChildren();
     try {
       if (!window.JsBarcode) throw new Error('No se pudo cargar el código de barras.');
       JsBarcode(get('libraryBarcode'), product.ean, { format: product.ean.length === 8 ? 'EAN8' : 'EAN13', width: 3, height: 110, displayValue: false, margin: 16 });
     } catch {
-      get('eanPosition').textContent += ' · No se pudo dibujar este EAN.';
+      get('eanPosition').hidden=false;get('eanPosition').textContent += ' · No se pudo dibujar este EAN.';
     }
   }
   function productDialog(ean = '', libraryId = activeId) {
@@ -226,6 +226,7 @@
       return;
     }
     try {
+      if(libraries.find(l=>Number(l.id)===Number(productLibraryId))?.products.some(p=>p.ean===ean)){get('libraryProductDialog').close();message('Ya tenés este producto en esta colección de tu biblioteca.');return;}
       await mutate({ action: 'add_product', library_id: productLibraryId, ean: get('libraryProductEan').value.trim(), name: get('libraryProductName').value.trim() });
       get('libraryProductDialog').close(); message(navigator.onLine?'Producto guardado.':'Guardado en este dispositivo · pendiente de sincronizar.');
     } catch (error) { message(error.message); }
@@ -236,8 +237,8 @@
   });
   function moveViewer(direction) {
     const library = libraries.find(l => Number(l.id) === viewerId);
-    if (!library || viewerIndex + direction < 0 || viewerIndex + direction >= library.products.length) return;
-    viewerIndex += direction; renderViewer();
+    if (!library?.products.length) return;
+    viewerIndex = (viewerIndex + direction + library.products.length) % library.products.length; renderViewer();
   }
   get('previousLibraryEan').addEventListener('click', () => moveViewer(-1));
   get('nextLibraryEan').addEventListener('click', () => moveViewer(1));
@@ -247,6 +248,7 @@
     openDialog('libraryInfoDialog'); window.RepoProductInfo.show(get('libraryProductDetails'), ean, { fresh: true });
   });
   get('libraryInfoDialog').addEventListener('close', () => window.RepoProductInfo.clear(get('libraryProductDetails')));
+  get('copyLibraryEan').addEventListener('click',async()=>{const ean=get('eanValue').textContent.trim();if(!ean)return;try{await navigator.clipboard.writeText(ean);window.RepoToast?.('Código EAN copiado.');}catch{window.RepoToast?.('No se pudo copiar el código EAN.',{kind:'error'});}});
   get('reportLibraryProduct').addEventListener('click', () => {
     const ean = get('eanValue').textContent;
     if (window.RepoEANScanner.validEAN(ean)) window.RepoProductReports.open(ean);
@@ -321,7 +323,8 @@
     const control = get('shareLibrary'); control.disabled = true;
     try {
       const result = await shareRequest({ action: 'share', library_id: library.id });
-      const url = new URL('biblioteca.php', location.href); url.searchParams.set('share', result.token);
+      let url = new URL('biblioteca.php', location.href); url.searchParams.set('share', result.token);
+      url=new URL(await window.RepoShareLinks.url('b',result.token,config.csrf,url.href));
       const showLink = () => { get('libraryShareUrl').value = url.href; openDialog('libraryShareDialog'); };
       if (navigator.share) {
         try { await navigator.share({ title: library.name, text: `${library.name}: ${library.products.length} productos`, url: url.href }); }
@@ -334,25 +337,29 @@
     try { await navigator.clipboard.writeText(get('libraryShareUrl').value); get('libraryShareDialog').close(); message('Enlace copiado.'); }
     catch { get('libraryShareUrl').select(); message('Copia este enlace para compartir.'); }
   });
+  let importedLibraryId = null;
   async function previewImport() {
     if (!config.share) return;
-    openDialog('libraryImportDialog'); get('confirmLibraryImport').disabled = true;
+    openDialog('libraryImportDialog'); get('confirmLibraryImport').hidden=false;get('confirmLibraryImport').disabled = true;
     get('libraryImportStatus').textContent = 'Cargando colección…';
     try {
       const response = await fetch(`api/biblioteca.php?share=${encodeURIComponent(config.share)}`);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'No pudimos cargar la colección.');
-      get('libraryImportQuestion').textContent = `¿Agregar «${result.collection.name}» a tu biblioteca con estos ${result.collection.products.length} productos?`;
+      get('libraryImportQuestion').textContent = `¿Agregar «${result.collection.name}» a tu biblioteca con ${result.collection.products.length} ${result.collection.products.length===1?'producto':'productos'}?`;
       get('libraryImportProducts').replaceChildren();
       result.collection.products.forEach(product => {
         const item = document.createElement('li'); item.textContent = product.name || 'Producto sin nombre';
         const code = document.createElement('small'); code.textContent = `EAN ${product.ean}`; item.append(code); get('libraryImportProducts').append(item);
       });
       get('libraryImportStatus').textContent = result.alreadyAdded ? 'Esta colección ya está en tu biblioteca.' : '';
-      get('confirmLibraryImport').disabled = result.alreadyAdded;
-    } catch (error) { get('libraryImportStatus').textContent = error.message; }
+      importedLibraryId = result.alreadyAdded ? Number(result.libraryId) : null;
+      get('confirmLibraryImport').textContent = importedLibraryId ? 'Ver en mi biblioteca' : 'Agregar a mi biblioteca';
+      get('confirmLibraryImport').disabled = false;
+    } catch (error) { get('libraryImportStatus').textContent = error.message;get('confirmLibraryImport').hidden=true;get('libraryImportQuestion').textContent=''; }
   }
   get('confirmLibraryImport').addEventListener('click', async () => {
+    if(importedLibraryId){activeId=importedLibraryId;render();get('libraryImportDialog').close();const url=new URL(location.href);url.searchParams.delete('share');history.replaceState(null,'',url);return;}
     const control = get('confirmLibraryImport'); control.disabled = true;
     try {
       const result = await shareRequest({ action: 'import', token: config.share });

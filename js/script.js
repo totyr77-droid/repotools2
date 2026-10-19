@@ -32,7 +32,7 @@ const els = {
   cantidadBox: document.querySelector(".cantidadbox")
 };
 
-const STORAGE_KEY = "lista";
+const eanList = window.RepoEANList(Number(window.repotoolsOfflineUser||0));
 const EAN = /^(?:\d{8}|\d{13})$/;
 const urlActual = new URL(window.location.href);
 const urlOriginal = `${urlActual.origin}${urlActual.pathname}`;
@@ -76,7 +76,7 @@ function inicializar() {
 function bindEventos() {
   document.getElementById('mainScanNormal')?.addEventListener('click', () => cambiarModoRapido(false));
   document.getElementById('mainScanRapid')?.addEventListener('click', () => cambiarModoRapido(true));
-  document.getElementById('mainRapidFinish')?.addEventListener('click', cerrarScanner);
+  document.getElementById('mainRapidFinish')?.addEventListener('click', () => {cerrarScanner();if(lista.length)abrirResultados();});
   els.borrarD?.addEventListener("click", borrarTodo);
   els.ver?.addEventListener("click", abrirResultados);
   els.cantidadBox?.addEventListener("click", () => {
@@ -93,6 +93,7 @@ function bindEventos() {
   els.copy?.addEventListener("click", copiarResultado);
   els.compartir?.addEventListener("click", compartirLista);
   els.compartirD?.addEventListener("click", compartirLista);
+  document.getElementById('copyCurrentEan')?.addEventListener('click', async () => { const ean=lista[indiceActual-1]; if(!ean)return; try { await navigator.clipboard.writeText(ean); window.RepoToast?.('EAN copiado.'); } catch { window.RepoToast?.('No se pudo copiar el EAN.',{kind:'error'}); } });
   document.getElementById('shareCurrentEan')?.addEventListener('click', () => { const ean = lista[indiceActual - 1]; if (ean) compartirCodigos([ean]); });
   document.getElementById('openResultInfo')?.addEventListener('click', () => {
     const ean = lista[indiceActual - 1]; if (!ean) return;
@@ -123,22 +124,12 @@ function bindEventos() {
 }
 
 function cargarLista() {
-  const guardado = localStorage.getItem(STORAGE_KEY);
-
-  if (!guardado) return [];
-
-  try {
-    const parseado = JSON.parse(guardado);
-    if (Array.isArray(parseado)) return limpiarLista(parseado);
-  } catch (error) {
-    return limpiarLista(guardado.split(","));
-  }
-
-  return [];
+  return eanList.read().map(row=>row.ean);
 }
 
 function guardarLista() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+  const names=new Map(eanList.read().map(row=>[row.ean,row.name]));
+  eanList.save(lista.map(ean=>({ean,name:names.get(ean)||''})));
 }
 
 function limpiarLista(valores) {
@@ -148,6 +139,7 @@ function limpiarLista(valores) {
 }
 
 function cargarListaCompartida() {
+  if(Array.isArray(window.repotoolsSharedCodes)){lista=limpiarLista(window.repotoolsSharedCodes);delete window.repotoolsSharedCodes;if(lista.length){esListaCompartida=true;guardarLista();abrirResultados();}return;}
   if (!urlActual.search || !window.LZString) return;
 
   try {
@@ -231,11 +223,11 @@ function verCodigo(indice) {
     displayValue: true,
     margin: 10
   });
-  els.veri.textContent = `${indiceActual} / ${lista.length}`;
+  els.veri.textContent = `${indiceActual} / ${lista.length}`;els.veri.hidden=lista.length<2;document.getElementById('resultSwipeHint').hidden=lista.length<2;document.getElementById('resultNavigation').hidden=lista.length<2;
   els.vers.className = "library-primary";
   els.vera.className = "library-secondary";
-  els.vers.disabled = indiceActual === lista.length;
-  els.vera.disabled = indiceActual === 1;
+  els.vers.disabled = lista.length < 2;
+  els.vera.disabled = lista.length < 2;
   document.getElementById('resultShareStatus').textContent = '';
   els.compartirD.textContent = `Compartir lista completa (${lista.length})`;
   const ean = lista[indiceActual - 1], version = ++viewerRevision, summary = document.getElementById('resultProductSummary'); summary.textContent = 'Buscando producto…';
@@ -246,8 +238,8 @@ function verCodigo(indice) {
 
 function moverResultado(direccion) {
   const nuevoIndice = indiceActual + direccion;
-  if (nuevoIndice < 1 || nuevoIndice > lista.length) return;
-  verCodigo(nuevoIndice);
+  if (!lista.length) return;
+  verCodigo(((nuevoIndice - 1) % lista.length + lista.length) % lista.length + 1);
 }
 
 function cerrarResultados() {
@@ -285,7 +277,7 @@ function cambiarModoRapido(enabled) {
   rapidActive = enabled;
   if (enabled) {
     rapidCount = 0;
-    document.getElementById('mainRapidCount').textContent = 'Escaneados: 0';
+    document.getElementById('mainRapidCount').textContent = 'Escaneados: 0';document.getElementById('mainRapidOutcome').textContent='';
     document.getElementById('mainRapidLast').textContent = 'Listo para escanear';
     document.getElementById('mainRapidCode').textContent = '';
     document.getElementById('mainRapidActions').replaceChildren();
@@ -297,15 +289,15 @@ function cambiarModoRapido(enabled) {
   if (!enabled || els.contenedor.hidden || window.RepoScanMethods?.isMobile === false) iniciarScanner();
 }
 function mostrarProductoRapido(product) {
-  document.getElementById('mainRapidLast').textContent = product && typeof product === 'object'
-    ? window.RepoProductInfo.summary(product)
-    : typeof product === 'string' ? product : 'Producto no encontrado';
-  document.getElementById('mainRapidLast').title = document.getElementById('mainRapidLast').textContent;
-  if (!product || typeof product === 'string') document.getElementById('mainRapidPanel').dataset.state = 'warning';
+  const host=document.getElementById('mainRapidLast');host.replaceChildren();
+  if(product&&typeof product==='object')host.append(camposProducto(product));
+  else {host.textContent=typeof product==='string'?'No pudimos consultar el producto':'Sin información. Tocá Reportar para completar los datos.';document.getElementById('mainRapidPanel').dataset.state='warning';}
+  host.title=host.textContent;
 }
 
 async function iniciarScanner() {
   const revision = ++scannerRevision;
+  delete els.contenedormax.dataset.hasResult;
   scanResultRevision++;
   resultadoActual = '';
   ultimoAgregado = null;
@@ -342,6 +334,21 @@ function cerrarScanner() {
   if (total !== null) window.RepoToast?.(`Escaneados: ${total}`);
 }
 
+function camposProducto(product){
+    const fields=document.createElement('dl');fields.className='scan-product-fields';
+    for(const [label,value] of [['Marca',product.brand],['Producto',product.name],['Contenido / gramaje',product.quantity]]){const term=document.createElement('dt'),detail=document.createElement('dd');term.textContent=label;detail.textContent=typeof value==='string'&&value.trim()?value.trim():'Sin información';if(detail.textContent==='Sin información')detail.className='scan-field-missing';fields.append(term,detail);}return fields;
+}
+
+function mostrarFichaEscaneada(product,ean=resultadoActual,revision=scanResultRevision) {
+  const host=els.resultadoApi;host.replaceChildren();host.dataset.lookupState=product&&typeof product==='object'?'found':typeof product==='string'?'error':'missing';
+  if(host.dataset.lookupState==='found'){
+    host.append(camposProducto(product));
+  }else{
+    const title=document.createElement('strong'),hint=document.createElement('p');title.textContent=host.dataset.lookupState==='missing'?'No tenemos información de este producto':'No pudimos consultar la información del producto';hint.textContent=host.dataset.lookupState==='missing'?'Podés ayudarnos a completarla tocando Reportar.':'Intentá consultar nuevamente cuando tengas conexión.';host.append(title,hint);
+    if(host.dataset.lookupState==='error'){const retry=document.createElement('button');retry.type='button';retry.className='library-secondary';retry.textContent='Volver a consultar';retry.addEventListener('click',async()=>{retry.disabled=true;let result;try{result=await window.RepoProductInfo.get(ean,{fresh:true});}catch{result='error';}if(revision===scanResultRevision&&els.contenedormax.open&&resultadoActual===ean)mostrarFichaEscaneada(result,ean,revision);});host.append(retry);}
+  }
+}
+
 async function mostrarResultadoEscaneo(codigo,lectura=true) {
   if (!els.contenedormax.open || !window.RepoEANScanner.validEAN(codigo)) return;
   const revision = ++scanResultRevision;
@@ -357,7 +364,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   indiceActual = lista.indexOf(codigo) + 1;
 
   if (rapidActive) {
-    rapidCount++;
+    rapidCount++;document.getElementById('mainRapidOutcome').textContent=esDuplicado?'Ya está en tu lista. No se agregó otra vez.':'Producto agregado a tu lista.';
     document.getElementById('mainRapidCount').textContent = `Escaneados: ${rapidCount}`;
     document.getElementById('mainRapidCode').textContent = codigo;
     document.getElementById('mainRapidLast').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto agregado';
@@ -373,23 +380,25 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
     return;
   }
 
+  els.contenedormax.dataset.hasResult='true';
   els.contenedor.hidden = true;
-  document.getElementById('mainScannerStatus').hidden = true;
+  document.getElementById('mainScannerStatus').textContent='Lectura confirmada.';
+  document.getElementById('mainScannerStatus').hidden = false;
   els.copy.disabled = false;
   els.cartelScaner.hidden = false;
   els.cartelScaner.style.display = 'flex';
   els.resultado.textContent = codigo;
   const heading = document.getElementById("scanResultHeading");
   document.getElementById('mainScannerTitle').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto escaneado';
-  if (heading) {heading.textContent = esDuplicado ? 'Ya tienes este producto en la lista. No lo agregamos otra vez.' : 'Producto agregado a tu lista.';heading.parentElement.dataset.state=esDuplicado?'warning':'success';}
+  if (heading) {heading.parentElement.hidden=false;heading.textContent=esDuplicado?'Este código ya está en tu lista. No lo agregamos otra vez.':'Producto agregado a tu lista.';heading.parentElement.dataset.state=esDuplicado?'warning':'success';}
   document.getElementById('scanProductActions')?.replaceChildren();
   els.rescancelar.style.display = esDuplicado ? "none" : "block";
   actualizarContadores();
 
-  els.resultadoApi.textContent = "Buscando producto…";
+  els.resultadoApi.dataset.lookupState='loading';els.resultadoApi.textContent = "Buscando producto…";
   const resultadoAPI = await buscarProductoPorEAN(codigo);
   if (revision !== scanResultRevision) return;
-  window.RepoProductInfo.renderSummary(els.resultadoApi, resultadoAPI);
+  mostrarFichaEscaneada(resultadoAPI,codigo,revision);
   window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), codigo);
 }
 
@@ -442,11 +451,12 @@ async function copiarResultado() {
   const revision = scanResultRevision;
   if (!els.contenedormax.open || code !== resultadoActual || !window.RepoEANScanner.validEAN(code)) return;
   const status = document.getElementById('scanCopyStatus');
+  status.textContent = '';
   try {
     await navigator.clipboard.writeText(code);
-    if (revision === scanResultRevision) status.textContent = 'EAN copiado: ' + code;
+    if (revision === scanResultRevision) window.RepoToast?.('Código EAN copiado.');
   } catch {
-    if (revision === scanResultRevision) status.textContent = 'No se pudo copiar. Mantén pulsado el EAN para seleccionarlo.';
+    if (revision === scanResultRevision) window.RepoToast?.('No se pudo copiar el código EAN.', {kind:'error'});
   }
 }
 
@@ -459,7 +469,9 @@ async function compartirLista() {
   return compartirCodigos([...lista]);
 }
 async function compartirCodigos(codigos) {
-  const link = crearLinkCompartido(codigos);
+  let link = crearLinkCompartido(codigos);
+  if(navigator.onLine){try{const response=await fetch('api/listas.php',{method:'POST',body:new URLSearchParams({csrf:window.repotoolsListCSRF,codes:JSON.stringify(codigos)})}),data=await response.json();if(!response.ok||!data.url)throw Error(data.error||'No pudimos crear el enlace.');link=data.url;}catch{window.RepoToast?.('Usamos el enlace completo. Tu lista se conserva.',{kind:'info'});}}
+
 
   if (navigator.share) {
     try {
@@ -481,7 +493,7 @@ async function compartirCodigos(codigos) {
 function crearLinkCompartido(codigos = lista) {
   const json = JSON.stringify(codigos);
   const comprimido = LZString.compressToBase64(json);
-  return `${urlOriginal}?${comprimido}`;
+  return new URL('index.php',document.baseURI).href+'?'+comprimido;
 }
 
 async function fallbackCompartir(link) {
@@ -560,7 +572,7 @@ window.quitarOverlay = quitarOverlay;
   const { ean, product } = event.detail;
   if (els.contenedormax.open && resultadoActual === ean) {
     if (rapidActive) { mostrarProductoRapido(product); return; }
-    window.RepoProductInfo.renderSummary(els.resultadoApi, product);
+    mostrarFichaEscaneada(product);
     document.getElementById('scanProductActions')?.replaceChildren();
     window.RepoProductInfo.editButton(document.getElementById('scanProductActions'), ean);
   }

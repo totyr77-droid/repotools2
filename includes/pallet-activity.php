@@ -2,8 +2,8 @@
 declare(strict_types=1);
 require_once __DIR__.'/stock.php';
 function pallet_activity_snapshot(PDO $db,int $id): ?array {
-    $p=stock_query($db,'SELECT id,description,released FROM pallets WHERE id=?',[$id])->fetch();if(!$p)return null;
-    $p['products']=stock_query($db,'SELECT id,ean,name,units,expires FROM pallet_products WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+    $p=stock_query($db,'SELECT id,code,branch_id,description,released,activated,owner_id FROM pallets WHERE id=?',[$id])->fetch();if(!$p)return null;
+    $p['products']=stock_query($db,'SELECT id,ean,name,units,expires,revision FROM pallet_products WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
     $p['members']=stock_query($db,"SELECT user_id FROM pallet_access WHERE pallet_id=? AND status='accepted'",[$id])->fetchAll(PDO::FETCH_COLUMN);
     $p['accesses']=stock_query($db,'SELECT user_id,status FROM pallet_access WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_KEY_PAIR);
     return $p;
@@ -41,9 +41,9 @@ function pallet_activity_initial_joins(PDO $db): string {
     return " LEFT JOIN pallet_activity initial_expiry ON a.action='product_added' AND initial_expiry.id=a.id+1 AND initial_expiry.action='expiry_added' AND initial_expiry.pallet_id=a.pallet_id AND (initial_expiry.product_id=a.product_id OR (initial_expiry.product_id IS NULL AND a.product_id IS NULL AND {$expiryEan})) AND initial_expiry.user_id=a.user_id AND initial_expiry.created_at=a.created_at LEFT JOIN pallet_activity initial_add ON a.action='expiry_added' AND initial_add.id=a.id-1 AND initial_add.action='product_added' AND initial_add.pallet_id=a.pallet_id AND (initial_add.product_id=a.product_id OR (initial_add.product_id IS NULL AND a.product_id IS NULL AND {$addEan})) AND initial_add.user_id=a.user_id AND initial_add.created_at=a.created_at ";
 }
 function pallet_activity_list(PDO $db,int $user,int $id,int $cursor=0,int $limit=25,int $event=0): array {
-    $p=stock_query($db,'SELECT owner_id,code FROM pallets WHERE id=?',[$id])->fetch();
+    $p=stock_query($db,'SELECT owner_id,code,branch_id FROM pallets WHERE id=?',[$id])->fetch();
     if(!$p)throw new CatalogException('No encontramos este palet.',404);
-    if((int)$p['owner_id']!==$user&&!stock_is_admin($db,$user)&&stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted')throw new CatalogException('No tenés acceso a la actividad de este palet.',403);
+    if((int)$p['owner_id']!==$user&&!stock_is_admin($db,$user)&&!team_role($db,$user,(int)($p['branch_id']??0))&&stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted')throw new CatalogException('No tenés acceso a la actividad de este palet.',403);
     $limit=max(1,min(30,$limit));$args=[$id];$filter='';if($event){$filter=' AND a.id=?';$args[]=$event;}elseif($cursor>0){$filter=' AND a.id<?';$args[]=$cursor;}
     $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,a.user_id AS actor_id,u.public_name,initial_expiry.metadata AS initial_expiry FROM pallet_activity a LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND a.pallet_id=?{$filter} ORDER BY a.id DESC LIMIT ".($event?1:$limit+1),$args)->fetchAll();
     if($event&&!$rows)throw new CatalogException('Este movimiento no está disponible.',404);

@@ -1,5 +1,5 @@
-<section class="account-security">
-  <h2><?= account_icon('lock') ?>Seguridad</h2>
+<section class="account-security settings-group settings-security">
+  <h2>Seguridad</h2>
   <div class="account-security-actions"><button id="changePassword" class="library-secondary" type="button"><?= account_icon('lock') ?>Cambiar contraseña</button><button id="closeOtherSessions" class="library-secondary" type="button"><?= stock_icon('close') ?>Cerrar otras sesiones</button></div>
   <p id="accountSecurityStatus" role="status"></p>
 </section>

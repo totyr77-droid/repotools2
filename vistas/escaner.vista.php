@@ -8,12 +8,13 @@
     <button id="mainScanNormal" class="library-secondary" type="button" aria-pressed="true">Normal</button>
     <button id="mainScanRapid" class="library-secondary" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 6 6 6-6 6m10-12 6 6-6 6"/></svg>Rápido</button>
   </div>
-  <div id="contenedor" class="ean-reader"></div>
-  <p id="mainScannerStatus" class="scanner-status" role="status">Centra un solo código dentro del recuadro.</p>
+  <p id="mainScannerStatus" class="scanner-status camera-message-area" role="status">Centrá un solo código dentro del recuadro.</p>
+  <div class="main-camera-slot"><div id="contenedor" class="ean-reader"></div><p class="main-camera-paused">Lectura lista. Podés consultar el producto abajo.</p></div>
   <button id="retryMainScanner" class="library-primary" type="button" hidden>Intentar de nuevo</button>
+  <div class="main-scan-result-zone"><p class="main-scan-idle">Apuntá la cámara al código de barras. El resultado aparecerá acá.</p>
   <div id="mainRapidPanel" class="main-rapid-panel" hidden>
-    <div class="main-rapid-feedback" role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path class="rapid-check" d="m5 12 4 4 10-10"/><g class="rapid-warning"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3h.01"/></g></svg><span id="mainRapidLast">Listo para escanear</span></div>
-    <div class="main-rapid-meta"><span id="mainRapidCount">Escaneados: 0</span><span class="main-rapid-ean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/></svg><span id="mainRapidCode"></span></span><div id="mainRapidActions"></div></div>
+    <div class="main-rapid-feedback" role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path class="rapid-check" d="m5 12 4 4 10-10"/><g class="rapid-warning"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3h.01"/></g></svg><div class="main-rapid-info"><div id="mainRapidLast">Listo para escanear</div><span class="main-rapid-ean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/></svg><span id="mainRapidCode"></span></span></div></div>
+    <div class="main-rapid-meta"><div class="main-rapid-status-text"><p id="mainRapidOutcome" class="main-rapid-outcome"></p><span id="mainRapidCount">Escaneados: 0</span></div><div id="mainRapidActions"></div></div>
     <button id="mainRapidFinish" class="library-primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>Finalizar</button>
   </div>
 
@@ -27,7 +28,7 @@
         <div class="resultado-box">
           <div class="resultado-api" role="status"></div>
           <div class="resultado-title">
-            <i class="fa-solid fa-barcode"></i><p id="resultado"></p>
+            <span class="scan-ean-code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4v16M6 4v16M10 4v16M14 4v16M17 4v16M21 4v16"/></svg><p id="resultado"></p></span><button class="library-secondary scan-ean-copy" id="copy" type="button" aria-label="Copiar EAN" title="Copiar EAN" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 8h12v13H8zM16 8V3H3v13h5"/></svg><span>Copiar</span></button>
           </div>
           <div id="scanProductActions" class="scan-product-actions" aria-label="Acciones del producto"></div>
         </div>
@@ -35,9 +36,6 @@
         <div class="CsBH">
           <button class="cantidadbox" type="button" aria-label="Ver resultados">
             <i class="fa-solid fa-box-open" aria-hidden="true"></i>Ver lista (<span id="cantidadScan"></span>)
-          </button>
-          <button class="copybox" id="copy" type="button" aria-label="Copiar codigo" disabled>
-            <i class="fa-solid fa-copy" aria-hidden="true"></i>Copiar EAN
           </button>
         </div>
         <p id="scanCopyStatus" class="scanner-status" role="status"></p>
@@ -55,7 +53,7 @@
       </div>
     </div>
   </div>
-</dialog>
+</div></dialog>
 
 <?php if (current_user()): ?>
 <dialog id="scanLibraryDialog" class="library-dialog" aria-labelledby="scanLibraryTitle">
@@ -79,16 +77,17 @@
         <p id="resultProductSummary" class="results-summary" role="status"></p>
         <svg id="barcode" role="img" aria-label="Código de barras del producto"></svg>
         <p id="veri" role="status"></p>
-        <p class="results-swipe-hint">Desliza para cambiar de código</p>
+        <p id="resultSwipeHint" class="results-swipe-hint">Desliza para cambiar de código</p>
       </div>
       <div class="results-actions">
-        <button id="shareCurrentEan" class="library-primary" type="button">Compartir este EAN</button>
-        <button id="openResultInfo" class="library-secondary" type="button">Ver información</button>
+        <button id="copyCurrentEan" class="library-secondary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></svg> Copiar EAN</button>
+<button id="shareCurrentEan" class="library-primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></svg><span>Compartir EAN</span></button>
+        <button id="openResultInfo" class="library-secondary" type="button" aria-label="Ver información del producto" title="Ver información del producto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><span>Información</span></button>
         <button id="compartirD" class="library-secondary" type="button">Compartir lista completa</button>
         <p id="resultShareStatus" class="library-status" role="status"></p>
       </div>
     </div>
-    <div class="verpag library-dialog-actions ean-navigation"><button id="vera" class="library-secondary" type="button" aria-label="Código anterior">← Anterior</button><button id="vers" class="library-primary" type="button" aria-label="Código siguiente">Siguiente →</button></div>
+    <div id="resultNavigation" class="verpag library-dialog-actions ean-navigation"><button id="vera" class="library-secondary" type="button" aria-label="Código anterior">← Anterior</button><button id="vers" class="library-primary" type="button" aria-label="Código siguiente">Siguiente →</button></div>
   </div>
 </dialog>
 <dialog id="resultInfoDialog" class="library-dialog library-ean-dialog" aria-labelledby="resultInfoTitle">
