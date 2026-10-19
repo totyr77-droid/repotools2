@@ -1,6 +1,12 @@
 {
-  "version": 26,
+  "version": 27,
   "changes": [
+    {
+      "version": 27,
+      "label": "1.22",
+      "date": "2026-10-19",
+      "summary": "Modales centrados y selector de sucursales con búsqueda"
+    },
     {
       "version": 26,
       "label": "1.21",
@@ -155,6 +161,6 @@
     }
   ],
   "major": 1,
-  "minor": 21,
-  "label": "1.21"
+  "minor": 22,
+  "label": "1.22"
 }

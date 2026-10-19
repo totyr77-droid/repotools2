@@ -58,3 +58,11 @@ La recuperación se encontró en la base principal de Neon. No asumir aislamient
 Panelmanager: Inicio usa acceso secundario con SVG home; asignación en bloque blanco con pestañas Empresa/Sucursal y validación antes de avanzar. Formulario compartido conserva funcionamiento en Mi equipo. PHP/UI ambos flujos y SW aprobados, incluyendo re-asignación sin resucitar permisos y conservación de ubicaciones/enlaces. Reversión de UI desde padre; conservar corrección de desvinculación (no reinstalar borrado físico). Main sigue v1.79 de logos.
 
 Ajuste v1.20: en Ajustes, enlaces de equipo/empresas solo con vínculo activo, dentro de la grilla account-shortcuts (SVG20px). Manager sin vínculo sigue entrando al panel administrativo desde Inicio. Evita el icono gigante causado por un enlace fuera del grupo. Sin cambios de permisos de API ni directorio.
+
+## Beta v1.22: centrado y selector de sucursales
+
+Modales centrados con inset0/margenauto/altura de contenido y límite al viewport visible; conserva adaptación de teclado del sistema. Encabezados con SVG sucursal, búsqueda con lupa, volver con flecha y cerrar con X; acciones alineadas según mano. Reutiliza branch-search-results/branch-choice-row/branch-search-option del selector de repositores mediante stock-branches.css.
+
+Elegir sucursal abre el modal con foco en título y buscador, sin enfocar/abrir select nativo ni teclado automáticamente. Selector nativo queda oculto como campo de formulario; resultados muestran nombre/dirección/localidad/provincia, búsqueda ignora tildes y la elección se marca. Nueva sucursal despliega formulario solo al solicitarla. Sin elección no permite asignar. API existente añade metadatos del directorio, solo para manager autorizado; sigue límite existente de200 disponibles. Volver conserva selección y formulario. No crea sucursales duplicadas al elegir una existente.
+
+Validación branch-manager-ui: centrado de ambos modales320/390/1366 ambasmanos, foco, búsqueda/dirección con tildes, selección marcada, nueva sucursal, vuelta, guardado existente sin aumentar directorio; inspección tmp/company-branch-picker-390.png. PHP branch-team/branch-manager, SW y sintaxis aprobadas. No sensor/teclado Safari físico. Sin escrituras reales ni cambios main. Reversión UI/APImetadatos/header al padre y publicar versión superior; conservar desvinculación segura y permisos.

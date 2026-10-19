@@ -56,7 +56,7 @@ try {
     $canAssign=team_can_assign($db,$uid);
     $result+=['locations'=>$locations,'active'=>$active,'csrf'=>$csrf,'ok'=>true,'can_assign_company'=>$canAssign];
     if($method==='GET'){
-        $result['available']=$canAssign?stock_query($db,'SELECT b.id,b.name,b.address FROM stock_branches b WHERE NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200')->fetchAll():[];
+        $result['available']=$canAssign?stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description FROM stock_branches b WHERE NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200')->fetchAll():[];
         $result['assignable_workspaces']=$canAssign?stock_query($db,'SELECT w.id,w.name,u.public_name AS owner_name FROM branch_workspaces w JOIN users u ON u.id=w.owner_id ORDER BY w.name,w.id LIMIT 200')->fetchAll():[];
         $branch=(int)($_GET['branch_id']??$active);$role=$branch?team_role($db,$uid,$branch):'';
         if(isset($_GET['branch_id'])&&!$role)throw new CatalogException('Tu vínculo no está activo.',403);
