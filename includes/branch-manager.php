@@ -22,7 +22,7 @@ function team_manager_company(PDO $db,int $user,int $workspace,int $cursor=0): a
     team_require_assignment($db,$user);
     $company=stock_query($db,'SELECT w.id,w.name,w.owner_id,u.public_name AS owner_name,u.email AS owner_email FROM branch_workspaces w JOIN users u ON u.id=w.owner_id WHERE w.id=?',[$workspace])->fetch();
     if(!$company)throw new CatalogException('La empresa ya no está disponible.',404);
-    $rows=stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.revision,(SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.released=0) AS pallets,1+(SELECT COUNT(*) FROM branch_team_members m WHERE m.branch_id=b.id AND m.active=1 AND m.user_id<>?) AS people FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id WHERE l.workspace_id=? AND b.id>? ORDER BY b.id LIMIT 31',[(int)$company['owner_id'],$workspace,$cursor])->fetchAll();
+    $rows=stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.revision,(SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.released=0) AS pallets,1+(SELECT COUNT(*) FROM branch_team_members m WHERE m.branch_id=b.id AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>?) AND m.user_id<>?) AS people FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id WHERE l.workspace_id=? AND b.id>? ORDER BY b.id LIMIT 31',[time(),(int)$company['owner_id'],$workspace,$cursor])->fetchAll();
     $more=count($rows)>30;$rows=array_slice($rows,0,30);
     return ['company'=>$company,'branches'=>$rows,'next_cursor'=>$more?(int)end($rows)['id']:null,'delete_stamp'=>team_manager_delete_stamp($db,$workspace)];
 }

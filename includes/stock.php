@@ -24,7 +24,7 @@ function stock_expire(PDO $db): void {
     stock_query($db, 'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE pallet_id IS NULL AND reserved_until<=?', [$now]);
 }
 function stock_saved_reference(PDO $db, string $ean, int $user): string {
-    $q=stock_query($db,"SELECT b.name FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.ean=? AND TRIM(b.name)<>'' AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted') OR EXISTS(SELECT 1 FROM branch_team_members m WHERE m.branch_id=p.branch_id AND m.user_id=? AND m.active=1) OR EXISTS(SELECT 1 FROM branch_workspace_locations l JOIN branch_workspaces w ON w.id=l.workspace_id WHERE l.branch_id=p.branch_id AND w.owner_id=?)) ORDER BY p.updated_at DESC,b.id DESC LIMIT 1",[$ean,$user,$user,$user,$user]);
+    $q=stock_query($db,"SELECT b.name FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.ean=? AND TRIM(b.name)<>'' AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted') OR EXISTS(SELECT 1 FROM branch_team_members m WHERE m.branch_id=p.branch_id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().")) OR EXISTS(SELECT 1 FROM branch_workspace_locations l JOIN branch_workspaces w ON w.id=l.workspace_id WHERE l.branch_id=p.branch_id AND w.owner_id=?)) ORDER BY p.updated_at DESC,b.id DESC LIMIT 1",[$ean,$user,$user,$user,$user]);
     $name=$q->fetchColumn();if($name!==false)return trim($name);
     $q=stock_query($db,"SELECT b.name FROM library_products b JOIN libraries l ON l.id=b.library_id WHERE b.ean=? AND l.user_id=? AND TRIM(b.name)<>'' ORDER BY b.id DESC LIMIT 1",[$ean,$user]);
     $name=$q->fetchColumn();return $name===false?'':trim((string)$name);
@@ -43,7 +43,7 @@ function stock_watch(PDO $db,string $code,int $user,?string $stamp=null): array 
     $state=stock_query($db,"SELECT l.code,l.pallet_id,l.reserved_by,l.reserved_until,p.released,p.revision,p.branch_id,p.owner_id,
         (SELECT status FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=?) AS access_status,
         (SELECT role FROM users WHERE id=?) AS system_role,
-        (SELECT role FROM branch_team_members m WHERE m.branch_id=p.branch_id AND m.user_id=? AND m.active=1) AS team_role,
+        (SELECT role FROM branch_team_members m WHERE m.branch_id=p.branch_id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().")) AS team_role,
         (SELECT w.owner_id FROM branch_workspace_locations b JOIN branch_workspaces w ON w.id=b.workspace_id WHERE b.branch_id=p.branch_id) AS branch_owner
         FROM pallet_labels l LEFT JOIN pallets p ON p.id=l.pallet_id WHERE l.code=?",[$user,$user,$user,$code])->fetch();
     if(!$state)throw new CatalogException('Este código no fue generado por Repotools.',404);

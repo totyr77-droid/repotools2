@@ -1,6 +1,12 @@
 {
-  "version": 60,
+  "version": 61,
   "changes": [
+    {
+      "version": 61,
+      "label": "1.56",
+      "date": "2026-10-19",
+      "summary": "Invitaciones y tokens de equipo, acceso opcional por 7 horas y ubicación con radio configurable."
+    },
     {
       "version": 60,
       "label": "1.55",
@@ -294,15 +300,9 @@
       "label": "1.07",
       "date": "2026-10-19",
       "summary": "Beta: equipos de sucursal, permisos e invitaciones con la misma cuenta"
-    },
-    {
-      "version": 11,
-      "label": "1.06",
-      "date": "2026-10-15",
-      "summary": "Vencimientos al final de los accesos de Stock"
     }
   ],
   "major": 1,
-  "minor": 55,
-  "label": "1.55"
+  "minor": 56,
+  "label": "1.56"
 }

@@ -34,9 +34,13 @@ try {
             case 'unlink_branch':
             case 'delete_branch':team_unlink_branch($db,$uid,$branch,(int)($_POST['revision']??0));break;
             case 'select':team_select($db,$uid,$branch);break;
-            case 'invite':$result['token']=team_invite($db,$uid,$branch,$_POST['role']??'',trim($_POST['email']??''),true);break;
-            case 'accept':team_accept($db,$uid,$_POST['token']??'');break;
-            case 'accept_pending':team_accept_pending($db,$uid,$_POST['invite_id']??'');break;
+            case 'invite':
+            case 'generate_token':
+                if(!in_array($_POST['temporary']??'0',['0','1'],true))throw new CatalogException('Duración no válida.',422);
+                $result['token']=team_invite($db,$uid,$branch,$_POST['role']??'',trim($_POST['email']??''),$action==='invite',($_POST['temporary']??'0')==='1'?25200:null);break;
+            case 'security':team_security_save($db,$uid,$branch,$_POST);break;
+            case 'accept':team_accept_location($db,$uid,$_POST['token']??'',false,$_POST);break;
+            case 'accept_pending':team_accept_location($db,$uid,$_POST['invite_id']??'',true,$_POST);break;
             case 'change_role':team_change_role($db,$uid,$branch,(int)($_POST['target_id']??0),$_POST['role']??'',(int)($_POST['revision']??0));break;
             case 'revoke':team_revoke($db,$uid,$branch,(int)($_POST['target_id']??0),(int)($_POST['revision']??0));break;
             case 'cancel_invite':
@@ -49,7 +53,7 @@ try {
                 stock_query($db,'UPDATE branch_team_members SET active=0,revision=revision+1 WHERE branch_id=? AND user_id=?',[$branch,$uid]);
                 stock_query($db,'DELETE FROM branch_team_active WHERE user_id=? AND branch_id=?',[$uid,$branch]);
                 stock_query($db,'UPDATE branch_team_invites SET revoked=1 WHERE branch_id=? AND invited_by=? AND used_by IS NULL',[$branch,$uid]);team_event($db,$uid,$branch,'member_left',$uid);break;
-            case 'scan':$result=team_scan($db,$uid,$_POST['code']??'',$branch);break;
+            case 'scan':$result=team_scan($db,$uid,$_POST['code']??'',$branch,$_POST);break;
             default:throw new CatalogException('Acción no válida.',422);
         }
         $db->commit();
@@ -62,6 +66,7 @@ try {
         $result['assignable_workspaces']=$canAssign?stock_query($db,'SELECT w.id,w.name,u.public_name AS owner_name FROM branch_workspaces w JOIN users u ON u.id=w.owner_id ORDER BY w.name,w.id LIMIT 200')->fetchAll():[];
         $branch=(int)($_GET['branch_id']??$active);$role=$branch?team_role($db,$uid,$branch):'';
         if(isset($_GET['branch_id'])&&!$role)throw new CatalogException('Tu vínculo no está activo.',403);
+        if($role==='admin')$result['security']=team_security($db,$branch);
         if(in_array($role,['admin','manager'],true))$result['overview']=team_overview($db,$uid,$branch,max(0,(int)($_GET['cursor']??0)));
     }
     echo json_encode($result,JSON_UNESCAPED_UNICODE);

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=36;
+const REPOTOOLS_SCHEMA_VERSION=37;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -299,6 +299,13 @@ function initialize_database(PDO $db): void {
             $db->exec("ALTER TABLE branch_team_invites ADD COLUMN recipient_id {$ref} REFERENCES users(id)");
             $db->exec('CREATE INDEX branch_team_recipient ON branch_team_invites(recipient_id,revoked,expires)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(36)');
+        }
+        if(!isset($applied[37])){
+            $db->exec('ALTER TABLE branch_team_members ADD COLUMN expires_at BIGINT');
+            $db->exec('ALTER TABLE branch_team_invites ADD COLUMN access_seconds INTEGER');
+            $db->exec("CREATE TABLE branch_team_security(branch_id {$ref} PRIMARY KEY REFERENCES stock_branches(id),latitude DOUBLE PRECISION NOT NULL,longitude DOUBLE PRECISION NOT NULL,radius INTEGER NOT NULL DEFAULT 200 CHECK(radius BETWEEN 50 AND 1000),revision INTEGER NOT NULL DEFAULT 1)");
+            $db->exec('CREATE INDEX branch_team_member_expiry ON branch_team_members(user_id,active,expires_at)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(37)');
         }
         $db->commit();
     } catch (Throwable $error) {
