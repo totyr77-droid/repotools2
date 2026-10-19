@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const page=window.RepoNavigation?.page,doc=page?.document||document;
-  if(!doc.getElementById('palletBranchDialog')&&!doc.getElementById('manageBranchDialog'))return;
+  if(!doc.getElementById('palletBranchDialog')&&!doc.getElementById('manageBranchDialog')&&!doc.querySelector('[data-company-manager]'))return;
   const instances=new Set();let left=false;
   function load(){
     let css=document.querySelector('link[data-leaflet]');

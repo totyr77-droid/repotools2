@@ -121,6 +121,6 @@
 
 
 <?php if(current_user()&&(!empty($paginaInicio)||!empty($paginaEquipo))): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-team.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
-<?php if(!empty($paginaGestionEmpresas)): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><link rel="stylesheet" href="css/branch-manager.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-manager.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(!empty($paginaGestionEmpresas)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><link rel="stylesheet" href="css/branch-manager.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-manager.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
 </html>

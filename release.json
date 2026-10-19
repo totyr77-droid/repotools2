@@ -1,6 +1,12 @@
 {
-  "version": 28,
+  "version": 29,
   "changes": [
+    {
+      "version": 29,
+      "label": "1.24",
+      "date": "2026-10-19",
+      "summary": "Alta desplegable de sucursales con ubicación en mapa"
+    },
     {
       "version": 28,
       "label": "1.23",
@@ -167,6 +173,6 @@
     }
   ],
   "major": 1,
-  "minor": 23,
-  "label": "1.23"
+  "minor": 24,
+  "label": "1.24"
 }

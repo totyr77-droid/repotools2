@@ -69,3 +69,6 @@ Validación branch-manager-ui: centrado de ambos modales320/390/1366 ambasmanos,
 
 ### Beta v1.23 — Modales de sucursales
 Alta nueva en tercer modal, selección anterior conservada al volver, confirmación final en asignación. Editor existente en modal desde nombre o configuración; formulario inicial compacto. Validación local PHP/JS, permisosmanager, SW y UI móvil/PC ambasmanos. Sin escrituras reales ni main. Revertir archivos UI de esta entrega al padre y publicar versión superior; no revertir seguridad de desvinculación.
+
+### Beta v1.24 — Alta desplegable y ubicación
+Sustituye tercer modal por sección expandida. Selector incorpora mapa existente; marcadores seleccionan sucursales libres, punto abre alta y consulta locales cercanos. Conserva carga manual sin proveedor. Latitud/longitud pasan por validación de branch_save; permisos y transacción manager existentes. Pruebas UI usan mapa y sugerencias simulados; pendiente proveedor/geolocalización en móvil físico. No se tocaron datos reales ni main. Reversión: restaurar UI/API de esta entrega al padre y publicar versión superior.

@@ -21,7 +21,7 @@ try {
                 team_require_assignment($db,$uid);
                 $workspace=(int)($_POST['workspace_id']??0);
                 if($action==='add_branch'&&!stock_query($db,'SELECT 1 FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn())throw new CatalogException('La empresa no está disponible.',404);
-                if(!$branch){$saved=branch_save($db,$uid,array_intersect_key($_POST,array_flip(['name','address','locality','province'])));$branch=(int)$saved['branch']['id'];}
+                if(!$branch){$saved=branch_save($db,$uid,array_intersect_key($_POST,array_flip(['name','address','locality','province','latitude','longitude'])));$branch=(int)$saved['branch']['id'];}
                 if($action==='create'){
                     $email=trim($_POST['owner_email']??$user['email']);
                     $owner=(int)stock_query($db,'SELECT id FROM users WHERE LOWER(email)=LOWER(?)',[$email])->fetchColumn();
@@ -56,7 +56,7 @@ try {
     $canAssign=team_can_assign($db,$uid);
     $result+=['locations'=>$locations,'active'=>$active,'csrf'=>$csrf,'ok'=>true,'can_assign_company'=>$canAssign];
     if($method==='GET'){
-        $result['available']=$canAssign?stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description FROM stock_branches b WHERE NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200')->fetchAll():[];
+        $result['available']=$canAssign?stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.latitude,b.longitude FROM stock_branches b WHERE NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200')->fetchAll():[];
         $result['assignable_workspaces']=$canAssign?stock_query($db,'SELECT w.id,w.name,u.public_name AS owner_name FROM branch_workspaces w JOIN users u ON u.id=w.owner_id ORDER BY w.name,w.id LIMIT 200')->fetchAll():[];
         $branch=(int)($_GET['branch_id']??$active);$role=$branch?team_role($db,$uid,$branch):'';
         if(isset($_GET['branch_id'])&&!$role)throw new CatalogException('Tu vínculo no está activo.',403);
