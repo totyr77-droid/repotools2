@@ -39,7 +39,7 @@ function current_user(): ?array {
         $_SESSION['device_token']=$token;$_SESSION['device_kind']=$kind;
     }
     if(!device_valid(database(),$user,$_SESSION['device_token'],$_SESSION['device_kind'])){unset($_SESSION['user']);$_SESSION['logout_error']='Tu sesión se abrió en otro equipo. Puedes volver a ingresar aquí.';return null;}
-    if((int)($_SESSION['device_renewed']??0)<time()-600){database()->prepare('UPDATE account_devices SET expires_at=? WHERE user_id=? AND kind=? AND token_hash=?')->execute([time()+30*86400,$user['id'],$_SESSION['device_kind'],hash('sha256',$_SESSION['device_token'])]);$_SESSION['device_renewed']=time();}
+    if((int)($_SESSION['device_renewed']??0)<time()-600){device_renew(database(),$user,$_SESSION['device_token'],$_SESSION['device_kind']);$_SESSION['device_renewed']=time();}
     return $_SESSION['user']=$user;
 }
 
