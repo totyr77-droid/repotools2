@@ -1,6 +1,12 @@
 {
-  "version": 52,
+  "version": 53,
   "changes": [
+    {
+      "version": 53,
+      "label": "1.48",
+      "date": "2026-10-19",
+      "summary": "Enlace corto para el perfil y QR de usuario"
+    },
     {
       "version": 52,
       "label": "1.47",
@@ -293,14 +299,9 @@
       "version": 4,
       "date": "2026-10-14",
       "summary": "Escáner de Inicio sin aviso previo de guardado y botón integrado al contenido."
-    },
-    {
-      "version": 3,
-      "date": "2026-10-14",
-      "summary": "Recorte de fotos con ajuste opcional y registro de actualizaciones compacto para cuentas con rango."
     }
   ],
   "major": 1,
-  "minor": 47,
-  "label": "1.47"
+  "minor": 48,
+  "label": "1.48"
 }

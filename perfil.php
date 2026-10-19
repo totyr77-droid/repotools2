@@ -6,7 +6,9 @@ require_once __DIR__.'/includes/stock-icons.php';
 header('Cache-Control: no-store');
 header('Referrer-Policy: no-referrer');
 header('X-Robots-Tag: noindex, nofollow');
-$token=$_GET['user']??'';$profile=false;
+$publicShareBase=rtrim(str_replace('\\','/',dirname($_SERVER['SCRIPT_NAME']??'/perfil.php')),'/').'/';
+$code=$_GET['code']??'';$token=$_GET['user']??'';$profile=false;
+if(is_string($code)&&preg_match('/^[A-Z0-9]{12}$/D',$code)){$q=database()->prepare('SELECT u.id,u.name,u.public_name,u.company FROM referral_codes t JOIN users u ON u.id=t.user_id WHERE t.code=?');$q->execute([$code]);$profile=$q->fetch();}
 if(is_string($token)&&preg_match('/^[a-f0-9]{64}$/D',$token)){
     $q=database()->prepare('SELECT u.id,u.name,u.public_name,u.company FROM user_profile_tokens t JOIN users u ON u.id=t.user_id WHERE t.token=?');
     $q->execute([$token]);$profile=$q->fetch();

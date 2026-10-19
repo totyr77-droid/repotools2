@@ -16,6 +16,7 @@ DirectoryIndex index.php index.html
     RewriteRule ^([psbe])/([A-Za-z0-9]{8})/?$ enlace.php?kind=$1&alias=$2 [END]
     RewriteRule ^l/([A-Za-z0-9]{8})/?$ lista-compartida.php?code=$1 [END]
     RewriteRule ^r/([A-Za-z0-9]{12})/?$ invitar.php?code=$1 [END]
+    RewriteRule ^u/([A-Z0-9]{12})/?$ perfil.php?code=$1 [END]
     RewriteCond %{HTTP_HOST} ^repotools2\.onrender\.com(?::[0-9]+)?$ [NC]
     RewriteRule ^ https://repotools.online%{REQUEST_URI} [R=308,L]
     RewriteRule ^q/([0-9]{8})/?$ palet.php?codigo=$1 [END]
