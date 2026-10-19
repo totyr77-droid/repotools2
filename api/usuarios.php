@@ -9,6 +9,11 @@ try {
     if ($method==='POST' && !valid_csrf()) throw new CatalogException('Recarga la página para continuar.',403);
     $csrf=csrf_token();session_write_close();$db=database();$actor=profile_user($db,(int)$session['id']);
     if ($method==='GET' && isset($_GET['mine'])) user_response(200,['token'=>profile_token($db,(int)$actor['id'])]);
+    if($method==='POST'&&($_POST['action']??'')==='resolve_qr'){
+        $token=$_POST['token']??'';if(!is_string($token)||!preg_match('/^[a-f0-9]{64}$/D',$token))throw new CatalogException('Este QR no corresponde a una cuenta de RepoTools.',422);
+        $q=$db->prepare('SELECT u.public_name,u.id,u.email FROM user_profile_tokens t JOIN users u ON u.id=t.user_id WHERE t.token=?');$q->execute([$token]);$target=$q->fetch();if(!$target)throw new CatalogException('Este QR de usuario ya no está disponible.',404);
+        user_response(200,['name'=>get_public_user_name($target),'email'=>$target['email']]);
+    }
     if (!in_array($actor['role'],['administrador','manager'],true)) throw new CatalogException('Solo administradores y managers pueden consultar perfiles.',403);
     if ($method==='GET' && isset($_GET['list'])) {
         $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);

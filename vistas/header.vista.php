@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/../includes/auth.php";
+require_once __DIR__ . '/../includes/stock-icons.php';
 require_once __DIR__ . "/../includes/catalog.php";
 require_once __DIR__ . "/../includes/reports.php";
 require_once __DIR__ . '/../includes/page-metadata.php';
@@ -139,6 +140,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
           <?php if ($navModerator): ?><span class="report-pending-badge report-menu-badge" data-report-pending<?= $navPending === 0 ? ' hidden' : '' ?> aria-label="<?= $navPending ?> reportes pendientes"><?= $navPending > 99 ? '99+' : $navPending ?></span><?php endif; ?>
         </button>
       </div>
+    <?php if(current_user()): ?><details id="quickUserQR" class="quick-user-qr"><summary aria-label="Mostrar mi QR de usuario" title="Mi QR"><?= stock_icon('chevron') ?></summary><div class="quick-user-qr-panel"><strong>Mi QR de usuario</strong><div id="quickUserQRImage" aria-label="QR de mi cuenta"></div><p id="quickUserQRStatus" role="status"></p><small>Quien lo escanee podrá completar tu correo en accesos o transferencias.</small></div></details><?php endif; ?>
     </header>
     <?php if (current_user() && empty($paginaStock) && empty($paginaBiblioteca) && empty($paginaReportes)): ?>
     <div class="account-bar"><span class="account-greeting" title="Hola, <?= escape(current_user()['name']) ?>">Hola, <strong><?= escape(current_user()['name']) ?></strong><?php if (isset($roleLabels[$navRole])): $badge = $roleLabels[$navRole]; ?><span class="account-role account-role-<?= escape($navRole) ?>" title="<?= escape($badge[1]) ?>" aria-label="<?= escape($badge[1]) ?>"><i class="fa-solid <?= escape($badge[2]) ?>" aria-hidden="true"></i><?= escape($badge[0]) ?></span><?php endif; ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/></svg><span>Salir</span></button></form></div>

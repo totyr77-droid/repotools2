@@ -281,7 +281,7 @@ function palletNumberRegion(image){
     };
   }
 
-  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false, onMetric = () => {} }) {
+  function create(elementId, { onCode, onError = () => {}, onStatus = () => {}, onManual, scanContext, identification = 'qr', validateQR, allowZoom = true, feedbackPreferences = () => ({ sound: document.body?.dataset?.scanSound !== '0', vibration: document.body?.dataset?.scanVibration !== '0' }), canAccept = () => true, keepOpen = () => false, repeatCooldown = 900, rearmRepeated = false, relayBypass = false, onMetric = () => {} }) {
     const element = document.getElementById(elementId);
     const statusArea=element?.parentElement?.querySelector?.(':scope > .scanner-status,:scope > #userScannerStatus')||(elementId==='contenedor'?document.getElementById('mainScannerStatus'):null);if(statusArea){statusArea.classList.add('camera-message-area','scanner-status');statusArea.classList.add('camera-message-overlay');}
     let revision = 0, session = null;
@@ -300,7 +300,7 @@ function palletNumberRegion(image){
       const capabilities = track?.getCapabilities?.() ?? {}, settings = track?.getSettings?.() ?? {};metric(current,'camera-capabilities',{width:settings.width,height:settings.height,zoom:capabilities.zoom?{...capabilities.zoom,current:settings.zoom}:null,focusContinuous:Boolean(capabilities.focusMode?.includes('continuous')),torch:capabilities.torch===true});
       const zoom = capabilities.zoom;
       const minZoom = !current.isQR || current.kind === 'pallet' ? Math.max(1,zoom?.min ?? 1) : zoom?.min ?? 1;
-      const hasZoom = Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && minZoom>0 && zoom.max > minZoom && Number.isFinite(settings.zoom);
+      const hasZoom = allowZoom && Number.isFinite(zoom?.min) && Number.isFinite(zoom?.max) && minZoom>0 && zoom.max > minZoom && Number.isFinite(settings.zoom);
       if (!hasZoom && capabilities.torch !== true && !onManual) return;
       const controls = document.createElement('div'); controls.className = 'ean-camera-controls';
       controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', 'Controles de cámara');
