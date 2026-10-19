@@ -33,7 +33,7 @@
       node.setAttribute('role', 'status'); node.setAttribute('aria-live', 'polite');
       const text = document.createElement('span'); text.className = 'repotools-loader-label'; text.textContent = label;
       if (type === 'fullscreen') {
-        const logo = document.createElement('img'); logo.src = new URL('img/Repotools_Logo_Pack_Blanco/02_isotipo_blanco_transparente/repotools-icon-blanco-128x128.png', document.baseURI).href; logo.alt = ''; logo.width = logo.height = 80; node.append(logo);
+        const logo = document.createElement('img'); logo.src = new URL('img/brand/repotools-isotipo-transparente.svg', document.baseURI).href; logo.alt = ''; logo.width = logo.height = 80; node.append(logo);
       }
       const mark = document.createElement('span'); mark.className = 'repotools-loader-mark'; mark.setAttribute('aria-hidden', 'true');
       for (let i = 0; i < (type === 'skeleton' ? 3 : 5); i++) { const bar = document.createElement('i'); bar.style.setProperty('--loader-index', i); mark.append(bar); }

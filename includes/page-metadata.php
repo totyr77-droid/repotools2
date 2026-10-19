@@ -26,6 +26,6 @@ function repotools_page_metadata(?string $title = null, ?string $description = n
         'title' => $title ?? 'Repotools - Herramientas para repositores',
         'description' => $description ?? 'Escaneá productos, controlá stock y organizá tu trabajo con Repotools.',
         'url' => $origin . $path . $suffix,
-        'image' => $origin . '/img/repotools-og-preview.png',
+        'image' => $origin . '/img/brand/repotools-social-1200x630.png',
     ];
 }

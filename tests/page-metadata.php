@@ -14,6 +14,6 @@ $cases = [
 foreach ($cases as $request=>$expected) { $_SERVER['REQUEST_URI']=$request; check_metadata(repotools_page_metadata()['url']===$expected); }
 putenv('APP_URL=http://localhost:8080');$_SERVER['REQUEST_URI']='/';$data=repotools_page_metadata();
 check_metadata($data['url']==='https://repotools.online/');check_metadata($data['title']==='Repotools - Herramientas para repositores');
-check_metadata($data['image']==='https://repotools.online/img/repotools-og-preview.png');
-$size=getimagesize(__DIR__.'/../img/repotools-og-preview.png');check_metadata($size[0]===1200&&$size[1]===630&&$size['mime']==='image/png');
+check_metadata($data['image']==='https://repotools.online/img/brand/repotools-social-1200x630.png');
+$size=getimagesize(__DIR__.'/../img/brand/repotools-social-1200x630.png');check_metadata($size[0]===1200&&$size[1]===630&&$size['mime']==='image/png');
 echo "OK: metadata origin, canonical filtering, public URLs, privacy and preview dimensions.\n";

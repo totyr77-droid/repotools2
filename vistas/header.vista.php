@@ -33,23 +33,23 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Logo de Repotools blanco sobre fondo negro">
+    <meta property="og:image:alt" content="Logo de Repotools blanco sobre fondo violeta">
     <meta property="og:site_name" content="Repotools">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<?= escape($previewTitle) ?>">
     <meta name="twitter:description" content="<?= escape($previewDescription) ?>">
     <meta name="twitter:image" content="<?= escape($metadata['image']) ?>">
-    <meta name="twitter:image:alt" content="Logo de Repotools blanco sobre fondo negro">
+    <meta name="twitter:image:alt" content="Logo de Repotools blanco sobre fondo violeta">
     <meta property="og:url" content="<?= escape($previewUrl) ?>">
     <meta property="og:type" content="website">
 
     <meta name="description" content="<?= escape($previewDescription) ?>">
     <meta name="keywords" content="repositores, escaneo de codigos de barras, gestion de stock, inventario, productos, logistica, scanner de codigos, administracion de inventario, manejo de stock">
     <meta name="robots" content="index, follow">
-    <link rel="icon" href="img/Repotools_Logo_Pack_Blanco/03_isotipo_fondo_negro/repotools-icon-negro-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="img/brand/repotools-icon-violeta-32x32.png" sizes="32x32" type="image/png">
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#27187e">
-    <link rel="apple-touch-icon" href="img/Repotools_Logo_Pack_Blanco/05_apple/apple-touch-icon-180x180.png" sizes="180x180">
+    <meta name="theme-color" content="#27197F">
+    <link rel="apple-touch-icon" href="img/brand/apple-touch-icon-180x180.png" sizes="180x180">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="preload" href="css/vendor/fontawesome-6.7.2/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
@@ -102,7 +102,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <header>
       <div class="header-contenedor">
-        <a class="logo" href="./" aria-label="Inicio Repotools"><span class="logo-mark"><img src="img/Repotools_Logo_Pack_Blanco/06_horizontal_blanco_transparente/repotools-horizontal-blanco-480w.png" width="480" height="82" alt="Repotools"><span class="development-badge">BETA</span><?php if(current_user()&&$navRole==='manager'): ?><span class="app-logo-version" aria-label="Versión <?= app_release_label() ?>">v<?= app_release_label() ?></span><?php endif; ?></span></a>
+        <a class="logo" href="./" aria-label="Inicio Repotools"><span class="logo-mark"><img src="img/brand/repotools-horizontal-transparente.svg" width="1561" height="268" alt="Repotools"><span class="development-badge">BETA</span><?php if(current_user()&&$navRole==='manager'): ?><span class="app-logo-version" aria-label="Versión <?= app_release_label() ?>">v<?= app_release_label() ?></span><?php endif; ?></span></a>
 
         <?php if(current_user() && (!empty($paginaStock)||!empty($paginaBiblioteca)||!empty($paginaReportes))): ?><a class="workspace-account-icon" href="cuenta.php" aria-label="Mi cuenta y ajustes" title="Mi cuenta y ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a><?php endif; ?>
         <nav class="nav" aria-label="Navegacion principal">
