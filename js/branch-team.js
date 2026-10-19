@@ -38,6 +38,9 @@
   function confirm(title,message,yes){$('teamConfirmTitle').textContent=title;$('teamConfirmText').textContent=message;$('teamConfirmYes').onclick=()=>{$('teamConfirm').close();run(yes);};$('teamConfirm').showModal();}
   const locationSelect=panel?$('teamLocation'):home.querySelector('[data-team-location]');locationSelect.addEventListener('change',()=>run(async()=>{try{await api({action:'select',branch_id:locationSelect.value});await load('Sucursal activa actualizada.');}catch(error){renderLocations();throw error;}}));
   if(panel){
+    const tabs=[...panel.querySelectorAll('[data-team-tab]')];function selectSection(key,focus=false){for(const tab of tabs){const chosen=tab.dataset.teamTab===key;tab.setAttribute('aria-selected',String(chosen));tab.tabIndex=chosen?0:-1;$(tab.getAttribute('aria-controls')).hidden=!chosen;if(chosen&&focus)tab.focus();}}
+    tabs.forEach((tab,index)=>{tab.addEventListener('click',()=>selectSection(tab.dataset.teamTab));tab.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(index+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;selectSection(tabs[next].dataset.teamTab,true);});});
+
     $('teamRefresh').addEventListener('click',()=>run(()=>load('Información actualizada.')));
     $('teamMore').addEventListener('click',()=>run(async()=>{const result=await api(null,'?branch_id='+state.active+'&cursor='+nextCursor);showPallets(result.overview.pallets,true);nextCursor=result.overview.next_cursor;$('teamMore').hidden=!nextCursor;status('');}));
     $('teamConfirmCancel').addEventListener('click',()=>$('teamConfirm').close());

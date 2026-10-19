@@ -14,7 +14,7 @@ header('Referrer-Policy: no-referrer');
 $paginaEquipo=true;$publicPageTitle='Mi equipo';include 'vistas/header.vista.php';
 ?>
 <main class="library-main team-page" data-team-page data-csrf="<?= escape(csrf_token()) ?>">
-<div class="team-page-title"><h1><?= stock_icon('branch') ?>Mi equipo</h1><a href="index.php">Inicio</a></div>
+<div class="team-page-title"><h1><?= stock_icon('branch') ?>Mi equipo</h1><label class="team-title-location"><span class="team-hint">Sucursal</span><select id="teamLocation" aria-label="Sucursal activa"><option value="0">Uso personal</option></select></label><a href="index.php" class="team-text" aria-label="Volver a Inicio"><?= stock_icon('home') ?></a></div>
 <p id="teamStatus" role="status">Cargando sucursales…</p>
 <?php if($token): ?>
 <section id="teamInvitation" class="team-section">
@@ -23,15 +23,15 @@ $paginaEquipo=true;$publicPageTitle='Mi equipo';include 'vistas/header.vista.php
 <button type="button" class="library-primary" id="teamAccept" data-token="<?= escape($token) ?>">Aceptar invitación</button>
 <?php else: ?><p>La invitación venció o ya fue utilizada. Pedí una nueva.</p><?php unset($_SESSION['branch_team_invitation']);endif; ?>
 </section><?php endif; ?>
-<label>Sucursal activa<select id="teamLocation"><option value="0">Uso personal</option></select></label>
+
 <p id="teamRole" class="team-hint"></p>
-<div id="teamOverview" hidden>
-<section class="team-section"><div class="team-section-title"><h2>Palets de la sucursal</h2><button type="button" class="team-text" id="teamRefresh">Actualizar</button></div><div id="teamPallets"></div><button type="button" class="team-text" id="teamMore" hidden>Ver más palets</button></section>
-<section class="team-section"><h2>Personas autorizadas</h2><p class="team-hint">El administrador conserva el control del espacio. Cada vínculo corresponde a esta sucursal.</p><div id="teamMembers"></div>
+<div id="teamOverview" hidden><div class="team-tabs" role="tablist" aria-label="Secciones de sucursal"><button type="button" id="teamTabPallets" role="tab" aria-selected="true" aria-controls="teamPanelPallets" data-team-tab="Pallets"><?= stock_icon('pallet') ?>Palets</button><button type="button" id="teamTabMovements" role="tab" aria-selected="false" tabindex="-1" aria-controls="teamPanelMovements" data-team-tab="Movements"><?= stock_icon('clock') ?>Movimientos</button><button type="button" id="teamTabAccounts" role="tab" aria-selected="false" tabindex="-1" aria-controls="teamPanelAccounts" data-team-tab="Accounts"><?= stock_icon('user') ?>Cuentas</button></div>
+<section id="teamPanelPallets" role="tabpanel" aria-labelledby="teamTabPallets" class="team-section"><div class="team-section-title"><h2>Palets de la sucursal</h2><button type="button" class="team-text" id="teamRefresh">Actualizar</button></div><div id="teamPallets"></div><button type="button" class="team-text" id="teamMore" hidden>Ver más palets</button></section>
+<section id="teamPanelAccounts" role="tabpanel" aria-labelledby="teamTabAccounts" class="team-section" hidden><h2>Personas autorizadas</h2><p class="team-hint">El administrador conserva el control del espacio. Cada vínculo corresponde a esta sucursal.</p><div id="teamMembers"></div>
 <form id="teamInviteForm" class="team-inline"><label>Nuevo acceso<select name="role"><option value="operator">Operador</option><option value="manager" id="teamManagerOption">Encargado</option></select></label><button type="submit" class="library-secondary">Crear invitación</button></form>
 <div id="teamInviteResult" hidden><label>Enlace de un uso · vence en 3 días<input id="teamInviteLink" readonly></label><button type="button" class="team-text" id="teamCopy">Copiar enlace</button><button type="button" class="team-text" id="teamShare">Compartir</button><div id="teamInviteQR" aria-label="QR de invitación"></div></div>
 <details><summary>Invitaciones pendientes</summary><div id="teamInvites"></div></details></section>
-<section class="team-section"><h2>Últimos movimientos</h2><div id="teamMovements"></div><details><summary>Accesos y asignaciones</summary><div id="teamEvents"></div></details></section>
+<section id="teamPanelMovements" role="tabpanel" aria-labelledby="teamTabMovements" class="team-section" hidden><h2>Últimos movimientos</h2><div id="teamMovements"></div><details><summary>Accesos y asignaciones</summary><div id="teamEvents"></div></details></section>
 </div>
 <p id="teamOperatorHint" hidden>Podés trabajar con los palets desde Escanear palet en Inicio. El encargado consulta el inventario completo.</p>
 <button type="button" class="team-text team-danger" id="teamDeleteBranch" hidden>Desvincular sucursal</button>
