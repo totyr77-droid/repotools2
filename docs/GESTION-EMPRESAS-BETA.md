@@ -56,3 +56,5 @@ Se corrigió la interpretación anterior de Eliminar sucursal. Recuperación pun
 La recuperación se encontró en la base principal de Neon. No asumir aislamiento de datos de beta por el nombre de la rama Git: revisar DATABASE_URL del servicio antes de futuras pruebas con datos reales. No se cambiaron credenciales ni configuración del alojamiento.
 
 Panelmanager: Inicio usa acceso secundario con SVG home; asignación en bloque blanco con pestañas Empresa/Sucursal y validación antes de avanzar. Formulario compartido conserva funcionamiento en Mi equipo. PHP/UI ambos flujos y SW aprobados, incluyendo re-asignación sin resucitar permisos y conservación de ubicaciones/enlaces. Reversión de UI desde padre; conservar corrección de desvinculación (no reinstalar borrado físico). Main sigue v1.79 de logos.
+
+Ajuste v1.20: en Ajustes, enlaces de equipo/empresas solo con vínculo activo, dentro de la grilla account-shortcuts (SVG20px). Manager sin vínculo sigue entrando al panel administrativo desde Inicio. Evita el icono gigante causado por un enlace fuera del grupo. Sin cambios de permisos de API ni directorio.
