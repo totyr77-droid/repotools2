@@ -61,6 +61,8 @@
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-management.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/reports-page.js?v=<?= substr(sha1_file(__DIR__.'/../js/reports-page.js'),0,12) ?>"></script>
+<?php elseif (!empty($paginaGestionEmpresas)): ?>
+<!-- Gestión administrativa: sin lector ni formularios de mercadería. -->
 <?php elseif (!empty($paginaEquipo)): ?>
 <script src="js/vendor/qrcode.min.js"></script>
 <?php elseif (!empty($paginaStock)): ?>
@@ -119,5 +121,6 @@
 
 
 <?php if(current_user()&&(!empty($paginaInicio)||!empty($paginaEquipo))): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-team.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(!empty($paginaGestionEmpresas)): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><link rel="stylesheet" href="css/branch-manager.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-manager.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
 </html>

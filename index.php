@@ -14,7 +14,7 @@ include 'vistas/header.vista.php';
       <div class="home-intro"><h1>Herramientas para repositores</h1><p>Escaneá productos, controlá stock y organizá tu trabajo.</p></div>
       <div class="home-shortcuts">
       <a class="home-tops" href="tops.php">TOPs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v6m-4 1h8"/></svg></a>
-      <?php if($teamHomeUser&&$teamHomeAssign&&!$teamHomeLocations): ?><a class="home-tops" href="sucursales.php"><?= stock_icon('branch') ?><span data-team-home-label>Asignar empresa</span></a><?php endif; ?>
+      <?php if($teamHomeUser&&$teamHomeAssign): ?><a class="home-tops" href="gestion-empresas.php"><?= stock_icon('branch') ?><span data-team-home-label>Asignar empresa</span></a><?php endif; ?>
       </div>
       <?php if (current_user()): ?><p id="scanStatsStatus" class="scan-stats-status" role="status"></p><?php endif; ?>
     </div>

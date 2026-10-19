@@ -7,7 +7,7 @@ require_once __DIR__.'/includes/referrals.php';
 require_once __DIR__.'/includes/email-verification.php';
 $referralsEnabled=referrals_enabled();
 $register = ($_GET['mode'] ?? '') === 'registro';
-$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion', 'palet', 'stock-compartido', 'sucursales'], true) ? $_GET['next'] : '';
+$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion', 'palet', 'stock-compartido', 'sucursales', 'gestion-empresas'], true) ? $_GET['next'] : '';
 $error = $_SESSION['logout_error'] ?? '';
 unset($_SESSION['logout_error']);
 $invitation=$_SESSION['referral_invitation']??null;
@@ -118,7 +118,7 @@ include __DIR__ . '/vistas/header.vista.php';
     <?php include __DIR__.'/vistas/public-name.vista.php'; ?>
 
     </section>
-    <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2><a href="sucursales.php" class="library-secondary"><?= stock_icon('branch') ?>Mi equipo y sucursales</a>
+    <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2><?php require_once __DIR__.'/includes/branch-team.php';$accountTeamLocations=team_locations(database(),(int)current_user()['id']);if(team_can_assign(database(),(int)current_user()['id'])): ?><a href="gestion-empresas.php" class="library-secondary"><?= stock_icon('branch') ?>Empresas y sucursales</a><?php endif;if($accountTeamLocations): ?><a href="sucursales.php" class="library-secondary"><?= stock_icon('branch') ?>Mi equipo</a><?php endif; ?>
     <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
