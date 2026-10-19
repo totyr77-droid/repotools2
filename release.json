@@ -1,6 +1,12 @@
 {
-  "version": 63,
+  "version": 64,
   "changes": [
+    {
+      "version": 64,
+      "label": "1.59",
+      "date": "2026-10-19",
+      "summary": "Configuración de equipo, accesos por QR y actualización automática de integrantes."
+    },
     {
       "version": 63,
       "label": "1.58",
@@ -294,15 +300,9 @@
       "label": "1.10",
       "date": "2026-10-19",
       "summary": "Beta: referencia inmediata al repetir EAN y palets abiertos actualizados entre cuentas"
-    },
-    {
-      "version": 14,
-      "label": "1.09",
-      "date": "2026-10-19",
-      "summary": "Beta: varias sesiones móviles de manager para pruebas"
     }
   ],
   "major": 1,
-  "minor": 58,
-  "label": "1.58"
+  "minor": 59,
+  "label": "1.59"
 }

@@ -37,7 +37,10 @@ try {
             case 'invite':
             case 'generate_token':
                 if(!in_array($_POST['temporary']??'0',['0','1'],true))throw new CatalogException('Duración no válida.',422);
-                $result['token']=team_invite($db,$uid,$branch,$_POST['role']??'',trim($_POST['email']??''),$action==='invite',($_POST['temporary']??'0')==='1'?25200:null);break;
+                if(isset($_POST['access_seconds'])&&!preg_match('/^(0|3600|14400|25200|43200)$/D',$_POST['access_seconds']))throw new CatalogException('Duración no válida.',422);
+                $seconds=isset($_POST['access_seconds'])?(int)$_POST['access_seconds']:(($_POST['temporary']??'0')==='1'?25200:0);
+                if(!in_array($seconds,[0,3600,14400,25200,43200],true))throw new CatalogException('Duración no válida.',422);
+                $result['token']=team_invite($db,$uid,$branch,$_POST['role']??'',trim($_POST['email']??''),$action==='invite',$seconds?:null);break;
             case 'security':team_security_save($db,$uid,$branch,$_POST);break;
             case 'accept':team_accept_location($db,$uid,$_POST['token']??'',false,$_POST);break;
             case 'accept_pending':team_accept_location($db,$uid,$_POST['invite_id']??'',true,$_POST);break;
@@ -62,6 +65,13 @@ try {
     $canAssign=team_can_assign($db,$uid);
     $result+=['has_pending_invites'=>(bool)team_incoming($db,$uid),'viewer_id'=>$uid,'locations'=>$locations,'active'=>$active,'csrf'=>$csrf,'ok'=>true,'can_assign_company'=>$canAssign];
     if($method==='GET'){
+        if(isset($_GET['token_status'])){
+            $token=$_GET['token_status'];if(!is_string($token)||!preg_match('/^[a-f0-9]{64}$/D',$token))throw new CatalogException('Token no válido.',422);
+            $inv=stock_query($db,'SELECT branch_id,invited_by,used_by,expires,revoked FROM branch_team_invites WHERE token_hash=?',[hash('sha256',$token)])->fetch();
+            if(!$inv||((int)$inv['invited_by']!==$uid&&team_role($db,$uid,(int)$inv['branch_id'])!=='admin'))throw new CatalogException('Token no disponible.',403);
+            $result['token_state']=$inv['used_by']?'used':($inv['revoked']||$inv['expires']<=time()?'expired':'pending');
+        }
+        $result['incoming']=team_incoming($db,$uid);
         $result['available']=$canAssign?stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.latitude,b.longitude FROM stock_branches b WHERE NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200')->fetchAll():[];
         $result['assignable_workspaces']=$canAssign?stock_query($db,'SELECT w.id,w.name,u.public_name AS owner_name FROM branch_workspaces w JOIN users u ON u.id=w.owner_id ORDER BY w.name,w.id LIMIT 200')->fetchAll():[];
         $branch=(int)($_GET['branch_id']??$active);$role=$branch?team_role($db,$uid,$branch):'';
