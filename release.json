@@ -1,6 +1,12 @@
 {
-  "version": 86,
+  "version": 87,
   "changes": [
+    {
+      "version": 87,
+      "label": "1.82",
+      "date": "2026-10-19",
+      "summary": "Mejorar centrado y aviso RT al consultar palet"
+    },
     {
       "version": 86,
       "label": "1.81",
@@ -294,15 +300,9 @@
       "label": "1.33",
       "date": "2026-10-16",
       "summary": "Pegar EAN dentro del campo, búsqueda visible y avance cómodo de vencimiento a descripción y cantidad."
-    },
-    {
-      "version": 37,
-      "label": "1.32",
-      "date": "2026-10-16",
-      "summary": "Calculadora offline al tocar cantidad, sin teclado y centrada sobre el campo."
     }
   ],
   "major": 1,
-  "minor": 81,
-  "label": "1.81"
+  "minor": 82,
+  "label": "1.82"
 }
