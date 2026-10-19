@@ -9,11 +9,23 @@
   function tokenFromQR(value){try{const url=new URL(value);const shortBase=new URL('u/',document.baseURI);if(url.origin===shortBase.origin&&url.pathname.startsWith(shortBase.pathname)){const code=url.pathname.slice(shortBase.pathname.length);if(/^[A-Z0-9]{12}$/.test(code))return code;}const expected=new URL('reportes.php',document.baseURI);const token=url.searchParams.get('user')||'';return url.origin===expected.origin&&[expected.pathname,new URL('perfil.php',document.baseURI).pathname].includes(url.pathname)&&/^[a-f0-9]{64}$/.test(token)?token:null;}catch{return null;}}
   async function request(body){const response=await fetchPage('api/usuarios.php'+(body?'':'?mine=1'),body?{method:'POST',body:new URLSearchParams({...body,csrf:window.repotoolsNotifications?.csrf||''})}:{});const data=await response.json();if(!response.ok)throw new Error(data.error||'No pudimos consultar el usuario.');return data;}
   disclosure.addEventListener('toggle',async()=>{if(!disclosure.open||loading||disclosure.querySelector('canvas'))return;loading=true;const status=doc.getElementById('quickUserQRStatus');status.textContent='Cargando QR…';try{const [data]=await Promise.all([request(),script('js/vendor/qrcode.min.js',()=>!!window.QRCode)]);if(leaving)return;const url=new URL('u/'+data.code,document.baseURI);new window.QRCode(doc.getElementById('quickUserQRImage'),{text:url.href,width:190,height:190,correctLevel:window.QRCode.CorrectLevel.M});status.textContent='';}catch(error){if(!leaving)status.textContent=error.message;}finally{loading=false;}});
-  const outside=event=>{if(!disclosure.contains(event.target))disclosure.open=false;};
-  const escape=event=>{if(event.key==='Escape')disclosure.open=false;};
+  let folding;
+  function dismissQR(){
+    if(!disclosure.open||folding)return;
+    const panel=disclosure.querySelector('.quick-user-qr-panel');
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||!panel.animate){disclosure.open=false;return;}
+    const style=getComputedStyle(panel);
+    disclosure.classList.add('is-folding');
+    const animation=panel.animate([{clipPath:style.clipPath,transform:style.transform},{clipPath:'inset(0 0 100% 0 round 14px)',transform:'translate(-50%,-6px)'}],{duration:200,easing:'ease-in',fill:'forwards'});
+    folding=animation;
+    animation.onfinish=()=>{if(folding!==animation)return;disclosure.open=false;disclosure.classList.remove('is-folding');folding=null;animation.cancel();};
+  }
+  disclosure.querySelector('summary').addEventListener('click',event=>{if(!disclosure.open)return;event.preventDefault();if(folding){folding.cancel();folding=null;disclosure.classList.remove('is-folding');}else dismissQR();});
+  const outside=event=>{if(!disclosure.contains(event.target))dismissQR();};
+  const escape=event=>{if(event.key==='Escape')dismissQR();};
   doc.addEventListener('pointerdown',outside);doc.addEventListener('keydown',escape);
   function close(){++generation;scanner?.stop();if(dialog?.open)dialog.close();}
-  async function open(input){target=input;const attempt=++generation;disclosure.open=false;
+  async function open(input){target=input;const attempt=++generation;dismissQR();
     if(!dialog){dialog=doc.createElement('dialog');dialog.className='user-qr-scanner';dialog.setAttribute('aria-labelledby','userQRTitle');dialog.innerHTML='<div class="library-heading"><h2 id="userQRTitle">Escanear usuario</h2><button type="button" class="app-close" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div id="userQRReader" class="ean-reader"></div><p id="userQRScanStatus" role="status"></p><button type="button" class="library-secondary" data-user-manual>Ingresar correo</button>';doc.body.append(dialog);dialog.querySelector('.app-close').onclick=close;dialog.querySelector('[data-user-manual]').onclick=()=>{close();target?.focus();};dialog.addEventListener('cancel',close);dialog.addEventListener('close',()=>{++generation;scanner?.stop();if(target?.isConnected)target.focus();});}
     dialog.showModal();const status=doc.getElementById('userQRScanStatus');status.textContent='Abriendo cámara…';
     try{if(!doc.querySelector('link[href^="css/ean-scanner.css"]')){const css=doc.createElement('link');css.rel='stylesheet';css.href='css/ean-scanner.css';doc.head.append(css);}await script('js/vendor/html5-qrcode-2.3.8.min.js',()=>!!window.Html5Qrcode);await script('js/ean-scanner.js',()=>!!window.RepoEANScanner);if(leaving||attempt!==generation||!dialog.open)return;
@@ -21,5 +33,5 @@
     }catch(error){if(attempt===generation)status.textContent=error.message||'Revisá el permiso de cámara o ingresá el correo.';}
   }
   doc.querySelectorAll('#palletInviteEmail,#stockTransferEmail,#teamOwnerLabel input[name="owner_email"]').forEach(input=>{if(input.closest('.user-qr-input'))return;const wrap=doc.createElement('span');wrap.className='user-qr-input';input.before(wrap);wrap.append(input);const button=doc.createElement('button');button.type='button';button.setAttribute('aria-label','Escanear QR de usuario');button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v14H3Z"/><circle cx="12" cy="13" r="4"/></svg>';button.onclick=()=>open(input);wrap.append(button);});
-  page?.onLeave(()=>{leaving=true;close();dialog?.remove();doc.removeEventListener('pointerdown',outside);doc.removeEventListener('keydown',escape);});
+  page?.onLeave(()=>{leaving=true;folding?.cancel();close();dialog?.remove();doc.removeEventListener('pointerdown',outside);doc.removeEventListener('keydown',escape);});
 })();

@@ -23,3 +23,5 @@ Pruebas locales public-profile-referral-ui: QR anterior a perfil sin login, nomb
 Revertir archivos de esta entrega al padre y publicar versión superior; las atribuciones ya registradas no se borran al revertir código. Main intacta.
 
 En v1.48 el QR nuevo usa /u/CODIGO (12 caracteres), reutilizando el código aleatorio permanente de invitación, sin nueva tabla/migración. RewriteApache sirve perfil y baseHTML fija asegura recursos/enlaces relativos correctos. El API autenticado y el lector de moderación aceptan código corto y token anterior manteniendo permisos. Pruebas perfilreferidoUI con ruta corta, selecciónQRcorto y perfilesAPI aprobadas. Revertir archivos de esta entrega y publicar versiónsuperior; no borrar códigos/referrals existentes.
+
+V1.49: cierre del QR usa animación de repliegue antes de retirar open, para flecha/fuera/Escape. Reapertura durante cierre cancela animación; movimiento reducido cierra inmediatamente y salir de página cancela el efecto. Prueba QRUI ampliada aprobada. Revertir JS/CSS/prueba de esta entrega al padre y publicar versión superior.

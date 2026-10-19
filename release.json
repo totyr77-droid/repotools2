@@ -1,6 +1,12 @@
 {
-  "version": 53,
+  "version": 54,
   "changes": [
+    {
+      "version": 54,
+      "label": "1.49",
+      "date": "2026-10-19",
+      "summary": "Cierre suave del QR personal"
+    },
     {
       "version": 53,
       "label": "1.48",
@@ -294,14 +300,9 @@
       "label": "1.00",
       "date": "2026-10-14",
       "summary": "Controles flotantes uniformes, contador de reportes separado y versiones 1.00."
-    },
-    {
-      "version": 4,
-      "date": "2026-10-14",
-      "summary": "Escáner de Inicio sin aviso previo de guardado y botón integrado al contenido."
     }
   ],
   "major": 1,
-  "minor": 48,
-  "label": "1.48"
+  "minor": 49,
+  "label": "1.49"
 }
