@@ -20,6 +20,7 @@ function stock_icon(string $name): string {
         'share'=>'<path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/>',
         'settings'=>'<path d="M9.7 2h4.6l.6 2.8 2.1 1.2 2.7-.8 2.3 4-2.1 2v2.4l2.1 2-2.3 4-2.7-.8-2.1 1.2-.6 2.8H9.7l-.6-2.8L7 18.8l-2.7.8-2.3-4 2.1-2v-2.4L2 9.2l2.3-4 2.7.8 2.1-1.2z"/><circle cx="12" cy="12" r="3"/>',
         'trash'=>'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
+        'user-plus'=>'<circle cx="9" cy="7" r="4"/><path d="M2 21v-3a7 7 0 0 1 12-5M19 13v8m-4-4h8"/>',
         'user'=>'<circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/>',
         'refresh'=>'<path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/>',
         'info'=>'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',

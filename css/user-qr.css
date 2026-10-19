@@ -9,3 +9,5 @@
 .quick-user-qr>summary::before{height:14px}.quick-user-qr>summary>svg{transform:translateY(-5px)}.quick-user-qr[open]>summary>svg{transform:translateY(-5px) rotate(180deg)}.quick-user-qr-panel{top:28px;margin-bottom:6px}.quick-user-qr[open]>.quick-user-qr-panel{animation:user-qr-unfold 240ms ease-out both}@keyframes user-qr-unfold{from{clip-path:inset(0 0 100% 0 round 14px);transform:translate(-50%,-6px)}to{clip-path:inset(0 round 14px);transform:translate(-50%,0)}}@media(prefers-reduced-motion:reduce){.quick-user-qr[open]>.quick-user-qr-panel{animation:none}}
 
 .quick-user-qr>summary>svg{transition:transform 200ms ease}.quick-user-qr.is-folding>summary>svg{transform:translateY(-5px)}@media(prefers-reduced-motion:reduce){.quick-user-qr>summary>svg{transition:none}}
+
+body[data-hand=left] .user-qr-input{flex-direction:row-reverse}

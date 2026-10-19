@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=35;
+const REPOTOOLS_SCHEMA_VERSION=36;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -294,6 +294,11 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE branch_team_events (id {$id}, branch_id {$ref} NOT NULL REFERENCES stock_branches(id), actor_id {$ref} NOT NULL REFERENCES users(id), action TEXT NOT NULL, target_id {$ref} REFERENCES users(id), pallet_id {$ref} REFERENCES pallets(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec('CREATE INDEX branch_team_events_recent ON branch_team_events(branch_id,id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(35)');
+        }
+        if(!isset($applied[36])){
+            $db->exec("ALTER TABLE branch_team_invites ADD COLUMN recipient_id {$ref} REFERENCES users(id)");
+            $db->exec('CREATE INDEX branch_team_recipient ON branch_team_invites(recipient_id,revoked,expires)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(36)');
         }
         $db->commit();
     } catch (Throwable $error) {

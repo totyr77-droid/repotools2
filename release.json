@@ -1,6 +1,12 @@
 {
-  "version": 55,
+  "version": 56,
   "changes": [
+    {
+      "version": 56,
+      "label": "1.51",
+      "date": "2026-10-19",
+      "summary": "Cuentas de sucursal ordenadas e invitaciones por correo o QR"
+    },
     {
       "version": 55,
       "label": "1.50",
@@ -294,15 +300,9 @@
       "label": "1.02",
       "date": "2026-10-15",
       "summary": "Sincronización de palets confirmada por producto y unidades, sin perder ni duplicar cargas."
-    },
-    {
-      "version": 6,
-      "label": "1.01",
-      "date": "2026-10-14",
-      "summary": "Guías QR más finas y transparentes en la cámara de Stock."
     }
   ],
   "major": 1,
-  "minor": 50,
-  "label": "1.50"
+  "minor": 51,
+  "label": "1.51"
 }

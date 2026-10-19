@@ -34,8 +34,10 @@ try {
             case 'unlink_branch':
             case 'delete_branch':team_unlink_branch($db,$uid,$branch,(int)($_POST['revision']??0));break;
             case 'select':team_select($db,$uid,$branch);break;
-            case 'invite':$result['token']=team_invite($db,$uid,$branch,$_POST['role']??'');break;
+            case 'invite':$result['token']=team_invite($db,$uid,$branch,$_POST['role']??'',trim($_POST['email']??''),true);break;
             case 'accept':team_accept($db,$uid,$_POST['token']??'');break;
+            case 'accept_pending':team_accept_pending($db,$uid,$_POST['invite_id']??'');break;
+            case 'change_role':team_change_role($db,$uid,$branch,(int)($_POST['target_id']??0),$_POST['role']??'',(int)($_POST['revision']??0));break;
             case 'revoke':team_revoke($db,$uid,$branch,(int)($_POST['target_id']??0),(int)($_POST['revision']??0));break;
             case 'cancel_invite':
                 $role=team_require($db,$uid,$branch,true);$hash=$_POST['invite_id']??'';
@@ -54,7 +56,7 @@ try {
     }
     $locations=team_locations($db,$uid);$active=team_active($db,$uid);
     $canAssign=team_can_assign($db,$uid);
-    $result+=['locations'=>$locations,'active'=>$active,'csrf'=>$csrf,'ok'=>true,'can_assign_company'=>$canAssign];
+    $result+=['viewer_id'=>$uid,'locations'=>$locations,'active'=>$active,'csrf'=>$csrf,'ok'=>true,'can_assign_company'=>$canAssign];
     if($method==='GET'){
         $result['available']=$canAssign?stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.latitude,b.longitude FROM stock_branches b WHERE NOT EXISTS(SELECT 1 FROM branch_workspace_locations l WHERE l.branch_id=b.id) ORDER BY b.name LIMIT 200')->fetchAll():[];
         $result['assignable_workspaces']=$canAssign?stock_query($db,'SELECT w.id,w.name,u.public_name AS owner_name FROM branch_workspaces w JOIN users u ON u.id=w.owner_id ORDER BY w.name,w.id LIMIT 200')->fetchAll():[];
