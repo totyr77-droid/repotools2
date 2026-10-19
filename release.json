@@ -1,6 +1,12 @@
 {
-  "version": 85,
+  "version": 86,
   "changes": [
+    {
+      "version": 86,
+      "label": "1.81",
+      "date": "2026-10-19",
+      "summary": "Corregir ancho del buscador y filtro de sucursales"
+    },
     {
       "version": 85,
       "label": "1.80",
@@ -294,15 +300,9 @@
       "label": "1.32",
       "date": "2026-10-16",
       "summary": "Calculadora offline al tocar cantidad, sin teclado y centrada sobre el campo."
-    },
-    {
-      "version": 36,
-      "label": "1.31",
-      "date": "2026-10-16",
-      "summary": "La cantidad de producto abre la calculadora al tocarla, sin teclado del celular."
     }
   ],
   "major": 1,
-  "minor": 80,
-  "label": "1.80"
+  "minor": 81,
+  "label": "1.81"
 }
