@@ -3,17 +3,17 @@
   const page=window.RepoNavigation?.page,doc=page?.document||document,request=page?.fetch||fetch.bind(window);
   const root=doc.querySelector('[data-company-manager]');if(!root)return;
   const $=id=>doc.getElementById(id);
-  let csrf=root.dataset.csrf,left=false,busy=false,company=null,editing=null,listCursor=null,branchCursor=null,listTurn=0,detailTurn=0,timer,listAbort,detailAbort,opener=null;
+  let csrf=root.dataset.csrf,left=false,busy=false,company=null,editing=null,listCursor=null,branchCursor=null,listTurn=0,detailTurn=0,timer,listAbort,detailAbort,opener=null,deleteStamp='';
   const status=message=>{$('companyStatus').textContent=message;$('companyStatus').hidden=!message;};
   function node(tag,text,parent,cls=''){const n=doc.createElement(tag);n.textContent=text;n.className=cls;parent.append(n);return n;}
   async function api(query='',data=null,endpoint='api/gestion-empresas.php',signal){
     const response=await request(endpoint+query,{method:data?'POST':'GET',cache:'no-store',signal,headers:data?{'Content-Type':'application/x-www-form-urlencoded'}:{},body:data?new URLSearchParams({...data,csrf}):undefined});
-    const result=await response.json();if(!response.ok)throw Error(result.error||'No pudimos completar la acción.');if(result.csrf)csrf=result.csrf;return result;
+    const result=await response.json();if(!response.ok){const error=Error(result.error||'No pudimos completar la acción.');error.status=response.status;throw error;}if(result.csrf)csrf=result.csrf;return result;
   }
   async function run(work){if(busy||left)return;busy=true;const controls=[...root.querySelectorAll('button,input,select')];const previous=controls.map(n=>n.disabled);controls.forEach(n=>n.disabled=true);root.setAttribute('aria-busy','true');status('Guardando…');try{await work();}catch(e){if(!left)status(e.message);}finally{busy=false;controls.forEach((n,i)=>n.disabled=previous[i]);root.removeAttribute('aria-busy');}}
   function listRow(item){
     const button=node('button','',$('companyList'),'company-result');button.type='button';button.dataset.companyId=item.id;button.setAttribute('aria-pressed',String(Number(company?.id)===Number(item.id)));
-    const info=node('span','',button);node('strong',item.name,info);node('small',[item.owner_name||'Responsable',Number(item.branches)+(Number(item.branches)===1?' sucursal':' sucursales')].join(' · '),info);
+    const info=node('span','',button);node('strong',item.name,info);node('small',[item.owner_name||'Responsable',Number(item.branches)?Number(item.branches)+(Number(item.branches)===1?' sucursal':' sucursales'):'Sin sucursales'].join(' · '),info);
     button.addEventListener('click',()=>choose(item.id,button));
   }
   async function loadList(append=false){
@@ -39,16 +39,16 @@
     if(busy&&!refresh)return;
     if(!append&&hasDraft()){status('Guardá o cancelá los cambios antes de cambiar de empresa.');return;}
     const turn=++detailTurn;detailAbort?.abort();detailAbort=new AbortController();
-    if(!append){opener=source||opener;company=null;clearBranchEdit();$('companyDetail').hidden=false;$('companyTitle').textContent='Consultando empresa…';$('companyOwner').textContent='';$('companyBranches').replaceChildren();$('companyEdit').hidden=true;$('companyAddBranch').hidden=true;$('companyMoreBranches').hidden=true;}
+    if(!append){opener=source||opener;company=null;deleteStamp='';$('companyDelete').hidden=true;clearBranchEdit();$('companyDetail').hidden=false;$('companyTitle').textContent='Consultando empresa…';$('companyOwner').textContent='';$('companyBranches').replaceChildren();$('companyEdit').hidden=true;$('companyAddBranch').hidden=true;$('companyMoreBranches').hidden=true;}
     $('companyBranchesStatus').textContent='Cargando sucursales…';
     try{
       const result=await api('?'+new URLSearchParams({workspace_id:id,cursor:append?branchCursor||0:0}),null,undefined,detailAbort.signal);if(left||turn!==detailTurn)return;
-      company=result.company;$('companyTitle').textContent=company.name;$('companyOwner').textContent='Responsable · '+(company.owner_name||'')+' · '+company.owner_email;$('companyEdit').hidden=false;$('companyAddBranch').hidden=false;
+      company=result.company;deleteStamp=result.delete_stamp;$('companyDelete').hidden=false;$('companyTitle').textContent=company.name;$('companyOwner').textContent='Responsable · '+(company.owner_name||'')+' · '+company.owner_email;$('companyEdit').hidden=false;$('companyAddBranch').hidden=false;
       if(!append){$('companyNameForm').elements.name.value=company.name;$('companyEdit').open=false;}
-      for(const branch of result.branches)branchRow(branch);branchCursor=result.next_cursor;$('companyMoreBranches').hidden=!branchCursor;$('companyBranchesStatus').textContent=$('companyBranches').children.length?'':'Sin sucursales. Podés añadir una a esta empresa.';
+      for(const branch of result.branches)branchRow(branch);branchCursor=result.next_cursor;$('companyMoreBranches').hidden=!branchCursor;$('companyBranchesStatus').textContent=$('companyBranches').children.length?'':'Esta empresa quedó sin sucursales. Podés eliminarla o añadir una.';
       for(const b of $('companyList').children)b.setAttribute('aria-pressed',String(Number(b.dataset.companyId)===Number(company.id)));
       if(!append&&source&&matchMedia('(max-width:799px)').matches)$('companyDetail').focus();
-    }catch(e){if(!left&&turn===detailTurn&&e.name!=='AbortError'){$('companyBranchesStatus').textContent=e.message;status(e.message);if(refresh)throw e;}}
+    }catch(e){if(!left&&turn===detailTurn&&e.name!=='AbortError'){$('companyBranchesStatus').textContent=e.message;if(e.status===404){company=null;deleteStamp='';$('companyDetail').hidden=true;}status(e.message);if(refresh)throw e;}}
   }
   async function reloadCompany(id){await Promise.all([loadList(),choose(id,null,false,true)]);}
   async function openAssignment(existing=false){
@@ -64,16 +64,22 @@
   }
   function assignmentFields(){const existing=$('teamAssignWorkspace').value!=='0';$('teamWorkspaceLabel').hidden=existing;$('teamOwnerLabel').hidden=existing;$('teamCreateForm').elements.owner_email.required=!existing;$('teamCreateButton').textContent=existing?'Añadir sucursal':'Asignar empresa';}
   function branchFields(){const fresh=$('teamDirectory').value==='0';$('teamNewBranch').hidden=!fresh;for(const n of $('teamNewBranch').querySelectorAll('input'))n.required=fresh;}
+  async function refreshCompanies(quiet=false){if(left||busy||doc.hidden)return;if(hasDraft()){if(!quiet)status('Guardá o cancelá los cambios antes de actualizar.');return;}const id=company?.id;$('companyRefresh').disabled=true;try{await Promise.all([loadList(),id?choose(id,null,false,true):Promise.resolve()]);if(!quiet)status('Información actualizada.');}catch(e){if(!left)status(e.message);}finally{$('companyRefresh').disabled=false;}}
+  $('companyRefresh').addEventListener('click',()=>refreshCompanies());
+  const resume=()=>refreshCompanies(true);(page?.listen||window.addEventListener.bind(window))('focus',resume);doc.addEventListener('visibilitychange',resume);
   $('companySearch').addEventListener('input',()=>{clearTimeout(timer);listAbort?.abort();listTurn++;listCursor=null;$('companyMore').hidden=true;timer=setTimeout(()=>loadList(),220);});
   $('companyMore').addEventListener('click',()=>loadList(true));$('companyMoreBranches').addEventListener('click',()=>{if(company)choose(company.id,null,true);});
   $('companyNew').addEventListener('click',()=>openAssignment());$('companyAddBranch').addEventListener('click',()=>openAssignment(true));
   $('companyClose').addEventListener('click',()=>{if(hasDraft()){status('Guardá o cancelá los cambios antes de cerrar.');return;}detailTurn++;detailAbort?.abort();company=null;$('companyDetail').hidden=true;for(const b of $('companyList').children)b.setAttribute('aria-pressed','false');opener?.focus();});
+  $('companyDelete').addEventListener('click',()=>{if(busy||!company)return;if(hasDraft()){status('Guardá o cancelá los cambios antes de eliminar.');return;}$('companyDeleteTitle').textContent='Eliminar '+company.name;$('companyDeleteDialog').showModal();$('companyDeleteCancel').focus();});
+  $('companyDeleteCancel').addEventListener('click',()=>$('companyDeleteDialog').close());
+  $('companyDeleteConfirm').addEventListener('click',()=>{if(!company)return;const data={action:'delete_company',workspace_id:company.id,delete_stamp:deleteStamp};$('companyDeleteDialog').close();run(async()=>{await api('',data);detailTurn++;detailAbort?.abort();company=null;deleteStamp='';clearBranchEdit();$('companyDetail').hidden=true;await loadList();status('Empresa eliminada. Las sucursales y la mercadería se conservaron.');$('companySearch').focus();});});
   $('companyBranchCancel').addEventListener('click',clearBranchEdit);
   $('companyNameForm').addEventListener('submit',event=>{event.preventDefault();if(!company)return;const id=company.id,data={action:'rename',workspace_id:id,expected_name:company.name,name:event.target.elements.name.value};run(async()=>{await api('',data);$('companyEdit').open=false;await reloadCompany(id);status('Nombre actualizado.');});});
   $('companyBranchForm').addEventListener('submit',event=>{event.preventDefault();if(!editing||!company)return;const id=company.id,data={...Object.fromEntries(new FormData(event.target)),action:'save_branch',workspace_id:id,branch_id:editing.id,revision:editing.revision};run(async()=>{await api('',data);clearBranchEdit();await reloadCompany(id);status('Sucursal actualizada.');});});
   $('teamAssignWorkspace').addEventListener('change',assignmentFields);$('teamDirectory').addEventListener('change',branchFields);
   const cancel=node('button','Cancelar',$('teamCreateForm'),'team-text');cancel.type='button';cancel.addEventListener('click',()=>{$('teamSetup').open=false;$('teamSetup').hidden=true;$('teamCreateForm').reset();});
   $('teamCreateForm').addEventListener('submit',event=>{event.preventDefault();const data=Object.fromEntries(new FormData(event.target)),workspace=$('teamAssignWorkspace').value;run(async()=>{const result=await api('',{...data,action:workspace==='0'?'create':'add_branch',workspace_id:workspace},'api/equipo-sucursal.php');$('teamSetup').open=false;$('teamSetup').hidden=true;event.target.reset();await reloadCompany(result.workspace_id||Number(workspace));status(workspace==='0'?'Empresa asignada.':'Sucursal añadida.');});});
-  page?.onLeave(()=>{left=true;clearTimeout(timer);listAbort?.abort();detailAbort?.abort();});
+  page?.onLeave(()=>{left=true;doc.removeEventListener('visibilitychange',resume);clearTimeout(timer);listAbort?.abort();detailAbort?.abort();});
   loadList();
 })();

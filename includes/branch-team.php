@@ -119,6 +119,7 @@ function team_delete_branch(PDO $db,int $user,int $branch,int $revision): void {
     if(team_require($db,$user,$branch)!=='admin')throw new CatalogException('Solo el administrador de la sucursal puede eliminarla.',403);
     $before=stock_query($db,'SELECT * FROM stock_branches WHERE id=?',[$branch])->fetch();
     if(!$before||(int)$before['revision']!==$revision)throw new CatalogException('La sucursal cambió. Actualizá antes de eliminarla.',409);
+    $workspace=stock_query($db,'SELECT w.id,w.name,w.owner_id FROM branch_workspace_locations l JOIN branch_workspaces w ON w.id=l.workspace_id WHERE l.branch_id=?',[$branch])->fetch();
     require_once __DIR__.'/stock-branches.php';
     // Keep team audit records after removing the directory entry and its FK children.
     $events=stock_query($db,'SELECT * FROM branch_team_events WHERE branch_id=? ORDER BY id',[$branch])->fetchAll();
@@ -128,4 +129,8 @@ function team_delete_branch(PDO $db,int $user,int $branch,int $revision): void {
     stock_query($db,'UPDATE stock_shares SET active=0,branch_id=NULL WHERE branch_id=?',[$branch]);
     foreach(['branch_team_active','branch_team_invites','branch_team_members','branch_team_events','branch_workspace_locations'] as $table)stock_query($db,'DELETE FROM '.$table.' WHERE branch_id=?',[$branch]);
     stock_query($db,'DELETE FROM stock_branches WHERE id=?',[$branch]);
+    if($workspace&&!stock_query($db,'SELECT 1 FROM branch_workspace_locations WHERE workspace_id=?',[$workspace['id']])->fetchColumn()){
+        stock_query($db,'DELETE FROM branch_workspaces WHERE id=?',[$workspace['id']]);
+        stock_query($db,'INSERT INTO branch_events(actor_id,branch_name,action,before_data,after_data) VALUES(?,?,?,?,?)',[$user,$workspace['name'],'workspace_deleted',json_encode($workspace,JSON_UNESCAPED_UNICODE),json_encode(['reason'=>'last_branch_deleted'],JSON_UNESCAPED_UNICODE)]);
+    }
 }

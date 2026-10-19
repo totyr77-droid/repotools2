@@ -24,7 +24,7 @@ function team_manager_company(PDO $db,int $user,int $workspace,int $cursor=0): a
     if(!$company)throw new CatalogException('La empresa ya no está disponible.',404);
     $rows=stock_query($db,'SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.revision,(SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.released=0) AS pallets,1+(SELECT COUNT(*) FROM branch_team_members m WHERE m.branch_id=b.id AND m.active=1 AND m.user_id<>?) AS people FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id WHERE l.workspace_id=? AND b.id>? ORDER BY b.id LIMIT 31',[(int)$company['owner_id'],$workspace,$cursor])->fetchAll();
     $more=count($rows)>30;$rows=array_slice($rows,0,30);
-    return ['company'=>$company,'branches'=>$rows,'next_cursor'=>$more?(int)end($rows)['id']:null];
+    return ['company'=>$company,'branches'=>$rows,'next_cursor'=>$more?(int)end($rows)['id']:null,'delete_stamp'=>team_manager_delete_stamp($db,$workspace)];
 }
 function team_manager_rename(PDO $db,int $user,int $workspace,string $expected,string $name): void {
     team_require_assignment($db,$user);$name=catalog_text($name,100);
@@ -41,4 +41,24 @@ function team_manager_save_branch(PDO $db,int $user,int $workspace,array $input)
     $branch=(int)($input['branch_id']??0);
     if(!stock_query($db,'SELECT 1 FROM branch_workspace_locations WHERE workspace_id=? AND branch_id=?',[$workspace,$branch])->fetchColumn())throw new CatalogException('La sucursal ya no pertenece a esta empresa.',409);
     branch_save($db,$user,['id'=>$branch,...array_intersect_key($input,array_flip(['name','address','locality','province','description','revision']))]);
+}
+function team_manager_delete_stamp(PDO $db,int $workspace): string {
+    $rows=stock_query($db,'SELECT w.id,w.name,w.owner_id,l.branch_id,b.revision FROM branch_workspaces w LEFT JOIN branch_workspace_locations l ON l.workspace_id=w.id LEFT JOIN stock_branches b ON b.id=l.branch_id WHERE w.id=? ORDER BY l.branch_id',[$workspace])->fetchAll();
+    return hash('sha256',json_encode($rows,JSON_UNESCAPED_UNICODE));
+}
+// Requires the API's Stock write transaction/lock. Inventory and directory remain intact.
+function team_manager_delete(PDO $db,int $user,int $workspace,string $stamp): void {
+    team_require_assignment($db,$user);
+    $company=stock_query($db,'SELECT id,name,owner_id FROM branch_workspaces WHERE id=?',[$workspace])->fetch();
+    if(!$company)throw new CatalogException('La empresa ya no está disponible.',404);
+    if(!hash_equals(team_manager_delete_stamp($db,$workspace),$stamp))throw new CatalogException('La empresa cambió. Actualizá antes de eliminarla.',409);
+    $branches=stock_query($db,'SELECT branch_id FROM branch_workspace_locations WHERE workspace_id=? ORDER BY branch_id',[$workspace])->fetchAll(PDO::FETCH_COLUMN);
+    foreach($branches as $branch){
+        stock_query($db,'UPDATE branch_team_members SET active=0,revision=revision+1 WHERE branch_id=? AND active=1',[$branch]);
+        stock_query($db,'UPDATE branch_team_invites SET revoked=1 WHERE branch_id=?',[$branch]);
+        stock_query($db,'DELETE FROM branch_team_active WHERE branch_id=?',[$branch]);
+    }
+    stock_query($db,'DELETE FROM branch_workspace_locations WHERE workspace_id=?',[$workspace]);
+    stock_query($db,'DELETE FROM branch_workspaces WHERE id=?',[$workspace]);
+    stock_query($db,'INSERT INTO branch_events(actor_id,branch_name,action,before_data,after_data) VALUES(?,?,?,?,?)',[$user,$company['name'],'workspace_deleted',json_encode($company+['branches'=>$branches],JSON_UNESCAPED_UNICODE),json_encode(['reason'=>'manager_deleted'],JSON_UNESCAPED_UNICODE)]);
 }

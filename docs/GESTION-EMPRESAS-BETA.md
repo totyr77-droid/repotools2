@@ -29,10 +29,20 @@ En esta revisión se detectó el logo horizontal repetido en la lista de instala
 
 1. Probar el panel con los managers y ajustar nombres, orden y búsquedas según uso.
 2. Definir el procedimiento para cambiar responsable de una empresa: qué accesos conserva o pierde y cómo se confirma y registra.
-3. Definir baja/archivo de empresa y gestión administrativa de vínculos. La eliminación de una sucursal por su administrador sigue funcionando en `Mi equipo`; no se añadió borrado global desde este panel.
+3. Definir recuperación/archivo y cambios de responsable. La eliminación de empresas por managers se añadió en v1.18, conservando directorio e inventario; la eliminación de sucursal sigue en `Mi equipo`.
 4. Mejorar selección del directorio libre si supera los 200 registros que entrega el selector existente.
 5. Marcas y comparación Excel permanecen para una entrega posterior.
 
 ## Reversión
 
 Restaurar al padre de esta entrega los enlaces en Inicio/Ajustes, los includes compartidos, header/footer y respuesta `workspace_id` de asignación; retirar la nueva vista, API, helper, JS y CSS. Publicar una versión superior para renovar caché. Mantener la corrección de entrada duplicada del SW. No revertir inventario, cuentas o vínculos: no hubo migración. Los nombres/datos guardados durante el uso real quedan persistidos y cualquier corrección se realiza por una nueva operación auditada.
+
+## Beta v1.18: eliminación de empresas
+
+Solo el manager global puede usar Eliminar empresa en el detalle. La confirmación explica el alcance: se borra el contenedor empresarial y se revocan sus miembros, invitaciones y selecciones activas. Se conservan las sucursales del directorio, los palets, sus dueños, cantidades, movimientos y enlaces públicos independientes. Auditoría workspace_deleted conserva la referencia de empresa/sucursales. Firma de nombre/responsable/sucursales/revisión evita borrar a partir de un detalle obsoleto. La operación usa CSRF y la transacción/bloqueo existentes.
+
+Borrar una sucursal desde Mi equipo ahora retira también su empresa si era la última sucursal. La empresa se conserva si quedan otras. Esto corrige la fila vacía que antes quedaba en el panel manager. Las empresas vacías anteriores siguen siendo visibles como Sin sucursales y pueden eliminarse con el nuevo botón; no se ejecuta limpieza global ni se borraron empresas reales durante las pruebas.
+
+El panel permite Actualizar empresas y reconsulta al volver a la ventana visible, salvo que haya cambios en edición. Una empresa eliminada por otra cuenta desaparece del listado y del detalle; se conserva el aislamiento de respuestas tardías.
+
+Validación adicional: pruebas PHP con denegación de administrador empresarial/usuario, firma obsoleta, rollback, empresa vacía/con sucursales, revocación y conservación de directorio/inventario/enlaces/auditoría; UI cancelar/confirmar y eliminación de última sucursal por otra cuenta con actualización manager. stock-watch y SW conservados. Reversión de código al padre de entrega y nueva versión; recuperar una empresa efectivamente eliminada requiere respaldo o nueva asignación/autorización (no se restauran vínculos revocados automáticamente).

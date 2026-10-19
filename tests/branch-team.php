@@ -61,4 +61,6 @@ team_check(stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$p['id']]
 team_check((int)stock_query($db,'SELECT SUM(units) FROM pallet_products WHERE pallet_id=?',[$p['id']])->fetchColumn()===24,'inventory retained on deletion');
 team_check((int)stock_query($db,'SELECT active FROM stock_shares WHERE token=?',[str_repeat('a',64)])->fetchColumn()===0,'branch share disabled');
 
+team_check((bool)stock_query($db,'SELECT 1 FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn(),'company retained while another branch exists');
+$db->beginTransaction();team_delete_branch($db,1,(int)$second['id'],1);$db->commit();team_check(!stock_query($db,'SELECT 1 FROM branch_workspaces WHERE id=?',[$workspace])->fetchColumn(),'last branch removes empty company');
 echo "OK: independent business ranks, manager-only company assignment, one-use/expired invitations, scan assignment, retained owner, exact units, scoped overview, revocation, new authorization and foreign branch protection.\n";

@@ -20,6 +20,7 @@ try {
         $db->beginTransaction();
         if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
         switch($input['action']??''){
+            case 'delete_company':team_manager_delete($db,$uid,$workspace,$input['delete_stamp']??'');break;
             case 'rename':team_manager_rename($db,$uid,$workspace,$input['expected_name']??'',$input['name']??'');break;
             case 'save_branch':team_manager_save_branch($db,$uid,$workspace,$input);break;
             default:throw new CatalogException('Acción no válida.',422);
