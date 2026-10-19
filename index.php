@@ -9,10 +9,10 @@ include 'vistas/header.vista.php';
   <?php endif; ?>
   <div class="contenedor-main">
 <?php if (current_user() && $userHand === ''): ?><aside class="profile-pending" data-profile-pending role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3h.01"/></svg><span>Tienes información por completar en tu perfil.</span><a href="cuenta.php#handPreferences">Completar <span aria-hidden="true">→</span></a></aside><?php endif; ?>
-    <?php include __DIR__.'/vistas/branch-team-home.vista.php'; ?>
     <div class="app-resumen">
       <div class="home-intro"><h1>Herramientas para repositores</h1><p>Escaneá productos, controlá stock y organizá tu trabajo.</p></div>
       <div class="home-shortcuts">
+      <?php include __DIR__.'/vistas/branch-team-home.vista.php'; ?>
       <a class="home-tops" href="tops.php">TOPs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v6m-4 1h8"/></svg></a>
       <?php if($teamHomeUser&&$teamHomeAssign): ?><a class="home-tops" href="gestion-empresas.php"><?= stock_icon('branch') ?><span data-team-home-label>Asignar empresa</span></a><?php endif; ?>
       </div>
@@ -21,7 +21,7 @@ include 'vistas/header.vista.php';
 
     <!--BOTON SCANER-->
     <aside id="pwaInstallCard" class="pwa-install-card" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3H5v18h14V3h-3M12 3v11m-4-4 4 4 4-4"/></svg><div><strong>RepoTools a mano</strong><p>Instalala para abrirla desde tu pantalla de inicio.</p><button id="installApp" type="button" class="library-secondary">Instalar app</button><p id="installAppHelp" hidden></p></div></aside>
-    <button id="boton" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5v14M6 5v14M10 5v14M13 5v14M18 5v14M21 5v14"/></svg>Escanear producto</button>
+    <div class="home-scan-actions"><button id="boton" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5v14M6 5v14M10 5v14M13 5v14M18 5v14M21 5v14"/></svg>Escanear producto</button><?php if($teamHomeUser&&$teamHomeLocations): ?><button type="button" class="library-secondary home-pallet-scan" data-team-scan hidden aria-label="Escanear palet" title="Escanear palet"><?= stock_icon('qr') ?><span>Palet</span></button><?php endif; ?></div>
 
     <!--BOTON VER-->
 
