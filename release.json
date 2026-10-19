@@ -1,6 +1,12 @@
 {
-  "version": 51,
+  "version": 52,
   "changes": [
+    {
+      "version": 52,
+      "label": "1.47",
+      "date": "2026-10-19",
+      "summary": "Perfil público desde QR con invitación y selección de usuario"
+    },
     {
       "version": 51,
       "label": "1.46",
@@ -292,14 +298,9 @@
       "version": 3,
       "date": "2026-10-14",
       "summary": "Recorte de fotos con ajuste opcional y registro de actualizaciones compacto para cuentas con rango."
-    },
-    {
-      "version": 2,
-      "date": "2026-10-14",
-      "summary": "Guías de QR y número de palet en la cámara de Stock."
     }
   ],
   "major": 1,
-  "minor": 46,
-  "label": "1.46"
+  "minor": 47,
+  "label": "1.47"
 }
