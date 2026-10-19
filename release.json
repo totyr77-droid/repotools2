@@ -1,6 +1,12 @@
 {
-  "version": 46,
+  "version": 47,
   "changes": [
+    {
+      "version": 47,
+      "label": "1.42",
+      "date": "2026-10-19",
+      "summary": "Transferir mercadería entre palets y propiedad a otro usuario"
+    },
     {
       "version": 46,
       "label": "1.41",
@@ -275,6 +281,6 @@
     }
   ],
   "major": 1,
-  "minor": 41,
-  "label": "1.41"
+  "minor": 42,
+  "label": "1.42"
 }
