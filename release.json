@@ -1,6 +1,12 @@
 {
-  "version": 50,
+  "version": 51,
   "changes": [
+    {
+      "version": 51,
+      "label": "1.46",
+      "date": "2026-10-19",
+      "summary": "Despliegue suave del QR personal y tirador más oculto"
+    },
     {
       "version": 50,
       "label": "1.45",
@@ -291,14 +297,9 @@
       "version": 2,
       "date": "2026-10-14",
       "summary": "Guías de QR y número de palet en la cámara de Stock."
-    },
-    {
-      "version": 1,
-      "date": "2026-10-14",
-      "summary": "Versión visible y registro de actualizaciones en Ajustes."
     }
   ],
   "major": 1,
-  "minor": 45,
-  "label": "1.45"
+  "minor": 46,
+  "label": "1.46"
 }

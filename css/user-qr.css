@@ -4,3 +4,6 @@
 
 /* Discreet header handle; the larger transparent area remains touch friendly. */
 .quick-user-qr>summary{position:relative;background:transparent;border:0;border-radius:0;color:#aaa2d4}.quick-user-qr>summary::before{content:'';position:absolute;top:10px;left:6px;width:32px;height:18px;background:#27197F;border-radius:0 0 8px 8px}.quick-user-qr>summary>svg{position:relative;width:14px;height:14px}.quick-user-qr>summary:focus-visible{outline:2px solid #aaa2d4;outline-offset:2px}
+
+/* Keep only the end of the handle visible and unfold the QR beneath it. */
+.quick-user-qr>summary::before{height:14px}.quick-user-qr>summary>svg{transform:translateY(-5px)}.quick-user-qr[open]>summary>svg{transform:translateY(-5px) rotate(180deg)}.quick-user-qr-panel{top:28px;margin-bottom:6px}.quick-user-qr[open]>.quick-user-qr-panel{animation:user-qr-unfold 240ms ease-out both}@keyframes user-qr-unfold{from{clip-path:inset(0 0 100% 0 round 14px);transform:translate(-50%,-6px)}to{clip-path:inset(0 round 14px);transform:translate(-50%,0)}}@media(prefers-reduced-motion:reduce){.quick-user-qr[open]>.quick-user-qr-panel{animation:none}}
