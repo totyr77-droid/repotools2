@@ -6,13 +6,17 @@ $token=$_GET['invitacion']??($_SESSION['branch_team_invitation']??'');
 if(!is_string($token)||!preg_match('/^[a-f0-9]{64}$/D',$token))$token='';
 if($token)$_SESSION['branch_team_invitation']=$token;
 if(!current_user()){header('Location: cuenta.php?next=sucursales');exit;}
+$invite=$token?stock_query(database(),'SELECT b.name,i.role,i.revoked,i.used_by,i.expires FROM branch_team_invites i JOIN stock_branches b ON b.id=i.branch_id WHERE i.token_hash=?',[hash('sha256',$token)])->fetch():false;
+$teamPendingInvite=$invite&&!$invite['revoked']&&!$invite['used_by']&&$invite['expires']>time();
+if(!$teamPendingInvite)unset($_SESSION['branch_team_invitation']);
+if(!$teamPendingInvite&&!team_can_assign(database(),(int)current_user()['id'])&&!team_locations(database(),(int)current_user()['id'])){header('Location: index.php');exit;}
 header('Referrer-Policy: no-referrer');
 $paginaEquipo=true;$publicPageTitle='Mi equipo';include 'vistas/header.vista.php';
 ?>
 <main class="library-main team-page" data-team-page data-csrf="<?= escape(csrf_token()) ?>">
 <div class="team-page-title"><h1><?= stock_icon('branch') ?>Mi equipo</h1><a href="index.php">Inicio</a></div>
 <p id="teamStatus" role="status">Cargando sucursales…</p>
-<?php if($token): $invite=stock_query(database(),'SELECT b.name,i.role,i.revoked,i.used_by,i.expires FROM branch_team_invites i JOIN stock_branches b ON b.id=i.branch_id WHERE i.token_hash=?',[hash('sha256',$token)])->fetch(); ?>
+<?php if($token): ?>
 <section id="teamInvitation" class="team-section">
 <?php if($invite&&!$invite['revoked']&&!$invite['used_by']&&$invite['expires']>time()): ?>
 <h2>Invitación a <?= escape($invite['name']) ?></h2><p>Acceso como <?= $invite['role']==='manager'?'encargado':'operador' ?>. Usás tu misma cuenta.</p>

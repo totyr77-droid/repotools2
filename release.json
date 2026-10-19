@@ -1,6 +1,12 @@
 {
-  "version": 17,
+  "version": 18,
   "changes": [
+    {
+      "version": 18,
+      "label": "1.13",
+      "date": "2026-10-19",
+      "summary": "Mi equipo visible solo para cuentas vinculadas"
+    },
     {
       "version": 17,
       "label": "1.12",
@@ -101,6 +107,6 @@
     }
   ],
   "major": 1,
-  "minor": 12,
-  "label": "1.12"
+  "minor": 13,
+  "label": "1.13"
 }
