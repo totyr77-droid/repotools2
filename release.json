@@ -1,6 +1,12 @@
 {
-  "version": 89,
+  "version": 90,
   "changes": [
+    {
+      "version": 90,
+      "label": "1.85",
+      "date": "2026-10-19",
+      "summary": "Restringir toda transferencia al propietario del palet"
+    },
     {
       "version": 89,
       "label": "1.84",
@@ -294,15 +300,9 @@
       "label": "1.36",
       "date": "2026-10-16",
       "summary": "Referencias de productos con conexión rápida sin crédito TOP y recuperación offline sin interrumpir formularios."
-    },
-    {
-      "version": 40,
-      "label": "1.35",
-      "date": "2026-10-16",
-      "summary": "Filtro de sucursal para Mis palets, Cancelar y buscador compacto en una fila."
     }
   ],
   "major": 1,
-  "minor": 84,
-  "label": "1.84"
+  "minor": 85,
+  "label": "1.85"
 }
