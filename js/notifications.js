@@ -31,7 +31,7 @@
       const body = document.createElement('span'); body.textContent = item.body;
       const date = document.createElement('time'); date.dateTime = item.created_at;
       const instant = window.RepoDateTime?.parse(item.created_at)||new Date(item.created_at); date.textContent = Number.isNaN(instant.getTime()) ? '' : instant.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short', timeZone:'America/Buenos_Aires', hourCycle:'h23' });
-      const content = document.createElement('div'); content.className = 'notification-content'; content.append(title, body);if(item.expiry_label){const tag=document.createElement('span');tag.className='notification-expiry-label';tag.textContent=item.expiry_label;content.append(tag);}content.append(date); link.append(icon, content);
+      const content = document.createElement('div'); content.className = 'notification-content'; content.append(title, body);if(item.achievement_detail){const detail=document.createElement('span');detail.className='notification-achievement-detail';detail.textContent=item.achievement_detail;content.append(detail);}if(item.expiry_label){const tag=document.createElement('span');tag.className='notification-expiry-label';tag.textContent=item.expiry_label;content.append(tag);}content.append(date); if(item.type==='achievement'&&/^img\/achievements\/[a-z_]+\/[a-z_]+_[0-9]{2}_[a-z]+\.svg$/.test(item.badge||'')){const badge=document.createElement('img');badge.className='notification-badge';badge.src=item.badge;badge.alt='';badge.width=44;badge.height=50;link.append(badge,content);}else link.append(icon, content);
       link.addEventListener('click', async event => {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         event.preventDefault();

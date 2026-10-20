@@ -290,7 +290,7 @@ function cambiarModoRapido(enabled) {
 }
 function mostrarProductoRapido(product) {
   const host=document.getElementById('mainRapidLast');host.replaceChildren();
-  if(product&&typeof product==='object')host.append(camposProducto(product));
+  if(product&&typeof product==='object'){const name=document.createElement('strong');name.className='rapid-product-name';name.textContent=product.name?.trim()||'Producto sin nombre';host.append(name);const detail=[product.brand,product.quantity].filter(v=>typeof v==='string'&&v.trim()).join(' · ');if(detail){const meta=document.createElement('small');meta.className='rapid-product-meta';meta.textContent=detail;host.append(meta);}}
   else {host.textContent=typeof product==='string'?'No pudimos consultar el producto':'Sin información. Tocá Reportar para completar los datos.';document.getElementById('mainRapidPanel').dataset.state='warning';}
   host.title=host.textContent;
 }
@@ -368,7 +368,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
     rapidCount++;document.getElementById('mainRapidOutcome').textContent=esDuplicado?'Ya está en tu lista. No se agregó otra vez.':'Producto agregado a tu lista.';
     document.getElementById('mainRapidCount').textContent = `Escaneados: ${rapidCount}`;
     document.getElementById('mainRapidCode').textContent = codigo;
-    document.getElementById('mainRapidLast').textContent = esDuplicado ? 'Ya está en tu lista' : 'Producto agregado';
+    document.getElementById('mainRapidLast').textContent = 'Consultando producto…';
     document.getElementById('mainRapidPanel').dataset.state = esDuplicado ? 'warning' : 'success';
     const actions = document.getElementById('mainRapidActions'); actions.replaceChildren();
     window.RepoProductInfo.editButton(actions, codigo);

@@ -62,3 +62,4 @@ body[data-hand=left] .team-inventory-search{flex-direction:row-reverse}body[data
 @media(min-width:1024px){.ux-home-scan-pair [data-team-scan]{flex-basis:120px;width:120px;min-width:120px;height:120px;min-height:120px}}
 
 .home-scan-actions .home-pallet-scan,.ux-home-scan-pair [data-team-scan]{background:#b9dce5;color:#245c6b;border:1px solid #97c4d0}
+.team-goods-row>summary{list-style:none}.team-goods-row>summary::-webkit-details-marker{display:none}.team-goods-row>summary>.team-goods-chevron{width:18px;height:18px;flex:none;color:#7a718f;align-self:center;transition:transform .15s}.team-goods-row[open]>summary>.team-goods-chevron{transform:rotate(180deg);color:#27197f}.team-goods-row[open]{border-inline-start:2px solid #b9dce5;padding-inline-start:8px}.team-goods-row[open] .team-goods-lots{margin-top:5px}@media(prefers-reduced-motion:reduce){.team-goods-row>summary>.team-goods-chevron{transition:none}}

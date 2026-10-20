@@ -46,3 +46,14 @@ function achievement_snapshot(PDO $db,int $user,bool $own): array {
     $catalog=achievement_catalog();$categories=[];foreach($catalog as $id=>$c){$rows=array_values(array_filter($awards,fn($a)=>$a['category']===$id));$categories[]=['id'=>$id,'name'=>$c['nombre'],'rule'=>$c['regla'],'goals'=>$c['metas'],'levels'=>$c['niveles'],'progress'=>$own?(int)($progress[$id]??0):null,'awards'=>$rows];}
     return ['categories'=>$categories,'unlocked'=>count($awards),'total'=>72,'pallets'=>(int)($progress['pallets']??0),'days'=>(int)($progress['actividad']??0),'own'=>$own];
 }
+
+function achievement_notification(array $item): array {
+    if(($item['type']??'')!=='achievement')return $item;
+    if(!preg_match('/^achievement:[0-9]+:([a-z_]+):([1-6])$/D',$item['event_key']??'',$match))return $item;
+    $category=achievement_catalog()[$match[1]]??null;$level=(int)$match[2];if(!$category)return $item;
+    $levels=['bronce','plata','oro','platino','diamante','leyenda'];
+    $item['badge']='img/achievements/'.$match[1].'/'.$match[1].'_'.str_pad((string)$level,2,'0',STR_PAD_LEFT).'_'.$levels[$level-1].'.svg';
+    $item['body']=$category['nombre'].' · '.$category['niveles'][$level-1];
+    $item['achievement_detail']='Meta alcanzada: '.$category['metas'][$level-1].' · '.$category['regla'];
+    return $item;
+}

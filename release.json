@@ -1,6 +1,12 @@
 {
-  "version": 74,
+  "version": 75,
   "changes": [
+    {
+      "version": 75,
+      "label": "1.70",
+      "date": "2026-10-20",
+      "summary": "Avisos de insignias compactos, compartir perfil y acceso a Mi equipo movible."
+    },
     {
       "version": 74,
       "label": "1.69",

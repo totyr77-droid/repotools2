@@ -29,3 +29,5 @@ Miembros activos del equipo pueden retirar únicamente la sucursal actual del pa
 Validación: tests/team-refinements.php (orden, permisos, pérdida de acceso e invitador), tests/team-inventory-ui.cjs (modales y visibilidad), tests/branch-team-ui.cjs, tests/team-shortcut-ui.cjs (bordes, ambas manos, arrastre), tests/home-scan-pair-ui.cjs, SW y sintaxis. Bases aisladas; sin escritura real ni migración. Safari/cámara física y revisión del usuario pendientes. Main intacta.
 
 Reversión: revertir el commit de v1.69 y publicar un número superior; no borrar eventos ni modificar datos. Restaurar permiso previo de asignación y retirar vista/CSS/JS de lengüeta junto con sus referencias y caché.
+
+Beta1.70: Mercadería muestra chevron con estado abierto/cerrado y marca lateral tenue para identificar producto desplegado. LengüetaMiEquipo usa etiquetaempresa y admite ambosbordes porarrastre/teclado con persistencialocal porusuario; reglasdevisibilidad/permisos de1.69 intactas. Ver validación/reversión en PERFIL-INSIGNIAS-BETA.md.

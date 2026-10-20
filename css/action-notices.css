@@ -18,3 +18,4 @@
 .repotools-send-toast.repo-toast[data-notice-key=scanner-performance]{pointer-events:none;font-size:.8rem;padding:8px 10px}
 .repo-toast[data-notice-key=scanner-performance]>.repo-toast-close{display:none}
 .repo-toast{touch-action:pan-x}
+.repotools-send-toast.repo-toast[data-compact=true]{width:max-content;max-width:calc(100vw - 24px);gap:7px;padding:5px 7px 5px 10px;border-radius:10px;font-size:.8rem;box-shadow:0 3px 12px #17203318}.repo-toast[data-compact=true]>img{width:28px;height:32px;object-fit:contain;flex:none}.repo-toast[data-compact=true]>div{display:flex;align-items:center;gap:8px}.repo-toast[data-compact=true] a{color:inherit;font-size:.76rem;white-space:nowrap}.repo-toast[data-compact=true] .repo-toast-close{width:44px;min-height:44px;padding:10px}
