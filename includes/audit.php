@@ -18,7 +18,11 @@ function audit_event(PDO $db,int $actor,string $action,string $operation,array $
     if(!$insert||$result!=='confirmed')return;
     require_once __DIR__.'/achievements.php';
     if(in_array($action,['save_product','deduct_product','transfer_commit','edited'],true))achievement_day($db,$actor);
-    if($action==='referral_credited')achievement_record($db,$actor,'referidos',(string)($context['target_user']??$operation));
+    if($action==='referral_credited'){
+        achievement_record($db,$actor,'referidos',(string)($context['target_user']??$operation));
+        $joined=audit_q($db,"SELECT r.id AS referral_id,u.id,u.public_name FROM referrals r JOIN users u ON u.id=r.invitee_id WHERE r.referrer_id=? AND r.invitee_id=? AND r.state='validated' AND r.email_verified_at IS NOT NULL",[$actor,(int)($context['target_user']??0)])->fetch();
+        if($joined)audit_q($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO NOTHING",[$actor,'referral-joined:'.$joined['referral_id'],'referral_joined','¡Se sumó tu referido!',get_public_user_name($joined).' se unió a RepoTools con tu invitación. ¡Gracias por ayudarnos a crecer!']);
+    }
     if($action==='transfer_commit')achievement_record($db,$actor,'transferencias',$operation);
     if($action==='deduct_product')achievement_record($db,$actor,'retiros',$operation);
     if($action==='save_product'){

@@ -1,6 +1,12 @@
 {
-  "version": 98,
+  "version": 99,
   "changes": [
+    {
+      "version": 99,
+      "label": "1.94",
+      "date": "2026-10-20",
+      "summary": "Notificación al invitador cuando su referido confirma el correo"
+    },
     {
       "version": 98,
       "label": "1.93",
@@ -294,15 +300,9 @@
       "label": "1.45",
       "date": "2026-10-17",
       "summary": "Sistema para managers: registros y promedios de rendimiento QR/EAN, con aviso de tiempo por lectura."
-    },
-    {
-      "version": 49,
-      "label": "1.44",
-      "date": "2026-10-16",
-      "summary": "Modales de resultado sin espacio vacío ni botones recortados; enlaces compartidos contenidos."
     }
   ],
   "major": 1,
-  "minor": 93,
-  "label": "1.93"
+  "minor": 94,
+  "label": "1.94"
 }
