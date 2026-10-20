@@ -744,3 +744,6 @@ Main v2.02 (2026-10-20): Configuración junto aetiquetasucursal coniconoSVG ámb
 
 
 Main v2.03 (2026-10-20): filtrosaplicados dePalets/Mercadería enfilahorizontal desplazable cuando exceden espacio, título fijo, valores sincompresión/ellipsis ybotoneseditables completos. Barradiscreta, scrolltáctil/nativo/teclado yposiciónconservada alactualizar filtros; no scrollhorizontal depágina. Pruebaaislada stock-tagsUI3filtros/edicióncadauno320/390/1366 ambasmanos +restoflujo/etiquetas/permisos, SW/sintaxis/diff ycaptura aprobados. SoloCSS/JS sin datos/backend. Reversión: revertirentrega ypublicar versiónsuperior.
+
+
+Main v2.04 (2026-10-20): guíaQRpalet protegida delselector genérico team-page svg:not(leaflet), que reducíaelSVG a22px dentrodelmarco ylo dejabachico/descentrado. Selectoresdelcomponentemásprecisos mantienenSVG100% ycuadradocentrado sobrelanumeración. Sin cambiarenfoque/zoom/OCR/EAN/detección. Prueba shared-cameraUI conCSSreales/viewportmóvil320/390/1366 ambasmanos/tamañocompleto/centrado/QRsobreOCR yrestocámaraEAN/lease/cleanup, SW/diff ycapturarevisada aprobados; iPhonefísicopendiente. Sin datos/backend. Reversión: revertirentrega ypublicar versiónsuperior.

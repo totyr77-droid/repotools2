@@ -1,6 +1,12 @@
 {
-  "version": 108,
+  "version": 109,
   "changes": [
+    {
+      "version": 109,
+      "label": "2.04",
+      "date": "2026-10-20",
+      "summary": "Guía QR de palets centrada con su tamaño correcto"
+    },
     {
       "version": 108,
       "label": "2.03",
@@ -294,15 +300,9 @@
       "label": "1.55",
       "date": "2026-10-17",
       "summary": "Acceso a Stock según mano hábil e ingreso para filtros con retorno al informe actualizado del palet."
-    },
-    {
-      "version": 59,
-      "label": "1.54",
-      "date": "2026-10-17",
-      "summary": "Los QR abren el informe del palet con acceso explícito a Stock o ingreso, conservando resumen y filtros."
     }
   ],
   "major": 2,
-  "minor": 3,
-  "label": "2.03"
+  "minor": 4,
+  "label": "2.04"
 }
