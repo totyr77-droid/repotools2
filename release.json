@@ -1,6 +1,12 @@
 {
-  "version": 95,
+  "version": 96,
   "changes": [
+    {
+      "version": 96,
+      "label": "1.91",
+      "date": "2026-10-20",
+      "summary": "Correo: logo oficial integrado y ayuda para verificación bloqueada por spam"
+    },
     {
       "version": 95,
       "label": "1.90",
@@ -294,15 +300,9 @@
       "label": "1.42",
       "date": "2026-10-16",
       "summary": "Filtro de sucursales limitado a los palets propios del usuario."
-    },
-    {
-      "version": 46,
-      "label": "1.41",
-      "date": "2026-10-16",
-      "summary": "Correcciones de espacios, buscador móvil, contador de impresión y lectura de resultados y palets."
     }
   ],
   "major": 1,
-  "minor": 90,
-  "label": "1.90"
+  "minor": 91,
+  "label": "1.91"
 }
