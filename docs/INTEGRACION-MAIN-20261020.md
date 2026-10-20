@@ -9,3 +9,9 @@ Base existente verificada por lectura: esquema40,40migraciones aplicadas; equipo
 Validación: PHP de transferencias/seguridad/equipos/administración/logros/etiquetas/watch/sucursales/notificaciones/referencias/perfiles/referidos/core y límites de dispositivos; fastpath de esquema; EAN y service-worker. UI transferencias, Mi equipo/inventario, perfiles/logros, avisos, caché manager y escaneo rápido. PHP lint de51archivos modificados. Se corrigió prueba antigua de bienvenida que contaba el logo anterior como ilustración email; mantiene cuatro ilustraciones y logo oficial. PostgreSQL producción: solo lectura de esquema. Cámara/GPS/Safari físico siguen requiriendo campo; no se atribuye una puntuación objetiva.
 
 Reversión: revertir el merge de esta entrega con main como primer padre (base05dfebb), mantener contadorrelease superior a91 y publicar caché nueva. No eliminar tablas ni datos de equipos/logros. Preferir hotfix si hay operaciones confirmadas nuevas; una reversión de código no revierte movimientos de mercadería ni autorizaciones ya registradas.
+
+## Main 1.87 — orden habitual de Stock
+
+El listado de la cuenta se ordena por última modificación descendente, con id descendente para empates. Se elimina la prioridad automática del vencimiento: un palet recién creado/cargado o con retiro reciente aparece primero incluso si otro vence antes. Consultar no escribe actividad ni cambia la posición. La búsqueda y vista filtrada de vencimientos conservan su orden específico; sucursal/etiqueta filtran sin alterar el orden restante. No se modificó Mi equipo.
+
+Validación: tests/stock-recent-order.php, tests/stock.php, tests/stock-api.cjs, tests/stock-tags-ui.cjs y SW. Fixtures aisladas, sin datos reales ni migración. Reversión: restaurar solo ORDER BY de stock_list anterior a esta entrega y publicar versión superior para caché.

@@ -1,6 +1,12 @@
 {
-  "version": 91,
+  "version": 92,
   "changes": [
+    {
+      "version": 92,
+      "label": "1.87",
+      "date": "2026-10-20",
+      "summary": "Ordenar Stock por creación o movimiento reciente, sin priorizar vencimientos automáticamente."
+    },
     {
       "version": 91,
       "label": "1.86",
@@ -294,15 +300,9 @@
       "label": "1.38",
       "date": "2026-10-16",
       "summary": "Cambio de correo integrado en Correo electrónico debajo del estado de verificación."
-    },
-    {
-      "version": 42,
-      "label": "1.37",
-      "date": "2026-10-16",
-      "summary": "Stock más compacto y explicación de Pendientes junto al título."
     }
   ],
   "major": 1,
-  "minor": 86,
-  "label": "1.86"
+  "minor": 87,
+  "label": "1.87"
 }
