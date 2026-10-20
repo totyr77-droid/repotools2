@@ -1,6 +1,12 @@
 {
-  "version": 72,
+  "version": 73,
   "changes": [
+    {
+      "version": 73,
+      "label": "1.68",
+      "date": "2026-10-20",
+      "summary": "Mi equipo: búsqueda con cámara, filtros inmediatos y mercadería más clara."
+    },
     {
       "version": 72,
       "label": "1.67",
@@ -294,15 +300,9 @@
       "label": "1.19",
       "date": "2026-10-19",
       "summary": "Desvincular sucursal sin borrar directorio y ordenar asignación por pestañas"
-    },
-    {
-      "version": 23,
-      "label": "1.18",
-      "date": "2026-10-19",
-      "summary": "Managers pueden eliminar empresas y se retiran empresas sin última sucursal"
     }
   ],
   "major": 1,
-  "minor": 67,
-  "label": "1.67"
+  "minor": 68,
+  "label": "1.68"
 }

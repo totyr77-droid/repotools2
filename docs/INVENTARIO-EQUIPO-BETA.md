@@ -9,3 +9,13 @@ La sucursal del encabezado usa una etiqueta compacta con icono de sucursal, sin 
 Validación: tests/team-inventory.php y tests/team-inventory-ui.cjs aprobados, incluyendo más de 30 palets, totales, lotes, búsquedas históricas, filtros, permisos, tamaños 320/390/1366 y ambas manos. Integración PostgreSQL y pruebas físicas Safari/cámara/GPS pendientes. No se usaron datos reales ni se modificó main.
 
 Reversión: restaurar código de v1.62 y publicar una versión superior. Conservar la columna metadata y sus registros; no deshacer cambios de permisos ni operaciones confirmadas mediante borrado de datos.
+
+## Mi equipo — beta v1.68
+Rol junto al título, sucursal separada como etiqueta. Mercadería usa iconos del sistema para EAN, palets, cantidad y fecha; vencimientos en etiquetas con estado/color existentes. Cada lote conserva la apertura del resumen local y agrega Ver en Stock con el código correspondiente.
+
+Buscadores con cámara integrada y lupa que pasa a X para borrar solo la consulta. Se reutiliza RepoEANScanner con modos Producto (EAN) y Palet (QR), controles y guía existentes; el lector de búsqueda no asigna sucursal ni traslada inventario ni acepta invitaciones. Cierre/ingreso manual/navegación liberan cámara; ingreso manual vuelve al campo. Cámara física/Safari pendientes; prueba de integración de controles con lector simulado y motor compartido EAN aprobado.
+
+Filtros: input/change/focusout, Enter y cierre del desplegable aplican valores; tocar fuera lo cierra. Se elimina el guard que solo atendía SELECT. Claves de consulta evitan repeticiones y versiones invalidan respuestas anteriores incluso durante el debounce. Etiquetas de texto discretas y Limpiar filtros en la misma fila; X conserva los demás filtros. Campos sin resultados mantienen estado y opciones de limpieza.
+
+Validación: team-inventory PHP/UI ampliado con EAN/QR, X, ingreso manual, fecha cambiada al perder foco, cierre exterior, respuesta antigua demorada, enlaces por palet, etiquetas y rol; paginación, agrupación, administración, permisos, URL y 320/390/1366 ambas manos. branch-team-ui completo, EAN, SW y sintaxis aprobados; capturas de Mercadería y filtros revisadas. Sin migraciones ni datos reales. Reversión: vistas, módulos, iconos y estilos a v1.67 con versión superior; conservar inventario. Solo beta.
+`nQR de Inicio: proporción cuadrada en una mano, contraste invertido conservando paleta y separación4px. Validado tests/home-scan-pair-ui.cjs a320/390/531/1366 y ambasmanos. Reversión: restaurar reglas añadidas al final de branch-team.css y prueba al padre; publicar versión superior.

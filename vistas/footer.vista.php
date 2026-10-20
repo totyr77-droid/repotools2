@@ -66,6 +66,9 @@
 <!-- Gestión administrativa: sin lector ni formularios de mercadería. -->
 <?php elseif (!empty($paginaEquipo)): ?>
 <script src="js/vendor/qrcode.min.js"></script>
+<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
+<script src="js/vendor/quagga-1.12.1.min.js"></script>
+<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <?php include __DIR__.'/stock-scripts.vista.php'; ?>
 <?php elseif (empty($paginaCuenta)): ?>
