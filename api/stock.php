@@ -34,7 +34,13 @@ try {
     $expiryDue=$method==='POST'||stock_query($db,'SELECT 1 FROM pallet_labels WHERE (pallet_id IS NULL AND reserved_until>0 AND reserved_until<=?) OR pallet_id IN (SELECT id FROM pallets WHERE released=1 OR (released=0 AND activated=0 AND prepared_until<=? AND NOT EXISTS(SELECT 1 FROM pallet_products b WHERE b.pallet_id=pallets.id))) LIMIT 1',[time(),time()])->fetchColumn();
     if($expiryDue){if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');stock_expire($db);}
     if ($method==='GET') {
-        if(isset($_GET['offline_codes'])){
+        if(isset($_GET['goods'])){
+            if(!$uid)throw new CatalogException('Ingresá para consultar tu mercadería.',401);
+            require_once __DIR__.'/../includes/team-inventory.php';
+            $view=match($_GET['goods']){'lots'=>'lotes','dates'=>'fechas',default=>'mercaderia'};if(!is_string($_GET['goods'])||!in_array($_GET['goods'],['list','dates','lots'],true))throw new CatalogException('Sección no válida.',422);
+            $input=$_GET;if(($input['sort']??'')==='modified')$input['sort']='';
+            $result=['inventory'=>team_inventory_page($db,$uid,0,$view,$input,true)];
+        }elseif(isset($_GET['offline_codes'])){
             if(!$uid)throw new CatalogException('Inicia sesión para preparar Stock.',401);
             $codes=is_string($_GET['offline_codes'])?explode(',',$_GET['offline_codes']):[];if(!$codes||count($codes)>5||count(array_unique($codes))!==count($codes))throw new CatalogException('El lote no es válido.',422);
             $items=[];foreach($codes as $code){if(!preg_match('/^[0-9]{8}$/D',$code))throw new CatalogException('El código no es válido.',422);$allowed=stock_query($db,"SELECT p.id FROM pallets p WHERE p.code=? AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$code,$uid,$uid])->fetchColumn();if(!$allowed)throw new CatalogException('Este palet no está disponible para preparar en tu cuenta.',403);$items[]=stock_detail($db,$code,$uid);}$result=['pallets'=>$items];
