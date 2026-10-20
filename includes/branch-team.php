@@ -21,8 +21,8 @@ function team_require(PDO $db,int $user,int $branch,bool $manage=false): string 
     if(!$role||($manage&&!in_array($role,['admin','manager'],true)))throw new CatalogException('Tu vínculo no permite esta acción en la sucursal.',403);
     return $role;
 }
-function team_event(PDO $db,int $user,int $branch,string $action,?int $target=null,?int $pallet=null): void {
-    stock_query($db,'INSERT INTO branch_team_events(branch_id,actor_id,action,target_id,pallet_id) VALUES(?,?,?,?,?)',[$branch,$user,$action,$target,$pallet]);
+function team_event(PDO $db,int $user,int $branch,string $action,?int $target=null,?int $pallet=null,array $metadata=[]): void {
+    stock_query($db,'INSERT INTO branch_team_events(branch_id,actor_id,action,target_id,pallet_id,metadata) VALUES(?,?,?,?,?,?)',[$branch,$user,$action,$target,$pallet,json_encode($metadata,JSON_UNESCAPED_UNICODE)]);
 }
 function team_locations(PDO $db,int $user): array {
     return stock_query($db,"SELECT b.id,b.name,b.address,b.revision,m.expires_at,COALESCE(s.enabled,1) AS security_enabled,CASE WHEN s.branch_id IS NULL THEN 25200 ELSE s.default_seconds END AS default_seconds,w.id AS workspace_id,w.name AS workspace_name,CASE WHEN w.owner_id=? THEN 'admin' ELSE m.role END AS role FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id JOIN branch_workspaces w ON w.id=l.workspace_id LEFT JOIN branch_team_security s ON s.branch_id=b.id LEFT JOIN branch_team_members m ON m.branch_id=b.id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().") WHERE w.owner_id=? OR m.user_id IS NOT NULL ORDER BY w.name,b.name,b.id",[$user,$user,$user])->fetchAll();
@@ -63,7 +63,7 @@ function team_invite(PDO $db,int $user,int $branch,string $role,string $email=''
     $token=bin2hex(random_bytes(32));
     stock_query($db,'INSERT INTO branch_team_invites(token_hash,branch_id,role,invited_by,expires,recipient_id,access_seconds) VALUES(?,?,?,?,?,?,?)',[hash('sha256',$token),$branch,$role,$user,team_invite_deadline($db,$user,$branch),$recipient,$seconds]);
     if($recipient){$name=stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branch])->fetchColumn();stock_query($db,'INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?)',[$recipient,'team-invite:'.hash('sha256',$token),'team_invitation','Invitación a una sucursal','Te invitaron a '.$name.'. Abrí Mi equipo para revisar y aceptar.']);}
-    team_event($db,$user,$branch,'invite_created',$recipient);return $token;
+    team_event($db,$user,$branch,'invite_created',$recipient,null,['role'=>$role,'access_seconds'=>$seconds,'channel'=>$recipient?'solicitud':'token']);return $token;
 }
 function team_accept(PDO $db,int $user,string $token,array $position=[]): void {
     if(!preg_match('/^[a-f0-9]{64}$/D',$token))throw new CatalogException('La invitación no está disponible.',404);
@@ -83,7 +83,7 @@ function team_accept_hash(PDO $db,int $user,string $hash,array $position=[]): vo
     team_require_position($db,$branch,$position);
     stock_query($db,"INSERT INTO branch_team_members(branch_id,user_id,role,active,expires_at) VALUES(?,?,?,1,?) ON CONFLICT(branch_id,user_id) DO UPDATE SET role=excluded.role,active=1,expires_at=excluded.expires_at,revision=branch_team_members.revision+1",[$branch,$user,$invite['role'],$invite['access_seconds']===null?null:time()+(int)$invite['access_seconds']]);
     if(!stock_query($db,'UPDATE branch_team_invites SET used_by=? WHERE token_hash=? AND used_by IS NULL AND revoked=0',[$user,$hash])->rowCount())throw new CatalogException('La invitación ya fue utilizada.',409);
-    team_event($db,$user,$branch,'member_joined',$user);team_select($db,$user,$branch);
+    team_event($db,$user,$branch,'member_joined',$user,null,['role'=>$invite['role'],'access_seconds'=>$invite['access_seconds']]);team_select($db,$user,$branch);
 }
 
 function team_incoming(PDO $db,int $user): array {
@@ -92,9 +92,10 @@ function team_incoming(PDO $db,int $user): array {
 function team_change_role(PDO $db,int $user,int $branch,int $target,string $role,int $revision): void {
     if(team_require($db,$user,$branch,true)!=='admin'||$target===$user||!in_array(team_role($db,$target,$branch),['manager','operator'],true))throw new CatalogException('Solo el administrador puede cambiar este rango.',403);
     if(!in_array($role,['manager','operator'],true))throw new CatalogException('Elegí un rango válido.',422);
+    $previous=team_role($db,$target,$branch);
     if(!stock_query($db,'UPDATE branch_team_members SET role=?,revision=revision+1 WHERE branch_id=? AND user_id=? AND active=1 AND revision=?',[$role,$branch,$target,$revision])->rowCount())throw new CatalogException('El vínculo cambió. Actualizá el equipo.',409);
     if($role==='operator')stock_query($db,'UPDATE branch_team_invites SET revoked=1 WHERE branch_id=? AND invited_by=? AND used_by IS NULL',[$branch,$target]);
-    team_event($db,$user,$branch,'member_role_changed',$target);
+    team_event($db,$user,$branch,'member_role_changed',$target,null,['old_role'=>$previous,'new_role'=>$role]);
 }
 
 function team_revoke(PDO $db,int $user,int $branch,int $target,int $revision): void {
@@ -104,7 +105,7 @@ function team_revoke(PDO $db,int $user,int $branch,int $target,int $revision): v
     stock_query($db,'DELETE FROM branch_team_active WHERE branch_id=? AND user_id=?',[$branch,$target]);
     // Previously shared links cannot silently restore a revoked membership.
     stock_query($db,'UPDATE branch_team_invites SET revoked=1 WHERE branch_id=? AND used_by IS NULL',[$branch]);
-    team_event($db,$user,$branch,'member_revoked',$target);
+    team_event($db,$user,$branch,'member_revoked',$target,null,['role'=>$role]);
 }
 function team_scan(PDO $db,int $user,string $code,int $expectedBranch,array $position=[]): array {
     $branch=team_active($db,$user);

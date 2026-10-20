@@ -9,6 +9,7 @@ try {
     if(!in_array($method,['GET','POST'],true))throw new CatalogException('Solicitud no válida.',405);
     if($method==='POST'&&!valid_csrf())throw new CatalogException('La sesión cambió. Recargá la página.',403);
     $csrf=csrf_token();session_write_close();$db=database();$result=[];
+    if($method==='GET'&&isset($_GET['view'])){require_once __DIR__.'/../includes/team-inventory.php';$inventory=team_inventory_page($db,$uid,(int)($_GET['branch_id']??0),is_string($_GET['view'])?$_GET['view']:'',$_GET);echo json_encode(['ok'=>true,'csrf'=>$csrf,'inventory'=>$inventory],JSON_UNESCAPED_UNICODE);exit;}
     if($method==='POST'){
         foreach($_POST as $value)if(!is_string($value)||strlen($value)>2000)throw new CatalogException('Formulario no válido.',422);
         foreach(['branch_id','workspace_id','target_id','revision'] as $field)if(isset($_POST[$field])&&!preg_match('/^[0-9]{1,15}$/D',$_POST[$field]))throw new CatalogException('Selección no válida.',422);

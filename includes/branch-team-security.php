@@ -38,7 +38,7 @@ function team_security_save(PDO $db,int $user,int $branch,array $data): void {
     $radius=filter_var($data['radius']??null,FILTER_VALIDATE_INT);
     if($radius===false||$radius<50||$radius>1000)throw new CatalogException('Elegí un radio entre 50 y 1000 metros.',422);
     stock_query($db,'INSERT INTO branch_team_security(branch_id,latitude,longitude,radius,enabled,default_seconds,has_point) VALUES(?,?,?,?,?,?,?) ON CONFLICT(branch_id) DO UPDATE SET latitude=excluded.latitude,longitude=excluded.longitude,radius=excluded.radius,enabled=excluded.enabled,default_seconds=excluded.default_seconds,has_point=excluded.has_point,revision=branch_team_security.revision+1',[$branch,$latitude,$longitude,$radius,(int)$enabled,$seconds,(int)$hasPoint]);
-    team_event($db,$user,$branch,'location_security_updated');
+    team_event($db,$user,$branch,'location_security_updated',null,null,['old_radius'=>$old['radius'],'radius'=>(int)$radius,'old_security'=>$old['enabled'],'security'=>(int)$enabled,'old_seconds'=>$old['default_seconds'],'access_seconds'=>$seconds,'point_changed'=>$hasPoint&&($old['latitude']!=$latitude||$old['longitude']!=$longitude)]);
 }
 function team_accept_location(PDO $db,int $user,string $proof,bool $pending,array $position): void {
     if(!preg_match('/^[a-f0-9]{64}$/D',$proof))throw new CatalogException('La invitación no está disponible.',404);

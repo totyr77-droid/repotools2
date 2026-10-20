@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=38;
+const REPOTOOLS_SCHEMA_VERSION=39;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -312,6 +312,10 @@ function initialize_database(PDO $db): void {
             $db->exec('ALTER TABLE branch_team_security ADD COLUMN default_seconds INTEGER DEFAULT 25200');
             $db->exec('ALTER TABLE branch_team_security ADD COLUMN has_point INTEGER NOT NULL DEFAULT 1');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(38)');
+        }
+        if(!isset($applied[39])){
+            $db->exec("ALTER TABLE branch_team_events ADD COLUMN metadata TEXT NOT NULL DEFAULT '{}'");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(39)');
         }
         $db->commit();
     } catch (Throwable $error) {

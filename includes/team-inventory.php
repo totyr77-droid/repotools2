@@ -1,0 +1,39 @@
+<?php
+require_once __DIR__.'/branch-team.php';
+function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $input): array {
+    team_require($db,$user,$branch,true);
+    if(!in_array($view,['palets','movimientos','administracion','mercaderia','lotes'],true))throw new CatalogException('Sección no válida.',422);
+    foreach($input as $value)if(!is_string($value)||strlen($value)>2000)throw new CatalogException('Filtro no válido.',422);
+    $offset=filter_var($input['offset']??'0',FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>100000]]);if($offset===false)throw new CatalogException('Página no válida.',422);
+    $q=catalog_text($input['q']??'',100);$like='%'.str_replace(['!','%','_'],['!!','!%','!_'],mb_strtolower($q)).'%';$where=['p.branch_id=?'];$params=[$branch];$today=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->format('Y-m-d');$near=(new DateTimeImmutable($today))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
+    $expiry=$input['expiry']??'all';if(!in_array($expiry,['all','expired','upcoming','none'],true))throw new CatalogException('Vencimiento no válido.',422);
+    $dateCondition=static function(string $alias)use($expiry,$today,$near):array{return match($expiry){'expired'=>["$alias.expires<>'' AND $alias.expires<?",[$today]],'upcoming'=>["$alias.expires>=? AND $alias.expires<=?",[$today,$near]],'none'=>["$alias.expires=''",[]],default=>['1=1',[]]};};
+    if(in_array($view,['palets','mercaderia','lotes'],true))$where[]='p.released=0';
+    if($view==='palets'){
+        if($q!==''){$where[]="(p.code LIKE ? ESCAPE '!' OR LOWER(p.description) LIKE ? ESCAPE '!' OR LOWER(u.public_name) LIKE ? ESCAPE '!' OR EXISTS(SELECT 1 FROM pallet_products x LEFT JOIN products c ON c.ean=x.ean WHERE x.pallet_id=p.id AND (x.ean LIKE ? ESCAPE '!' OR LOWER(x.name) LIKE ? ESCAPE '!' OR LOWER(c.name) LIKE ? ESCAPE '!')))";array_push($params,...array_fill(0,6,$like));}
+        if($expiry!=='all'){[$condition,$args]=$dateCondition('x');$where[]='EXISTS(SELECT 1 FROM pallet_products x WHERE x.pallet_id=p.id AND '.$condition.')';array_push($params,...$args);}
+        $rows=stock_query($db,"SELECT p.id,p.code,p.description,p.updated_at,u.public_name AS owner_name,MIN(NULLIF(b.expires,'')) AS nearest_expiry,COALESCE(SUM(CASE WHEN b.expires<>'' AND b.expires<=? THEN 1 ELSE 0 END),0) AS expiry_count,COALESCE(SUM(b.units),0) AS units,COUNT(b.id) AS products FROM pallets p JOIN users u ON u.id=p.owner_id LEFT JOIN pallet_products b ON b.pallet_id=p.id WHERE ".implode(' AND ',$where)." GROUP BY p.id,p.code,p.description,p.updated_at,u.public_name ORDER BY p.id LIMIT 31 OFFSET $offset",[$near,...$params])->fetchAll();
+        $tags=array_column(stock_user_tags($db,$user),'name','pallet_id');foreach($rows as &$row){$row['tag']=$tags[$row['id']]??'';$row['expiry']=$row['nearest_expiry']?stock_expiry_state($row['nearest_expiry'],stock_warning_days($db,$user)):null;}unset($row);
+    }elseif(in_array($view,['mercaderia','lotes'],true)){
+        [$condition,$args]=$dateCondition('b');$where[]=$condition;array_push($params,...$args);
+        if($view==='lotes'){$ean=$input['ean']??'';$expires=$input['expires']??'';if(!preg_match('/^(?:[0-9]{8}|[0-9]{13})$/D',$ean)||($expires!==''&&!preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/D',$expires)))throw new CatalogException('Producto no válido.',422);$where[]='b.ean=? AND b.expires=?';array_push($params,$ean,$expires);}
+        if($q!==''){$where[]="(b.ean LIKE ? ESCAPE '!' OR LOWER(b.name) LIKE ? ESCAPE '!' OR LOWER(c.name) LIKE ? ESCAPE '!' OR p.code LIKE ? ESCAPE '!')";array_push($params,...array_fill(0,4,$like));}
+        $select=$view==='mercaderia'?"b.ean,b.expires,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets":"b.id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,p.code,p.owner_id";
+        $group=$view==='mercaderia'?' GROUP BY b.ean,b.expires ORDER BY b.ean,b.expires':' ORDER BY p.id,b.id';
+        $rows=stock_query($db,'SELECT '.$select.' FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN products c ON c.ean=b.ean WHERE '.implode(' AND ',$where).$group." LIMIT 31 OFFSET $offset",$params)->fetchAll();
+    }else{
+        $admin=$view==='administracion';$alias=$admin?'e':'a';$where=[$admin?'e.branch_id=?':'p.branch_id=?'];$params=[$branch];
+        if(isset($input['record'])){if(!preg_match('/^[1-9][0-9]{0,14}$/D',$input['record']))throw new CatalogException('Movimiento no válido.',422);$where[]="$alias.id=?";$params[]=$input['record'];}
+        if(($input['action']??'')!==''){$where[]="$alias.action=?";$params[]=catalog_text($input['action'],60);}
+        foreach(['from'=>'>=','to'=>'<'] as $key=>$operator)if(($input[$key]??'')!==''){$date=DateTimeImmutable::createFromFormat('!Y-m-d',$input[$key],new DateTimeZone('America/Buenos_Aires'));if(!$date||$date->format('Y-m-d')!==$input[$key])throw new CatalogException('Fecha no válida.',422);if($key==='to')$date=$date->modify('+1 day');$where[]="$alias.created_at $operator ?";$params[]=$date->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');}
+        if($q!==''){
+            $reference=$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql'?"COALESCE(a.metadata::jsonb->>'reference','')":"COALESCE(json_extract(a.metadata,'$.reference'),'')";
+            $where[]=$admin?"(LOWER(u.public_name) LIKE ? ESCAPE '!' OR LOWER(t.public_name) LIKE ? ESCAPE '!' OR p.code LIKE ? ESCAPE '!')":"(LOWER(u.public_name) LIKE ? ESCAPE '!' OR LOWER(a.metadata) LIKE ? ESCAPE '!' OR p.code LIKE ? ESCAPE '!' OR LOWER($reference) LIKE ? ESCAPE '!')";
+            array_push($params,...array_fill(0,$admin?3:4,$like));
+        }
+        if($admin)$rows=stock_query($db,'SELECT e.id,e.action,e.created_at,e.metadata,u.public_name AS actor,t.public_name AS target,p.code FROM branch_team_events e JOIN users u ON u.id=e.actor_id LEFT JOIN users t ON t.id=e.target_id LEFT JOIN pallets p ON p.id=e.pallet_id WHERE '.implode(' AND ',$where)." ORDER BY e.id DESC LIMIT 31 OFFSET $offset",$params)->fetchAll();
+        else{require_once __DIR__.'/pallet-activity.php';$raw=stock_query($db,'SELECT a.id,a.action,a.metadata,a.created_at,a.user_id AS actor_id,u.public_name,p.code FROM pallet_activity a JOIN pallets p ON p.id=a.pallet_id LEFT JOIN users u ON u.id=a.user_id WHERE '.implode(' AND ',$where)." ORDER BY a.id DESC LIMIT 31 OFFSET $offset",$params)->fetchAll();$rows=pallet_activity_present($db,$raw);foreach($rows as $i=>&$row)$row['code']=$raw[$i]['code'];unset($row);}
+    }
+    if($view==='administracion')foreach($rows as &$row)$row['metadata']=json_decode($row['metadata'],true)??[];unset($row);
+    $more=count($rows)>30;return ['items'=>array_slice($rows,0,30),'next_offset'=>$more?$offset+30:null,'view'=>$view];
+}
