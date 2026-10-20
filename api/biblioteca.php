@@ -29,6 +29,10 @@ try {
         $name = trim(is_string($_POST['name'] ?? null) ? $_POST['name'] : '');
         if (in_array($action, ['create', 'rename'], true) && (mb_strlen($name) < 1 || mb_strlen($name) > 80)) library_response(422, ['error' => 'Escribe un nombre de hasta 80 caracteres.']);
         if ($action === 'offline_add' && (int)($_POST['offline_owner']??0)!==$userId) library_response(403,['error'=>'Ingresa con la cuenta que guardó esta carga.']);
+        if($action==='share_user'){
+            $id=filter_var($_POST['library_id']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);if(!$id)library_response(422,['error'=>'Colección no válida.']);
+            library_share_to_user($db,$userId,$id,is_string($_POST['email']??null)?$_POST['email']:'');library_response(200,['sent'=>true]);
+        }
         if ($action === 'share') {
             $id = filter_var($_POST['library_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
             if (!$id) library_response(422, ['error' => 'Colección no válida.']);

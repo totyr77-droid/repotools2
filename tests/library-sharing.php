@@ -44,3 +44,15 @@ $other = library_share_import($db, $users[2], $token);
 verify_share($other !== $copy, 'Cada usuario obtiene su propia copia.');
 verify_share((int) $db->query('SELECT COUNT(*) FROM scan_events')->fetchColumn() === $previousScans, 'Importar no genera escaneos.');
 echo "OK: migración repetible, permisos, mínimo de productos, enlace estable, copia independiente, nombres y duplicados.\n";
+
+$beforeLibraries=(int)$db->query('SELECT COUNT(*) FROM libraries')->fetchColumn();
+library_share_to_user($db,$users[0],$source,'recipient'.$suffix.'@example.invalid');
+library_share_to_user($db,$users[0],$source,'RECIPIENT'.$suffix.'@example.invalid');
+$q=$db->prepare("SELECT user_id,read_at FROM notifications WHERE type='library_invitation'");$q->execute();$notices=$q->fetchAll();
+verify_share(count($notices)===1&&(int)$notices[0]['user_id']===$users[1]&&$notices[0]['read_at']===null,'targeted unread and idempotent notification');
+verify_share((int)$db->query('SELECT COUNT(*) FROM libraries')->fetchColumn()===$beforeLibraries,'recipient must explicitly import');
+rejected_share(fn()=>library_share_to_user($db,$users[1],$source,'other'.$suffix.'@example.invalid'));
+rejected_share(fn()=>library_share_to_user($db,$users[0],$source,'sender'.$suffix.'@example.invalid'));
+rejected_share(fn()=>library_share_to_user($db,$users[0],$source,'unknown@example.invalid'));
+echo "OK: share by account email, sender ownership, unknown/self rejection, no auto import and deduplication.
+";

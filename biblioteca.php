@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__.'/includes/stock-icons.php';
 if (is_string($_GET['share'] ?? null) && preg_match('/^[a-f0-9]{64}$/D', $_GET['share'])) $_SESSION['library_share'] = $_GET['share'];
 if(!current_user()){
     require_once __DIR__.'/includes/stock-icons.php';
@@ -66,14 +67,18 @@ include __DIR__ . '/vistas/header.vista.php';
   <p id="libraryInfoEan" class="library-scanned-ean"></p><section id="libraryProductDetails" class="product-details" aria-label="Características del producto"></section>
 </dialog>
 <dialog id="libraryImportDialog" class="library-dialog" aria-labelledby="libraryImportTitle">
-  <h2 id="libraryImportTitle">Colección compartida</h2><p id="libraryImportQuestion"></p>
+  <div class="library-heading"><h2 id="libraryImportTitle"><?= stock_icon('book') ?>Colección compartida</h2><button type="button" data-close="libraryImportDialog" class="library-secondary app-close" aria-label="Cerrar colección compartida"><?= stock_icon('close') ?></button></div><p id="libraryImportQuestion" class="library-import-summary"></p><p id="libraryImportHint" class="library-share-hint">Se guardará una copia en tu biblioteca.</p>
   <ul id="libraryImportProducts" class="library-import-products"></ul>
   <p id="libraryImportStatus" role="status"></p>
   <div class="library-dialog-actions"><button type="button" data-close="libraryImportDialog" class="library-secondary">Cancelar</button><button id="confirmLibraryImport" type="button" class="library-primary">Agregar a mi biblioteca</button></div>
 </dialog>
 <dialog id="libraryShareDialog" class="library-dialog" aria-labelledby="libraryShareTitle">
-  <h2 id="libraryShareTitle">Compartir colección</h2><label>Enlace<input id="libraryShareUrl" readonly></label>
-  <div class="library-dialog-actions"><button type="button" data-close="libraryShareDialog" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><button id="copyLibraryShare" type="button" class="library-primary">Copiar enlace</button></div>
+  <div class="library-heading"><h2 id="libraryShareTitle"><?= stock_icon('share') ?>Compartir colección</h2><button type="button" data-close="libraryShareDialog" class="library-secondary app-close" aria-label="Cerrar compartir colección"><?= stock_icon('close') ?></button></div>
+  <p id="libraryShareName" class="library-import-summary"></p>
+  <div class="library-share-tabs" role="tablist" aria-label="Cómo compartir"><button id="libraryShareUserTab" type="button" role="tab" aria-selected="true" aria-controls="libraryShareUserPanel"><?= stock_icon('user') ?>Por correo</button><button id="libraryShareLinkTab" type="button" role="tab" aria-selected="false" aria-controls="libraryShareLinkPanel"><?= stock_icon('link') ?>Por enlace</button></div>
+  <form id="libraryShareUserPanel"><label for="libraryShareEmail">Correo del usuario</label><input id="libraryShareEmail" name="email" type="email" maxlength="254" autocomplete="off" required><p class="library-share-hint">La persona podrá revisar y agregar la colección.</p><button type="submit" class="library-primary">Enviar colección</button></form>
+  <section id="libraryShareLinkPanel" hidden><label>Enlace<input id="libraryShareUrl" readonly></label><div class="library-dialog-actions"><button id="copyLibraryShare" type="button" class="library-secondary"><?= stock_icon('copy') ?>Copiar enlace</button><button id="sendLibraryShareLink" type="button" class="library-primary"><?= stock_icon('share') ?>Compartir</button></div></section>
+  <p id="libraryShareStatus" class="library-share-status" role="status"></p>
 </dialog>
 <script>window.repotoolsLibrary = <?= json_encode(['userId' => current_user() ? (int) current_user()['id'] : null, 'csrf' => csrf_token(), 'share' => $pendingShare], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
 <?php include __DIR__ . '/vistas/footer.vista.php'; ?>

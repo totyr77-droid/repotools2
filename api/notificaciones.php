@@ -26,6 +26,9 @@ try {
     $stmt = $db->prepare('SELECT n.event_key, n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? ORDER BY n.id DESC LIMIT 40');
     $stmt->execute([$userId]); $items = $stmt->fetchAll();
     foreach ($items as &$item) {
+        if($item['type']==='library_invitation'&&preg_match('/^library-share:([0-9]+):/',$item['event_key'],$match)){
+            $q=$db->prepare('SELECT token FROM library_shares WHERE source_library_id=?');$q->execute([(int)$match[1]]);$item['library_token']=$q->fetchColumn()?:null;
+        }
         if($item['type']==='stock_invitation'){
             if(preg_match('/^pallet-invite:(\d+):/',$item['event_key'],$match)){
                 $p=stock_query($db,'SELECT p.code,u.id,u.name,u.public_name FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.id=?',[(int)$match[1]])->fetch();

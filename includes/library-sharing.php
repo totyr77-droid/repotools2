@@ -63,3 +63,18 @@ function library_share_import(PDO $db, int $userId, string $token): int {
         throw $error;
     }
 }
+
+function library_share_to_user(PDO $db,int $userId,int $libraryId,string $email): void {
+    $db->beginTransaction();try{
+        $q=$db->prepare('SELECT name FROM libraries WHERE id=? AND user_id=?');$q->execute([$libraryId,$userId]);$name=$q->fetchColumn();
+        if($name===false)throw new DomainException('No encontramos esa colección.');
+        $email=trim($email);if(strlen($email)>254||!filter_var($email,FILTER_VALIDATE_EMAIL))throw new DomainException('Ingresá un correo válido.');
+        $q=$db->prepare('SELECT id FROM users WHERE LOWER(email)=LOWER(?)');$q->execute([$email]);$recipient=(int)$q->fetchColumn();
+        if(!$recipient)throw new DomainException('Esa persona todavía no tiene cuenta. Podés compartirle el enlace.');
+        if($recipient===$userId)throw new DomainException('Esta colección ya está en tu biblioteca.');
+        library_share_create($db,$userId,$libraryId);
+        $q=$db->prepare('SELECT id,public_name FROM users WHERE id=?');$q->execute([$userId]);$sender=get_public_user_name($q->fetch());
+        $db->prepare("INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO NOTHING")->execute([$recipient,'library-share:'.$libraryId.':'.$recipient,'library_invitation','Colección compartida',$sender.' compartió «'.$name.'» con vos. Revisala y agregala a tu biblioteca.']);
+        $db->commit();
+    }catch(Throwable $error){if($db->inTransaction())$db->rollBack();throw $error;}
+}

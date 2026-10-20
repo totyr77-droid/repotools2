@@ -317,22 +317,13 @@
     if (!response.ok) throw new Error(result.error || 'No pudimos compartir la colección.');
     return result;
   }
-  get('shareLibrary').addEventListener('click', async () => {
-    const library = activeLibrary();
-    if (!library || library.products.length < 1 || busy) return;
-    const control = get('shareLibrary'); control.disabled = true;
-    try {
-      const result = await shareRequest({ action: 'share', library_id: library.id });
-      let url = new URL('biblioteca.php', location.href); url.searchParams.set('share', result.token);
-      url=new URL(await window.RepoShareLinks.url('b',result.token,config.csrf,url.href));
-      const showLink = () => { get('libraryShareUrl').value = url.href; openDialog('libraryShareDialog'); };
-      if (navigator.share) {
-        try { await navigator.share({ title: library.name, text: `${library.name}: ${library.products.length} productos`, url: url.href }); }
-        catch (error) { if (error.name !== 'AbortError') showLink(); }
-      } else showLink();
-    } catch (error) { message(error.message); }
-    finally { control.hidden = !activeLibrary() || activeLibrary().products.length < 1; control.disabled = control.hidden; }
-  });
+  let sharingLibrary=null;
+  function shareTab(mode){for(const [name,panel]of [['User','libraryShareUserPanel'],['Link','libraryShareLinkPanel']]){const selected=name===mode;get('libraryShare'+name+'Tab').setAttribute('aria-selected',String(selected));get('libraryShare'+name+'Tab').tabIndex=selected?0:-1;get(panel).hidden=!selected;}}
+  for(const mode of ['User','Link']){const tab=get('libraryShare'+mode+'Tab');tab.addEventListener('click',()=>shareTab(mode));tab.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const next=mode==='User'?'Link':'User';shareTab(next);get('libraryShare'+next+'Tab').focus();});}
+  get('shareLibrary').addEventListener('click',async()=>{const library=activeLibrary();if(!library||!library.products.length||busy)return;const control=get('shareLibrary');control.disabled=true;try{const result=await shareRequest({action:'share',library_id:library.id});let url=new URL('biblioteca.php',location.href);url.searchParams.set('share',result.token);url=new URL(await window.RepoShareLinks.url('b',result.token,config.csrf,url.href));sharingLibrary={id:library.id,name:library.name,count:library.products.length};get('libraryShareUrl').value=url.href;get('libraryShareName').textContent=library.name+' · '+library.products.length+' productos';get('libraryShareEmail').value='';get('libraryShareStatus').textContent='';shareTab('User');openDialog('libraryShareDialog');}catch(error){message(error.message);}finally{control.hidden=!activeLibrary()||!activeLibrary().products.length;control.disabled=control.hidden;}});
+  get('sendLibraryShareLink').addEventListener('click',async()=>{if(!sharingLibrary)return;if(!navigator.share){get('copyLibraryShare').click();return;}try{await navigator.share({title:sharingLibrary.name,text:sharingLibrary.name+': '+sharingLibrary.count+' productos',url:get('libraryShareUrl').value});}catch(error){if(error.name!=='AbortError')get('libraryShareStatus').textContent='No pudimos compartir. Podés copiar el enlace.';}});
+  let sendingLibrary=false;
+  get('libraryShareUserPanel').addEventListener('submit',async event=>{event.preventDefault();if(sendingLibrary||!sharingLibrary)return;sendingLibrary=true;const controls=[...get('libraryShareUserPanel').querySelectorAll('button,input')];controls.forEach(n=>n.disabled=true);get('libraryShareStatus').textContent='Enviando…';try{await shareRequest({action:'share_user',library_id:sharingLibrary.id,email:get('libraryShareEmail').value.trim()});get('libraryShareDialog').close();window.RepoToast?.('Colección enviada.');}catch(error){get('libraryShareStatus').textContent=error.message;}finally{sendingLibrary=false;controls.forEach(n=>n.disabled=false);}});
   get('copyLibraryShare').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(get('libraryShareUrl').value); get('libraryShareDialog').close(); message('Enlace copiado.'); }
     catch { get('libraryShareUrl').select(); message('Copia este enlace para compartir.'); }
@@ -346,13 +337,14 @@
       const response = await fetch(`api/biblioteca.php?share=${encodeURIComponent(config.share)}`);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'No pudimos cargar la colección.');
-      get('libraryImportQuestion').textContent = `¿Agregar «${result.collection.name}» a tu biblioteca con ${result.collection.products.length} ${result.collection.products.length===1?'producto':'productos'}?`;
+      get('libraryImportQuestion').textContent = `«${result.collection.name}» · ${result.collection.products.length} ${result.collection.products.length===1?'producto':'productos'}`;
       get('libraryImportProducts').replaceChildren();
       result.collection.products.forEach(product => {
-        const item = document.createElement('li'); item.textContent = product.name || 'Producto sin nombre';
-        const code = document.createElement('small'); code.textContent = `EAN ${product.ean}`; item.append(code); get('libraryImportProducts').append(item);
+        const item=document.createElement('li'),info=document.createElement('span'),name=document.createElement('strong');name.textContent=product.name||'Producto sin nombre';info.append(name);item.append(barcodeIcon(),info);
+        const code=document.createElement('small');code.textContent=product.ean;info.append(code); get('libraryImportProducts').append(item);
       });
       get('libraryImportStatus').textContent = result.alreadyAdded ? 'Esta colección ya está en tu biblioteca.' : '';
+      get('libraryImportHint').hidden=result.alreadyAdded;
       importedLibraryId = result.alreadyAdded ? Number(result.libraryId) : null;
       get('confirmLibraryImport').textContent = importedLibraryId ? 'Ver en mi biblioteca' : 'Agregar a mi biblioteca';
       get('confirmLibraryImport').disabled = false;

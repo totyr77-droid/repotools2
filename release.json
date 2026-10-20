@@ -1,6 +1,12 @@
 {
-  "version": 101,
+  "version": 102,
   "changes": [
+    {
+      "version": 102,
+      "label": "1.97",
+      "date": "2026-10-20",
+      "summary": "Biblioteca: compartir por usuario con QR o enlace y mejorar recepción"
+    },
     {
       "version": 101,
       "label": "1.96",
@@ -294,15 +300,9 @@
       "label": "1.48",
       "date": "2026-10-17",
       "summary": "Permite abrir, imprimir y reenviar enlaces compartidos de etiquetas sin iniciar sesión."
-    },
-    {
-      "version": 52,
-      "label": "1.47",
-      "date": "2026-10-17",
-      "summary": "Corrige inicio de sesión desde enlaces cortos de impresión y conserva el lote solicitado."
     }
   ],
   "major": 1,
-  "minor": 96,
-  "label": "1.96"
+  "minor": 97,
+  "label": "1.97"
 }
