@@ -74,8 +74,8 @@ function branch_save(PDO $db, int $user, array $input): array {
 function branch_assign(PDO $db,int $user,array $input): void {
     $id=(int)($input['pallet_id']??0); $p=stock_editable($db,$id,$user);
     $branchId=(int)($input['branch_id']??0);
-    // Team members may only remove the current location, never assign another.
-    if ((int)$p['owner_id']!==$user && ($branchId!==0 || !team_role($db,$user,(int)($p['branch_id']??0)))) throw new CatalogException('Solo el propietario puede asignar otra sucursal.',403);
+    // Team administrators and managers may remove the current location, never assign another.
+    if ((int)$p['owner_id']!==$user){if($branchId!==0)throw new CatalogException('Solo el propietario puede asignar otra sucursal.',403);if(!in_array(team_role($db,$user,(int)($p['branch_id']??0)),['admin','manager'],true))throw new CatalogException('Solo el propietario, encargados y administradores del equipo pueden retirar la sucursal.',403);}
     if ($branchId) branch_owned($db,$branchId,$user);
     $shares=$branchId ? stock_query($db,'SELECT id FROM stock_shares WHERE owner_id=? AND branch_id=? AND active=1',[$user,$branchId])->fetchAll(PDO::FETCH_COLUMN) : [];
     $changing=(int)($p['branch_id']??0)!==$branchId;

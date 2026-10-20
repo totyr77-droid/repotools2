@@ -86,8 +86,11 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     $owner=$user !== null && (int)$p['owner_id']===$user;
     $access=$user ? stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$p['id'],$user])->fetchColumn() : false;
-    $p['can_tag']=$admin&&($owner||$access==='accepted'); $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted' || ($user&&team_role($db,$user,(int)($p['branch_id']??0))!==''); $p['pending_invitation']=$access==='pending';
-    $p['team_access']=$user?stock_team_access($db,$p,$user):false;$p['can_edit_description']=$p['can_edit']&&!$p['team_access'];$p['can_transfer_stock']=$owner||$p['team_access'];
+    $teamRole=$user?team_role($db,$user,(int)($p['branch_id']??0)):'';
+    $p['can_remove_branch']=$owner||in_array($teamRole,['admin','manager'],true);
+    $p['can_tag']=$admin&&($owner||$access==='accepted'); $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted' || ($teamRole!==''); $p['pending_invitation']=$access==='pending';
+    $p['team_access']=!$owner&&$teamRole!=='';$p['can_edit_description']=$p['can_edit']&&!$p['team_access'];$p['can_transfer_stock']=$owner||$p['team_access'];
+    $p['team_tag']=in_array($teamRole,['admin','manager'],true)?(stock_query($db,'SELECT name FROM pallet_user_tags WHERE pallet_id=? AND user_id=?',[$p['id'],$p['owner_id']])->fetchColumn()?:''):'';
     $p['products']=stock_query($db,'SELECT b.*,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id=? ORDER BY CASE WHEN b.expires=\'\' THEN 1 ELSE 0 END,b.expires,b.name,b.id',[$p['id']])->fetchAll();
     foreach ($p['products'] as &$product) $product=stock_product_names($product);
     unset($product);

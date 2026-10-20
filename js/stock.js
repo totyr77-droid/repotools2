@@ -146,6 +146,7 @@
     const p=data.pallet;
     if(!p||p.code!==code||typeof p.available!=='boolean'||(!p.available&&(!Number.isSafeInteger(Number(p.id))||Number(p.id)<1||!Number.isSafeInteger(Number(p.revision))||Number(p.revision)<1||!Array.isArray(p.products)))||(p.available&&p.products?.length)){const e=Error('No pudimos comprobar el contenido del palet. No se considera vacío ni disponible.');e.status=502;throw e;}
     if(!p.available&&p.products.some(v=>Number(v.pallet_id)!==Number(p.id)||!Number.isInteger(Number(v.units))||Number(v.units)<1)){const e=Error('La información del palet no coincide con sus productos. Necesita revisión.');e.status=502;throw e;}
+    if(config.teamContext&&(!p.can_edit||Number(p.branch_id)!==Number(window.RepoTeamView?.branch?.id)))throw Object.assign(Error('El palet ya no está disponible en esta sucursal.'),{status:403});
     return p;
   }
   function canLiveRefresh(){return !left&&active&&$('palletDialog').open&&!document.hidden&&navigator.onLine!==false&&!['offline','server','auth'].includes(window.RepoConnectivity?.state?.kind)&&!busy.size&&!syncing&&!document.querySelector('dialog[open]:not(#palletDialog)')&&(!settings.open||active.available)&&(!$('palletDialog').querySelector('input:focus,textarea:focus,select:focus')||document.activeElement.closest('.pallet-view-tools'));}

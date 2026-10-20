@@ -31,3 +31,15 @@ Validación: tests/team-refinements.php (orden, permisos, pérdida de acceso e i
 Reversión: revertir el commit de v1.69 y publicar un número superior; no borrar eventos ni modificar datos. Restaurar permiso previo de asignación y retirar vista/CSS/JS de lengüeta junto con sus referencias y caché.
 
 Beta1.70: Mercadería muestra chevron con estado abierto/cerrado y marca lateral tenue para identificar producto desplegado. LengüetaMiEquipo usa etiquetaempresa y admite ambosbordes porarrastre/teclado con persistencialocal porusuario; reglasdevisibilidad/permisos de1.69 intactas. Ver validación/reversión en PERFIL-INSIGNIAS-BETA.md.
+
+## Beta 1.71 — detalle local y etiquetas de propietario
+
+Los accesos Ver en Stock de Palets y Mercadería abren el editor existente como modal dentro de Mi equipo. No cambian URL/sección/filtros ni consumen el estado de Stock personal. Al pasar desde el resumen, se cierra el resumen para evitar dos pasos al regresar. El editor comprueba que el palet siga editable y en la sucursal activa; el polling de equipo espera mientras el editor esté abierto. Sucursal y etiqueta aparecen en el encabezado del detalle y como badges en el resumen.
+
+Usuario confirmó compartir la etiqueta del propietario con encargados/administradores y usarla como filtro. Solo esa etiqueta se incorpora al listado y a las opciones de Palets/Mercadería de la sucursal; las etiquetas personales de terceros no se comparten. El filtro se aplica en servidor antes de paginar/agrupar y pasa también al desglose de lotes, manteniendo los totales coherentes. La edición de etiquetas sigue siendo personal; se actualizó el texto explicativo. Se acotó el render de etiquetas de Stock a su propio contenedor para que no borre las de Mi equipo.
+
+Se aplica aclaración de rangos del usuario: retirar sucursal desde equipo solo para administrador/encargado; operador sin control ni autorización en servidor. Propietario mantiene su permiso habitual. Retirar sucursal puede quitar acceso del equipo y conserva confirmación existente.
+
+Validación: tests/team-pallet-labels.php (propietario frente a etiquetas ajenas, filtros/opciones/totales/lotes, límites por rango y público), team-refinements.php, team-inventory.php, stock-tags.php; team-inventory-ui.cjs comprueba apertura local desde Palets/Mercadería, sucursal/etiqueta visibles, cierre con filtros/grupo abierto conservados y persistencia de etiquetas; branch-team-ui.cjs verifica ambos botones locales; stock-tags-ui.cjs conserva gestión personal. SW, PHP/JS y revisión visual aprobados. Datos aislados, sin migración ni cambios en main; Safari físico pendiente.
+
+Reversión: revertir entrega1.71 sobre6cf1dcc y publicar número superior. No borrar etiquetas. Conservar la restricción de retirada para admin/encargado si se revierte únicamente el diseño; revertir a1.69/70 completo volvería a habilitar operadores y requiere conservar ese guard de servidor.

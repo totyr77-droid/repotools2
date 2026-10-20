@@ -65,6 +65,7 @@
 <?php elseif (!empty($paginaGestionEmpresas)): ?>
 <!-- Gestión administrativa: sin lector ni formularios de mercadería. -->
 <?php elseif (!empty($paginaEquipo)): ?>
+<script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/qrcode.min.js"></script>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/quagga-1.12.1.min.js"></script>
@@ -104,11 +105,11 @@
 <script src="js/motion.js?v=<?= substr(sha1_file(__DIR__.'/../js/motion.js'),0,12) ?>"></script>
 
 
-<?php if(!empty($stockEmbedded)): ?><script>window.repotoolsStock=<?= json_encode(['csrf'=>csrf_token(),'user_id'=>(int)current_user()['id'],'embedded'=>true],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script>
+<?php if(!empty($stockEmbedded)): ?><script>window.repotoolsStock=<?= json_encode(['csrf'=>csrf_token(),'user_id'=>(int)current_user()['id'],'embedded'=>true,'teamContext'=>!empty($paginaEquipo)],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script>
 <?php include __DIR__.'/stock-scripts.vista.php'; ?>
 <script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
-<?php if(!empty($paginaEquipo)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
-<?php if(!empty($paginaEquipo)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(!empty($paginaEquipo)&&empty($stockEmbedded)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(!empty($paginaEquipo)&&empty($stockEmbedded)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()&&(!empty($paginaInicio)||!empty($paginaEquipo))): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-team.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaEquipo)): ?><script src="js/team-inventory.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaGestionEmpresas)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><link rel="stylesheet" href="css/branch-manager.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-manager.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
