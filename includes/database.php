@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=39;
+const REPOTOOLS_SCHEMA_VERSION=40;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -316,6 +316,15 @@ function initialize_database(PDO $db): void {
         if(!isset($applied[39])){
             $db->exec("ALTER TABLE branch_team_events ADD COLUMN metadata TEXT NOT NULL DEFAULT '{}'");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(39)');
+        }
+        if(!isset($applied[40])){
+            $db->exec("CREATE TABLE achievement_receipts(user_id {$ref} NOT NULL REFERENCES users(id),operation_key TEXT NOT NULL,PRIMARY KEY(user_id,operation_key))");
+            $db->exec("CREATE TABLE achievement_events(user_id {$ref} NOT NULL REFERENCES users(id),category TEXT NOT NULL,event_key TEXT NOT NULL,day TEXT NOT NULL,PRIMARY KEY(user_id,category,event_key))");
+            $db->exec('CREATE INDEX achievement_event_day ON achievement_events(user_id,category,day)');
+            $db->exec("CREATE TABLE achievement_progress(user_id {$ref} NOT NULL REFERENCES users(id),category TEXT NOT NULL,value INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(user_id,category))");
+            $db->exec("CREATE TABLE achievement_days(user_id {$ref} NOT NULL REFERENCES users(id),day TEXT NOT NULL,PRIMARY KEY(user_id,day))");
+            $db->exec("CREATE TABLE user_achievements(user_id {$ref} NOT NULL REFERENCES users(id),category TEXT NOT NULL,level INTEGER NOT NULL CHECK(level BETWEEN 1 AND 6),unlocked_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP,featured INTEGER NOT NULL DEFAULT 0,seen_at {$timestamp},PRIMARY KEY(user_id,category,level))");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(40)');
         }
         $db->commit();
     } catch (Throwable $error) {

@@ -12,6 +12,7 @@
   function toggle(open) { panel.hidden = !open; button.setAttribute('aria-expanded', String(open)); }
   function render(result) {
     items = result.notifications;
+    window.dispatchEvent(new CustomEvent('repotools:achievement-notifications',{detail:items.filter(i=>i.type==='achievement'&&!i.read_at)}));
     document.querySelectorAll('[data-stock-expiry]').forEach(badge => { const count=Number(result.expiring_stock_count)||0;badge.hidden=count===0;badge.textContent=count>99?'99+':String(count);badge.setAttribute('aria-label',count+' productos por vencer o vencidos'); });
     const badge = get('notificationBadge'); badge.hidden = result.unread === 0; badge.textContent = result.unread > 99 ? '99+' : result.unread;
     button.setAttribute('aria-label', result.unread ? `Notificaciones: ${result.unread} sin leer` : 'Notificaciones');
@@ -24,7 +25,7 @@
       link.dataset.state = state;
       const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); icon.classList.add('notification-icon'); icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('fill', 'none'); icon.setAttribute('stroke', 'currentColor'); icon.setAttribute('stroke-width', '1.8'); icon.setAttribute('aria-hidden', 'true');
       const path = document.createElementNS(icon.namespaceURI, 'path'); path.setAttribute('d', ['stock_invitation','team_invitation'].includes(item.type) ? 'M3 5h18v14H3zM3 5l9 7 9-7' : state === 'approved' ? 'M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' : state === 'rejected' ? 'm9 9 6 6m0-6-6 6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' : ['warning','today','expired'].includes(state) ? 'M12 8v5m0 3v1M3 20h18L12 3Z' : 'M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'); icon.append(path);
-      link.href = item.type==='team_invitation' ? 'sucursales.php' : item.type==='stock_invitation' ? 'stock.php?invitacion='+encodeURIComponent(item.invitation_code||'') : item.report_id ? `reportes.php?report=${encodeURIComponent(item.report_id)}` : item.pallet_code ? 'stock.php?codigo='+encodeURIComponent(item.pallet_code)+'&producto='+encodeURIComponent(item.product_id) : item.type?.startsWith('stock_') ? 'stock.php' : 'cuenta.php';
+      link.href = item.type==='achievement' ? 'cuenta.php#insignias' : item.type==='team_invitation' ? 'sucursales.php' : item.type==='stock_invitation' ? 'stock.php?invitacion='+encodeURIComponent(item.invitation_code||'') : item.report_id ? `reportes.php?report=${encodeURIComponent(item.report_id)}` : item.pallet_code ? 'stock.php?codigo='+encodeURIComponent(item.pallet_code)+'&producto='+encodeURIComponent(item.product_id) : item.type?.startsWith('stock_') ? 'stock.php' : 'cuenta.php';
       if (!item.read_at) link.dataset.unread = '';
       const title = document.createElement('strong'); title.textContent = item.title;
       const body = document.createElement('span'); body.textContent = item.body;

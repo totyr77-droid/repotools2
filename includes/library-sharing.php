@@ -54,7 +54,8 @@ function library_share_import(PDO $db, int $userId, string $token): int {
         $stmt = $db->prepare('INSERT INTO libraries (user_id, name) VALUES (?, ?) RETURNING id');
         $stmt->execute([$userId, $name]); $id = (int) $stmt->fetchColumn(); $stmt->closeCursor();
         $stmt = $db->prepare('INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO NOTHING');
-        foreach ($collection['products'] as $product) $stmt->execute([$id, $product['ean'], $product['name']]);
+        require_once __DIR__.'/achievements.php';
+        foreach ($collection['products'] as $product) {$stmt->execute([$id, $product['ean'], $product['name']]);achievement_record($db,$userId,'listas',$product['ean']);}
         $db->prepare('INSERT INTO library_imports (user_id, source_library_id, library_id) VALUES (?, ?, ?)')->execute([$userId, $share['source_library_id'], $id]);
         $db->commit(); return $id;
     } catch (Throwable $error) {

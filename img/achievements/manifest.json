@@ -1,0 +1,156 @@
+{
+  "categorias": [
+    {
+      "id": "escaneos",
+      "nombre": "Ojo de águila",
+      "metas": [
+        10,
+        50,
+        100,
+        500,
+        1000,
+        10000
+      ]
+    },
+    {
+      "id": "pallets",
+      "nombre": "Arquitecto de pallets",
+      "metas": [
+        1,
+        10,
+        25,
+        50,
+        100,
+        1000
+      ]
+    },
+    {
+      "id": "productos_agregados",
+      "nombre": "Repositor incansable",
+      "metas": [
+        10,
+        50,
+        100,
+        500,
+        1000,
+        5000
+      ]
+    },
+    {
+      "id": "retiros",
+      "nombre": "Maestro del despacho",
+      "metas": [
+        10,
+        50,
+        100,
+        500,
+        1000,
+        5000
+      ]
+    },
+    {
+      "id": "transferencias",
+      "nombre": "Rey de las sucursales",
+      "metas": [
+        5,
+        25,
+        50,
+        100,
+        500,
+        1000
+      ]
+    },
+    {
+      "id": "referidos",
+      "nombre": "Embajador RepoTools",
+      "metas": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100
+      ]
+    },
+    {
+      "id": "actividad",
+      "nombre": "Usuario fiel",
+      "metas": [
+        7,
+        30,
+        90,
+        180,
+        365,
+        730
+      ]
+    },
+    {
+      "id": "rachas",
+      "nombre": "Imparable",
+      "metas": [
+        3,
+        7,
+        15,
+        30,
+        60,
+        100
+      ]
+    },
+    {
+      "id": "listas",
+      "nombre": "Organizador profesional",
+      "metas": [
+        5,
+        25,
+        50,
+        100,
+        250,
+        500
+      ]
+    },
+    {
+      "id": "qr",
+      "nombre": "Maestro del QR",
+      "metas": [
+        5,
+        25,
+        100,
+        250,
+        500,
+        1000
+      ]
+    },
+    {
+      "id": "busquedas",
+      "nombre": "Detective de productos",
+      "metas": [
+        25,
+        100,
+        500,
+        1000,
+        5000,
+        10000
+      ]
+    },
+    {
+      "id": "ediciones",
+      "nombre": "Perfeccionista",
+      "metas": [
+        10,
+        50,
+        100,
+        500,
+        1000,
+        5000
+      ]
+    }
+  ],
+  "niveles": [
+    "Bronce",
+    "Plata",
+    "Oro",
+    "Platino",
+    "Diamante",
+    "Leyenda"
+  ]
+}

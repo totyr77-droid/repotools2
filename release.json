@@ -1,6 +1,12 @@
 {
-  "version": 68,
+  "version": 69,
   "changes": [
+    {
+      "version": 69,
+      "label": "1.64",
+      "date": "2026-10-20",
+      "summary": "Perfil renovado, preferencias compactas y 72 insignias con progreso desde cero."
+    },
     {
       "version": 68,
       "label": "1.63",
@@ -294,15 +300,9 @@
       "label": "1.15",
       "date": "2026-10-19",
       "summary": "Asignar empresa junto a TOPs y sin espacio superior"
-    },
-    {
-      "version": 19,
-      "label": "1.14",
-      "date": "2026-10-19",
-      "summary": "Administrador de sucursal puede eliminarla conservando mercadería"
     }
   ],
   "major": 1,
-  "minor": 63,
-  "label": "1.63"
+  "minor": 64,
+  "label": "1.64"
 }

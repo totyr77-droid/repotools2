@@ -649,6 +649,7 @@ function palletNumberRegion(image){
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
+          if(source!=='ocr'&&typeof CustomEvent==='function'&&typeof window.dispatchEvent==='function')window.dispatchEvent(new CustomEvent('repotools:accepted-code',{detail:{code,isQR,reader:elementId}}));
           metric(current,'confirmed',{source,confirmationMs:source==='ocr'?null:isQR?0:Math.max(0,performance.now()-(current.confirm.startedAt??performance.now()))});
           current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
           element.classList.add('ean-confirmed'); onStatus(source==='ocr'?'Número confirmado · 3/3':'Código confirmado.');

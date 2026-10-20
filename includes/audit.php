@@ -16,6 +16,17 @@ function audit_event(PDO $db,int $actor,string $action,string $operation,array $
     $at=$original??gmdate('Y-m-d H:i:s');
     $insert=audit_q($db,'INSERT INTO audit_events(event_id,actor_id,actor_name,actor_role,actor_rank,action,category,result,occurred_at,synced_at,operation_id,branch_id,pallet_id,pallet_code,ean,target_user,before_data,after_data) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(event_id) DO NOTHING',[$id,$actor,$u?get_public_user_name($u):'Usuario eliminado',$u['role']??'usuario',audit_rank($u['role']??'usuario'),$action,$context['category']??'movements',$result,$at,gmdate('Y-m-d H:i:s'),$operation,$context['branch_id']??null,$context['pallet_id']??null,$context['code']??'',$context['ean']??'',$context['target_user']??null,json_encode(audit_clean($before),JSON_UNESCAPED_UNICODE),json_encode(audit_clean($after),JSON_UNESCAPED_UNICODE)])->rowCount();
     if(!$insert||$result!=='confirmed')return;
+    require_once __DIR__.'/achievements.php';
+    if(in_array($action,['save_product','deduct_product','transfer_commit','edited'],true))achievement_day($db,$actor);
+    if($action==='referral_credited')achievement_record($db,$actor,'referidos',(string)($context['target_user']??$operation));
+    if($action==='transfer_commit')achievement_record($db,$actor,'transferencias',$operation);
+    if($action==='deduct_product')achievement_record($db,$actor,'retiros',$operation);
+    if($action==='save_product'){
+        $oldUnits=array_sum(array_column($before['products']??[],'units'));$newUnits=array_sum(array_column($after['products']??[],'units'));
+        if($newUnits>$oldUnits&&!empty($context['new_load']))achievement_record($db,$actor,'productos_agregados',$operation);
+        if(empty($before['activated'])&&!empty($after['products'])&&(int)($after['owner_id']??0)===$actor)achievement_record($db,$actor,'pallets',(string)$after['id']);
+    }
+    if($action==='approved'&&!empty($context['target_user'])&&(int)$context['target_user']!==$actor&&array_intersect_key($before['product']??[],array_flip(['name','brand','quantity','category','packaging','image']))!==array_intersect_key($after['product']??[],array_flip(['name','brand','quantity','category','packaging','image'])))achievement_record($db,(int)$context['target_user'],'ediciones',$operation);
     $day=(new DateTimeImmutable($at,new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('America/Argentina/Buenos_Aires'))->format('Y-m-d');
     foreach([['activity',$actor,$activity],['branches',(int)($context['branch_id']??0),$units]] as [$kind,$subject,$value])if($subject>0&&$value>0)audit_q($db,'INSERT INTO ranking_daily(kind,subject_id,day,value) VALUES(?,?,?,?) ON CONFLICT(kind,subject_id,day) DO UPDATE SET value=ranking_daily.value+excluded.value',[$kind,$subject,$day,$value]);
 }
@@ -30,7 +41,7 @@ function audit_stock(PDO $db,int $actor,string $action,string $key,array $before
     foreach($before['products']??[] as $p)$old[$p['ean']]=($old[$p['ean']]??0)+(int)$p['units'];
     if(empty($after['released']))foreach($after['products']??[] as $p)$new[$p['ean']]=($new[$p['ean']]??0)+(int)$p['units'];
     foreach(array_unique([...array_keys($old),...array_keys($new)]) as $code){$delta=abs(($new[$code]??0)-($old[$code]??0));$units+=$delta;if($delta)$ean=$code;}
-    audit_event($db,$actor,$action,$key,['category'=>in_array($action,['invite','accept','decline','revoke','leave'],true)?'roles':'movements','branch_id'=>$after['branch_id']??$before['branch_id']??null,'pallet_id'=>$after['id']??$before['id']??null,'code'=>$after['code']??$before['code']??($input['code']??''),'ean'=>$ean,'target_user'=>$input['user_id']??null],$before,$after,'confirmed',isset($input['offline_created'])?audit_time((int)$input['offline_created']):null,1,$units);
+    audit_event($db,$actor,$action,$key,['new_load'=>$action==='save_product'&&(int)($input['product_id']??0)===0,'category'=>in_array($action,['invite','accept','decline','revoke','leave'],true)?'roles':'movements','branch_id'=>$after['branch_id']??$before['branch_id']??null,'pallet_id'=>$after['id']??$before['id']??null,'code'=>$after['code']??$before['code']??($input['code']??''),'ean'=>$ean,'target_user'=>$input['user_id']??null],$before,$after,'confirmed',isset($input['offline_created'])?audit_time((int)$input['offline_created']):null,1,$units);
 }
 function audit_denied(PDO $db,int $actor,string $action,string $key,int $status,array $input=[]): void {
     if(!in_array($status,[403,409,422],true)||!$actor)return;

@@ -360,6 +360,7 @@ async function mostrarResultadoEscaneo(codigo,lectura=true) {
   if (!esDuplicado) {
     lista.push(codigo);
     guardarLista();
+    window.dispatchEvent(new CustomEvent('repotools:list-saved',{detail:{ean:codigo}}));
   }
   indiceActual = lista.indexOf(codigo) + 1;
 

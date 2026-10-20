@@ -92,6 +92,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/title-icons.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
 <link href="css/device-workspace.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaCuenta) && current_user()): ?><link href="css/settings.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+  <?php if (!empty($paginaCuenta)): ?><link href="css/profile-showcase.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaStock) || !empty($stockEmbedded)): ?><link href="css/pallet-activity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
 <link href="css/connectivity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/responsive.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
