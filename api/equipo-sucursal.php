@@ -56,6 +56,7 @@ try {
                 stock_query($db,'UPDATE branch_team_members SET active=0,revision=revision+1 WHERE branch_id=? AND user_id=?',[$branch,$uid]);
                 stock_query($db,'DELETE FROM branch_team_active WHERE user_id=? AND branch_id=?',[$uid,$branch]);
                 stock_query($db,'UPDATE branch_team_invites SET revoked=1 WHERE branch_id=? AND invited_by=? AND used_by IS NULL',[$branch,$uid]);team_event($db,$uid,$branch,'member_left',$uid);break;
+            case 'check_position':team_require($db,$uid,$branch);team_require_position($db,$branch,$_POST);break;
             case 'scan':$result=team_scan($db,$uid,$_POST['code']??'',$branch,$_POST);break;
             default:throw new CatalogException('Acción no válida.',422);
         }
