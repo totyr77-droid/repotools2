@@ -708,3 +708,6 @@ Main v1.90 (2026-10-20): aclaración usuario: manager RepoTools ingresa desde mo
 
 
 Main v1.91 (2026-10-20): logo welcome PNG oficial inline CID/MIME, dimensiones180×31 explícitas, URL origen validado y ayuda No es spam/copiar enlace. Usuario confirma no abre nada; sin evidencia tokeninválido. Links/tokens/24h/POST/usoúnico intactos; sinconsumir tokenfoto. DNS público DKIM/SPFsend existentes, DMARC no encontrado; requiere ajuste externo/validación encabezados, no se asegura entregabilidad. PHPcore/inline, coloresUI y presentaciónverificación aislados; sin correos enviados/datosreales. Detalle/reversión docs/CORREO-VERIFICACION-20261020.md.
+
+
+Main v1.92 (2026-10-20): anunciar logro ya no actualiza notifications.read_at. Reclamo atómico mediante achievement_receipts con namespace announcement:id, independiente de lectura y sin migración. Toast se muestra una vez entre sesiones/dispositivos; campana/lista conserva noleída hasta lectura explícita o marcar todas. Mantiene ámbito usuario/tipo/CSRF y bloqueo transaccional. No modifica notificaciones antiguas ya leídas ni otorga logros. Tests achievements-ui comprueban announce1/reintento0/nolectura/conteo/POSTread; PHPachievements/SW/sintaxis aprobados. Reversión: revertir cambioAPI y publicar versión superior; conservar recibos e historial sin borrar.
