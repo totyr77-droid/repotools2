@@ -1,6 +1,12 @@
 {
-  "version": 97,
+  "version": 98,
   "changes": [
+    {
+      "version": 98,
+      "label": "1.93",
+      "date": "2026-10-20",
+      "summary": "Logros: Ver marca leído y mejora su botón"
+    },
     {
       "version": 97,
       "label": "1.92",
@@ -294,15 +300,9 @@
       "label": "1.44",
       "date": "2026-10-16",
       "summary": "Modales de resultado sin espacio vacío ni botones recortados; enlaces compartidos contenidos."
-    },
-    {
-      "version": 48,
-      "label": "1.43",
-      "date": "2026-10-16",
-      "summary": "Correo actual y estado de verificación alineados en una fila."
     }
   ],
   "major": 1,
-  "minor": 92,
-  "label": "1.92"
+  "minor": 93,
+  "label": "1.93"
 }
