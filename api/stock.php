@@ -117,7 +117,7 @@ try {
                 if(isset($_POST['offline_owner'])){$current=stock_editable($db,$id,$uid);if($current['code']!==($_POST['code']??'')||(int)$_POST['offline_revision']>(int)$current['revision'])throw new CatalogException('El palet no coincide con la copia local.',409);}
                 $result=stock_deduct_product($db,$uid,$_POST);
                 $result['deduction']=['product_id'=>(int)$_POST['product_id'],'ean'=>$result['_movement']['ean'],'units_before'=>$result['_movement']['old'],'units_after'=>$result['_movement']['new'],'units_removed'=>$result['removed']];
-                stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$uid,$id,$result['remaining']?(int)$_POST['product_id']:null,'quantity_deducted',json_encode($result['_movement'],JSON_UNESCAPED_UNICODE)]);
+                stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$uid,$id,$result['remaining']?(int)$_POST['product_id']:null,'quantity_deducted',json_encode([...$result['_movement'],...pallet_activity_team_metadata($db,$uid,$id,($_POST['activity_source']??'')==='team')],JSON_UNESCAPED_UNICODE)]);
                 unset($result['_movement']);break;
             case 'import':
                 $products=json_decode(is_string($_POST['products']??null)?$_POST['products']:'',true);
@@ -194,7 +194,7 @@ try {
                 stock_query($db,'INSERT INTO stock_preferences(user_id,expiry_days) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET expiry_days=excluded.expiry_days',[$uid,$days]); break;
             default: throw new CatalogException('Acción no válida.',422);
         }
-        if($tracks){$historyId=(int)($result['id']??$historyId);if($historyId){$historyAfter=pallet_activity_snapshot($db,$historyId);pallet_activity_record($db,$uid,$historyId,($historyBefore&& (int)$historyBefore['id']===$historyId)?$historyBefore:null,$historyAfter);}}
+        if($tracks){$historyId=(int)($result['id']??$historyId);if($historyId){$historyAfter=pallet_activity_snapshot($db,$historyId);pallet_activity_record($db,$uid,$historyId,($historyBefore&& (int)$historyBefore['id']===$historyId)?$historyBefore:null,$historyAfter,($_POST['activity_source']??'')==='team');}}
         if ($action!=='tag'&&stock_is_admin($db,$uid)&&($id||isset($_POST['code']))) {
             $target=$id?stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn():(string)$_POST['code'];
             $details=$_POST;unset($details['csrf'],$details['operation_key']);

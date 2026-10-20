@@ -8,9 +8,15 @@ function pallet_activity_snapshot(PDO $db,int $id): ?array {
     $p['accesses']=stock_query($db,'SELECT user_id,status FROM pallet_access WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_KEY_PAIR);
     return $p;
 }
-function pallet_activity_record(PDO $db,int $user,int $id,?array $before,?array $after): void {
+function pallet_activity_team_metadata(PDO $db,int $user,int $id,bool $teamContext=false): array {
+    $p=stock_query($db,'SELECT owner_id,branch_id FROM pallets WHERE id=?',[$id])->fetch();
+    if(!$p||!team_role($db,$user,(int)($p['branch_id']??0))||(!$teamContext&&(int)$p['owner_id']===$user))return [];
+    return ['source'=>'team'];
+}
+function pallet_activity_record(PDO $db,int $user,int $id,?array $before,?array $after,bool $teamContext=false): void {
     if(!$after)return;
-    $emit=static function(string $action,array $metadata=[],?int $product=null)use($db,$user,$id):void{stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$user,$id,$product,$action,json_encode($metadata,JSON_UNESCAPED_UNICODE)]);};
+    $source=pallet_activity_team_metadata($db,$user,$id,$teamContext);
+    $emit=static function(string $action,array $metadata=[],?int $product=null)use($db,$user,$id,$source):void{stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$user,$id,$product,$action,json_encode([...$metadata,...$source],JSON_UNESCAPED_UNICODE)]);};
     if(!$before)$emit('pallet_created');
     if($before&&$before['released']!=$after['released'])$emit('pallet_deleted');
     if(($before['description']??'')!==$after['description'])$emit('description_updated',['old'=>$before['description']??'','new'=>$after['description']]);

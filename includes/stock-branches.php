@@ -86,7 +86,7 @@ function branch_assign(PDO $db,int $user,array $input): void {
     if($changing&&$shares){foreach($shares as $share){stock_query($db,'DELETE FROM stock_share_exclusions WHERE share_id=? AND pallet_id=?',[$share,$id]);if((string)$input['share_pallet']==='0')stock_query($db,'INSERT INTO stock_share_exclusions(share_id,pallet_id) VALUES(?,?)',[$share,$id]);}}
     stock_touch($db,$id,$user);
     if ($branchId) branch_recent($db,$user,$branchId);
-    if($changing){$oldName=($p['branch_id']??0)?stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$p['branch_id']])->fetchColumn():false;$newName=$branchId?stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branchId])->fetchColumn():false;stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,action,metadata) VALUES(?,?,?,?)',[$user,$id,'branch_updated',json_encode(['old'=>$oldName?:'Sin sucursal','new'=>$newName?:'Sin sucursal'],JSON_UNESCAPED_UNICODE)]);}
+    if($changing){$oldName=($p['branch_id']??0)?stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$p['branch_id']])->fetchColumn():false;$newName=$branchId?stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branchId])->fetchColumn():false;stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,action,metadata) VALUES(?,?,?,?)',[$user,$id,'branch_updated',json_encode(['old'=>$oldName?:'Sin sucursal','new'=>$newName?:'Sin sucursal',...((int)$p['owner_id']!==$user&&team_role($db,$user,(int)($p['branch_id']??0))?['source'=>'team']:[])],JSON_UNESCAPED_UNICODE)]);}
 }
 function branch_delete(PDO $db,int $user,array $input): void {
     if (!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden eliminar sucursales.',403);
