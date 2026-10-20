@@ -161,20 +161,22 @@
       const code = /\/q\/(\d{8})\/?$/.exec(url.pathname)?.[1]||url.searchParams.get('codigo'); return /^\d{8}$/.test(code || '') ? code : null;
     } catch { return null; }
   }
-  function ocrConsensus() {
-    const valid=value=>/^\d{8}$/.test(value||''),maxGap=2000,maxWindow=5000;
+  function ocrConsensus(getZoom=()=>1) {
+    const valid=value=>/^\d{8}$/.test(value||'');
+    const tolerance=()=>{const z=Number(getZoom()),zoom=Number.isFinite(z)&&z>=1?z:1;return Math.min(4000,2000+(zoom-1)*500);};
+    const windowMs=()=>tolerance()*2+1000;
     let code='',count=0,first=0,last=0,lastFrame=null;
     // OCR may lose the digits between clear frames while digital zoom magnifies hand movement.
     const read=(value,frame,now=performance.now())=>{
       if(!valid(value))return false;
       if(frame!==null&&frame!==undefined&&frame===lastFrame)return false;
       lastFrame=frame;
-      if(value!==code||now<last||now-last>maxGap||now-first>maxWindow){code=value;count=1;first=last=now;return false;}
+      if(value!==code||now<last||now-last>tolerance()||now-first>windowMs()){code=value;count=1;first=last=now;return false;}
       if(now-last<60)return false;
       last=now;return ++count>=3;
     };
-    read.progress=(now=performance.now())=>count&&now>=last&&now-last<=maxGap&&now-first<=maxWindow?Math.min(count,3):0;
-    return read;
+    read.progress=(now=performance.now())=>count&&now>=last&&now-last<=tolerance()&&now-first<=windowMs()?Math.min(count,3):0;
+    read.tolerance=tolerance;return read;
   }
   function ocrCandidate(data) {
     const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
@@ -211,7 +213,8 @@ function palletNumberRegion(image){
 }
 
   function palletOCR(element, active, accept, status, viewport, canAnalyze = () => true,onAnalysis=()=>{}) {
-    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus(),pageMode='11',lockedRegion=null;
+    const getZoom=()=>{try{return element.querySelector('video')?.srcObject?.getVideoTracks?.()[0]?.getSettings?.().zoom||1;}catch{return 1;}};
+    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus(getZoom),pageMode='11',lockedRegion=null;
     const canvas = document.createElement('canvas'), context = canvas.getContext('2d'),lineCanvas=document.createElement('canvas'),lineContext=lineCanvas.getContext('2d');
     if (!context) return { dispose() {}, resume() {}, reset() {} };
 
@@ -272,7 +275,7 @@ function palletNumberRegion(image){
         const analysisStarted=performance.now();
         const result = await worker.recognize(ocrSurface, {rotateAuto:false}, { text: true, blocks: true });
         if (disposed || !active()) return;
-        const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),costMs:performance.now()-analysisStarted});
+        const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),zoom:Number(getZoom())||1,toleranceMs:confirm.tolerance(),costMs:performance.now()-analysisStarted});
         if(candidate?.box){
           const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y+=lineOffset-canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
           viewport?.track({x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},fullWidth,fullHeight);
@@ -285,7 +288,8 @@ function palletNumberRegion(image){
     schedule();
     return {
       hasCandidate(){return !disposed&&lockedAngle!==null;},
-      reset() { confirm = ocrConsensus();lockedRegion=null;lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
+      tolerance(){return confirm.tolerance();},
+      reset() { confirm = ocrConsensus(getZoom);lockedRegion=null;lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
       resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
       dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { clearCanvases(); try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
     };
@@ -700,7 +704,7 @@ function palletNumberRegion(image){
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, (unavailable,count) => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Número detectado · '+count+'/3'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 2000); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, (unavailable,count) => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Número detectado · '+count+'/3'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, current.ocr?.tolerance?.()||2000); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {

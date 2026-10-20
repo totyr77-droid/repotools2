@@ -1,6 +1,12 @@
 {
-  "version": 100,
+  "version": 101,
   "changes": [
+    {
+      "version": 101,
+      "label": "1.96",
+      "date": "2026-10-20",
+      "summary": "OCR: tolerancia gradual según zoom aplicado de cámara"
+    },
     {
       "version": 100,
       "label": "1.95",
@@ -294,15 +300,9 @@
       "label": "1.47",
       "date": "2026-10-17",
       "summary": "Corrige inicio de sesión desde enlaces cortos de impresión y conserva el lote solicitado."
-    },
-    {
-      "version": 51,
-      "label": "1.46",
-      "date": "2026-10-17",
-      "summary": "Fotos de producto desde edición, recorte automático compartido y ajuste manual del encuadre."
     }
   ],
   "major": 1,
-  "minor": 95,
-  "label": "1.95"
+  "minor": 96,
+  "label": "1.96"
 }
