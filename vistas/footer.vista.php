@@ -107,7 +107,7 @@
 
 <?php if(!empty($stockEmbedded)): ?><script>window.repotoolsStock=<?= json_encode(['csrf'=>csrf_token(),'user_id'=>(int)current_user()['id'],'embedded'=>true,'teamContext'=>!empty($paginaEquipo)],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script>
 <?php include __DIR__.'/stock-scripts.vista.php'; ?>
-<script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-overview.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-overview.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaEquipo)&&empty($stockEmbedded)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaEquipo)&&empty($stockEmbedded)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()&&(!empty($paginaInicio)||!empty($paginaEquipo))): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-team.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>

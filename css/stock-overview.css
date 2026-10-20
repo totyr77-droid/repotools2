@@ -7,3 +7,8 @@
 .stock-overview-metrics span{min-width:0;overflow:hidden;text-overflow:ellipsis}
 
 #openStockHistory{width:auto;min-height:44px;padding:6px 10px;background:transparent;color:#68627c;font-weight:400}#openStockHistory:hover{background:#efedf7;color:#27187e}
+
+/* Independent actions: movement, team origin, then its ticket. */
+.stock-history-list .stock-history-row{display:flex;align-items:center;gap:4px}.stock-history-row>.stock-history-ticket{flex:1;min-width:0;width:auto}.stock-history-row>.stock-activity-team{display:grid;place-items:center;flex:none;width:40px;min-height:44px;margin:0;padding:9px;border:0;border-radius:9px;background:transparent;color:#27197f;cursor:pointer}.stock-activity-team svg{width:20px;height:20px}.stock-history-row>.stock-activity-team:hover,.stock-history-row>.stock-activity-team[aria-expanded=true]{background:#eeebf7}.stock-history-row>.stock-history-access{min-height:44px;margin:0;padding:8px 2px;border:0;background:transparent;color:#27197f;cursor:pointer;font:inherit}.stock-history-access small{color:#727385;font-size:.78rem}.stock-team-origin-hint{position:fixed;inset:auto;margin:0;width:min(250px,calc(100vw - 24px));max-width:calc(100vw - 24px);box-sizing:border-box;padding:10px 12px;border:1px solid #ded8ef;border-radius:10px;background:#f3f0fa;color:#27197f;box-shadow:0 4px 16px #27197f20;font-size:.82rem;line-height:1.4}.stock-activity-team:focus-visible,.stock-history-access:focus-visible{outline:2px solid #27197f;outline-offset:1px}.stock-history-row>.stock-history-ticket{flex-direction:row;text-align:left}
+
+.stock-history-row>.stock-history-access{flex:none;white-space:nowrap}.stock-history-row>.stock-history-access small{flex:none}
