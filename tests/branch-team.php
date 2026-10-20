@@ -11,6 +11,7 @@ $geo=['latitude'=>-34.6037,'longitude'=>-58.3816,'accuracy'=>10,'position_at'=>t
 $workspace=(int)stock_query($db,'INSERT INTO branch_workspaces(owner_id,name) VALUES(1,?) RETURNING id',['Equipo'])->fetchColumn();team_attach($db,6,$workspace,$branch);
 team_denied(fn()=>team_attach($db,1,$workspace,(int)$foreign['id']),403);team_denied(fn()=>team_attach($db,5,$workspace,(int)$foreign['id']),403);
 team_check(team_role($db,1,$branch)==='admin','business admin');team_check(!stock_is_admin($db,1),'business rank never grants platform admin');
+stock_query($db,"UPDATE users SET role='usuario' WHERE id=6");
 $targeted=team_invite($db,1,$branch,'operator','user5@example.invalid',true);
 team_denied(fn()=>team_accept($db,5,$targeted,$geo),403);
 team_check(team_role($db,6,$branch)==='','invitation grants nothing before consent');
@@ -53,6 +54,7 @@ team_select($db,4,0);team_denied(fn()=>team_scan($db,4,'00123456',$branch,$geo),
 $expired=team_invite($db,1,$branch,'operator');stock_query($db,'UPDATE branch_team_invites SET expires=? WHERE token_hash=?',[time()-1,hash('sha256',$expired)]);team_denied(fn()=>team_accept($db,5,$expired,$geo),410);
 team_denied(fn()=>team_revoke($db,2,$branch,1,1),403);team_denied(fn()=>team_revoke($db,2,$branch,2,1),403);
 team_revoke($db,1,$branch,2,1);team_check(team_role($db,2,$branch)==='','manager revocation');
+stock_query($db,"UPDATE users SET role='manager' WHERE id=6");
 $second=branch_save($db,1,['name'=>'Sucursal C','address'=>'Calle 3','locality'=>'Ciudad','province'=>'Provincia'])['branch'];team_attach($db,6,$workspace,(int)$second['id']);team_check(count(team_locations($db,1))===2,'admin switches multiple branches');team_denied(fn()=>team_select($db,3,(int)$second['id']),403);team_check(count(team_locations($db,3))===1,'operator sees only authorized branch');
 stock_query($db,"UPDATE users SET role='administrador' WHERE id=1");team_denied(fn()=>branch_delete($db,1,['id'=>$branch,'revision'=>1]),409);
 team_denied(fn()=>team_require_assignment($db,1),403);team_denied(fn()=>team_require_assignment($db,2),403);team_denied(fn()=>team_require_assignment($db,3),403);team_check(team_can_assign($db,6),'only platform manager');stock_query($db,"UPDATE users SET role='administrador' WHERE id=6");team_denied(fn()=>team_require_assignment($db,6),403);

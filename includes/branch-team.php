@@ -13,7 +13,7 @@ function team_require_assignment(PDO $db,int $user): void {
 function team_role(PDO $db,int $user,int $branch): string {
     if(!$user||!$branch)return '';
     $owner=stock_query($db,'SELECT w.owner_id FROM branch_workspace_locations l JOIN branch_workspaces w ON w.id=l.workspace_id WHERE l.branch_id=?',[$branch])->fetchColumn();
-    if((int)$owner===$user)return 'admin';
+    if($owner!==false&&((int)$owner===$user||team_can_assign($db,$user)))return 'admin';
     return (string)(stock_query($db,'SELECT role FROM branch_team_members WHERE branch_id=? AND user_id=? AND active=1 AND (expires_at IS NULL OR expires_at>?)',[$branch,$user,time()])->fetchColumn()?:'');
 }
 function team_require(PDO $db,int $user,int $branch,bool $manage=false): string {
@@ -25,7 +25,7 @@ function team_event(PDO $db,int $user,int $branch,string $action,?int $target=nu
     stock_query($db,'INSERT INTO branch_team_events(branch_id,actor_id,action,target_id,pallet_id,metadata) VALUES(?,?,?,?,?,?)',[$branch,$user,$action,$target,$pallet,json_encode($metadata,JSON_UNESCAPED_UNICODE)]);
 }
 function team_locations(PDO $db,int $user): array {
-    return stock_query($db,"SELECT b.id,b.name,b.address,b.revision,m.expires_at,COALESCE(s.enabled,1) AS security_enabled,CASE WHEN s.branch_id IS NULL THEN 25200 ELSE s.default_seconds END AS default_seconds,w.id AS workspace_id,w.name AS workspace_name,CASE WHEN w.owner_id=? THEN 'admin' ELSE m.role END AS role FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id JOIN branch_workspaces w ON w.id=l.workspace_id LEFT JOIN branch_team_security s ON s.branch_id=b.id LEFT JOIN branch_team_members m ON m.branch_id=b.id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().") WHERE w.owner_id=? OR m.user_id IS NOT NULL ORDER BY w.name,b.name,b.id",[$user,$user,$user])->fetchAll();
+    return stock_query($db,"SELECT b.id,b.name,b.address,b.revision,m.expires_at,COALESCE(s.enabled,1) AS security_enabled,CASE WHEN s.branch_id IS NULL THEN 25200 ELSE s.default_seconds END AS default_seconds,w.id AS workspace_id,w.name AS workspace_name,CASE WHEN w.owner_id=? OR CAST(? AS INTEGER)=1 THEN 'admin' ELSE m.role END AS role FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id JOIN branch_workspaces w ON w.id=l.workspace_id LEFT JOIN branch_team_security s ON s.branch_id=b.id LEFT JOIN branch_team_members m ON m.branch_id=b.id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().") WHERE w.owner_id=? OR m.user_id IS NOT NULL OR (CAST(? AS INTEGER)=1 AND b.id=(SELECT branch_id FROM branch_team_active WHERE user_id=?)) ORDER BY w.name,b.name,b.id",[$user,(int)team_can_assign($db,$user),$user,$user,(int)team_can_assign($db,$user),$user])->fetchAll();
 }
 function team_active(PDO $db,int $user): int {
     $branch=(int)stock_query($db,'SELECT branch_id FROM branch_team_active WHERE user_id=?',[$user])->fetchColumn();
