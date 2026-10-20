@@ -4,7 +4,7 @@ const collectionDialog=root.querySelector('#profileCollectionDialog'),categoryDi
 let data=JSON.parse(root.dataset.achievements),busy=false,activeCategory=null;
 const levels=['bronce','plata','oro','platino','diamante','leyenda'];
 const make=(tag,text,parent,cls)=>{const e=doc.createElement(tag);if(text!==null)e.textContent=text;if(cls)e.className=cls;parent.append(e);return e;};
-const image=(c,n,parent)=>{const i=make('img',null,parent);i.src='img/achievements/'+c.id+'/'+c.id+'_'+String(n).padStart(2,'0')+'_'+levels[n-1]+'.svg';i.alt=c.name+' · '+c.levels[n-1];i.width=88;i.height=99;i.loading='lazy';};
+const image=(c,n,parent)=>{const art=make('span',null,parent,'profile-badge-art');art.setAttribute('aria-hidden','false');art.style.setProperty('--badge-glow',['#b8734459','#8da4cc66','#dbad3b66','#b5b3e166','#61cedc66','#ec70cc77'][n-1]);art.style.setProperty('--shine-delay',(-n*.8)+'s');const i=make('img',null,art);i.src='img/achievements/'+c.id+'/'+c.id+'_'+String(n).padStart(2,'0')+'_'+levels[n-1]+'.svg';i.alt=c.name+' · '+c.levels[n-1];i.width=88;i.height=99;i.loading='lazy';if(!parent.classList.contains('is-locked')){const glint=make('span',null,art,'profile-badge-glint');glint.setAttribute('aria-hidden','true');glint.style.maskImage='url("'+i.src+'")';glint.style.webkitMaskImage='url("'+i.src+'")';}};
 const nextIndex=c=>c.goals.findIndex((g,i)=>!c.awards.some(a=>Number(a.level)===i+1));
 const selected=()=>data.categories.flatMap(c=>c.awards.filter(a=>Number(a.featured)).map(a=>c.id+':'+a.level));
 function notify(message,kind='success'){window.RepoToast?.(message,{kind,key:'profile-achievement'});}
@@ -29,5 +29,20 @@ collectionDialog.addEventListener('close',()=>root.querySelector('.profile-all')
 categoryDialog.addEventListener('close',()=>{const id=activeCategory;activeCategory=null;if(root.isConnected&&id){const target=collectionDialog.open?collectionDialog.querySelector('[data-category="'+id+'"]'):root.querySelector('[data-featured-category="'+id+'"]');target?.focus({preventScroll:true});}});
 const verified=root.querySelector('.profile-verified');verified?.addEventListener('click',()=>{const info=root.querySelector('.profile-verification-info');info.hidden=!info.hidden;verified.setAttribute('aria-expanded',String(!info.hidden));});render();if(new URL(location.href).hash==='#insignias')openCollection();
 if(data.own){const update=async()=>{try{const r=await(page?.fetch||window.fetch.bind(window))('api/insignias.php');if(r.ok&&root.isConnected){data=(await r.json()).profile;render();}}catch{}};window.addEventListener('repotools:achievements-changed',update);page?.onLeave(()=>window.removeEventListener('repotools:achievements-changed',update));}
+
+// Delegate to keep effects working when featured selections redraw the collection.
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');let gesture=null,tilted=null,frame=0,point=null,suppressed=null,suppressTimer;
+const badgeButton=target=>target?.closest?.('.profile-mini-award,.profile-category-button:not(.is-locked),.profile-level:not(.is-locked)');
+function resetTilt(){if(frame)cancelAnimationFrame(frame);frame=0;point=null;if(tilted){tilted.style.removeProperty('--tilt-x');tilted.style.removeProperty('--tilt-y');tilted.style.removeProperty('--shine-x');tilted.classList.remove('is-tilting');}tilted=null;}
+function tilt(button,x,y){if(reduced.matches)return;point={button,x,y};if(frame)return;frame=requestAnimationFrame(()=>{frame=0;if(!point?.button.isConnected)return;const {button,x,y}=point,art=button.querySelector('.profile-badge-art');if(!art)return;if(tilted&&tilted!==art)resetTilt();const b=button.getBoundingClientRect(),nx=Math.max(-1,Math.min(1,(x-b.left)/b.width*2-1)),ny=Math.max(-1,Math.min(1,(y-b.top)/b.height*2-1));tilted=art;art.classList.add('is-tilting');art.style.setProperty('--tilt-x',(-ny*12).toFixed(2)+'deg');art.style.setProperty('--tilt-y',(nx*16).toFixed(2)+'deg');art.style.setProperty('--shine-x',((nx+1)*50).toFixed(1)+'%');});}
+root.addEventListener('pointerdown',e=>{const b=badgeButton(e.target);if(!b||reduced.matches||e.button!==0)return;clearTimeout(suppressTimer);suppressed=null;gesture={button:b,x:e.clientX,y:e.clientY,touch:e.pointerType!=='mouse',drag:false};tilt(b,e.clientX,e.clientY);},{passive:true});
+root.addEventListener('pointermove',e=>{const b=badgeButton(e.target);if(!b)return;if(e.pointerType!=='mouse'&&!gesture)return;if(gesture?.touch&&gesture.button===b&&Math.abs(e.clientX-gesture.x)>8&&Math.abs(e.clientX-gesture.x)>Math.abs(e.clientY-gesture.y))gesture.drag=true;tilt(b,e.clientX,e.clientY);},{passive:true});
+root.addEventListener('pointerout',e=>{const b=badgeButton(e.target);if(b&&!b.contains(e.relatedTarget))resetTilt();},{passive:true});
+root.addEventListener('pointerup',()=>{if(gesture?.drag){suppressed=gesture.button;suppressTimer=setTimeout(()=>suppressed=null,600);}gesture=null;resetTilt();},{passive:true});
+root.addEventListener('pointercancel',()=>{gesture=null;resetTilt();},{passive:true});
+root.addEventListener('click',e=>{if(suppressed&&badgeButton(e.target)===suppressed){e.preventDefault();e.stopPropagation();suppressed=null;}},true);
+const motionChanged=()=>{gesture=null;resetTilt();};reduced.addEventListener('change',motionChanged);
+page?.onLeave(()=>{resetTilt();clearTimeout(suppressTimer);reduced.removeEventListener('change',motionChanged);});
+
 page?.onLeave(()=>{categoryDialog.close();collectionDialog.close();});
 })();

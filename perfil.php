@@ -18,11 +18,11 @@ if($profile&&!current_user()&&referrals_enabled())try{referral_limit(database(),
 $paginaCuenta=true;$paginaReferidos=true;$publicPageTitle='Perfil de usuario';
 include __DIR__.'/vistas/header.vista.php';
 ?>
-<main class="tops-main referral-workspace">
-  <div class="referral-heading"><h1><?= stock_icon('user') ?>Perfil de usuario</h1><?php if(!current_user()): ?><a class="library-secondary" href="index.php">Inicio</a><?php endif; ?></div>
+<main class="tops-main referral-workspace public-profile-page">
+  <h1 class="sr-only">Perfil de usuario</h1>
   <?php if($profile): ?>
   <?php require_once __DIR__.'/includes/profile-card.php';profile_card(database(),(int)$profile['id']); ?>
-  <?php if(!current_user()): ?><p class="referral-muted">Organizá tu mercadería con RepoTools.</p><a class="library-primary" href="cuenta.php?mode=registro">Crear cuenta</a><a class="library-secondary" href="cuenta.php">Ingresar</a><?php else: ?><p class="referral-muted">Compartí este perfil para que puedan encontrarte en RepoTools.</p><?php endif; ?>
+  <?php if(!current_user()): ?><p class="referral-muted">Organizá tu mercadería con RepoTools.</p><a class="library-primary" href="cuenta.php?mode=registro">Crear cuenta</a><a class="library-secondary" href="cuenta.php">Ingresar</a><?php endif; ?>
   <?php else: ?><p>Este perfil no está disponible.</p><a class="library-primary" href="index.php">Volver al inicio</a><?php endif; ?>
 </main>
 <?php include __DIR__.'/vistas/footer.vista.php'; ?>

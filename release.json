@@ -1,6 +1,12 @@
 {
-  "version": 70,
+  "version": 71,
   "changes": [
+    {
+      "version": 71,
+      "label": "1.66",
+      "date": "2026-10-20",
+      "summary": "Perfiles compactos e insignias con brillo e inclinación interactiva."
+    },
     {
       "version": 70,
       "label": "1.65",
@@ -294,15 +300,9 @@
       "label": "1.17",
       "date": "2026-10-19",
       "summary": "Isotipo transparente en la introducción"
-    },
-    {
-      "version": 21,
-      "label": "1.16",
-      "date": "2026-10-19",
-      "summary": "Panel de empresas y sucursales para managers de Repotools"
     }
   ],
   "major": 1,
-  "minor": 65,
-  "label": "1.65"
+  "minor": 66,
+  "label": "1.66"
 }
