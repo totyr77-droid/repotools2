@@ -31,3 +31,10 @@ SQLite aislada: achievements.php, achievements-ui.cjs, settings-ui.cjs, public-p
 
 ## Reversión
 Volver código a v1.63 y publicar versión superior. Conservar tablas nuevas y registros; no borrar inventario, contadores operativos ni datos de usuarios. Main no se modifica. Quitar las nuevas referencias de recursos si se retira la función, sin borrar archivos usados por clientes anteriores.
+
+## Ajuste beta v1.65
+Correo privado debajo del nombre y engranaje de edición en el extremo contrario. El perfil público autenticado omite Inicio porque ya dispone de navegación. Ver todas abre un modal con una insignia representativa por categoría; cada categoría abre otro modal con sus seis niveles. Cerrar niveles conserva la colección, con foco restaurado. Destacadas 96px y niveles 112px, adaptación móvil/PC; fechas interpretadas con el parser compartido compatible con TIMESTAMPTZ de PostgreSQL. El próximo logro omite niveles ya concedidos.
+
+Pruebas achievements-ui actualizadas: modal/12 categorías/6 niveles bajo demanda, candados, destacar/guardar, cierre/Escape, dimensiones móviles y PC, correo/edición alineados y privacidad, Inicio ausente con sesión. Settings-ui y sintaxis aprobados; capturas de ambos modales revisadas tras animación. Sin migración ni cambios en main.
+
+Se otorgaron por pedido explícito insignias de muestra a una cuenta de prueba existente: 41 niveles repartidos entre las 12 categorías y tres destacadas. Inserción idempotente restringida a la cuenta solicitada, sin cambiar contadores, permisos, correo o inventario, y sin crear notificaciones de logros. Los identificadores privados no se guardan en Git. Para retirar esos datos de muestra, revisar primero sus logros posteriores y ejecutar una corrección autorizada solo sobre las concesiones manuales; no borrar toda la actividad. El código de interfaz puede revertirse a v1.64 y publicarse con versión superior sin tocar la cuenta.

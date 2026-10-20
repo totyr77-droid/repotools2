@@ -19,7 +19,7 @@ $paginaCuenta=true;$paginaReferidos=true;$publicPageTitle='Perfil de usuario';
 include __DIR__.'/vistas/header.vista.php';
 ?>
 <main class="tops-main referral-workspace">
-  <div class="referral-heading"><h1><?= stock_icon('user') ?>Perfil de usuario</h1><a class="library-secondary" href="index.php">Inicio</a></div>
+  <div class="referral-heading"><h1><?= stock_icon('user') ?>Perfil de usuario</h1><?php if(!current_user()): ?><a class="library-secondary" href="index.php">Inicio</a><?php endif; ?></div>
   <?php if($profile): ?>
   <?php require_once __DIR__.'/includes/profile-card.php';profile_card(database(),(int)$profile['id']); ?>
   <?php if(!current_user()): ?><p class="referral-muted">Organizá tu mercadería con RepoTools.</p><a class="library-primary" href="cuenta.php?mode=registro">Crear cuenta</a><a class="library-secondary" href="cuenta.php">Ingresar</a><?php else: ?><p class="referral-muted">Compartí este perfil para que puedan encontrarte en RepoTools.</p><?php endif; ?>

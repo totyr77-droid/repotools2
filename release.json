@@ -1,6 +1,12 @@
 {
-  "version": 69,
+  "version": 70,
   "changes": [
+    {
+      "version": 70,
+      "label": "1.65",
+      "date": "2026-10-20",
+      "summary": "Insignias más grandes, colección y niveles en modales; perfil más compacto."
+    },
     {
       "version": 69,
       "label": "1.64",
@@ -294,15 +300,9 @@
       "label": "1.16",
       "date": "2026-10-19",
       "summary": "Panel de empresas y sucursales para managers de Repotools"
-    },
-    {
-      "version": 20,
-      "label": "1.15",
-      "date": "2026-10-19",
-      "summary": "Asignar empresa junto a TOPs y sin espacio superior"
     }
   ],
   "major": 1,
-  "minor": 64,
-  "label": "1.64"
+  "minor": 65,
+  "label": "1.65"
 }
