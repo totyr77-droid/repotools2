@@ -1,6 +1,12 @@
 {
-  "version": 106,
+  "version": 107,
   "changes": [
+    {
+      "version": 107,
+      "label": "2.02",
+      "date": "2026-10-20",
+      "summary": "Configuración de sucursal, mapa modal, filtros compactos y salida de gestión"
+    },
     {
       "version": 106,
       "label": "2.01",
@@ -294,15 +300,9 @@
       "label": "1.53",
       "date": "2026-10-17",
       "summary": "Filtros de consulta sin etiquetas, orden por cantidad y búsqueda con cámara en Stock y palets."
-    },
-    {
-      "version": 57,
-      "label": "1.52",
-      "date": "2026-10-17",
-      "summary": "Compacta filtros de Stock y compartir, agrega búsqueda autenticada y orden por vencimiento en Stock compartido."
     }
   ],
   "major": 2,
-  "minor": 1,
-  "label": "2.01"
+  "minor": 2,
+  "label": "2.02"
 }
