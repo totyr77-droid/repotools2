@@ -1,6 +1,12 @@
 {
-  "version": 109,
+  "version": 110,
   "changes": [
+    {
+      "version": 110,
+      "label": "2.05",
+      "date": "2026-10-20",
+      "summary": "Corrige el bloqueo por un modal invisible al abrir sucursal desde Inicio"
+    },
     {
       "version": 109,
       "label": "2.04",
@@ -294,15 +300,9 @@
       "label": "1.56",
       "date": "2026-10-18",
       "summary": "Corrige buscadores e iconos de consulta, centra carga e ingreso a filtros desde enlaces de Stock sin controles vacíos."
-    },
-    {
-      "version": 60,
-      "label": "1.55",
-      "date": "2026-10-17",
-      "summary": "Acceso a Stock según mano hábil e ingreso para filtros con retorno al informe actualizado del palet."
     }
   ],
   "major": 2,
-  "minor": 4,
-  "label": "2.04"
+  "minor": 5,
+  "label": "2.05"
 }
