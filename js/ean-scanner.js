@@ -162,10 +162,19 @@
     } catch { return null; }
   }
   function ocrConsensus() {
-    const valid=value=>/^\d{8}$/.test(value||''),confirm=confirmation(valid);
-    // An unreadable frame is a missed detection, just as with EAN. Age is checked on the next valid read.
-    const read=(value,frame,now=performance.now())=>valid(value)?confirm(value,now,frame):false;
-    read.progress=confirm.progress;return read;
+    const valid=value=>/^\d{8}$/.test(value||''),maxGap=2000,maxWindow=5000;
+    let code='',count=0,first=0,last=0,lastFrame=null;
+    // OCR may lose the digits between clear frames while digital zoom magnifies hand movement.
+    const read=(value,frame,now=performance.now())=>{
+      if(!valid(value))return false;
+      if(frame!==null&&frame!==undefined&&frame===lastFrame)return false;
+      lastFrame=frame;
+      if(value!==code||now<last||now-last>maxGap||now-first>maxWindow){code=value;count=1;first=last=now;return false;}
+      if(now-last<60)return false;
+      last=now;return ++count>=3;
+    };
+    read.progress=(now=performance.now())=>count&&now>=last&&now-last<=maxGap&&now-first<=maxWindow?Math.min(count,3):0;
+    return read;
   }
   function ocrCandidate(data) {
     const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
@@ -691,7 +700,7 @@ function palletNumberRegion(image){
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, (unavailable,count) => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Número detectado · '+count+'/3'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 650); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, (unavailable,count) => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Número detectado · '+count+'/3'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 2000); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
