@@ -1,6 +1,12 @@
 {
-  "version": 107,
+  "version": 108,
   "changes": [
+    {
+      "version": 108,
+      "label": "2.03",
+      "date": "2026-10-20",
+      "summary": "Filtros aplicados desplazables sin recortar sus nombres"
+    },
     {
       "version": 107,
       "label": "2.02",
@@ -294,15 +300,9 @@
       "label": "1.54",
       "date": "2026-10-17",
       "summary": "Los QR abren el informe del palet con acceso explícito a Stock o ingreso, conservando resumen y filtros."
-    },
-    {
-      "version": 58,
-      "label": "1.53",
-      "date": "2026-10-17",
-      "summary": "Filtros de consulta sin etiquetas, orden por cantidad y búsqueda con cámara en Stock y palets."
     }
   ],
   "major": 2,
-  "minor": 2,
-  "label": "2.02"
+  "minor": 3,
+  "label": "2.03"
 }
