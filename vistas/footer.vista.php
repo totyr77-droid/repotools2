@@ -115,5 +115,6 @@
 <?php if(current_user()): ?><link rel="stylesheet" href="css/user-qr.css?v=<?= (int)app_release()['version'] ?>"><script src="js/user-qr.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaCuenta)): ?><script src="js/profile-showcase.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()): ?><script src="js/achievement-events.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php include __DIR__.'/team-shortcut.vista.php'; ?>
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
 </html>

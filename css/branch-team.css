@@ -60,3 +60,5 @@ body[data-hand=left] .team-inventory-search{flex-direction:row-reverse}body[data
 .ux-home-scan-pair #boton,body.home-page[data-one-hand='1'] .ux-home-actions .ux-home-scan-pair #boton{padding:12px;display:flex;align-items:center;justify-content:center}
 .ux-home-scan-pair #boton svg{width:24px;height:24px;flex:none}
 @media(min-width:1024px){.ux-home-scan-pair [data-team-scan]{flex-basis:120px;width:120px;min-width:120px;height:120px;min-height:120px}}
+
+.home-scan-actions .home-pallet-scan,.ux-home-scan-pair [data-team-scan]{background:#b9dce5;color:#245c6b;border:1px solid #97c4d0}

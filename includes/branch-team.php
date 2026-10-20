@@ -83,7 +83,7 @@ function team_accept_hash(PDO $db,int $user,string $hash,array $position=[]): vo
     team_require_position($db,$branch,$position);
     stock_query($db,"INSERT INTO branch_team_members(branch_id,user_id,role,active,expires_at) VALUES(?,?,?,1,?) ON CONFLICT(branch_id,user_id) DO UPDATE SET role=excluded.role,active=1,expires_at=excluded.expires_at,revision=branch_team_members.revision+1",[$branch,$user,$invite['role'],$invite['access_seconds']===null?null:time()+(int)$invite['access_seconds']]);
     if(!stock_query($db,'UPDATE branch_team_invites SET used_by=? WHERE token_hash=? AND used_by IS NULL AND revoked=0',[$user,$hash])->rowCount())throw new CatalogException('La invitación ya fue utilizada.',409);
-    team_event($db,$user,$branch,'member_joined',$user,null,['role'=>$invite['role'],'access_seconds'=>$invite['access_seconds']]);team_select($db,$user,$branch);
+    team_event($db,(int)$invite['invited_by'],$branch,'member_joined',$user,null,['role'=>$invite['role'],'access_seconds'=>$invite['access_seconds']]);team_select($db,$user,$branch);
 }
 
 function team_incoming(PDO $db,int $user): array {

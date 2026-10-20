@@ -19,3 +19,13 @@ Filtros: input/change/focusout, Enter y cierre del desplegable aplican valores; 
 
 Validación: team-inventory PHP/UI ampliado con EAN/QR, X, ingreso manual, fecha cambiada al perder foco, cierre exterior, respuesta antigua demorada, enlaces por palet, etiquetas y rol; paginación, agrupación, administración, permisos, URL y 320/390/1366 ambas manos. branch-team-ui completo, EAN, SW y sintaxis aprobados; capturas de Mercadería y filtros revisadas. Sin migraciones ni datos reales. Reversión: vistas, módulos, iconos y estilos a v1.67 con versión superior; conservar inventario. Solo beta.
 `nQR de Inicio: proporción cuadrada en una mano, contraste invertido conservando paleta y separación4px. Validado tests/home-scan-pair-ui.cjs a320/390/531/1366 y ambasmanos. Reversión: restaurar reglas añadidas al final de branch-team.css y prueba al padre; publicar versión superior.
+
+## Beta 1.69 — revisión de controles y movimientos
+
+QR de Inicio mantiene su proporción cuadrada, con fondo más claro y borde. Filtros de Palets/Mercadería incorporan orden por vencimiento cercano o lejano en servidor y paginación, fechas ausentes al final. Las nuevas aceptaciones guardan al invitador como actor y al receptor como destino, con rango; no se reescriben eventos históricos. Detalles de movimientos muestran comparación para alta/baja y unidades antes/después, además del formato old/new existente.
+
+Miembros activos del equipo pueden retirar únicamente la sucursal actual del palet, tras confirmar posible pérdida de acceso. Servidor verifica vínculo y revisión; no permite asignar otra sucursal ni actuar a ajenos. Herramientas de palet ocupan bordes opuestos según mano. Acceso lateral a Mi equipo exclusivo para administradores/encargados activos, fuera de Inicio y Mi equipo, arrastrable verticalmente sin activar navegación; posición local por usuario.
+
+Validación: tests/team-refinements.php (orden, permisos, pérdida de acceso e invitador), tests/team-inventory-ui.cjs (modales y visibilidad), tests/branch-team-ui.cjs, tests/team-shortcut-ui.cjs (bordes, ambas manos, arrastre), tests/home-scan-pair-ui.cjs, SW y sintaxis. Bases aisladas; sin escritura real ni migración. Safari/cámara física y revisión del usuario pendientes. Main intacta.
+
+Reversión: revertir el commit de v1.69 y publicar un número superior; no borrar eventos ni modificar datos. Restaurar permiso previo de asignación y retirar vista/CSS/JS de lengüeta junto con sus referencias y caché.

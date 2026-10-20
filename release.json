@@ -1,6 +1,12 @@
 {
-  "version": 73,
+  "version": 74,
   "changes": [
+    {
+      "version": 74,
+      "label": "1.69",
+      "date": "2026-10-19",
+      "summary": "Mi equipo: orden por vencimiento, movimientos y accesos más claros."
+    },
     {
       "version": 73,
       "label": "1.68",
