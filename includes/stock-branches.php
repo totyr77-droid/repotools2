@@ -72,10 +72,10 @@ function branch_save(PDO $db, int $user, array $input): array {
     return ['branch'=>$after];
 }
 function branch_assign(PDO $db,int $user,array $input): void {
-    $id=(int)($input['pallet_id']??0); $p=stock_editable($db,$id,$user,true);
-    // The directory is shared; only the pallet owner assigns its location.
-    if ((int)$p['owner_id']!==$user) throw new CatalogException('Solo el propietario puede asignar la sucursal.',403);
+    $id=(int)($input['pallet_id']??0); $p=stock_editable($db,$id,$user);
     $branchId=(int)($input['branch_id']??0);
+    // Team administrators and managers may remove the current location, never assign another.
+    if ((int)$p['owner_id']!==$user){if($branchId!==0)throw new CatalogException('Solo el propietario puede asignar otra sucursal.',403);if(!in_array(team_role($db,$user,(int)($p['branch_id']??0)),['admin','manager'],true))throw new CatalogException('Solo el propietario, encargados y administradores del equipo pueden retirar la sucursal.',403);}
     if ($branchId) branch_owned($db,$branchId,$user);
     $shares=$branchId ? stock_query($db,'SELECT id FROM stock_shares WHERE owner_id=? AND branch_id=? AND active=1',[$user,$branchId])->fetchAll(PDO::FETCH_COLUMN) : [];
     $changing=(int)($p['branch_id']??0)!==$branchId;
@@ -91,6 +91,7 @@ function branch_assign(PDO $db,int $user,array $input): void {
 function branch_delete(PDO $db,int $user,array $input): void {
     if (!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden eliminar sucursales.',403);
     $id=(int)($input['id']??0); branch_owned($db,$id,$user);
+    if(stock_query($db,'SELECT 1 FROM branch_workspace_locations WHERE branch_id=?',[$id])->fetchColumn())throw new CatalogException('Esta sucursal tiene un equipo activo. No puede eliminarse desde el directorio.',409);
     if ((int)stock_query($db,'SELECT revision FROM stock_branches WHERE id=?',[$id])->fetchColumn()!==(int)($input['revision']??0)) throw new CatalogException('La sucursal cambió. Vuelve a abrirla.',409);
     stock_query($db,'UPDATE pallets SET branch_id=NULL,revision=revision+1 WHERE branch_id=?',[$id]);
     stock_query($db,'UPDATE stock_shares SET active=0,branch_id=NULL WHERE branch_id=?',[$id]);

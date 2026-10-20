@@ -1,6 +1,12 @@
 {
-  "version": 90,
+  "version": 91,
   "changes": [
+    {
+      "version": 91,
+      "label": "1.86",
+      "date": "2026-10-20",
+      "summary": "Integrar Mi equipo, perfiles, insignias y mejoras de escaneo de beta."
+    },
     {
       "version": 90,
       "label": "1.85",
@@ -294,15 +300,9 @@
       "label": "1.37",
       "date": "2026-10-16",
       "summary": "Stock más compacto y explicación de Pendientes junto al título."
-    },
-    {
-      "version": 41,
-      "label": "1.36",
-      "date": "2026-10-16",
-      "summary": "Referencias de productos con conexión rápida sin crédito TOP y recuperación offline sin interrumpir formularios."
     }
   ],
   "major": 1,
-  "minor": 85,
-  "label": "1.85"
+  "minor": 86,
+  "label": "1.86"
 }

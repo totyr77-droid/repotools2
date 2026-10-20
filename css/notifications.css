@@ -43,3 +43,4 @@
 .notification-control{align-self:center}
 #openNotifications{margin:0;padding:0;border:0;line-height:1}
 #openNotifications svg{display:block}
+.notification-item .notification-badge{width:44px;height:50px;object-fit:contain;flex:none}.notification-item .notification-achievement-detail{font-size:.76rem;color:#747086;margin-top:5px}

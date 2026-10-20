@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const page=window.RepoNavigation?.page,doc=page?.document||document;
-  if(!doc.getElementById('palletBranchDialog')&&!doc.getElementById('manageBranchDialog'))return;
+  if(!doc.getElementById('palletBranchDialog')&&!doc.getElementById('manageBranchDialog')&&!doc.querySelector('[data-company-manager]')&&!doc.getElementById('teamSecurityDialog'))return;
   const instances=new Set();let left=false;
   function load(){
     let css=document.querySelector('link[data-leaflet]');
@@ -24,10 +24,10 @@
     return window.repoVectorLoad;
   }
   const coords=b=>b?.latitude!==null&&b?.latitude!==undefined&&b?.latitude!==''&&b?.longitude!==null&&b?.longitude!==undefined&&b?.longitude!==''&&Number.isFinite(Number(b.latitude))&&Number.isFinite(Number(b.longitude));
-  async function create(container,status,{branches=[],onSelect,onPoint,onBrowse,point=null}={}){
+  async function create(container,status,{branches=[],onSelect,onPoint,onBrowse,point=null,pointColor=null,pointSize=9,radius=null}={}){
     const L=await load();if(left||!container.isConnected||!container.closest('dialog')?.open||container.closest('[hidden]'))return null;
     const map=L.map(container,{scrollWheelZoom:window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches,dragging:true,doubleClickZoom:true,boxZoom:true,keyboard:true,zoomAnimation:false,fadeAnimation:false}).setView([-34.6037,-58.3816],12),group=L.layerGroup().addTo(map);
-    const markers=new Map();let pin,userMarker,dead=false,geoVersion=0;
+    const markers=new Map();let pin,zone,userMarker,dead=false,geoVersion=0;
     const dispose=()=>{dead=true;geoVersion++;clearTimeout(timer);instances.delete(dispose);map.remove();};instances.add(dispose);
     let vector,timer,raster=false;
     function fallback(){if(dead||left||raster)return;raster=true;clearTimeout(timer);if(vector&&map.hasLayer(vector))map.removeLayer(vector);
@@ -46,16 +46,16 @@
       }catch(e){fallback();}
     }).catch(fallback);
 
-    function setPoint(lat,lng,notify=true){if(pin)map.removeLayer(pin);pin=L.circleMarker([lat,lng],{radius:9,color:'#27187e',fillColor:'#7963d5',fillOpacity:1}).addTo(map);if(notify)onPoint?.(lat,lng);status.textContent='Ubicación marcada.';}
+    function setPoint(lat,lng,notify=true){if(zone)map.removeLayer(zone);zone=null;if(Number(radius)>0)zone=L.circle([lat,lng],{radius:Number(radius),color:pointColor||'#27197F',weight:1.5,fillOpacity:.09,interactive:false}).addTo(map);if(pin)map.removeLayer(pin);pin=L.circleMarker([lat,lng],{radius:pointSize,color:pointColor||'#27187e',fillColor:pointColor||'#7963d5',fillOpacity:1}).addTo(map);if(notify)onPoint?.(lat,lng);status.textContent='Ubicación marcada.';}
     function update(list){group.clearLayers();markers.clear();const located=list.filter(coords);for(const b of located){const popup=document.createElement('div');const title=document.createElement('strong');title.textContent=b.name;popup.append(title);const address=document.createElement('p');address.textContent=[b.address,b.locality,b.province].filter(Boolean).join(', ');popup.append(address);if(onSelect){const button=document.createElement('button');button.type='button';button.className='library-primary';button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Seleccionar sucursal</span>';button.addEventListener('click',()=>onSelect(b));popup.append(button);}const marker=L.marker([Number(b.latitude),Number(b.longitude)],{title:b.name,icon:L.divIcon({className:'branch-store-marker',html:'<span class="branch-store-pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h18l-2-6H5zM4 10v11h16V10M9 21v-7h6v7"/></svg></span>',iconSize:[40,44],iconAnchor:[20,40],popupAnchor:[0,-34]})}).addTo(group).bindPopup(popup);markers.set(String(b.id),marker);}return located;}
-    const located=update(branches);if(coords(point)){setPoint(Number(point.latitude),Number(point.longitude),false);map.setView([Number(point.latitude),Number(point.longitude)],16);}else if(located.length)map.fitBounds(located.map(b=>[Number(b.latitude),Number(b.longitude)]),{padding:[25,25],maxZoom:15});
+    const located=update(branches);if(coords(point)){setPoint(Number(point.latitude),Number(point.longitude),false);if(zone)map.fitBounds(zone.getBounds(),{padding:[20,20],maxZoom:18});else map.setView([Number(point.latitude),Number(point.longitude)],16);}else if(located.length)map.fitBounds(located.map(b=>[Number(b.latitude),Number(b.longitude)]),{padding:[25,25],maxZoom:15});
     if(onPoint||onBrowse)map.on('click',e=>{setPoint(e.latlng.lat,e.latlng.lng);onBrowse?.(e.latlng.lat,e.latlng.lng);});
     async function locate(){const request=++geoVersion;status.textContent='Buscando tu ubicación…';if(!navigator.geolocation){status.textContent='Tu navegador no ofrece ubicación. Puedes recorrer el mapa.';return;}
       navigator.geolocation.getCurrentPosition(pos=>{if(left||dead||request!==geoVersion)return;const center=[pos.coords.latitude,pos.coords.longitude];if(userMarker)map.removeLayer(userMarker);userMarker=L.circleMarker(center,{radius:6,color:'#fff',weight:2,fillColor:'#2787d9',fillOpacity:1,interactive:false}).addTo(map);map.setView(center,16);status.textContent=onPoint?'Toca el mapa para marcar el local.':'Toca una sucursal para seleccionarla.';},()=>{if(!left&&!dead&&request===geoVersion)status.textContent='No pudimos obtener tu ubicación. Puedes recorrer el mapa o buscar por nombre.';},{timeout:10000,maximumAge:60000,enableHighAccuracy:true});
     }
     status.textContent=onPoint?'Toca el mapa para marcar el local.':located.length?'Toca una sucursal para seleccionarla.':'Todavía no hay sucursales con ubicación en el mapa.';
     setTimeout(()=>{if(!dead&&!left)map.invalidateSize();},0);
-    return {locate,update,clearPoint:()=>{if(pin)map.removeLayer(pin);pin=null;status.textContent='Sin ubicación marcada.';},openBranch:id=>markers.get(String(id))?.openPopup(),resize:()=>map.invalidateSize(),destroy:dispose};
+    return {locate,update,setPoint:(lat,lng)=>{setPoint(lat,lng,false);if(zone)map.fitBounds(zone.getBounds(),{padding:[20,20],maxZoom:18});else map.setView([lat,lng],16);},setRadius:value=>{radius=Number(value);if(pin){const p=pin.getLatLng();setPoint(p.lat,p.lng,false);if(zone)map.fitBounds(zone.getBounds(),{padding:[20,20],maxZoom:18});}},clearPoint:()=>{if(zone)map.removeLayer(zone);zone=null;if(pin)map.removeLayer(pin);pin=null;status.textContent='Sin ubicación marcada.';},openBranch:id=>markers.get(String(id))?.openPopup(),resize:()=>map.invalidateSize(),destroy:dispose};
   }
   window.RepoBranchMaps={create,coords};
   window.RepoBranchLookup=function({form,host,csrf,onExisting,valid=()=>true,onBusy=()=>{},showLoading=true}){

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/catalog.php';
 require_once __DIR__ . '/public-names.php';
+require_once __DIR__.'/branch-team.php';
 
 function stock_public_identity(array $row): array {
     foreach(['owner','updated'] as $prefix){
@@ -23,7 +24,7 @@ function stock_expire(PDO $db): void {
     stock_query($db, 'UPDATE pallet_labels SET reserved_by=NULL,reserved_until=0 WHERE pallet_id IS NULL AND reserved_until<=?', [$now]);
 }
 function stock_saved_reference(PDO $db, string $ean, int $user): string {
-    $q=stock_query($db,"SELECT b.name FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.ean=? AND TRIM(b.name)<>'' AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC,b.id DESC LIMIT 1",[$ean,$user,$user]);
+    $q=stock_query($db,"SELECT b.name FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE b.ean=? AND TRIM(b.name)<>'' AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted') OR EXISTS(SELECT 1 FROM branch_team_members m WHERE m.branch_id=p.branch_id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().")) OR EXISTS(SELECT 1 FROM branch_workspace_locations l JOIN branch_workspaces w ON w.id=l.workspace_id WHERE l.branch_id=p.branch_id AND w.owner_id=?)) ORDER BY p.updated_at DESC,b.id DESC LIMIT 1",[$ean,$user,$user,$user,$user]);
     $name=$q->fetchColumn();if($name!==false)return trim($name);
     $q=stock_query($db,"SELECT b.name FROM library_products b JOIN libraries l ON l.id=b.library_id WHERE b.ean=? AND l.user_id=? AND TRIM(b.name)<>'' ORDER BY b.id DESC LIMIT 1",[$ean,$user]);
     $name=$q->fetchColumn();return $name===false?'':trim((string)$name);
@@ -34,6 +35,21 @@ function stock_label(PDO $db, string $code): array {
     if (!$label) throw new CatalogException('Este código no fue generado por Repotools.', 404);
     if (stock_query($db,'SELECT id FROM pallets WHERE code=? AND released=0 AND id<>? LIMIT 1',[$code,(int)($label['pallet_id']??0)])->fetchColumn()) throw new CatalogException('No pudimos verificar el vínculo de este código con su palet. Necesita revisión; no está disponible para reutilizar.',409);
     return $label;
+}
+function stock_watch(PDO $db,string $code,int $user,?string $stamp=null): array {
+    if(!$user)throw new CatalogException('Ingresá para actualizar el palet.',401);
+    if(!preg_match('/^[0-9]{8}$/D',$code)||($stamp!==null&&$stamp!==''&&!preg_match('/^[a-f0-9]{64}$/D',$stamp)))throw new CatalogException('Consulta de palet no válida.',422);
+    // One small read while unchanged. Include authorization so revocation also refreshes the view.
+    $state=stock_query($db,"SELECT l.code,l.pallet_id,l.reserved_by,l.reserved_until,p.released,p.revision,p.branch_id,p.owner_id,
+        (SELECT status FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=?) AS access_status,
+        (SELECT role FROM users WHERE id=?) AS system_role,
+        (SELECT role FROM branch_team_members m WHERE m.branch_id=p.branch_id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().")) AS team_role,
+        (SELECT w.owner_id FROM branch_workspace_locations b JOIN branch_workspaces w ON w.id=b.workspace_id WHERE b.branch_id=p.branch_id) AS branch_owner
+        FROM pallet_labels l LEFT JOIN pallets p ON p.id=l.pallet_id WHERE l.code=?",[$user,$user,$user,$code])->fetch();
+    if(!$state)throw new CatalogException('Este código no fue generado por Repotools.',404);
+    $current=hash('sha256',$user.':'.json_encode($state));
+    if($stamp!==null&&hash_equals($current,$stamp))return ['unchanged'=>true,'watch_stamp'=>$current];
+    return ['unchanged'=>false,'watch_stamp'=>$current,'pallet'=>stock_detail($db,$code,$user)];
 }
 function stock_generate(PDO $db, int $user): array {
     // Prefer expired/free labels, never duplicate an unexpired reservation.
@@ -51,6 +67,7 @@ function stock_generate(PDO $db, int $user): array {
     return stock_label($db,$code);
 }
 function stock_is_admin(PDO $db,?int $user): bool { return $user!==null && in_array(stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn(),['administrador','manager'],true); }
+function stock_team_access(PDO $db,array $p,int $user): bool {return (int)$p['owner_id']!==$user&&team_role($db,$user,(int)($p['branch_id']??0))!=='';}
 function stock_product_names(array $product): array {
     $name=trim((string)($product['catalog_product']??'')); $brand=trim((string)($product['catalog_brand']??''));
     if ($brand!=='' && mb_stripos($name,$brand)===false) $name=trim($brand.' '.$name);
@@ -69,7 +86,11 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     foreach(['created_at','updated_at'] as $field) $p[$field]=(new DateTimeImmutable($p[$field],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     $owner=$user !== null && (int)$p['owner_id']===$user;
     $access=$user ? stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$p['id'],$user])->fetchColumn() : false;
-    $p['can_tag']=$admin&&($owner||$access==='accepted'); $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted'; $p['pending_invitation']=$access==='pending';
+    $teamRole=$user?team_role($db,$user,(int)($p['branch_id']??0)):'';
+    $p['can_remove_branch']=$owner||in_array($teamRole,['admin','manager'],true);
+    $p['can_tag']=$admin&&($owner||$access==='accepted'); $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted' || ($teamRole!==''); $p['pending_invitation']=$access==='pending';
+    $p['team_access']=!$owner&&$teamRole!=='';$p['can_edit_description']=$p['can_edit']&&!$p['team_access'];$p['can_transfer_stock']=$owner;
+    $p['team_tag']=in_array($teamRole,['admin','manager'],true)?(stock_query($db,'SELECT name FROM pallet_user_tags WHERE pallet_id=? AND user_id=?',[$p['id'],$p['owner_id']])->fetchColumn()?:''):'';
     $p['products']=stock_query($db,'SELECT b.*,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id=? ORDER BY CASE WHEN b.expires=\'\' THEN 1 ELSE 0 END,b.expires,b.name,b.id',[$p['id']])->fetchAll();
     foreach ($p['products'] as &$product) $product=stock_product_names($product);
     unset($product);
@@ -90,7 +111,7 @@ function stock_editable(PDO $db, int $id, int $user, bool $ownerOnly=false): arr
     $p=stock_query($db,'SELECT * FROM pallets WHERE id=? AND released=0',[$id])->fetch();
     if (!$p) throw new CatalogException('El palet ya no está activo.',409);
     $owner=(int)$p['owner_id']===$user;
-    if (!$owner && !stock_is_admin($db,$user) && ($ownerOnly || stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted')) throw new CatalogException('No tienes permiso para modificar este palet.',403);
+    if (!$owner && !stock_is_admin($db,$user) && ($ownerOnly || (stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted' && !team_role($db,$user,(int)($p['branch_id']??0))))) throw new CatalogException('No tienes permiso para modificar este palet.',403);
     return $p;
 }
 function stock_claim(PDO $db,string $code,int $user): array {

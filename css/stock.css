@@ -197,7 +197,7 @@ body[data-hand="left"] .account-panel-auth .account-password-field input {paddin
 #palletMetadata strong{display:block;font-size:.74rem;font-weight:600;color:#62577e}
 #palletMetadata br{display:none}
 #palletMetadata .stock-metadata-movement{line-height:1.35;align-items:center}
-#palletProducts{border-top:1px solid #e7e5ef;padding-top:4px}
+#palletProducts{border-top:1px solid #e7e5ef;padding-top:4px;overflow-anchor:none}
 .stock-product-actions .stock-deduct-button{background:#fff0f2;color:#b52a3b}
 @media(max-width:600px){#palletTools #palletBranchButtonName{display:none}#palletTools #assignPalletBranch{width:44px;min-height:48px;padding:10px}#palletTools .stock-secondary-actions{gap:4px}#palletTools .library-settings summary{width:44px;min-height:48px}#palletTools[data-inline=true] .stock-secondary-actions{width:100%;flex-wrap:wrap}#palletTools[data-inline=true] .library-settings{width:100%}#palletMetadata{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}.stock-product{gap:8px}.stock-product-actions{gap:4px}}
 body[data-hand] #palletTools.stock-toolbar{flex-direction:row!important}
@@ -260,3 +260,5 @@ body[data-hand=left] .stock-product-save-actions>#saveStockProduct{grid-column:1
 body[data-hand=left] .stock-product-save-actions>#saveAndScanStockProduct{grid-column:2}
 body[data-hand] .stock-product-save-actions:has(#saveAndScanStockProduct[hidden])>#saveStockProduct{grid-column:1/-1}
 .stock-transfer-dialog{max-width:min(480px,calc(100vw - 24px))}.stock-transfer-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stock-transfer-choices button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;font-size:.9rem}.stock-transfer-choices svg,.stock-transfer-code svg{width:22px;height:22px;flex:none}.stock-transfer-code{display:flex;align-items:center;gap:6px}.stock-transfer-code input{min-width:0;flex:1}.stock-transfer-code button{width:44px;height:44px;padding:10px}.stock-transfer-dialog .stock-muted{font-size:.85rem;line-height:1.4}.stock-transfer-dialog form>button{margin-top:10px}.stock-transfer-dialog .library-dialog-actions{gap:8px;display:flex;justify-content:flex-end}body[data-hand=left] .stock-transfer-dialog .library-dialog-actions{flex-direction:row-reverse}
+
+#leavePallet{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:10px 14px;border:1px solid #e8b8bf;border-radius:10px;background:#fff2f3;color:#b3263a}#leavePallet[hidden]{display:none!important}

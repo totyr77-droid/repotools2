@@ -1,7 +1,14 @@
 <?php
 function stock_icon(string $name): string {
     $paths = [
+        'verified'=>'<path d="m12 2 3 2 3.5.5.5 3.5 2 4-2 3-.5 3.5-3.5.5-3 2-3-2-3.5-.5L4 15l-2-3 2-4 .5-3.5L8 4z"/><path d="m8 12 3 3 5-6"/>',
+        'lock'=>'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/>',
+        'crown'=>'<path d="m3 6 4 4 5-7 5 7 4-4-2 13H5zM5 22h14"/>',
+        'home'=>'<path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/>',
         'pallet'=>'<path d="M3 21h18M4 17h16V4H4zM4 10h16M12 4v13"/>',
+        'camera'=>'<path d="M3 7h4l2-3h6l2 3h4v14H3z"/><circle cx="12" cy="13" r="4"/>',
+        'calendar'=>'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 4h2m4 0h2m-8 3h2"/>',
+        'package'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5 9-5V8m-9 5v10M7.5 5.5l9 5"/>',
         'search'=>'<circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/>',
         'eye'=>'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12"/><circle cx="12" cy="12" r="3"/>',
         'branch'=>'<path d="M3 10h18l-2-6H5zM4 10v11h16V10M9 21v-7h6v7M8 4v6m8-6v6"/>',
@@ -19,8 +26,11 @@ function stock_icon(string $name): string {
         'share'=>'<path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/>',
         'settings'=>'<path d="M9.7 2h4.6l.6 2.8 2.1 1.2 2.7-.8 2.3 4-2.1 2v2.4l2.1 2-2.3 4-2.7-.8-2.1 1.2-.6 2.8H9.7l-.6-2.8L7 18.8l-2.7.8-2.3-4 2.1-2v-2.4L2 9.2l2.3-4 2.7.8 2.1-1.2z"/><circle cx="12" cy="12" r="3"/>',
         'trash'=>'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
+        'user-plus'=>'<circle cx="9" cy="7" r="4"/><path d="M2 21v-3a7 7 0 0 1 12-5M19 13v8m-4-4h8"/>',
+        'users'=>'<circle cx="9" cy="7" r="4"/><path d="M2 21v-3a7 7 0 0 1 14 0v3M17 3a4 4 0 0 1 0 8m3 10v-3a7 7 0 0 0-2-5"/>',
         'user'=>'<circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/>',
         'refresh'=>'<path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/>',
+        'info'=>'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
         'clock'=>'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         'package-plus'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5V13m9-5v5M7.5 5.5l9 5M17 18h6m-3-3v6"/>',
         'package-minus'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5V13m9-5v5M7.5 5.5l9 5M17 18h6"/>',

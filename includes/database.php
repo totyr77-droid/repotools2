@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=34;
+const REPOTOOLS_SCHEMA_VERSION=40;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -282,6 +282,49 @@ function initialize_database(PDO $db): void {
         if(!isset($applied[34])){
             $db->exec('CREATE TABLE catalog_photos (ean TEXT PRIMARY KEY REFERENCES products(ean) ON DELETE CASCADE, object_key TEXT NOT NULL)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(34)');
+        }
+        if(!isset($applied[35])){
+            $db->exec("CREATE TABLE branch_workspaces (id {$id}, owner_id {$ref} NOT NULL REFERENCES users(id), name TEXT NOT NULL CHECK(length(name)<=100), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE branch_workspace_locations (branch_id {$ref} PRIMARY KEY REFERENCES stock_branches(id), workspace_id {$ref} NOT NULL REFERENCES branch_workspaces(id))");
+            $db->exec("CREATE TABLE branch_team_members (branch_id {$ref} NOT NULL REFERENCES stock_branches(id), user_id {$ref} NOT NULL REFERENCES users(id), role TEXT NOT NULL CHECK(role IN ('manager','operator')), active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)), revision INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(branch_id,user_id))");
+            $db->exec('CREATE INDEX branch_team_user ON branch_team_members(user_id,active,branch_id)');
+            $db->exec("CREATE TABLE branch_team_invites (token_hash TEXT PRIMARY KEY, branch_id {$ref} NOT NULL REFERENCES stock_branches(id), role TEXT NOT NULL CHECK(role IN ('manager','operator')), invited_by {$ref} NOT NULL REFERENCES users(id), expires BIGINT NOT NULL, used_by {$ref} REFERENCES users(id), revoked INTEGER NOT NULL DEFAULT 0)");
+            $db->exec('CREATE INDEX branch_team_inviter ON branch_team_invites(branch_id,invited_by)');
+            $db->exec("CREATE TABLE branch_team_active (user_id {$ref} PRIMARY KEY REFERENCES users(id), branch_id {$ref} NOT NULL REFERENCES stock_branches(id))");
+            $db->exec("CREATE TABLE branch_team_events (id {$id}, branch_id {$ref} NOT NULL REFERENCES stock_branches(id), actor_id {$ref} NOT NULL REFERENCES users(id), action TEXT NOT NULL, target_id {$ref} REFERENCES users(id), pallet_id {$ref} REFERENCES pallets(id), created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX branch_team_events_recent ON branch_team_events(branch_id,id)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(35)');
+        }
+        if(!isset($applied[36])){
+            $db->exec("ALTER TABLE branch_team_invites ADD COLUMN recipient_id {$ref} REFERENCES users(id)");
+            $db->exec('CREATE INDEX branch_team_recipient ON branch_team_invites(recipient_id,revoked,expires)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(36)');
+        }
+        if(!isset($applied[37])){
+            $db->exec('ALTER TABLE branch_team_members ADD COLUMN expires_at BIGINT');
+            $db->exec('ALTER TABLE branch_team_invites ADD COLUMN access_seconds INTEGER');
+            $db->exec("CREATE TABLE branch_team_security(branch_id {$ref} PRIMARY KEY REFERENCES stock_branches(id),latitude DOUBLE PRECISION NOT NULL,longitude DOUBLE PRECISION NOT NULL,radius INTEGER NOT NULL DEFAULT 200 CHECK(radius BETWEEN 50 AND 1000),revision INTEGER NOT NULL DEFAULT 1)");
+            $db->exec('CREATE INDEX branch_team_member_expiry ON branch_team_members(user_id,active,expires_at)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(37)');
+        }
+        if(!isset($applied[38])){
+            $db->exec('ALTER TABLE branch_team_security ADD COLUMN enabled INTEGER NOT NULL DEFAULT 1');
+            $db->exec('ALTER TABLE branch_team_security ADD COLUMN default_seconds INTEGER DEFAULT 25200');
+            $db->exec('ALTER TABLE branch_team_security ADD COLUMN has_point INTEGER NOT NULL DEFAULT 1');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(38)');
+        }
+        if(!isset($applied[39])){
+            $db->exec("ALTER TABLE branch_team_events ADD COLUMN metadata TEXT NOT NULL DEFAULT '{}'");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(39)');
+        }
+        if(!isset($applied[40])){
+            $db->exec("CREATE TABLE achievement_receipts(user_id {$ref} NOT NULL REFERENCES users(id),operation_key TEXT NOT NULL,PRIMARY KEY(user_id,operation_key))");
+            $db->exec("CREATE TABLE achievement_events(user_id {$ref} NOT NULL REFERENCES users(id),category TEXT NOT NULL,event_key TEXT NOT NULL,day TEXT NOT NULL,PRIMARY KEY(user_id,category,event_key))");
+            $db->exec('CREATE INDEX achievement_event_day ON achievement_events(user_id,category,day)');
+            $db->exec("CREATE TABLE achievement_progress(user_id {$ref} NOT NULL REFERENCES users(id),category TEXT NOT NULL,value INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(user_id,category))");
+            $db->exec("CREATE TABLE achievement_days(user_id {$ref} NOT NULL REFERENCES users(id),day TEXT NOT NULL,PRIMARY KEY(user_id,day))");
+            $db->exec("CREATE TABLE user_achievements(user_id {$ref} NOT NULL REFERENCES users(id),category TEXT NOT NULL,level INTEGER NOT NULL CHECK(level BETWEEN 1 AND 6),unlocked_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP,featured INTEGER NOT NULL DEFAULT 0,seen_at {$timestamp},PRIMARY KEY(user_id,category,level))");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(40)');
         }
         $db->commit();
     } catch (Throwable $error) {

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/stock.php';
+require_once __DIR__.'/../includes/achievements.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
@@ -33,6 +34,7 @@ try {
             }else $item['body']='Te invitaron a un palet. Consultá Stock.';
         }
         if (isset($stockAlerts[$item['event_key']])) $item=array_merge($item,$stockAlerts[$item['event_key']]);
+        $item=achievement_notification($item);
         unset($item['event_key']);
         $item['created_at']=(new DateTimeImmutable($item['created_at'],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     }

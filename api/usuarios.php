@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/user-profiles.php';
+require_once __DIR__.'/../includes/referrals.php';
 header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');
 function user_response(int $status,array $body): void { http_response_code($status);echo json_encode($body,JSON_UNESCAPED_UNICODE);exit; }
 try {
@@ -8,7 +9,12 @@ try {
     $method=$_SERVER['REQUEST_METHOD'];if (!in_array($method,['GET','POST'],true)) throw new CatalogException('Solicitud no válida.',405);
     if ($method==='POST' && !valid_csrf()) throw new CatalogException('Recarga la página para continuar.',403);
     $csrf=csrf_token();session_write_close();$db=database();$actor=profile_user($db,(int)$session['id']);
-    if ($method==='GET' && isset($_GET['mine'])) user_response(200,['token'=>profile_token($db,(int)$actor['id'])]);
+    if ($method==='GET' && isset($_GET['mine'])) user_response(200,['token'=>profile_token($db,(int)$actor['id']),'code'=>referral_code($db,(int)$actor['id'])]);
+    if($method==='POST'&&($_POST['action']??'')==='resolve_qr'){
+        $token=$_POST['token']??'';if(!is_string($token)||!preg_match('/^(?:[a-f0-9]{64}|[A-Z0-9]{12})$/D',$token))throw new CatalogException('Este QR no corresponde a una cuenta de RepoTools.',422);
+        $q=$db->prepare(strlen($token)===12?'SELECT u.public_name,u.id,u.email FROM referral_codes t JOIN users u ON u.id=t.user_id WHERE t.code=?':'SELECT u.public_name,u.id,u.email FROM user_profile_tokens t JOIN users u ON u.id=t.user_id WHERE t.token=?');$q->execute([$token]);$target=$q->fetch();if(!$target)throw new CatalogException('Este QR de usuario ya no está disponible.',404);
+        user_response(200,['name'=>get_public_user_name($target),'email'=>$target['email']]);
+    }
     if (!in_array($actor['role'],['administrador','manager'],true)) throw new CatalogException('Solo administradores y managers pueden consultar perfiles.',403);
     if ($method==='GET' && isset($_GET['list'])) {
         $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);
@@ -31,7 +37,7 @@ try {
         $email=trim((string)($_GET['email']??''));$token=(string)($_GET['token']??'');
         if (isset($_GET['id'])) {$id=filter_var($_GET['id'],FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);if ($id===false) throw new CatalogException('Cuenta no válida.',422);$s=$db->prepare('SELECT id FROM users WHERE id=?');$s->execute([$id]);}
         elseif ($email!=='' && filter_var($email,FILTER_VALIDATE_EMAIL)) {$s=$db->prepare('SELECT id FROM users WHERE LOWER(email)=LOWER(?)');$s->execute([$email]);}
-        elseif (preg_match('/^[a-f0-9]{64}$/D',$token)) {$s=$db->prepare('SELECT user_id FROM user_profile_tokens WHERE token=?');$s->execute([$token]);}
+        elseif (preg_match('/^(?:[a-f0-9]{64}|[A-Z0-9]{12})$/D',$token)) {$s=$db->prepare(strlen($token)===12?'SELECT user_id FROM referral_codes WHERE code=?':'SELECT user_id FROM user_profile_tokens WHERE token=?');$s->execute([$token]);}
         else throw new CatalogException('Ingresa un correo válido o escanea el QR del perfil.',422);
         $id=$s->fetchColumn();if (!$id) throw new CatalogException('No encontramos esa cuenta.',404);$target=profile_user($db,(int)$id);
     }

@@ -56,7 +56,12 @@ try {
             $result['items']=array_map('stock_product_names',$result['items']);
             $result['has_more']=count($result['items'])>200;$result['items']=array_slice($result['items'],0,200);
         }
-        elseif (isset($_GET['code'])) $result=['pallet'=>stock_detail($db,(string)$_GET['code'],$uid,($_GET['public']??'')==='1')];
+        elseif (isset($_GET['watch'])) {
+            if(!$uid)throw new CatalogException('Ingresá para actualizar el palet.',401);
+            if(!is_string($_GET['watch'])||!is_string($_GET['stamp']??''))throw new CatalogException('Consulta de palet no válida.',422);
+            $result=stock_watch($db,$_GET['watch'],$uid,$_GET['stamp']??'');
+        }
+        elseif (isset($_GET['code'])) $result=$uid&&($_GET['public']??'')!=='1'?stock_watch($db,(string)$_GET['code'],$uid):['pallet'=>stock_detail($db,(string)$_GET['code'],$uid,($_GET['public']??'')==='1')];
         elseif (isset($_GET['ean'])) {
             if (!$uid) throw new CatalogException('Inicia sesión para agregar productos.',401);
             $ean=$_GET['ean'];
@@ -125,7 +130,7 @@ try {
                 if (!$changed) throw new CatalogException('El producto cambió. Recarga el palet antes de eliminarlo.',409);
                 stock_touch($db,$id,$uid); break;
             case 'description':
-                stock_editable($db,$id,$uid);
+                $p=stock_editable($db,$id,$uid);if(stock_team_access($db,$p,$uid))throw new CatalogException('Solo el propietario puede cambiar la descripción de este palet del equipo.',403);
                 $description=$_POST['description']??'';
                 if (!is_string($description)||mb_strlen(trim($description))>300) throw new CatalogException('La descripción admite hasta 300 caracteres.',422);
                 $updated=stock_query($db,'UPDATE pallets SET description=? WHERE id=? AND revision=?',[trim($description),$id,(int)($_POST['revision']??0)])->rowCount();
@@ -176,6 +181,7 @@ try {
                 stock_editable($db,$id,$uid,true); stock_query($db,'DELETE FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,(int)($_POST['user_id']??0)]); break;
             case 'leave':
                 $p=stock_editable($db,$id,$uid);
+                if(stock_team_access($db,$p,$uid))throw new CatalogException('Tu acceso a este palet pertenece al equipo.',403);
                 if ((int)$p['owner_id']===$uid) throw new CatalogException('Como propietario puedes eliminar el palet.',422);
                 stock_query($db,'DELETE FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$uid]); break;
             case 'tag':

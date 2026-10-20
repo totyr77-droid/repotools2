@@ -7,9 +7,10 @@
   const cache = new Map();
   const access = new Map();
   const activeRequests = new WeakMap();
+  function invalidate(ean) { cache.delete(ean); cache.delete(ean + ':image'); access.delete(ean); }
   async function get(ean, { fresh = false, image = false } = {}) {
     if (!/^(?:\d{8}|\d{13})$/.test(ean)) throw new Error('Código no válido.');
-    if (fresh) { cache.delete(ean); cache.delete(ean + ':image'); }
+    if (fresh) invalidate(ean);
     const key = image ? ean + ':image' : ean;
     if (!cache.has(key)) {
       const pending = (async () => {
@@ -19,8 +20,11 @@
           const response = await fetch(`api/productos.php?ean=${encodeURIComponent(ean)}${image ? '&image=1' : ''}`, { signal: controller.signal, credentials: 'same-origin', cache: 'no-store' });
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || 'No pudimos cargar el producto.');
-          access.set(ean, { canEdit: result.can_edit === true, photosEnabled:result.photos_enabled===true, csrf: result.csrf, missing:!result.product, checkedAt:Date.now() });
-          if(result.product)window.RepoOfflineCatalog?.put(Number(window.repotoolsOfflineUser||0),ean,result.product).catch(()=>{});return result.product || null;
+          if(cache.get(key)===pending){
+            access.set(ean, { canEdit: result.can_edit === true, photosEnabled:result.photos_enabled===true, csrf: result.csrf, missing:!result.product, checkedAt:Date.now() });
+            if(result.product)window.RepoOfflineCatalog?.put(Number(window.repotoolsOfflineUser||0),ean,result.product).catch(()=>{});
+          }
+          return result.product || null;
         } finally { clearTimeout(timeout); }
       })();
       cache.set(key, pending);
@@ -171,5 +175,5 @@
   async function takeReference(row){const job=referenceJobs.get(row.key);referenceJobs.delete(row.key);if(!job||referenceLeft||row.deferred||row.offline_wait||row.attempts||row.data?.action!=='save_product'||networkIsSlow())return '';for(const field of ['ean','name','code'])if(job.data[field]!==row.data[field])return '';const permit=await job.promise;return referenceLeft||networkIsSlow()?'':permit;}
   page?.onLeave(()=>{referenceLeft=true;referenceJobs.clear();for(const control of referenceControls)control.abort();});
   window.RepoCatalogReference={stage:stageReference,take:takeReference};
-  window.RepoProductInfo = { get, show, summary, renderSummary, displayName, referenceName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
+  window.RepoProductInfo = { get, invalidate, show, summary, renderSummary, displayName, referenceName, showSummary, clear, editButton, save, permission: ean => access.get(ean) };
 })();

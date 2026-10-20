@@ -94,6 +94,7 @@ try {
                         if ($existingReference!==false && trim((string)$existingReference)!==$name) { $db->rollBack(); library_response(409,['error'=>'Este EAN ya está guardado con otra referencia. Tu carga queda pendiente para revisar.']); }
                     }
                     if (!$alreadyApplied) $db->prepare($action==='offline_add'?"INSERT INTO library_products (library_id,ean,name) VALUES(?,?,?) ON CONFLICT(library_id,ean) DO NOTHING":"INSERT INTO library_products (library_id, ean, name) VALUES (?, ?, ?) ON CONFLICT(library_id, ean) DO UPDATE SET name = CASE WHEN excluded.name != '' THEN excluded.name ELSE library_products.name END")->execute([$id, $ean, $name]);
+                    if(!$alreadyApplied){require_once __DIR__.'/../includes/achievements.php';achievement_record($db,$userId,'listas',$ean);}
                 } else {
                     $db->prepare('DELETE FROM library_products WHERE library_id = ? AND ean = ?')->execute([$id, $ean]);
                 }

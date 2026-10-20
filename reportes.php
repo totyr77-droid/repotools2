@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__.'/includes/reports.php';
 header('Cache-Control: no-store');
+if(isset($_GET['user'])&&is_string($_GET['user'])){header('Location: perfil.php?user='.rawurlencode($_GET['user']),true,302);exit;}
 require_account(($_GET['queue']??'')==='1'?'moderacion':'reportes');
 if(($_GET['queue']??'')==='1'&&!can_edit_catalog(database(),current_user())){
     http_response_code(403);header('Cache-Control: no-store');
