@@ -1,5 +1,7 @@
 <?php
 $paginaInicio = true;
+require_once __DIR__.'/includes/auth.php';require_once __DIR__.'/includes/branch-team.php';
+$stockEmbedded=current_user()&&(bool)team_locations(database(),(int)current_user()['id']);
 include 'vistas/header.vista.php';
 ?>
 <main>
@@ -59,5 +61,7 @@ include 'vistas/header.vista.php';
 </main>
 <?php
 include 'vistas/escaner.vista.php';
+if($stockEmbedded){include __DIR__.'/vistas/stock-workspace.vista.php';include __DIR__.'/vistas/stock-dialogs.vista.php';}
+
 include 'vistas/footer.vista.php';
 ?>

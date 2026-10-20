@@ -15,7 +15,7 @@ header('Referrer-Policy: no-referrer');header('Cache-Control: no-store');
 $paginaEquipo=true;$publicPageTitle='Mi equipo';include 'vistas/header.vista.php';
 ?>
 <main class="library-main team-page" data-team-page data-csrf="<?= escape(csrf_token()) ?>">
-<div class="team-page-title"><h1><?= stock_icon('branch') ?>Mi equipo</h1><label class="team-title-location"><span class="team-hint">Sucursal</span><select id="teamLocation" aria-label="Sucursal activa"><option value="0">Uso personal</option></select></label><a href="index.php" class="team-text" aria-label="Volver a Inicio"><?= stock_icon('home') ?></a></div>
+<div class="team-page-title"><h1><?= stock_icon('branch') ?>Mi equipo</h1><label class="team-title-location"><span class="team-hint">Sucursal</span><select id="teamLocation" aria-label="Sucursal activa"></select></label><a href="index.php" class="team-text" aria-label="Volver a Inicio"><?= stock_icon('home') ?></a></div>
 <p id="teamStatus" role="status">Cargando sucursales…</p>
 <?php if($token): ?>
 <section id="teamInvitation" class="team-section">
@@ -33,7 +33,7 @@ $paginaEquipo=true;$publicPageTitle='Mi equipo';include 'vistas/header.vista.php
 <section id="teamPanelMovements" role="tabpanel" aria-labelledby="teamTabMovements" class="team-section" hidden><h2>Últimos movimientos</h2><div id="teamMovements"></div><details><summary>Accesos y asignaciones</summary><div id="teamEvents"></div></details></section>
 </div>
 <p id="teamOperatorHint" hidden>Podés trabajar con los palets desde Escanear palet en Inicio. El encargado consulta el inventario completo.</p>
-<button type="button" class="team-text team-danger" id="teamDeleteBranch" hidden>Desvincular sucursal</button>
+<button type="button" class="library-secondary team-danger" id="teamDeleteBranch" hidden><?= stock_icon('trash') ?>Eliminar equipo</button>
 <button type="button" class="team-text team-danger" id="teamLeave" hidden>Desvincularme de esta sucursal</button>
 
 <dialog id="teamSecurityDialog" class="library-dialog team-pallet-dialog team-account-dialog" aria-labelledby="teamSecurityTitle"><div class="team-section-title"><h2 id="teamSecurityTitle"><?= stock_icon('settings') ?>Configuración de sucursal</h2><button type="button" class="library-secondary" data-team-account-close="teamSecurityDialog" aria-label="Cerrar ubicación"><?= stock_icon('close') ?></button></div><form id="teamSecurityForm"><label class="team-temporary"><input type="checkbox" name="enabled" value="1">Seguridad por ubicación</label><label>Duración predeterminada<select name="default_seconds"><option value="3600">1 hora</option><option value="14400">4 horas</option><option value="25200">7 horas</option><option value="43200">12 horas</option><option value="0">Sin vencimiento</option></select></label><label>Radio permitido<select name="radius"><option value="100">100 metros</option><option value="200">200 metros</option><option value="500">500 metros</option><option value="1000">1000 metros</option></select></label><input name="latitude" type="hidden"><input name="longitude" type="hidden"><input name="revision" type="hidden"><button type="button" class="library-secondary" id="teamLocateSite">Usar mi ubicación</button><details id="teamSecurityMapOpen"><summary>Elegir punto en el mapa</summary><div id="teamSecurityMap" style="height:240px"></div></details><p id="teamSecurityStatus" role="status"></p><button type="submit" class="library-primary">Guardar configuración</button></form></dialog>

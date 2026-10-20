@@ -78,7 +78,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/notifications.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
     <link href="css/account-bar.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($paginaCuenta) || !empty($paginaEquipo)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/stock.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock) || !empty($stockEmbedded) || !empty($paginaCuenta) || !empty($paginaEquipo)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/stock.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
@@ -93,7 +93,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/device-workspace.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
 <?php if (!empty($paginaCuenta) && current_user()): ?><link href="css/settings.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
 <?php if (!empty($paginaStockCompartido)): ?><link href="css/stock-shared.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
-<?php if (!empty($paginaStock)): ?><link href="css/pallet-activity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+<?php if (!empty($paginaStock) || !empty($stockEmbedded)): ?><link href="css/pallet-activity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
 <link href="css/connectivity.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><link href="css/responsive.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
 <link href="css/motion.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
 <link href="css/mobile-navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
@@ -143,7 +143,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
       </div>
     <?php if(current_user()): ?><details id="quickUserQR" class="quick-user-qr"><summary aria-label="Mostrar mi QR de usuario" title="Mi QR"><?= stock_icon('chevron') ?></summary><div class="quick-user-qr-panel"><strong>Mi QR de usuario</strong><div id="quickUserQRImage" aria-label="QR de mi cuenta"></div><p id="quickUserQRStatus" role="status"></p><small>Abre tu perfil y comparte tu invitación. En la app también permite seleccionarte.</small></div></details><?php endif; ?>
     </header>
-    <?php if (current_user() && empty($paginaStock) && empty($paginaBiblioteca) && empty($paginaReportes)): ?>
+    <?php if (current_user() && empty($paginaStock) && empty($paginaBiblioteca) && empty($paginaReportes) && empty($paginaEquipo)): ?>
     <div class="account-bar"><span class="account-greeting" title="Hola, <?= escape(current_user()['name']) ?>">Hola, <strong><?= escape(current_user()['name']) ?></strong><?php if (isset($roleLabels[$navRole])): $badge = $roleLabels[$navRole]; ?><span class="account-role account-role-<?= escape($navRole) ?>" title="<?= escape($badge[1]) ?>" aria-label="<?= escape($badge[1]) ?>"><i class="fa-solid <?= escape($badge[2]) ?>" aria-hidden="true"></i><?= escape($badge[0]) ?></span><?php endif; ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/></svg><span>Salir</span></button></form></div>
     <?php endif; ?>
 

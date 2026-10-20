@@ -4,10 +4,10 @@ require_once __DIR__.'/stock.php';
 function stock_transfer_preview(PDO $db,int $user,array $input): array {
     if(!isset($input['pallet_id'])||is_array($input['pallet_id'])||!preg_match('/^[1-9][0-9]{0,14}$/D',(string)$input['pallet_id']))throw new CatalogException('El palet de origen no es válido.',422);
     $source=stock_editable($db,(int)($input['pallet_id']??0),$user);
-    if((int)$source['owner_id']!==$user)throw new CatalogException('Solo el propietario puede transferir este palet o su mercadería.',403);
+    $team=stock_team_access($db,$source,$user);if((int)$source['owner_id']!==$user&&!$team)throw new CatalogException('Solo el propietario o su equipo puede trasladar esta mercadería.',403);
     $mode=$input['mode']??'';if(!in_array($mode,['pallet','user'],true))throw new CatalogException('Elegí el destino de la transferencia.',422);
     $rows=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? ORDER BY id',[$source['id']])->fetchAll();
-    $result=['mode'=>$mode,'source_id'=>(int)$source['id'],'source_code'=>$source['code'],'source_revision'=>(int)$source['revision'],'products'=>count($rows),'units'=>array_sum(array_column($rows,'units'))];
+    $result=['team_transfer'=>$team,'mode'=>$mode,'source_id'=>(int)$source['id'],'source_code'=>$source['code'],'source_revision'=>(int)$source['revision'],'products'=>count($rows),'units'=>array_sum(array_column($rows,'units'))];
     if($mode==='user'){
         if((int)$source['owner_id']!==$user)throw new CatalogException('Solo el dueño puede transferir la propiedad.',403);
         $email=$input['email']??'';if(!is_string($email)||!filter_var(trim($email),FILTER_VALIDATE_EMAIL))throw new CatalogException('Ingresá un correo válido.',422);
@@ -22,7 +22,9 @@ function stock_transfer_preview(PDO $db,int $user,array $input): array {
     $label=stock_label($db,$code);$target=null;
     if($label['pallet_id'])$target=stock_editable($db,(int)$label['pallet_id'],$user);
     elseif($label['reserved_by']&&(int)$label['reserved_by']!==$user)throw new CatalogException('La etiqueta de destino está reservada para otra persona.',403);
+    if($team&&$target&&(int)$target['branch_id']!==(int)$source['branch_id'])throw new CatalogException('El destino debe estar en la misma sucursal. Escanealo primero desde Mi equipo.',403);
     $description=trim(implode(' · ',array_unique(array_filter([$target['description']??'',$source['description']],static fn($v)=>$v!==''))));
+    if($team)$description=(string)($target['description']??$source['description']);
     if(mb_strlen($description)>300)throw new CatalogException('Las descripciones combinadas superan 300 caracteres. Ajustalas antes de trasladar.',422);
     foreach($rows as $row){$same=$target?stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? AND ean=? AND expires=?',[$target['id'],$row['ean'],$row['expires']])->fetch():false;if($same){if((int)$same['units']+(int)$row['units']>1000000000)throw new CatalogException('La cantidad de destino supera el máximo permitido.',422);$names=implode(' / ',array_unique(array_filter([$same['name'],$row['name']],static fn($v)=>$v!=='')));if(mb_strlen($names)>120)throw new CatalogException('Las referencias combinadas son demasiado largas. Ajustalas antes de trasladar.',422);}}
     return $result+['target_code'=>$code,'target_id'=>(int)($target['id']??0),'target_revision'=>(int)($target['revision']??0),'target_products'=>$target?(int)stock_query($db,'SELECT COUNT(*) FROM pallet_products WHERE pallet_id=?',[$target['id']])->fetchColumn():0,'description'=>$description];
@@ -42,12 +44,12 @@ function stock_transfer_commit(PDO $db,int $user,array $input): array {
         $emit((int)$source['id'],'ownership_transferred',['old'=>get_public_user_name(stock_query($db,'SELECT id,public_name FROM users WHERE id=?',[$user])->fetch()),'new'=>$preview['target_name']]);
         return ['id'=>(int)$source['id'],'code'=>$source['code'],'mode'=>'user','target_name'=>$preview['target_name']];
     }
-    $targetId=$preview['target_id'];if(!$targetId){$created=stock_claim($db,$preview['target_code'],$user);if($created['code']!==$preview['target_code'])throw new CatalogException('El destino cambió. Volvé a escanearlo.',409);$targetId=(int)$created['id'];}
+    $targetId=$preview['target_id'];if(!$targetId){$created=stock_claim($db,$preview['target_code'],$user);if($created['code']!==$preview['target_code'])throw new CatalogException('El destino cambió. Volvé a escanearlo.',409);$targetId=(int)$created['id'];if($preview['team_transfer'])stock_query($db,'UPDATE pallets SET owner_id=? WHERE id=?',[$source['owner_id'],$targetId]);}
     $rows=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? ORDER BY id',[$source['id']])->fetchAll();
     foreach($rows as $row){$same=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? AND ean=? AND expires=?',[$targetId,$row['ean'],$row['expires']])->fetch();if($same){$name=implode(' / ',array_unique(array_filter([$same['name'],$row['name']])));stock_query($db,'UPDATE pallet_products SET units=units+?,name=?,revision=revision+1 WHERE id=?',[$row['units'],$name,$same['id']]);stock_query($db,'DELETE FROM pallet_products WHERE id=?',[$row['id']]);}else stock_query($db,'UPDATE pallet_products SET pallet_id=?,revision=revision+1 WHERE id=?',[$targetId,$row['id']]);}
     if($source['branch_id'])stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=? AND branch_id IS NULL',[$source['branch_id'],$targetId]);
     stock_query($db,'UPDATE pallets SET description=?,activated=1 WHERE id=?',[$preview['description'],$targetId]);
-    stock_query($db,"UPDATE pallets SET description='' WHERE id=?",[$source['id']]);
+    if(!$preview['team_transfer'])stock_query($db,"UPDATE pallets SET description='' WHERE id=?",[$source['id']]);
     foreach([(int)$source['id'],$targetId] as $id)stock_touch($db,$id,$user);
     $lots=array_map(static fn($r)=>array_intersect_key($r,array_flip(['ean','name','expires','units','kind','pack_size'])),$rows);
     $metadata=['old'=>$source['code'],'new'=>$preview['target_code'],'units'=>$preview['units'],'lots'=>$lots];

@@ -1,6 +1,12 @@
 {
-  "version": 66,
+  "version": 67,
   "changes": [
+    {
+      "version": 67,
+      "label": "1.62",
+      "date": "2026-10-20",
+      "summary": "Palets del equipo en Inicio, permisos de traslado y controles compactos."
+    },
     {
       "version": 66,
       "label": "1.61",
@@ -294,15 +300,9 @@
       "label": "1.13",
       "date": "2026-10-19",
       "summary": "Mi equipo visible solo para cuentas vinculadas"
-    },
-    {
-      "version": 17,
-      "label": "1.12",
-      "date": "2026-10-19",
-      "summary": "Apple Touch Icon con fondo violeta oficial"
     }
   ],
   "major": 1,
-  "minor": 61,
-  "label": "1.61"
+  "minor": 62,
+  "label": "1.62"
 }

@@ -67,27 +67,7 @@
 <?php elseif (!empty($paginaEquipo)): ?>
 <script src="js/vendor/qrcode.min.js"></script>
 <?php elseif (!empty($paginaStock)): ?>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
-<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
-<script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/vendor/qrcode.min.js"></script>
-<script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/pallet-label.js?v=<?= substr(sha1_file(__DIR__.'/../js/pallet-label.js'),0,12) ?>"></script>
-<script src="js/pallet-label-pdf.js?v=<?= substr(sha1_file(__DIR__.'/../js/pallet-label-pdf.js'),0,12) ?>"></script>
-<script src="js/label-files.js?v=<?= substr(sha1_file(__DIR__.'/../js/label-files.js'),0,12) ?>"></script>
-
-<script src="js/stock-preparation.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-preparation.js'),0,12) ?>"></script>
-<script src="js/date-keypad.js?v=<?= substr(sha1_file(__DIR__.'/../js/date-keypad.js'),0,12) ?>"></script>
-<script src="js/product-view-tools.js?v=<?= substr(sha1_file(__DIR__.'/../js/product-view-tools.js'),0,12) ?>"></script>
-<script src="js/stock-live.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/stock.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock.js'),0,12) ?>"></script>
-<script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/public-pallet.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/stock-filter-popovers.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-filter-popovers.js'),0,12) ?>"></script>
-<script src="js/stock-tags.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-tags.js'),0,12) ?>"></script>
-<script src="js/stock-branches.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-branches.js'),0,12) ?>"></script>
+<?php include __DIR__.'/stock-scripts.vista.php'; ?>
 <?php elseif (empty($paginaCuenta)): ?>
 <script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
@@ -121,6 +101,9 @@
 <script src="js/motion.js?v=<?= substr(sha1_file(__DIR__.'/../js/motion.js'),0,12) ?>"></script>
 
 
+<?php if(!empty($stockEmbedded)): ?><script>window.repotoolsStock=<?= json_encode(['csrf'=>csrf_token(),'user_id'=>(int)current_user()['id'],'embedded'=>true],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script>
+<?php include __DIR__.'/stock-scripts.vista.php'; ?>
+<script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaEquipo)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaEquipo)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()&&(!empty($paginaInicio)||!empty($paginaEquipo))): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-team.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
