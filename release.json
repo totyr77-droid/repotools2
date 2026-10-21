@@ -1,6 +1,12 @@
 {
-  "version": 126,
+  "version": 127,
   "changes": [
+    {
+      "version": 127,
+      "label": "2.22",
+      "date": "2026-10-21",
+      "summary": "Menú de filtros completo y sin desplazamiento interno innecesario."
+    },
     {
       "version": 126,
       "label": "2.21",
@@ -294,15 +300,9 @@
       "label": "1.73",
       "date": "2026-10-18",
       "summary": "Muestra sucursal y orden aplicados en el informe compartido, con edición directa y menos espacio entre búsqueda y palets."
-    },
-    {
-      "version": 77,
-      "label": "1.72",
-      "date": "2026-10-18",
-      "summary": "Lee el número debajo del QR con recorte automático de etiqueta, corrección de inclinación y confirmación en tres fotogramas."
     }
   ],
   "major": 2,
-  "minor": 21,
-  "label": "2.21"
+  "minor": 22,
+  "label": "2.22"
 }
