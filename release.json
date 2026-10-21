@@ -1,6 +1,12 @@
 {
-  "version": 125,
+  "version": 126,
   "changes": [
+    {
+      "version": 126,
+      "label": "2.21",
+      "date": "2026-10-21",
+      "summary": "Los filtros de Stock conservan la sección seleccionada."
+    },
     {
       "version": 125,
       "label": "2.20",
@@ -294,15 +300,9 @@
       "label": "1.72",
       "date": "2026-10-18",
       "summary": "Lee el número debajo del QR con recorte automático de etiqueta, corrección de inclinación y confirmación en tres fotogramas."
-    },
-    {
-      "version": 76,
-      "label": "1.71",
-      "date": "2026-10-18",
-      "summary": "Compacta filtros de Stock, agrega cancelación de búsqueda y limpieza externa, y mantiene metadatos en una línea."
     }
   ],
   "major": 2,
-  "minor": 20,
-  "label": "2.20"
+  "minor": 21,
+  "label": "2.21"
 }
