@@ -13,7 +13,7 @@
     let numberGuide;
     if(isQR&&pallet){guide.classList.add('repo-pallet-qr-guide');guide.innerHTML='<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 24V3h21M76 3h21v21M3 76v21h21M76 97h21V76"/><path d="M12 12h14v14H12ZM74 12h14v14H74ZM12 74h14v14H12Z"/></svg>';numberGuide=document.createElement('div');numberGuide.className='repo-pallet-number-guide';numberGuide.setAttribute('aria-hidden','true');numberGuide.innerHTML='<span>········</span><small>Número de palet</small>';element.append(numberGuide);}
     element.append(guide,marker); let timer;
-    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=pallet&&isQR?Math.min(width*.62,height*.58):Math.min(width,height)*.85;if(numberGuide){guide.style.top=height*.40+'px';numberGuide.style.width=Math.min(width*.72,300)+'px';numberGuide.style.top=(height*.40+side/2+12)+'px';}guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
+    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=pallet&&isQR?Math.min(width*.62,height*.58):Math.min(width,height)*.85;if(numberGuide){guide.style.top=height*.40+'px';numberGuide.style.width=side+'px';numberGuide.style.top=(height*.40+side/2-6)+'px';numberGuide.style.transform='translate(-50%,-100%)';}guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
     layout(); const observer=typeof ResizeObserver==='function'?new ResizeObserver(layout):null;observer?.observe(element);
     function reset() { clearTimeout(timer); marker.hidden = true; guide.hidden = false; }
     return {
@@ -113,6 +113,27 @@
     const frameWidth = Math.min(width, Math.round(height * ratio)), frameHeight = Math.min(height, Math.round(width / ratio));
     return { x: Math.round((width - frameWidth) / 2), y: Math.round((height - frameHeight) / 2), width: frameWidth, height: frameHeight };
   }
+  function palletFrame(video,element){
+    const frame=visibleFrame(video),v=video.getBoundingClientRect?.(),g=element.querySelector?.('.repo-pallet-qr-guide')?.getBoundingClientRect?.();
+    if(!v?.width||!v.height||!g?.width||!g.height)return null;
+    const left=Math.max(v.left,g.left),top=Math.max(v.top,g.top),right=Math.min(v.right,g.right),bottom=Math.min(v.bottom,g.bottom);
+    if(right<=left||bottom<=top)return null;
+    return {x:frame.x+(left-v.left)/v.width*frame.width,y:frame.y+(top-v.top)/v.height*frame.height,width:(right-left)/v.width*frame.width,height:(bottom-top)/v.height*frame.height};
+  }
+  function palletSelection(deliver,ambiguous,now=()=>performance.now()){
+    let pending=null,blockedUntil=0;
+    return {
+      ocr(code){pending={code,at:now()};},
+      qr(codes,capturedAt=now()){
+        const time=now(),unique=[...new Set(codes.map(palletIdentifier).filter(Boolean))];
+        if(time-capturedAt>1500)return;
+        if(unique.length>1||(unique.length===1&&pending&&time-pending.at<1500&&pending.code!==unique[0])){pending=null;blockedUntil=time+400;ambiguous();return;}
+        if(time<blockedUntil)return;
+        if(unique.length===1){pending=null;deliver(unique[0],'scoped-qr');}
+        else if(pending&&capturedAt>=pending.at){const value=pending;pending=null;if(time-value.at<1500)deliver(value.code,'scoped-ocr');}
+      },conflict(){pending=null;blockedUntil=now()+400;ambiguous();},reset(){pending=null;blockedUntil=0;}
+    };
+  }
   function validEAN(code) {
     if (typeof code !== 'string' || !/^(?:\d{8}|\d{13})$/.test(code) || /^0+$/.test(code)) return false;
     let sum = 0;
@@ -178,10 +199,9 @@
     read.progress=(now=performance.now())=>count&&now>=last&&now-last<=tolerance()&&now-first<=windowMs()?Math.min(count,3):0;
     read.tolerance=tolerance;return read;
   }
+  function ocrReadings(data){const lines=(data.blocks||[]).flatMap(b=>(b.paragraphs||[]).flatMap(p=>p.lines||[])),rows=lines.length?lines:[{text:data.text,confidence:data.confidence}];return {rows,numbers:rows.filter(r=>/^\s*(?:\d\s*){8}$/.test(r.text||'')).map(r=>r.text.replace(/\s/g,''))};}
   function ocrCandidate(data) {
-    const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
-    const rows = lines.length ? lines : [{ text: data.text, confidence: data.confidence }];
-    const numbers=rows.filter(r=>/^\s*(?:\d\s*){8}$/.test(r.text||'')).map(r=>r.text.replace(/\s/g,''));
+    const {rows,numbers}=ocrReadings(data);
     if(new Set(numbers).size>1)return null;
     const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
     return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
@@ -262,7 +282,7 @@ function palletNumberRegion(image){
           await worker.setParameters({ tessedit_char_whitelist: '0123456789', tessedit_pageseg_mode: '11' });
         }
         if (!active() || disposed) return;
-        const frame = visibleFrame(video), scale = Math.min(1, 1280 / frame.width,1920/Math.max(frame.width,frame.height));
+        const frame = palletFrame(video,element);if(!frame)return;const scale = Math.min(1, 1280 / frame.width,1920/Math.max(frame.width,frame.height));
         const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
         source.width=Math.round(frame.width*scale);source.height=Math.round(frame.height*scale);sourceContext.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,source.width,source.height);
         normalizeDimFrame();
@@ -275,10 +295,12 @@ function palletNumberRegion(image){
         const analysisStarted=performance.now();
         const result = await worker.recognize(ocrSurface, {rotateAuto:false}, { text: true, blocks: true });
         if (disposed || !active()) return;
+        if(new Set(ocrReadings(result.data).numbers).size>1){confirm(null,stamp);onAnalysis({matched:false,ambiguous:true,costMs:performance.now()-analysisStarted});accept(null,'ocr-ambiguous');return;}
         const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),zoom:Number(getZoom())||1,toleranceMs:confirm.tolerance(),costMs:performance.now()-analysisStarted});
         if(candidate?.box){
           const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y+=lineOffset-canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
-          viewport?.track({x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},fullWidth,fullHeight);
+          const localBox={x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},visible=visibleFrame(video),sx=frame.width/fullWidth,sy=frame.height/fullHeight;
+          viewport?.track({x0:frame.x-visible.x+localBox.x0*sx,y0:frame.y-visible.y+localBox.y0*sy,x1:frame.x-visible.x+localBox.x1*sx,y1:frame.y-visible.y+localBox.y1*sy},visible.width,visible.height);
         }else viewport?.reset();
         if (candidate) { lockedRegion=region?{region,width:fullWidth,height:fullHeight,at:performance.now()}:null;lockedAngle=angle;nextDelay=80;const confirmed=confirm(candidate.code, stamp);status(false,confirm.progress()); if (confirmed) accept(candidate.code, 'ocr'); }
         else {lockedRegion=null;lockedAngle=null;nextDelay=350;confirm(null, stamp);}
@@ -434,7 +456,8 @@ function palletNumberRegion(image){
       // Adaptador para html5-qrcode 2.3.8: reutiliza su decodificador sobre el canvas,
       // sin convertir cada fotograma en archivos ni crear URLs de imágenes.
       const decoder = current.reader.qrcode;
-      if (!context || typeof decoder?.decodeRobustlyAsync !== 'function' || !serialDecoder(current)) return;
+      const scopedPallet=current.isQR&&current.kind==='pallet';
+      if (!context || (!scopedPallet&&(typeof decoder?.decodeRobustlyAsync !== 'function' || !serialDecoder(current)))) return;
       const profiles = [{ angle: 0, crop: .7 }, { angle: -45, crop: .7 }, { angle: 45, crop: .7 }, { angle: 90, crop: .7 }, { angle: 0, crop: 1 }, { angle: -30, crop: .7 }, { angle: 30, crop: .7 }, { angle: -60, crop: .7 }, { angle: 60, crop: .7 }, { angle: 90, crop: 1 }, { angle: -18, crop: .7 }, { angle: 18, crop: .7 }];
       const probe = document.createElement('canvas'), probeContext = probe.getContext('2d', { willReadFrequently: true });
       function locate(video, frame) {
@@ -497,8 +520,8 @@ function palletNumberRegion(image){
       }
       let rescueWorker,rescueReady=false,rescueFailed=false,rescuePending=null,rescueInitTimer,rescueSequence=0,rescueLast=-Infinity;
       function stopRescue(){clearTimeout(rescueInitTimer);rescueWorker?.terminate();rescueWorker=null;rescueReady=false;if(rescuePending){clearTimeout(rescuePending.timer);rescuePending.resolve(null);rescuePending=null;}}
-      function startRescue(){if(rescueWorker||rescueFailed||typeof Worker!=='function')return;try{rescueWorker=new Worker(qrRescueURL);rescueInitTimer=setTimeout(()=>{rescueFailed=true;stopRescue();},12000);rescueWorker.onmessage=event=>{const value=event.data;if(value?.type==='ready'){clearTimeout(rescueInitTimer);rescueReady=true;metric(current,'qr-rescue-ready');return;}if(value?.type==='unavailable'){rescueFailed=true;stopRescue();return;}if(value?.type!=='result'||!rescuePending||value.id!==rescuePending.id)return;const pending=rescuePending;rescuePending=null;clearTimeout(pending.timer);const codes=Array.isArray(value.codes)?[...new Set(value.codes.filter(code=>typeof code==='string'&&current.validate(code)))]:[];metric(current,'qr-rescue-analysis',{costMs:performance.now()-pending.started,matched:codes.length===1});pending.resolve(codes.length===1?{text:codes[0]}:null);};rescueWorker.onerror=event=>{event.preventDefault?.();rescueFailed=true;stopRescue();};}catch{rescueFailed=true;stopRescue();}}
-      const rescueWarmup=current.isQR?setTimeout(()=>{if(current.accepting&&session===current&&!document.hidden&&canAccept())startRescue();},450):null;
+      function startRescue(){if(rescueWorker||rescueFailed)return;if(typeof Worker!=='function'){rescueFailed=true;return;}try{rescueWorker=new Worker(qrRescueURL);rescueInitTimer=setTimeout(()=>{rescueFailed=true;stopRescue();},12000);rescueWorker.onmessage=event=>{const value=event.data;if(value?.type==='ready'){clearTimeout(rescueInitTimer);rescueReady=true;metric(current,'qr-rescue-ready');return;}if(value?.type==='unavailable'){rescueFailed=true;stopRescue();return;}if(value?.type!=='result'||!rescuePending||value.id!==rescuePending.id)return;const pending=rescuePending;rescuePending=null;clearTimeout(pending.timer);const codes=Array.isArray(value.codes)?[...new Set(value.codes.filter(code=>typeof code==='string'&&current.validate(code)))]:[];metric(current,'qr-rescue-analysis',{costMs:performance.now()-pending.started,matched:codes.length===1,ambiguous:codes.length>1});if(scopedPallet&&pending.scoped&&current.accepting&&session===current&&!document.hidden&&canAccept())current.selection.qr(codes,pending.started);pending.resolve(codes.length===1?{text:codes[0]}:null);};rescueWorker.onerror=event=>{event.preventDefault?.();rescueFailed=true;stopRescue();};}catch{rescueFailed=true;stopRescue();}}
+      const rescueWarmup=current.isQR?setTimeout(()=>{if(current.accepting&&session===current&&!document.hidden&&canAccept())startRescue();},scopedPallet?0:450):null;
       async function decodeImage(surface){const original=current.isQR&&rescueReady?surface.getContext('2d').getImageData(0,0,surface.width,surface.height):null;try{return await decoder.decodeRobustlyAsync(surface);}catch(error){if(!current.isQR||!current.accepting||session!==current||document.hidden||!canAccept()||performance.now()-(current.cameraReadyAt??current.requestedAt)<650)throw error;startRescue();if(!rescueReady||rescuePending||performance.now()-rescueLast<350)throw error;rescueLast=performance.now();const image=original||surface.getContext('2d').getImageData(0,0,surface.width,surface.height),id=++rescueSequence;const result=await new Promise(resolve=>{rescuePending={id,resolve,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});if(result&&current.accepting&&session===current&&!document.hidden&&canAccept())return result;throw error;}}
       let lastRectify=-Infinity;
       let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false, lastFrame=null,lastQuagga=-Infinity,quaggaCandidate=false,attempts=0;
@@ -527,7 +550,18 @@ function palletNumberRegion(image){
         if (video?.videoWidth && video.videoHeight && video.readyState>=2 && video.currentTime!==lastFrame && !current.decodeBusy && (current.exclusive||started - (current.lastPrimaryDetection ?? -Infinity) > 180)) {
           running = true;lastFrame=video.currentTime;
           try {
-            const frame = visibleFrame(video);
+            const frame = scopedPallet?palletFrame(video,element):visibleFrame(video);
+            if(!frame)return;
+            if(scopedPallet){
+              startRescue();
+              if(!rescueReady){if(rescueFailed)onStatus('No pudimos verificar el QR. Ingresá el número con el teclado.');return;}
+              const scale=Math.min(1,(current.requestDetail?1920:1280)/Math.max(frame.width,frame.height));current.requestDetail=false;
+              canvas.width=Math.max(1,Math.round(frame.width*scale));canvas.height=Math.max(1,Math.round(frame.height*scale));
+              context.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,canvas.width,canvas.height);
+              const image=context.getImageData(0,0,canvas.width,canvas.height),id=++rescueSequence;current.decodeBusy=true;
+              try{await new Promise(resolve=>{rescuePending={id,resolve,scoped:true,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});}finally{current.decodeBusy=false;}
+              return;
+            }
             if(current.isQR&&!current.ocr?.hasCandidate?.()&&started-(current.cameraReadyAt??current.requestedAt)>900&&started-lastRectify>1100){
               lastRectify=started;
               if(rectifyLabel(video,frame)){metric(current,'perspective-attempt',{width:canvas.width,height:canvas.height});const result=await decodeImage(canvas);if(current.validate(result.text))accept(result.text,'background',lastFrame);return;}
@@ -596,7 +630,7 @@ function palletNumberRegion(image){
       if (!current) return;
       if (!current.cleanup) current.cleanup = (async () => {
         metric(current,'closed',{outcome:current.failed?'error':current.cycleConfirmed?'confirmed':'cancelled'});
-        current.accepting = false;current.frameObserver?.disconnect();current.frameAbort?.abort(); current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
+        current.accepting = false;current.selection?.reset();current.frameObserver?.disconnect();current.frameAbort?.abort(); current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
         try { if (current.reader.isScanning) await current.reader.stop(); }
         finally {
@@ -641,6 +675,12 @@ function palletNumberRegion(image){
         const current = { reader, metricId:globalThis.crypto?.randomUUID?.()||String(requestedAt)+':'+token, accepting: true, token, isQR, kind, validate, requestedAt, confirm: confirmation(validate,()=>isQR?650:((current.analysisCost||0)+100)*2) };metric(current,'camera-request');
         serialDecoder(current);session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera', recognizedFrame = null) => {
+          const scopedVideo=element.querySelector?.('video');
+          if(source==='ocr-ambiguous'){current.selection.conflict();return;}
+          if(isQR&&kind==='pallet'&&scopedVideo?.videoWidth){
+            if(source==='camera'||source==='background')return;
+            if(source==='ocr'){current.selection.ocr(code);return;}
+          }
           code = normalize(code);
           if (code === null) { if (current.accepting && session === current && token === revision && canAccept()) { current.confirm(null); current.ocr?.reset(); onStatus('Este QR no corresponde a un palet de Repotools.'); } return; }
           if (isQR && kind === 'pallet' && current.lastDelivered === code) return;
@@ -656,16 +696,16 @@ function palletNumberRegion(image){
           if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();
           metric(current,'decoded',{source});
-          const confirmed = source === 'ocr' || isQR || current.confirm(code,performance.now(),recognizedFrame??(video?.videoWidth&&video.readyState>=2?video.currentTime:null));
+          const confirmed = source === 'ocr' || source === 'scoped-ocr' || isQR || current.confirm(code,performance.now(),recognizedFrame??(video?.videoWidth&&video.readyState>=2?video.currentTime:null));
           if (!confirmed) {
             element.classList.add('ean-detecting'); onStatus('Detectando código…'); clearTimeout(current.progressTimer);
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
-          if(source!=='ocr'&&typeof CustomEvent==='function'&&typeof window.dispatchEvent==='function')window.dispatchEvent(new CustomEvent('repotools:accepted-code',{detail:{code,isQR,reader:elementId}}));
-          metric(current,'confirmed',{source,confirmationMs:source==='ocr'?null:isQR?0:Math.max(0,performance.now()-(current.confirm.startedAt??performance.now()))});
+          if(source!=='ocr'&&source!=='scoped-ocr'&&typeof CustomEvent==='function'&&typeof window.dispatchEvent==='function')window.dispatchEvent(new CustomEvent('repotools:accepted-code',{detail:{code,isQR,reader:elementId}}));
+          metric(current,'confirmed',{source,confirmationMs:source==='ocr'||source==='scoped-ocr'?null:isQR?0:Math.max(0,performance.now()-(current.confirm.startedAt??performance.now()))});
           current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
-          element.classList.add('ean-confirmed'); onStatus(source==='ocr'?'Número confirmado · 3/3':'Código confirmado.');
+          element.classList.add('ean-confirmed'); onStatus(source==='ocr'||source==='scoped-ocr'?'Número confirmado · 3/3':'Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
             Promise.resolve().then(()=>{metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR&&validEAN(code))rememberScanPhoto(code,element);metric(current,'action');return onCode(code);}).then(()=>metric(current,'action-complete')).catch(error=>{if(token===revision&&session===current){onError(error);}}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
@@ -681,6 +721,7 @@ function palletNumberRegion(image){
             if (token === revision) Promise.resolve().then(() => { if (token === revision) {metric(current,'action');return onCode(code);} }).then(()=>{if(current.actionStarted)metric(current,'action-complete');}).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };
+        current.selection=palletSelection(accept,()=>{current.ocr?.reset();element.classList.add('ean-detecting');onStatus('Centrá una sola etiqueta dentro de la guía.');});
         onStatus('Abriendo cámara…');
         try {
           if(typeof MutationObserver==='function'&&element.querySelector){current.frameAbort=new AbortController();const observed=()=>{const video=element.querySelector('video');if(!video||video===current.observedVideo)return;current.observedVideo=video;const first=()=>{if(!current.firstFrame){current.firstFrame=true;metric(current,'first-frame',{width:video.videoWidth,height:video.videoHeight});current.frameObserver?.disconnect();}};if(video.readyState>=2)first();else video.addEventListener('loadeddata',first,{once:true,signal:current.frameAbort.signal});};current.frameObserver=new MutationObserver(observed);current.frameObserver.observe(element,{childList:true,subtree:true});observed();}
@@ -721,5 +762,5 @@ function palletNumberRegion(image){
     const originalCode=onCode;const normalCode=code=>window.RepoTeamInvitation?.token(code)?window.RepoTeamInvitation.open(code):originalCode(code);if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
-  window.RepoEANScanner = { observe(listener){if(typeof listener!=='function')throw TypeError('Observer required');metricListeners.add(listener);return()=>metricListeners.delete(listener);}, create, rawCreate, validEAN, confirmation, palletIdentifier, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
+  window.RepoEANScanner = { observe(listener){if(typeof listener!=='function')throw TypeError('Observer required');metricListeners.add(listener);return()=>metricListeners.delete(listener);}, create, rawCreate, validEAN, confirmation, palletIdentifier, palletFrame, palletSelection, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
 })();

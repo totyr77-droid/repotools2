@@ -1,6 +1,12 @@
 {
-  "version": 122,
+  "version": 123,
   "changes": [
+    {
+      "version": 123,
+      "label": "2.18",
+      "date": "2026-10-21",
+      "summary": "QR y OCR de palets centrados en la misma guía, con control de lecturas ambiguas"
+    },
     {
       "version": 122,
       "label": "2.17",
@@ -294,15 +300,9 @@
       "label": "1.69",
       "date": "2026-10-18",
       "summary": "Evita teclado de vencimiento recortado, compacta metadatos de informes y unifica iconos y cabecera de cámara."
-    },
-    {
-      "version": 73,
-      "label": "1.68",
-      "date": "2026-10-18",
-      "summary": "Búsqueda de Stock con descripción coincidente, total completo de palets y unidades por EAN y apertura del producto destacado."
     }
   ],
   "major": 2,
-  "minor": 17,
-  "label": "2.17"
+  "minor": 18,
+  "label": "2.18"
 }
