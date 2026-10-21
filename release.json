@@ -1,6 +1,12 @@
 {
-  "version": 118,
+  "version": 119,
   "changes": [
+    {
+      "version": 119,
+      "label": "2.14",
+      "date": "2026-10-21",
+      "summary": "Días restantes visibles en mercadería"
+    },
     {
       "version": 118,
       "label": "2.13",
@@ -294,15 +300,9 @@
       "label": "1.65",
       "date": "2026-10-18",
       "summary": "Corrige cierre y gesto de avisos sobre modales, compacta nombre y selección al compartir y ajusta colores de mercadería."
-    },
-    {
-      "version": 69,
-      "label": "1.64",
-      "date": "2026-10-18",
-      "summary": "Stock demo abre un detalle de palet simplificado, con búsqueda y acciones similares a la cuenta real."
     }
   ],
   "major": 2,
-  "minor": 13,
-  "label": "2.13"
+  "minor": 14,
+  "label": "2.14"
 }
