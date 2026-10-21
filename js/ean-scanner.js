@@ -121,17 +121,19 @@
     return {x:frame.x+(left-v.left)/v.width*frame.width,y:frame.y+(top-v.top)/v.height*frame.height,width:(right-left)/v.width*frame.width,height:(bottom-top)/v.height*frame.height};
   }
   function palletSelection(deliver,ambiguous,now=()=>performance.now()){
-    let pending=null,blockedUntil=0;
+    let pending=null,blockedUntil=0,candidate=null;
     return {
       ocr(code){pending={code,at:now()};},
-      qr(codes,capturedAt=now()){
+      qr(codes,capturedAt=now(),positions=null){
         const time=now(),unique=[...new Set(codes.map(palletIdentifier).filter(Boolean))];
         if(time-capturedAt>1500)return;
-        if(unique.length>1||(unique.length===1&&pending&&time-pending.at<1500&&pending.code!==unique[0])){pending=null;blockedUntil=time+400;ambiguous();return;}
+        if(unique.length>1||(unique.length===1&&pending&&time-pending.at<1500&&pending.code!==unique[0])){pending=null;candidate=null;blockedUntil=time+400;ambiguous();return;}
         if(time<blockedUntil)return;
-        if(unique.length===1){pending=null;deliver(unique[0],'scoped-qr');}
+        if(unique.length===1&&positions){const symbol=positions.find(p=>palletIdentifier(p.text)===unique[0]);if(!symbol||Math.abs(symbol.x-.5)>.20||Math.abs(symbol.y-.5)>.30){pending=null;candidate=null;ambiguous();return;}}
+        if(!unique.length)candidate=null;
+        if(unique.length===1){if(candidate?.code===unique[0]&&capturedAt>candidate.frame&&time-candidate.at<=700){pending=null;candidate=null;deliver(unique[0],'scoped-qr');}else candidate={code:unique[0],frame:capturedAt,at:time};}
         else if(pending&&capturedAt>=pending.at){const value=pending;pending=null;if(time-value.at<1500)deliver(value.code,'scoped-ocr');}
-      },conflict(){pending=null;blockedUntil=now()+400;ambiguous();},reset(){pending=null;blockedUntil=0;}
+      },conflict(){pending=null;candidate=null;blockedUntil=now()+400;ambiguous();},reset(){pending=null;candidate=null;blockedUntil=0;}
     };
   }
   function validEAN(code) {
@@ -160,7 +162,7 @@
   }
 
   // Shared identification engine. Camera/QR decoder and feedback remain in create().
-  const qrRescueURL=(()=>{try{return new URL('qr-rescue-worker.js',document.currentScript?.src||new URL('js/ean-scanner.js',window.location.href)).href;}catch{return 'js/qr-rescue-worker.js';}})();
+  const qrRescueURL=(()=>{try{return new URL('qr-rescue-worker.js?v=bbcb731b62c9',document.currentScript?.src||new URL('js/ean-scanner.js',window.location.href)).href;}catch{return 'js/qr-rescue-worker.js?v=bbcb731b62c9';}})();
   const ocrBase = (() => { try { return new URL('vendor/ocr/', document.currentScript?.src || new URL('js/ean-scanner.js', window.location.href)).href; } catch { return 'js/vendor/ocr/'; } })();
   let ocrLibrary;
   function loadOCR() {
@@ -297,11 +299,14 @@ function palletNumberRegion(image){
         if (disposed || !active()) return;
         if(new Set(ocrReadings(result.data).numbers).size>1){confirm(null,stamp);onAnalysis({matched:false,ambiguous:true,costMs:performance.now()-analysisStarted});accept(null,'ocr-ambiguous');return;}
         const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),zoom:Number(getZoom())||1,toleranceMs:confirm.tolerance(),costMs:performance.now()-analysisStarted});
+        let centeredCandidate=false;
         if(candidate?.box){
           const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y+=lineOffset-canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
           const localBox={x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},visible=visibleFrame(video),sx=frame.width/fullWidth,sy=frame.height/fullHeight;
+          centeredCandidate=Math.abs((localBox.x0+localBox.x1)/2/fullWidth-.5)<=.20;
           viewport?.track({x0:frame.x-visible.x+localBox.x0*sx,y0:frame.y-visible.y+localBox.y0*sy,x1:frame.x-visible.x+localBox.x1*sx,y1:frame.y-visible.y+localBox.y1*sy},visible.width,visible.height);
         }else viewport?.reset();
+        if(candidate&&!centeredCandidate){confirm(null,stamp);lockedRegion=null;lockedAngle=null;nextDelay=350;accept(null,'ocr-off-center');return;}
         if (candidate) { lockedRegion=region?{region,width:fullWidth,height:fullHeight,at:performance.now()}:null;lockedAngle=angle;nextDelay=80;const confirmed=confirm(candidate.code, stamp);status(false,confirm.progress()); if (confirmed) accept(candidate.code, 'ocr'); }
         else {lockedRegion=null;lockedAngle=null;nextDelay=350;confirm(null, stamp);}
       } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
@@ -520,7 +525,7 @@ function palletNumberRegion(image){
       }
       let rescueWorker,rescueReady=false,rescueFailed=false,rescuePending=null,rescueInitTimer,rescueSequence=0,rescueLast=-Infinity;
       function stopRescue(){clearTimeout(rescueInitTimer);rescueWorker?.terminate();rescueWorker=null;rescueReady=false;if(rescuePending){clearTimeout(rescuePending.timer);rescuePending.resolve(null);rescuePending=null;}}
-      function startRescue(){if(rescueWorker||rescueFailed)return;if(typeof Worker!=='function'){rescueFailed=true;return;}try{rescueWorker=new Worker(qrRescueURL);rescueInitTimer=setTimeout(()=>{rescueFailed=true;stopRescue();},12000);rescueWorker.onmessage=event=>{const value=event.data;if(value?.type==='ready'){clearTimeout(rescueInitTimer);rescueReady=true;metric(current,'qr-rescue-ready');return;}if(value?.type==='unavailable'){rescueFailed=true;stopRescue();return;}if(value?.type!=='result'||!rescuePending||value.id!==rescuePending.id)return;const pending=rescuePending;rescuePending=null;clearTimeout(pending.timer);const codes=Array.isArray(value.codes)?[...new Set(value.codes.filter(code=>typeof code==='string'&&current.validate(code)))]:[];metric(current,'qr-rescue-analysis',{costMs:performance.now()-pending.started,matched:codes.length===1,ambiguous:codes.length>1});if(scopedPallet&&pending.scoped&&current.accepting&&session===current&&!document.hidden&&canAccept())current.selection.qr(codes,pending.started);pending.resolve(codes.length===1?{text:codes[0]}:null);};rescueWorker.onerror=event=>{event.preventDefault?.();rescueFailed=true;stopRescue();};}catch{rescueFailed=true;stopRescue();}}
+      function startRescue(){if(rescueWorker||rescueFailed)return;if(typeof Worker!=='function'){rescueFailed=true;return;}try{rescueWorker=new Worker(qrRescueURL);rescueInitTimer=setTimeout(()=>{rescueFailed=true;stopRescue();},12000);rescueWorker.onmessage=event=>{const value=event.data;if(value?.type==='ready'){clearTimeout(rescueInitTimer);rescueReady=true;metric(current,'qr-rescue-ready');return;}if(value?.type==='unavailable'){rescueFailed=true;stopRescue();return;}if(value?.type!=='result'||!rescuePending||value.id!==rescuePending.id)return;const pending=rescuePending;rescuePending=null;clearTimeout(pending.timer);const codes=Array.isArray(value.codes)?[...new Set(value.codes.filter(code=>typeof code==='string'&&current.validate(code)))]:[];metric(current,'qr-rescue-analysis',{costMs:performance.now()-pending.started,matched:codes.length===1,ambiguous:codes.length>1});if(scopedPallet&&pending.scoped&&current.accepting&&session===current&&!document.hidden&&canAccept()){if(value.verified===true)current.selection.qr(codes,pending.started,Array.isArray(value.symbols)?value.symbols:[]);else onStatus('No pudimos comprobar la etiqueta. Volvé a centrarla.');}pending.resolve(codes.length===1?{text:codes[0]}:null);};rescueWorker.onerror=event=>{event.preventDefault?.();rescueFailed=true;stopRescue();};}catch{rescueFailed=true;stopRescue();}}
       const rescueWarmup=current.isQR?setTimeout(()=>{if(current.accepting&&session===current&&!document.hidden&&canAccept())startRescue();},scopedPallet?0:450):null;
       async function decodeImage(surface){const original=current.isQR&&rescueReady?surface.getContext('2d').getImageData(0,0,surface.width,surface.height):null;try{return await decoder.decodeRobustlyAsync(surface);}catch(error){if(!current.isQR||!current.accepting||session!==current||document.hidden||!canAccept()||performance.now()-(current.cameraReadyAt??current.requestedAt)<650)throw error;startRescue();if(!rescueReady||rescuePending||performance.now()-rescueLast<350)throw error;rescueLast=performance.now();const image=original||surface.getContext('2d').getImageData(0,0,surface.width,surface.height),id=++rescueSequence;const result=await new Promise(resolve=>{rescuePending={id,resolve,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});if(result&&current.accepting&&session===current&&!document.hidden&&canAccept())return result;throw error;}}
       let lastRectify=-Infinity;
@@ -559,7 +564,7 @@ function palletNumberRegion(image){
               canvas.width=Math.max(1,Math.round(frame.width*scale));canvas.height=Math.max(1,Math.round(frame.height*scale));
               context.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,canvas.width,canvas.height);
               const image=context.getImageData(0,0,canvas.width,canvas.height),id=++rescueSequence;current.decodeBusy=true;
-              try{await new Promise(resolve=>{rescuePending={id,resolve,scoped:true,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});}finally{current.decodeBusy=false;}
+              try{await new Promise(resolve=>{rescuePending={id,resolve,scoped:true,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,multiple:true,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});}finally{current.decodeBusy=false;}
               return;
             }
             if(current.isQR&&!current.ocr?.hasCandidate?.()&&started-(current.cameraReadyAt??current.requestedAt)>900&&started-lastRectify>1100){
@@ -676,7 +681,7 @@ function palletNumberRegion(image){
         serialDecoder(current);session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera', recognizedFrame = null) => {
           const scopedVideo=element.querySelector?.('video');
-          if(source==='ocr-ambiguous'){current.selection.conflict();return;}
+          if(source==='ocr-ambiguous'||source==='ocr-off-center'){current.selection.conflict();return;}
           if(isQR&&kind==='pallet'&&scopedVideo?.videoWidth){
             if(source==='camera'||source==='background')return;
             if(source==='ocr'){current.selection.ocr(code);return;}

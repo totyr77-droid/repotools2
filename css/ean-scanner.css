@@ -90,3 +90,6 @@
 
 /* Camera controls remain legible when the label fills the frame with white. */
 .repo-camera-viewport .ean-camera-light,.repo-camera-viewport .ean-camera-manual{background:#17122b99;color:#fff}
+
+/* The middle of the shared target identifies the intended label. */
+.repo-pallet-qr-guide:after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);background:linear-gradient(currentColor,currentColor) center/12px 2px no-repeat,linear-gradient(currentColor,currentColor) center/2px 12px no-repeat;filter:drop-shadow(0 1px 1px #0008)}
