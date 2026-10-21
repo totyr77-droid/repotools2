@@ -25,13 +25,14 @@ function team_request_detail(PDO $db,string $code,int $user,int $branch): array 
     $r=team_pallet_request($db,$id,$branch);
     if(!$r){if((int)($p['branch_id']??0)!==$branch)throw new CatalogException('Este palet no tiene acceso autorizado a tu equipo. Volvé a escanearlo.',403);return $p;}
     $original=stock_query($db,'SELECT COUNT(*) AS products,COALESCE(SUM(units),0) AS units FROM pallet_products WHERE pallet_id=?',[$id])->fetch();
+    $originalProducts=$p['products'];
     $p['products']=team_request_products($db,(int)$r['id']);$p['revision']=(int)$r['revision'];$p['branch_id']=$branch;
     $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$branch])->fetch();
     foreach(['can_manage','can_delete','can_transfer_stock','can_tag','can_edit_description','is_owner'] as $flag)$p[$flag]=false;
     $p['team_tag']=in_array(team_role($db,$user,$branch),['admin','manager'],true)?(stock_query($db,'SELECT t.name FROM pallet_user_tags t JOIN pallets p ON p.id=t.pallet_id AND p.owner_id=t.user_id WHERE p.id=?',[$id])->fetchColumn()?:''):'';
     $p['description']=(string)stock_query($db,'SELECT description FROM pallets WHERE id=?',[$id])->fetchColumn();unset($p['members']);
     $p['can_edit']=true;$p['team_access']=true;$p['can_remove_branch']=in_array(team_role($db,$user,$branch),['admin','manager'],true);
-    $p['team_request']=['id'=>(int)$r['id'],'revision'=>(int)$r['revision'],'status'=>'pending','original'=>$original];
+    $p['team_request']=['id'=>(int)$r['id'],'revision'=>(int)$r['revision'],'status'=>'pending','original'=>$original,'original_products'=>$originalProducts];
     return $p;
 }
 function team_request_edit(PDO $db,int $user,int $branch,array $input): ?array {

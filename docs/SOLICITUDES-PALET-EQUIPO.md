@@ -24,3 +24,9 @@ Migración40→41 y contrato de solicitudes comprobados en una rama temporal de 
 ## Reversión
 
 Conservar migración41, propuestas, estados, notificaciones e historial: no borrar inventario ni restaurar una base anterior. Para desactivar la función, bloquear temporalmente el escáner de equipo ante palets de otra/sin sucursal, mantener la edición normal de palets de la misma sucursal y publicar versión superior. No restaurar el team_scan previo, que reasignaba automáticamente. Las propuestas quedan disponibles para reactivar o rechazar posteriormente; los cambios aprobados son inventario confirmado y no deben revertirse automáticamente.
+
+## Ajustes v2.07
+
+La comparación reutilizada por equipo/propietario indica acción y diferencia neta por EAN+vencimiento, mantiene las eliminaciones y omite filas intactas en la revisión del propietario. Las solicitudes no disponibles no conservan botones de decisión ni referencias de otra solicitud: muestran Cerrar. No modifica permisos ni aceptación.
+
+La sugerencia geográfica al usar un QR nuevo es opcional: solo aparece si un punto del directorio está dentro de100m considerando la precisión reportada; se elige el más cercano, checkbox marcado. El usuario puede desmarcarlo o guardar antes de obtener ubicación. No afecta permisos ni activa GPS de equipo. La ubicación se compara en el navegador y no se envía al servidor; solo se envía la sucursal seleccionada. Servidor permite esta vía únicamente para una etiqueta nueva que pueda reclamar el usuario y excluye enlaces públicos previos. Sin coincidencia/permiso/datos, no hay aviso ni bloqueo. Prueba nearby-pallet-branch-ui incluye marcado/desmarcado/asignación/sin coincidencia/denegación, validaciones servidor y ambos modos de mano.

@@ -1,6 +1,12 @@
 {
-  "version": 111,
+  "version": 112,
   "changes": [
+    {
+      "version": 112,
+      "label": "2.07",
+      "date": "2026-10-21",
+      "summary": "Cambios pendientes más claros, compartir colección unificado y sucursal cercana opcional"
+    },
     {
       "version": 111,
       "label": "2.06",
@@ -294,15 +300,9 @@
       "label": "1.58",
       "date": "2026-10-18",
       "summary": "Entrega lecturas sin espera artificial y endereza números de palet inclinados, verticales o invertidos conservando confirmaciones."
-    },
-    {
-      "version": 62,
-      "label": "1.57",
-      "date": "2026-10-18",
-      "summary": "Informa EAN encontrado o ausente y unidades al buscar en informes de Stock y palets."
     }
   ],
   "major": 2,
-  "minor": 6,
-  "label": "2.06"
+  "minor": 7,
+  "label": "2.07"
 }

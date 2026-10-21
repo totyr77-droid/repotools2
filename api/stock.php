@@ -123,7 +123,12 @@ try {
                 $count=filter_var($_POST['count']??1,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>100]]);
                 if (!$count) throw new CatalogException('Elige entre 1 y 100 etiquetas.',422);
                 $result['labels']=[]; for($i=0;$i<$count;$i++) $result['labels'][]=stock_generate($db,$uid); break;
-            case 'claim': $result=stock_claim($db,(string)($_POST['code']??''),$uid); break;
+            case 'claim':
+                $suggested=$_POST['branch_id']??'';if(!is_string($suggested)||($suggested!==''&&!preg_match('/^[1-9][0-9]{0,14}$/D',$suggested)))throw new CatalogException('La sucursal no es válida.',422);
+                if($suggested!==''){require_once __DIR__.'/../includes/stock-branches.php';branch_owned($db,(int)$suggested,$uid);if(stock_label($db,(string)($_POST['code']??''))['pallet_id'])throw new CatalogException('El palet ya está en uso. Volvé a abrirlo antes de asignar sucursal.',409);}
+                $result=stock_claim($db,(string)($_POST['code']??''),$uid);
+                if($suggested!=='')branch_assign($db,$uid,['pallet_id'=>$result['id'],'revision'=>1,'branch_id'=>$suggested,'share_pallet'=>'0']);
+                break;
             case 'save_product':
                 if (isset($_POST['offline_revision'])) {
                     $current=stock_editable($db,$id,$uid);

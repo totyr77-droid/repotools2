@@ -16,6 +16,7 @@ function stock_dialog_heading(string $title,string $id,string $descriptionId='')
  <button id="managePalletAccess" class="library-secondary" type="button"><?= stock_icon('user') ?> Gestionar accesos</button>
  <button id="deletePallet" class="library-secondary stock-delete" type="button"><?= stock_icon('trash') ?> Eliminar palet</button>
  <button id="leavePallet" class="library-secondary" type="button"><?= stock_icon('exit') ?> Desvincularme de este palet</button></div></details><div id="palletBranchActions" class="pallet-branch-action" hidden><button id="assignPalletBranch" class="library-secondary" type="button"><?= stock_icon('branch') ?><span id="palletBranchButtonName">Sucursal</span></button></div><section id="palletActivity" class="pallet-activity" hidden><button id="openPalletHistory" class="library-secondary stock-icon" type="button" aria-label="Historial del palet" title="Historial del palet"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></button></section></div></div>
+ <label id="palletNearbyBranch" class="pallet-nearby-branch" hidden><input id="palletNearbyBranchCheck" type="checkbox"><span id="palletNearbyBranchName"></span></label>
  <button id="claimPallet" class="library-primary" type="button">Usar este palet</button>
 </dialog>
 <dialog id="stockProductDialog" class="library-dialog"><?php stock_dialog_heading('Producto','stockProductDialog'); ?><form id="stockProductForm">
