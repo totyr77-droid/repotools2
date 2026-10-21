@@ -35,3 +35,7 @@
 .home-page .resultado-box:has(.product-summary-quantity) #scanProductActions{flex-basis:100%}
 
 .home-shortcuts{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}.home-shortcuts .home-tops{box-sizing:border-box;font-size:.9rem;padding:8px 10px;white-space:nowrap}.home-shortcuts svg{flex:none}body[data-hand=left] .home-shortcuts{flex-direction:row-reverse}
+
+/* Los avisos crecen en el contenido; no forman parte de las acciones de escaneo. */
+.home-page .contenedor-main>:is(.home-location-notice,.pwa-install-card){flex-shrink:0;grid-column:1/-1}
+.home-page>main:has(#pwaInstallCard:not([hidden])){height:auto;justify-content:flex-start}
