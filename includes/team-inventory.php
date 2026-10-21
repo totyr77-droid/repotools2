@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__.'/branch-team.php';
 function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $input,bool $personal=false): array {
-    if($personal){if(!$user||!in_array($view,['mercaderia','fechas','lotes'],true))throw new CatalogException('Sección no válida.',422);}else{team_require($db,$user,$branch,true);if($view==='fechas')throw new CatalogException('Sección no válida.',422);}
+    if($personal){if(!$user||!in_array($view,['mercaderia','fechas','lotes'],true))throw new CatalogException('Sección no válida.',422);}else{team_require($db,$user,$branch,true);}
     if(!in_array($view,['palets','movimientos','administracion','mercaderia','fechas','lotes'],true))throw new CatalogException('Sección no válida.',422);
     foreach($input as $value)if(!is_string($value)||strlen($value)>2000)throw new CatalogException('Filtro no válido.',422);
     $offset=filter_var($input['offset']??'0',FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>100000]]);if($offset===false)throw new CatalogException('Página no válida.',422);
@@ -32,7 +32,7 @@ function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $i
         if($q!==''){$where[]="(b.ean LIKE ? ESCAPE '!' OR LOWER(b.name) LIKE ? ESCAPE '!' OR LOWER(c.name) LIKE ? ESCAPE '!' OR p.code LIKE ? ESCAPE '!')";array_push($params,...array_fill(0,4,$like));}
         $select=$view==='mercaderia'?"b.ean,b.expires,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets":"b.id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,p.code,p.owner_id,p.description AS pallet_description";
         $order=$sort?"CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires $direction,b.ean":'b.ean,b.expires';$group=$view==='mercaderia'?' GROUP BY b.ean,b.expires ORDER BY '.$order:' ORDER BY p.id,b.id';
-        if($personal&&$view==='mercaderia'){
+        if($view==='mercaderia'){
             $select="b.ean,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets,MIN(NULLIF(b.expires,'')) AS nearest_expiry,COUNT(DISTINCT b.expires) AS date_count,MIN(CASE WHEN b.expires>='$today' THEN b.expires END) AS nearest_active_expiry,COUNT(DISTINCT CASE WHEN b.expires>='$today' AND b.expires<='$near' THEN b.expires END) AS upcoming_dates,COUNT(DISTINCT CASE WHEN b.expires>'$near' THEN b.expires END) AS safe_dates,COUNT(DISTINCT CASE WHEN b.expires<>'' AND b.expires<'$today' THEN b.expires END) AS expired_dates,MAX(CASE WHEN b.expires='' THEN 1 ELSE 0 END) AS undated";
             $order=$sort?"CASE WHEN MIN(NULLIF(b.expires,'')) IS NULL THEN 1 ELSE 0 END,MIN(NULLIF(b.expires,'')) $direction,b.ean":'MAX(p.updated_at) DESC,b.ean';
             $group=' GROUP BY b.ean ORDER BY '.$order;
@@ -62,7 +62,7 @@ function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $i
     }
     if($view==='administracion')foreach($rows as &$row)$row['metadata']=json_decode($row['metadata'],true)??[];unset($row);
     $tagOptions=!$personal&&in_array($view,['palets','mercaderia'],true)?$query('SELECT DISTINCT t.name FROM pallet_user_tags t JOIN pallets p ON p.id=t.pallet_id WHERE p.branch_id=? AND p.released=0 AND t.user_id=p.owner_id ORDER BY t.name',[$branch])->fetchAll(PDO::FETCH_COLUMN):[];
-    if(!$personal&&$rows&&in_array($view,['palets','mercaderia','lotes'],true)){
+    if(!$personal&&$rows&&in_array($view,['palets','mercaderia','fechas','lotes'],true)){
         $pending=[];$original=[];$keys=array_fill(0,count($rows),'?');
         if($view==='palets'){
             $ids=array_column($rows,'id');
@@ -72,8 +72,8 @@ function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $i
             foreach(stock_query($db,"SELECT p.code,b.ean,b.expires,b.units,b.kind,b.pack_size FROM team_pallet_requests r JOIN pallets p ON p.id=r.pallet_id AND p.owner_id=r.owner_id LEFT JOIN pallet_products b ON b.pallet_id=p.id WHERE r.branch_id=? AND r.status='pending' AND p.code IN (".implode(',',$keys).')',[$branch,...array_column($rows,'code')])->fetchAll() as $r){$pending[$r['code']]=true;$original[$r['code'].'|'.$r['ean'].'|'.$r['expires']]=$r;}
             foreach($rows as &$row){$row['pending_approval']=isset($pending[$row['code']]);if($row['pending_approval']){$r=$original[$row['code'].'|'.$row['ean'].'|'.$row['expires']]??[];$row['original_units']=(int)($r['units']??0);$row['original_kind']=$r['kind']??'units';$row['original_pack_size']=$r['pack_size']??1;$row['pending_delta']=(int)$row['units']-$row['original_units'];}}unset($row);
         }else{
-            foreach($query("SELECT DISTINCT b.ean,b.expires FROM team_pallet_requests r JOIN team_products b ON b.pallet_id=r.pallet_id WHERE r.branch_id=? AND r.status='pending' AND b.ean IN (".implode(',',$keys).')',[$branch,...array_column($rows,'ean')])->fetchAll() as $r)$pending[$r['ean'].'|'.$r['expires']]=true;
-            foreach($rows as &$row)$row['pending_approval']=isset($pending[$row['ean'].'|'.$row['expires']]);unset($row);
+            foreach($query("SELECT DISTINCT b.ean,b.expires FROM team_pallet_requests r JOIN team_products b ON b.pallet_id=r.pallet_id WHERE r.branch_id=? AND r.status='pending' AND b.ean IN (".implode(',',$keys).')',[$branch,...array_column($rows,'ean')])->fetchAll() as $r)$pending[$view==='mercaderia'?$r['ean']:$r['ean'].'|'.$r['expires']]=true;
+            foreach($rows as &$row)$row['pending_approval']=isset($pending[$view==='mercaderia'?$row['ean']:$row['ean'].'|'.$row['expires']]);unset($row);
         }
     }
     $more=count($rows)>30;return ['tags'=>$tagOptions,'items'=>array_slice($rows,0,30),'next_offset'=>$more?$offset+30:null,'view'=>$view,'warning_days'=>stock_warning_days($db,$user)];

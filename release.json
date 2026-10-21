@@ -1,6 +1,12 @@
 {
-  "version": 119,
+  "version": 120,
   "changes": [
+    {
+      "version": 120,
+      "label": "2.15",
+      "date": "2026-10-21",
+      "summary": "Mercadería de sucursal unificada con fechas y días"
+    },
     {
       "version": 119,
       "label": "2.14",
@@ -294,15 +300,9 @@
       "label": "1.66",
       "date": "2026-10-18",
       "summary": "Al editar vencimiento conserva el foco y no abre cantidad; avance automático solo en nuevas cargas."
-    },
-    {
-      "version": 70,
-      "label": "1.65",
-      "date": "2026-10-18",
-      "summary": "Corrige cierre y gesto de avisos sobre modales, compacta nombre y selección al compartir y ajusta colores de mercadería."
     }
   ],
   "major": 2,
-  "minor": 14,
-  "label": "2.14"
+  "minor": 15,
+  "label": "2.15"
 }

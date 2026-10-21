@@ -886,3 +886,9 @@ body[data-hand=left] .team-request-dialog:not([data-conflict=true]) .team-reques
 @keyframes deduct-stock-updated{from{background:#dcd2ff}to{background:#f0ebff}}@media(prefers-reduced-motion:reduce){#deductRemaining[data-changed=true]>span:first-of-type{animation:none}}
 
 .stock-goods-total>.stock-goods-days{display:block;margin-top:4px;font-size:.75rem;line-height:1.3;color:#62577e;white-space:normal}
+
+.team-grouped-dates{padding:0 8px 8px}.team-grouped-dates>.team-goods-row[open]:only-child>summary{display:none}.team-grouped-dates>.team-goods-row[open]:only-child{background:transparent;border:0}.team-grouped-dates .team-goods-expiry,.stock-goods-dates .team-goods-expiry{white-space:normal;line-height:1.35}.team-goods-group .stock-goods-expiries{justify-content:flex-end}.team-goods-group .stock-goods-days{font-size:.75rem;color:#62577e}.team-goods-group summary{min-width:0}
+
+.team-goods-info>strong[hidden]{display:none!important}
+
+.team-grouped-dates .team-goods-expiry svg,.stock-goods-dates .team-goods-expiry svg{width:14px;height:14px;flex:none}.team-grouped-dates .team-goods-info>.team-goods-expiry,.stock-goods-dates .team-goods-info>.team-goods-expiry{margin-top:0}
