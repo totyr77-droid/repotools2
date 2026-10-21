@@ -13,11 +13,11 @@ function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $i
     };
     $q=catalog_text($input['q']??'',100);$like='%'.str_replace(['!','%','_'],['!!','!%','!_'],mb_strtolower($q)).'%';$where=$personal?["(p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))"]:['p.branch_id=?'];$params=$personal?[$user,$user]:[$branch];$today=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->format('Y-m-d');$near=(new DateTimeImmutable($today))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
     $sort=$input['sort']??'';if(!in_array($sort,['','expiry_asc','expiry_desc'],true))throw new CatalogException('Orden no válido.',422);$direction=$sort==='expiry_desc'?'DESC':'ASC';
-    $expiry=$input['expiry']??'all';if(!in_array($expiry,['all','expired','upcoming','none'],true))throw new CatalogException('Vencimiento no válido.',422);
+    $expiry=$input['expiry']??'all';if(!in_array($expiry,['all','expired','upcoming','none','due'],true))throw new CatalogException('Vencimiento no válido.',422);
     if($personal){$filter=$input['branch']??'all';if($filter==='none')$where[]='p.branch_id IS NULL';elseif($filter!=='all'){if(!preg_match('/^[1-9][0-9]{0,17}$/D',$filter))throw new CatalogException('Sucursal no válida.',422);$where[]='p.branch_id=?';$params[]=$filter;}}
     $tag=catalog_text($input['tag']??'',40);
     if($tag!==''&&in_array($view,['palets','mercaderia','fechas','lotes'],true)){if($personal&&!stock_is_admin($db,$user))throw new CatalogException('No tenés acceso a etiquetas.',403);$where[]="EXISTS(SELECT 1 FROM pallet_user_tags t WHERE t.pallet_id=p.id AND t.user_id=".($personal?'?':'p.owner_id')." AND t.name=?)";if($personal)$params[]=$user;$params[]=$tag;}
-    $dateCondition=static function(string $alias)use($expiry,$today,$near):array{return match($expiry){'expired'=>["$alias.expires<>'' AND $alias.expires<?",[$today]],'upcoming'=>["$alias.expires>=? AND $alias.expires<=?",[$today,$near]],'none'=>["$alias.expires=''",[]],default=>['1=1',[]]};};
+    $dateCondition=static function(string $alias)use($expiry,$today,$near):array{return match($expiry){'due'=>["$alias.expires<>'' AND $alias.expires<=?",[$near]],'expired'=>["$alias.expires<>'' AND $alias.expires<?",[$today]],'upcoming'=>["$alias.expires>=? AND $alias.expires<=?",[$today,$near]],'none'=>["$alias.expires=''",[]],default=>['1=1',[]]};};
     if(in_array($view,['palets','mercaderia','fechas','lotes'],true))$where[]='p.released=0';
     if($view==='palets'){
         if($q!==''){$where[]="(p.code LIKE ? ESCAPE '!' OR LOWER(p.description) LIKE ? ESCAPE '!' OR LOWER(u.public_name) LIKE ? ESCAPE '!' OR EXISTS(SELECT 1 FROM pallet_products x LEFT JOIN products c ON c.ean=x.ean WHERE x.pallet_id=p.id AND (x.ean LIKE ? ESCAPE '!' OR LOWER(x.name) LIKE ? ESCAPE '!' OR LOWER(c.name) LIKE ? ESCAPE '!')))";array_push($params,...array_fill(0,6,$like));}
@@ -33,12 +33,12 @@ function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $i
         $select=$view==='mercaderia'?"b.ean,b.expires,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets":"b.id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,p.code,p.owner_id,p.description AS pallet_description";
         $order=$sort?"CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires $direction,b.ean":'b.ean,b.expires';$group=$view==='mercaderia'?' GROUP BY b.ean,b.expires ORDER BY '.$order:' ORDER BY p.id,b.id';
         if($personal&&$view==='mercaderia'){
-            $select="b.ean,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets,MIN(NULLIF(b.expires,'')) AS nearest_expiry,COUNT(DISTINCT b.expires) AS date_count";
+            $select="b.ean,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets,MIN(NULLIF(b.expires,'')) AS nearest_expiry,COUNT(DISTINCT b.expires) AS date_count,MIN(CASE WHEN b.expires>='$today' THEN b.expires END) AS nearest_active_expiry,COUNT(DISTINCT CASE WHEN b.expires>='$today' AND b.expires<='$near' THEN b.expires END) AS upcoming_dates,COUNT(DISTINCT CASE WHEN b.expires>'$near' THEN b.expires END) AS safe_dates,COUNT(DISTINCT CASE WHEN b.expires<>'' AND b.expires<'$today' THEN b.expires END) AS expired_dates,MAX(CASE WHEN b.expires='' THEN 1 ELSE 0 END) AS undated";
             $order=$sort?"CASE WHEN MIN(NULLIF(b.expires,'')) IS NULL THEN 1 ELSE 0 END,MIN(NULLIF(b.expires,'')) $direction,b.ean":'MAX(p.updated_at) DESC,b.ean';
             $group=' GROUP BY b.ean ORDER BY '.$order;
         }elseif($view==='fechas'){
             $select="b.ean,b.expires,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets";
-            $group=" GROUP BY b.ean,b.expires ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires $direction,b.ean";
+            $group=" GROUP BY b.ean,b.expires ORDER BY CASE WHEN b.expires='' THEN 1 WHEN b.expires<'$today' THEN 2 ELSE 0 END,b.expires $direction,b.ean";
         }
         $rows=$query('SELECT '.$select.' FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN products c ON c.ean=b.ean WHERE '.implode(' AND ',$where).$group." LIMIT 31 OFFSET $offset",$params)->fetchAll();
     }else{
