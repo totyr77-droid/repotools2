@@ -1,6 +1,12 @@
 {
-  "version": 129,
+  "version": 130,
   "changes": [
+    {
+      "version": 130,
+      "label": "2.25",
+      "date": "2026-10-21",
+      "summary": "Avisos y respuesta debajo de Nombre público, con el mismo desplegable del perfil."
+    },
     {
       "version": 129,
       "label": "2.24",
@@ -294,15 +300,9 @@
       "label": "1.76",
       "date": "2026-10-18",
       "summary": "Conserva búsqueda, filtros y borradores de Stock al pasar offline, con resultados locales y sin duplicar cargas."
-    },
-    {
-      "version": 80,
-      "label": "1.75",
-      "date": "2026-10-18",
-      "summary": "Corrige OCR de números girados, recorta la línea enderezada y reduce el coste de confirmación en equipos lentos."
     }
   ],
   "major": 2,
-  "minor": 24,
-  "label": "2.24"
+  "minor": 25,
+  "label": "2.25"
 }
