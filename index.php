@@ -23,7 +23,8 @@ include 'vistas/header.vista.php';
 
     <?php include __DIR__.'/vistas/home-location.vista.php'; ?>
     <!--BOTON SCANER-->
-    <aside id="pwaInstallCard" class="pwa-install-card" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3H5v18h14V3h-3M12 3v11m-4-4 4 4 4-4"/></svg><div><strong>RepoTools a mano</strong><p>Instalala para abrirla desde tu pantalla de inicio.</p><button id="installApp" type="button" class="library-secondary">Instalar app</button><p id="installAppHelp" hidden></p></div></aside>
+    <aside id="pwaInstallCard" class="pwa-install-card" hidden><?= stock_icon('install') ?><div><strong>RepoTools a mano</strong><p>Instalala para abrirla desde tu pantalla de inicio.</p><button id="installApp" type="button" class="library-secondary">Instalar app</button></div></aside>
+    <dialog id="installAppHelpDialog" class="library-dialog" aria-labelledby="installAppHelpTitle"><div class="library-heading"><h2 id="installAppHelpTitle"><?= stock_icon('install') ?> Instalar RepoTools</h2><button type="button" class="app-close" id="installAppHelpClose" aria-label="Cerrar ayuda de instalación"><?= stock_icon('close') ?></button></div><p id="installAppHelp"></p></dialog>
     <div class="home-scan-actions"><button id="boton" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5v14M6 5v14M10 5v14M13 5v14M18 5v14M21 5v14"/></svg>Escanear producto</button><?php if($teamHomeUser&&$teamHomeLocations): ?><button type="button" class="library-secondary home-pallet-scan" data-team-scan hidden aria-label="Escanear palet" title="Escanear palet"><?= stock_icon('qr') ?><span>Palet</span></button><?php endif; ?></div>
 
     <!--BOTON VER-->

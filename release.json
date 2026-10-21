@@ -1,6 +1,12 @@
 {
-  "version": 128,
+  "version": 129,
   "changes": [
+    {
+      "version": 129,
+      "label": "2.24",
+      "date": "2026-10-21",
+      "summary": "Inicio sin scroll, avisos opcionales de a uno y ayuda de instalación independiente."
+    },
     {
       "version": 128,
       "label": "2.23",
@@ -294,15 +300,9 @@
       "label": "1.75",
       "date": "2026-10-18",
       "summary": "Corrige OCR de números girados, recorta la línea enderezada y reduce el coste de confirmación en equipos lentos."
-    },
-    {
-      "version": 79,
-      "label": "1.74",
-      "date": "2026-10-18",
-      "summary": "El OCR conserva coincidencias durante pérdidas breves de lectura, con los mismos límites temporales de confirmación del EAN."
     }
   ],
   "major": 2,
-  "minor": 23,
-  "label": "2.23"
+  "minor": 24,
+  "label": "2.24"
 }

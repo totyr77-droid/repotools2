@@ -1,6 +1,7 @@
 <?php
 function stock_icon(string $name): string {
     $paths = [
+        'install'=>'<path d="M8 3H5v18h14V3h-3M12 3v11m-4-4 4 4 4-4"/>',
         'verified'=>'<path d="m12 2 3 2 3.5.5.5 3.5 2 4-2 3-.5 3.5-3.5.5-3 2-3-2-3.5-.5L4 15l-2-3 2-4 .5-3.5L8 4z"/><path d="m8 12 3 3 5-6"/>',
         'lock'=>'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/>',
         'crown'=>'<path d="m3 6 4 4 5-7 5 7 4-4-2 13H5zM5 22h14"/>',
