@@ -1,6 +1,12 @@
 {
-  "version": 124,
+  "version": 125,
   "changes": [
+    {
+      "version": 125,
+      "label": "2.20",
+      "date": "2026-10-21",
+      "summary": "Ubicación opcional después de la intro y ayuda de sucursal solo al usar palets"
+    },
     {
       "version": 124,
       "label": "2.19",
@@ -294,15 +300,9 @@
       "label": "1.71",
       "date": "2026-10-18",
       "summary": "Compacta filtros de Stock, agrega cancelación de búsqueda y limpieza externa, y mantiene metadatos en una línea."
-    },
-    {
-      "version": 75,
-      "label": "1.70",
-      "date": "2026-10-18",
-      "summary": "Mejora el rescate local de QR inclinados con un segundo motor, sin enviar imágenes y conservando validaciones."
     }
   ],
   "major": 2,
-  "minor": 19,
-  "label": "2.19"
+  "minor": 20,
+  "label": "2.20"
 }

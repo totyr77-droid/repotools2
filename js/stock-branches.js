@@ -52,24 +52,29 @@
     applyFilter();if(active)renderActive();renderBranchMatches();
   }
   let nearbyCode='',nearbyTurn=0,nearbyId=0,ownerScanCode='',ownerLinking=false;const ownerDismissed=new Set();
-  function nearbyEligible(p){return p&&(p.available&&p.can_claim||!p.available&&p.is_owner&&!p.branch_id&&!p.team_request&&ownerScanCode===p.code&&!ownerDismissed.has(p.code));}
+  const missingHintKey='repotools_missing_branch_hint_'+Number(window.repotoolsStock?.user_id||0),missingHintMemory=window.RepoMissingBranchHintMemory??=new Set();
+  function missingSuggestion(){const hint=$('palletMissingBranch');if(!hint||missingHintMemory.has(missingHintKey))return;try{if(Number(localStorage.getItem(missingHintKey))>Date.now())return;localStorage.setItem(missingHintKey,String(Date.now()+7*86400000));}catch{}missingHintMemory.add(missingHintKey);hint.hidden=false;}
+  function nearbyEligible(p){return p&&(p.available&&p.can_claim&&!p.branch_id||!p.available&&p.is_owner&&!p.branch_id&&!p.team_request&&ownerScanCode===p.code&&!ownerDismissed.has(p.code));}
   function nearbySuggestion(p){
     const row=$('palletNearbyBranch'),check=$('palletNearbyBranchCheck');if(!row)return;
-    if(!nearbyEligible(p)){if($('palletNearbyOwner'))$('palletNearbyOwner').hidden=true;nearbyTurn++;nearbyCode='';nearbyId=0;row.hidden=true;check.checked=false;return;}
+    if(!nearbyEligible(p)){if($('palletMissingBranch'))$('palletMissingBranch').hidden=true;if($('palletNearbyOwner'))$('palletNearbyOwner').hidden=true;nearbyTurn++;nearbyCode='';nearbyId=0;row.hidden=true;check.checked=false;return;}
     if(nearbyCode===p.code)return;
     const sites=data.branches.filter(b=>b.latitude!=null&&b.longitude!=null&&Number.isFinite(Number(b.latitude))&&Number.isFinite(Number(b.longitude)));
-    if(!sites.length||!navigator.geolocation)return;
-    nearbyCode=p.code;nearbyId=0;row.hidden=true;$('palletNearbyOwner').hidden=true;check.checked=false;const turn=++nearbyTurn,code=p.code;
+    if(!navigator.geolocation)return;
+    let choice=window.RepoLocationNoticeChoices?.get(String(window.repotoolsStock?.user_id||0));try{choice=localStorage.getItem('repotools_location_notice_v1_user_'+Number(window.repotoolsStock?.user_id||0))||choice;}catch{}if(['dismissed','denied'].includes(choice))return;
+    nearbyCode=p.code;nearbyId=0;row.hidden=true;if($('palletMissingBranch'))$('palletMissingBranch').hidden=true;$('palletNearbyOwner').hidden=true;check.checked=false;const turn=++nearbyTurn,code=p.code;
     navigator.geolocation.getCurrentPosition(position=>{
       if(left||turn!==nearbyTurn||active?.code!==code||!nearbyEligible(active)||!$('palletDialog').open)return;
       const {latitude,longitude,accuracy}=position.coords;if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||!Number.isFinite(accuracy)||accuracy<0||accuracy>100||Math.abs(latitude)>90||Math.abs(longitude)>180)return;
       const rad=n=>n*Math.PI/180,distance=b=>{const a=rad(Number(b.latitude)-latitude),c=rad(Number(b.longitude)-longitude),h=Math.sin(a/2)**2+Math.cos(rad(latitude))*Math.cos(rad(Number(b.latitude)))*Math.sin(c/2)**2;return 6371000*2*Math.asin(Math.sqrt(Math.min(1,Math.max(0,h))));};
       const candidates=sites.map(b=>({branch:b,distance:distance(b)})).filter(b=>b.distance+accuracy<=100).sort((a,b)=>a.distance-b.distance||Number(a.branch.id)-Number(b.branch.id));
-      if(!candidates.length)return;nearbyId=Number(candidates[0].branch.id);const nearbyName=$('palletNearbyBranchName');nearbyName.replaceChildren();text('span','Vincular este palet a',nearbyName);const nearbyTag=text('span','',nearbyName,'stock-heading-branch pallet-nearby-branch-tag');nearbyTag.append(icon('branch'));text('span',candidates[0].branch.name,nearbyTag);if(active.available){check.checked=true;row.hidden=false;}else{$('palletNearbyOwnerTitle').textContent='¿Estás en '+candidates[0].branch.name+'?';$('palletNearbyOwnerStatus').textContent='';$('palletNearbyOwner').hidden=false;}
+      if(!candidates.length){missingSuggestion();return;}if($('palletMissingBranch'))$('palletMissingBranch').hidden=true;nearbyId=Number(candidates[0].branch.id);const nearbyName=$('palletNearbyBranchName');nearbyName.replaceChildren();text('span','Vincular este palet a',nearbyName);const nearbyTag=text('span','',nearbyName,'stock-heading-branch pallet-nearby-branch-tag');nearbyTag.append(icon('branch'));text('span',candidates[0].branch.name,nearbyTag);if(active.available){check.checked=true;row.hidden=false;}else{$('palletNearbyOwnerTitle').textContent='¿Estás en '+candidates[0].branch.name+'?';$('palletNearbyOwnerStatus').textContent='';$('palletNearbyOwner').hidden=false;}
     },()=>{}, {enableHighAccuracy:true,maximumAge:0,timeout:8000});
   }
   if(root){
     $('stockApp').addEventListener('branches:owner-scanned',event=>{if(active?.code!==event.detail?.code)return;ownerScanCode=active.code;nearbySuggestion(active);});
+    $('palletMissingBranchDismiss')?.addEventListener('click',()=>{$('palletMissingBranch').hidden=true;});
+    $('palletMissingBranchOpen')?.addEventListener('click',()=>{$('palletMissingBranch').hidden=true;$('assignPalletBranch').click();});
     $('palletNearbyOwnerCancel').addEventListener('click',()=>{if(ownerLinking)return;ownerDismissed.add(active.code);$('palletNearbyOwner').hidden=true;});
     $('palletNearbyOwnerAccept').addEventListener('click',async()=>{
       if(ownerLinking||!nearbyEligible(active)||active.available||!nearbyId)return;
@@ -79,7 +84,7 @@
       finally{ownerLinking=false;controls.forEach(b=>b.disabled=false);}
     });
   }
-  if(root){$('stockApp').repoNearbyBranch=code=>active?.available&&active.code===code&&nearbyCode===code&&$('palletNearbyBranchCheck')?.checked?nearbyId:0;$('palletDialog').addEventListener('close',()=>{nearbyTurn++;nearbyCode='';nearbyId=0;ownerScanCode='';if($('palletNearbyOwner'))$('palletNearbyOwner').hidden=true;if($('palletNearbyBranch'))$('palletNearbyBranch').hidden=true;});}
+  if(root){$('stockApp').repoNearbyBranch=code=>active?.available&&active.code===code&&nearbyCode===code&&$('palletNearbyBranchCheck')?.checked?nearbyId:0;$('palletDialog').addEventListener('close',()=>{nearbyTurn++;nearbyCode='';nearbyId=0;ownerScanCode='';if($('palletMissingBranch'))$('palletMissingBranch').hidden=true;if($('palletNearbyOwner'))$('palletNearbyOwner').hidden=true;if($('palletNearbyBranch'))$('palletNearbyBranch').hidden=true;});}
   function renderActive(){const p=active;nearbySuggestion(p);const b=data.branches.find(b=>Number(b.id)===Number(p.branch_id))||p.branch;const heading=$('palletHeadingBranch');if(heading){heading.hidden=!b;heading.replaceChildren();if(b){heading.append(icon('branch'));text('span',b.short_name||b.name,heading);}}$('palletBranchActions').hidden=Boolean(p.team_request)||(!p.is_owner&&!p.can_remove_branch);$('palletBranchButtonName').textContent=b?.name||'Sin sucursal';$('assignPalletBranch').setAttribute('aria-label',b?'Sucursal: '+b.name:'Sin sucursal');$('assignPalletBranch').title=b?'Sucursal: '+b.name:'Agregar sucursal';$('palletBranchInfo').replaceChildren();$('palletBranchInfo').hidden=true;if(b){$('palletBranchInfo').append(icon('branch'));text('span',b.name+' · '+address(b),$('palletBranchInfo'));if(b.description)text('small',b.description,$('palletBranchInfo'));}}
   async function shareURL(url,share=displayedShare){if(share?.token)url=await window.RepoShareLinks.url('s',share.token,csrf,url);if(navigator.share){try{await navigator.share({title:(share?.branch_id?'Stock de '+(data.branches.find(b=>Number(b.id)===Number(share.branch_id))?.name||'sucursal'):'Stock compartido')+' · Repotools',text:'Consulta los productos y las cantidades de este stock en Repotools. Acceso de solo lectura.',url});return;}catch(e){if(e.name==='AbortError')return;}}if(navigator.clipboard?.writeText){try{await navigator.clipboard.writeText(url);($('stockSharesDialog')?.open?$('stockSharesStatus'):$('stockShareFeedback')).textContent='';window.RepoToast?.('Enlace copiado.');return;}catch{}}result(share||{token:new URL(url).searchParams.get('token')||new URL(url).pathname.split('/').filter(Boolean).pop()});}
   async function result(share){displayedShare=share;$('stockShareForm').hidden=true;$('stockShareResult').hidden=false;$('stockShareFeedback').textContent='';const url=await window.RepoShareLinks.url('s',share.token,csrf,urlFor(share.token));if(left||displayedShare!==share)return;$('stockShareURL').value=url;$('openStockShare').href=url;show('stockShareDialog');$('stockShareDialog').dispatchEvent(new CustomEvent('repotools:form-saved',{bubbles:true}));}

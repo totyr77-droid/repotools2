@@ -60,6 +60,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
     <link href="css/loading.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if(!empty($paginaInicio)&&current_user()): ?><link rel="stylesheet" href="css/home-location.css?v=<?= substr(sha1_file(__DIR__.'/../css/home-location.css'),0,12) ?>"><?php endif; ?>
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <link href="css/contador.css" rel="stylesheet" type="text/css">

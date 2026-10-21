@@ -98,6 +98,7 @@
 <?php include __DIR__ . '/onboarding.vista.php'; ?>
 <script src="js/onboarding.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php endif; ?>
+<?php if(!empty($paginaInicio)&&current_user()): ?><script src="js/home-location.js?v=<?= substr(sha1_file(__DIR__.'/../js/home-location.js'),0,12) ?>"></script><?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-export.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-export.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-overview.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-overview.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()): ?><script src="js/scanner-performance.js?v=<?= substr(sha1_file(__DIR__.'/../js/scanner-performance.js'),0,12) ?>"></script><?php endif; ?>
