@@ -65,7 +65,7 @@
       const {latitude,longitude,accuracy}=position.coords;if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||!Number.isFinite(accuracy)||accuracy<0||accuracy>100||Math.abs(latitude)>90||Math.abs(longitude)>180)return;
       const rad=n=>n*Math.PI/180,distance=b=>{const a=rad(Number(b.latitude)-latitude),c=rad(Number(b.longitude)-longitude),h=Math.sin(a/2)**2+Math.cos(rad(latitude))*Math.cos(rad(Number(b.latitude)))*Math.sin(c/2)**2;return 6371000*2*Math.asin(Math.sqrt(Math.min(1,Math.max(0,h))));};
       const candidates=sites.map(b=>({branch:b,distance:distance(b)})).filter(b=>b.distance+accuracy<=100).sort((a,b)=>a.distance-b.distance||Number(a.branch.id)-Number(b.branch.id));
-      if(!candidates.length)return;nearbyId=Number(candidates[0].branch.id);$('palletNearbyBranchName').textContent='Vincular a '+candidates[0].branch.name;if(active.available){check.checked=true;row.hidden=false;}else{$('palletNearbyOwnerTitle').textContent='¿Estás en '+candidates[0].branch.name+'?';$('palletNearbyOwnerStatus').textContent='';$('palletNearbyOwner').hidden=false;}
+      if(!candidates.length)return;nearbyId=Number(candidates[0].branch.id);const nearbyName=$('palletNearbyBranchName');nearbyName.replaceChildren();text('span','Vincular este palet a',nearbyName);const nearbyTag=text('span','',nearbyName,'stock-heading-branch pallet-nearby-branch-tag');nearbyTag.append(icon('branch'));text('span',candidates[0].branch.name,nearbyTag);if(active.available){check.checked=true;row.hidden=false;}else{$('palletNearbyOwnerTitle').textContent='¿Estás en '+candidates[0].branch.name+'?';$('palletNearbyOwnerStatus').textContent='';$('palletNearbyOwner').hidden=false;}
     },()=>{}, {enableHighAccuracy:true,maximumAge:0,timeout:8000});
   }
   if(root){
