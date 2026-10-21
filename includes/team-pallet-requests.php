@@ -94,5 +94,6 @@ function team_request_resolve(PDO $db,int $user,int $id,string $decision,int $re
         pallet_activity_record($db,$user,(int)$p['id'],$before,pallet_activity_snapshot($db,(int)$p['id']));
     }
     stock_query($db,'UPDATE team_pallet_requests SET status=?,revision=revision+1 WHERE id=?',[$decision,$id]);
+    if($owner)stock_query($db,"UPDATE notifications SET read_at=COALESCE(read_at,CURRENT_TIMESTAMP) WHERE user_id=? AND event_key=? AND type='team_pallet_request'",[$user,'team-pallet-request:'.$id]);
     team_event($db,$user,(int)$r['branch_id'],'pallet_request_'.$decision,null,(int)$r['pallet_id'],['request_id'=>$id,'status'=>$decision]);
 }

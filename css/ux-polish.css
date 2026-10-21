@@ -850,3 +850,21 @@ body[data-hand=right] #palletDialog #palletTools>.stock-primary-actions,body[dat
 .team-request-dialog[data-conflict=true] .team-request-actions{flex-direction:row-reverse}
 body[data-hand=left] .team-request-dialog[data-conflict=true] .team-request-actions{flex-direction:row}
 body[data-hand=left] .team-request-dialog:not([data-conflict=true]) .team-request-actions{flex-direction:row-reverse}
+
+/* Deduct review: product first, clear quantities and one action after a conflict. */
+#stockDeductDialog .library-heading{margin-bottom:10px;padding-bottom:8px}#stockDeductDialog .library-heading h2{font-size:1.12rem}
+#stockDeductDialog #deductProductName{font-weight:600;color:#27187e;font-size:.95rem;line-height:1.35;margin:0 0 12px}
+#stockDeductDialog #deductFixedEan{font-size:.8rem;margin:0 0 4px}
+#stockDeductDialog #stockDeductForm label{font-size:.88rem}#stockDeductDialog #deductFields>.stock-form-row{margin-bottom:10px}
+#stockDeductDialog #deductRemaining{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0;color:#62577e;font-size:.75rem}
+#deductRemaining>span{min-width:0;display:grid;gap:2px}#deductRemaining small{font-size:.75rem}#deductRemaining strong{font-size:1.05rem;font-weight:600;color:#27187e;overflow-wrap:anywhere}#deductRemaining>span:last-child{text-align:right}#deductRemaining>span:nth-of-type(2){text-align:center}#deductRemaining[data-invalid=true]>span:last-child strong{color:#ad2438}
+#stockDeductDialog #deductStatus:empty{display:none}#stockDeductDialog #deductStatus{font-size:.84rem;line-height:1.4;margin:10px 0;padding:9px 11px;border-radius:8px;background:#f3f0fb;color:#62577e}#stockDeductDialog #deductStatus[data-state=warning]{background:#fff6de;color:#795b08}
+#stockDeductDialog .library-dialog-actions{margin-top:12px;gap:8px}#stockDeductDialog .library-dialog-actions button{font-size:.9rem;min-height:46px;padding:9px 12px}
+#stockDeductDialog #reloadDeductProduct{background:#27187e;color:#fff}#stockDeductDialog .library-dialog-actions button[hidden]{display:none!important}
+
+#deductRemaining>.deduct-summary-unit{grid-column:1/-1;font-size:.72rem;color:#716b80}#deductRemaining>span:nth-of-type(2){text-align:center}#deductRemaining>span:last-child{text-align:right}
+
+.team-request-dialog .team-request-title,.stock-explicit-heading{display:flex;align-items:center;gap:7px;color:#27187e}
+.team-request-title::before,.stock-explicit-heading::before{display:none!important}
+.team-request-dialog .team-request-title svg,.stock-explicit-heading svg{width:21px;height:21px;flex:none;color:inherit}
+.team-request-dialog .team-request-actions>button{display:inline-flex;align-items:center;justify-content:center;gap:6px}.team-request-actions>button svg{width:18px;height:18px;flex:none}
