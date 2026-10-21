@@ -1,6 +1,12 @@
 {
-  "version": 120,
+  "version": 121,
   "changes": [
+    {
+      "version": 121,
+      "label": "2.16",
+      "date": "2026-10-21",
+      "summary": "Acceso continuo al lector, vencimientos por lote y controles compactos de equipo"
+    },
     {
       "version": 120,
       "label": "2.15",
@@ -294,15 +300,9 @@
       "label": "1.67",
       "date": "2026-10-18",
       "summary": "Agrega Guardar y escanear otro para cargar productos seguidos en el mismo palet, también sin conexión."
-    },
-    {
-      "version": 71,
-      "label": "1.66",
-      "date": "2026-10-18",
-      "summary": "Al editar vencimiento conserva el foco y no abre cantidad; avance automático solo en nuevas cargas."
     }
   ],
   "major": 2,
-  "minor": 15,
-  "label": "2.15"
+  "minor": 16,
+  "label": "2.16"
 }
