@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../includes/branch-team.php';require_once __DIR__.'/../includes/stock-branches.php';
+require_once __DIR__.'/../includes/pallet-activity.php';require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../includes/branch-team.php';require_once __DIR__.'/../includes/stock-branches.php';
 function team_check($ok,string $message):void{if(!$ok)throw new RuntimeException($message);}
 function team_denied(callable $work,int $status):void{try{$work();}catch(CatalogException $error){team_check($error->status===$status,$error->getMessage());return;}throw new RuntimeException('Expected '.$status);}
 $db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($db);initialize_database($db);
@@ -34,10 +34,10 @@ stock_query($db,'INSERT INTO pallet_labels(code,reserved_by,reserved_until) VALU
 stock_query($db,'INSERT INTO pallet_labels(code,reserved_by,reserved_until) VALUES(?,4,?)',['00123456',time()+86400]);$p=stock_claim($db,'00123456',4);
 team_denied(fn()=>stock_editable($db,(int)$p['id'],3),403);
 stock_query($db,'INSERT INTO stock_shares(owner_id,token,branch_id,title) VALUES(4,?,?,?)',[str_repeat('a',64),$branch,'Consulta']);
-$scan=team_scan($db,3,'00123456',$branch,$geo);team_check($scan['assigned']&&$scan['pallet']['can_edit'],'scan auto assigns and grants access');
+$scan=team_scan($db,3,'00123456',$branch,$geo);team_check($scan['pending_approval']&&$scan['pallet']['can_edit'],'scan creates isolated proposal');$request=team_pallet_request($db,(int)$p['id'],$branch);team_request_resolve($db,4,(int)$request['id'],'accepted',(int)$request['revision']);
 team_check((int)stock_query($db,'SELECT owner_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===4,'owner retained');
 team_check(!team_scan($db,3,'00123456',$branch,$geo)['assigned'],'repeat scan is idempotent');
-team_check((int)stock_query($db,"SELECT COUNT(*) FROM branch_team_events WHERE action='pallet_assigned'")->fetchColumn()===1,'single assignment event');
+team_check((int)stock_query($db,"SELECT COUNT(*) FROM branch_team_events WHERE action='pallet_access_requested'")->fetchColumn()===1,'single assignment event');
 team_check((int)stock_query($db,'SELECT COUNT(*) FROM stock_share_exclusions')->fetchColumn()===1,'automatic assignment does not publish through old shares');
 team_denied(fn()=>stock_editable($db,(int)$p['id'],3,true),403);
 stock_save_product($db,3,['pallet_id'=>$p['id'],'ean'=>'96385074','name'=>'Producto','amount'=>2,'kind'=>'boxes','pack_size'=>12,'expires'=>'']);
@@ -49,7 +49,7 @@ team_denied(fn()=>stock_editable($db,(int)$p['id'],3),403);team_denied(fn()=>tea
 team_check(stock_detail($db,'00123456',4)['can_edit'],'owner independent of team');
 $again=team_invite($db,2,$branch,'operator');team_accept($db,3,$again,$geo);team_check(team_role($db,3,$branch)==='operator','fresh authorization restores');
 stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=?',[$foreign['id'],$p['id']]);team_scan($db,3,'00123456',$branch,$geo);
-team_check((int)stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===$branch,'located team scan reassigns previous branch');
+team_check((int)stock_query($db,'SELECT branch_id FROM pallets WHERE id=?',[$p['id']])->fetchColumn()===(int)$foreign['id'],'foreign branch stays unchanged until owner approval');$request=team_pallet_request($db,(int)$p['id'],$branch);team_request_resolve($db,4,(int)$request['id'],'rejected',(int)$request['revision']);
 team_select($db,4,0);team_denied(fn()=>team_scan($db,4,'00123456',$branch,$geo),409);
 $expired=team_invite($db,1,$branch,'operator');stock_query($db,'UPDATE branch_team_invites SET expires=? WHERE token_hash=?',[time()-1,hash('sha256',$expired)]);team_denied(fn()=>team_accept($db,5,$expired,$geo),410);
 team_denied(fn()=>team_revoke($db,2,$branch,1,1),403);team_denied(fn()=>team_revoke($db,2,$branch,2,1),403);

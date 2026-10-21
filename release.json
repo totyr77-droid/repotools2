@@ -1,6 +1,12 @@
 {
-  "version": 110,
+  "version": 111,
   "changes": [
+    {
+      "version": 111,
+      "label": "2.06",
+      "date": "2026-10-21",
+      "summary": "Solicitudes al propietario y ediciones pendientes de Mi equipo sin GPS"
+    },
     {
       "version": 110,
       "label": "2.05",
@@ -294,15 +300,9 @@
       "label": "1.57",
       "date": "2026-10-18",
       "summary": "Informa EAN encontrado o ausente y unidades al buscar en informes de Stock y palets."
-    },
-    {
-      "version": 61,
-      "label": "1.56",
-      "date": "2026-10-18",
-      "summary": "Corrige buscadores e iconos de consulta, centra carga e ingreso a filtros desde enlaces de Stock sin controles vacíos."
     }
   ],
   "major": 2,
-  "minor": 5,
-  "label": "2.05"
+  "minor": 6,
+  "label": "2.06"
 }

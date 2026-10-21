@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/stock.php';
 require_once __DIR__.'/branch-team-security.php';
+require_once __DIR__.'/team-pallet-requests.php';
 
 // Business permissions are independent of users.role (catalog moderation).
 function team_can_assign(PDO $db,int $user): bool {
@@ -25,7 +26,7 @@ function team_event(PDO $db,int $user,int $branch,string $action,?int $target=nu
     stock_query($db,'INSERT INTO branch_team_events(branch_id,actor_id,action,target_id,pallet_id,metadata) VALUES(?,?,?,?,?,?)',[$branch,$user,$action,$target,$pallet,json_encode($metadata,JSON_UNESCAPED_UNICODE)]);
 }
 function team_locations(PDO $db,int $user): array {
-    return stock_query($db,"SELECT b.id,b.name,b.address,b.revision,m.expires_at,COALESCE(s.enabled,1) AS security_enabled,CASE WHEN s.branch_id IS NULL THEN 25200 ELSE s.default_seconds END AS default_seconds,w.id AS workspace_id,w.name AS workspace_name,CASE WHEN w.owner_id=? OR CAST(? AS INTEGER)=1 THEN 'admin' ELSE m.role END AS role FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id JOIN branch_workspaces w ON w.id=l.workspace_id LEFT JOIN branch_team_security s ON s.branch_id=b.id LEFT JOIN branch_team_members m ON m.branch_id=b.id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().") WHERE w.owner_id=? OR m.user_id IS NOT NULL OR (CAST(? AS INTEGER)=1 AND b.id=(SELECT branch_id FROM branch_team_active WHERE user_id=?)) ORDER BY w.name,b.name,b.id",[$user,(int)team_can_assign($db,$user),$user,$user,(int)team_can_assign($db,$user),$user])->fetchAll();
+    return stock_query($db,"SELECT b.id,b.name,b.address,b.revision,m.expires_at,0 AS security_enabled,CASE WHEN s.branch_id IS NULL THEN 25200 ELSE s.default_seconds END AS default_seconds,w.id AS workspace_id,w.name AS workspace_name,CASE WHEN w.owner_id=? OR CAST(? AS INTEGER)=1 THEN 'admin' ELSE m.role END AS role FROM branch_workspace_locations l JOIN stock_branches b ON b.id=l.branch_id JOIN branch_workspaces w ON w.id=l.workspace_id LEFT JOIN branch_team_security s ON s.branch_id=b.id LEFT JOIN branch_team_members m ON m.branch_id=b.id AND m.user_id=? AND m.active=1 AND (m.expires_at IS NULL OR m.expires_at>".time().") WHERE w.owner_id=? OR m.user_id IS NOT NULL OR (CAST(? AS INTEGER)=1 AND b.id=(SELECT branch_id FROM branch_team_active WHERE user_id=?)) ORDER BY w.name,b.name,b.id",[$user,(int)team_can_assign($db,$user),$user,$user,(int)team_can_assign($db,$user),$user])->fetchAll();
 }
 function team_active(PDO $db,int $user): int {
     $branch=(int)stock_query($db,'SELECT branch_id FROM branch_team_active WHERE user_id=?',[$user])->fetchColumn();
@@ -87,7 +88,7 @@ function team_accept_hash(PDO $db,int $user,string $hash,array $position=[]): vo
 }
 
 function team_incoming(PDO $db,int $user): array {
-    return stock_query($db,'SELECT i.token_hash,i.role,i.access_seconds,b.name,COALESCE(s.enabled,1) AS security_enabled FROM branch_team_invites i JOIN stock_branches b ON b.id=i.branch_id LEFT JOIN branch_team_security s ON s.branch_id=b.id WHERE i.recipient_id=? AND i.revoked=0 AND i.used_by IS NULL AND i.expires>? ORDER BY i.expires DESC',[$user,time()])->fetchAll();
+    return stock_query($db,'SELECT i.token_hash,i.role,i.access_seconds,b.name,0 AS security_enabled FROM branch_team_invites i JOIN stock_branches b ON b.id=i.branch_id LEFT JOIN branch_team_security s ON s.branch_id=b.id WHERE i.recipient_id=? AND i.revoked=0 AND i.used_by IS NULL AND i.expires>? ORDER BY i.expires DESC',[$user,time()])->fetchAll();
 }
 function team_change_role(PDO $db,int $user,int $branch,int $target,string $role,int $revision): void {
     if(team_require($db,$user,$branch,true)!=='admin'||$target===$user||!in_array(team_role($db,$target,$branch),['manager','operator'],true))throw new CatalogException('Solo el administrador puede cambiar este rango.',403);
@@ -116,23 +117,11 @@ function team_scan(PDO $db,int $user,string $code,int $expectedBranch,array $pos
     if(!$label['pallet_id'])throw new CatalogException('Este QR todavía no tiene un palet. Su dueño debe prepararlo primero.',409);
     $p=stock_query($db,'SELECT * FROM pallets WHERE id=? AND released=0',[$label['pallet_id']])->fetch();
     if(!$p)throw new CatalogException('El palet ya no está disponible.',409);
-    $assigned=false;
     if((int)($p['branch_id']??0)!==$branch){
-        $assigned=(bool)stock_query($db,'UPDATE pallets SET branch_id=?,revision=revision+1,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND revision=? AND released=0',[$branch,$user,$p['id'],$p['revision']])->rowCount();
-        if($assigned){
-            team_event($db,$user,$branch,'pallet_assigned',null,(int)$p['id']);
-            $name=stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branch])->fetchColumn();
-            stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,action,metadata) VALUES(?,?,?,?)',[$user,$p['id'],'branch_updated',json_encode(['old'=>$p['branch_id']?stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$p['branch_id']])->fetchColumn():'Sin sucursal','new'=>$name],JSON_UNESCAPED_UNICODE)]);
-            // Joining a team is not consent to publish this pallet through an existing link.
-            foreach(stock_query($db,'SELECT id FROM stock_shares WHERE owner_id=? AND branch_id=? AND active=1',[$p['owner_id'],$branch])->fetchAll(PDO::FETCH_COLUMN) as $share){
-                stock_query($db,'INSERT INTO stock_share_exclusions(share_id,pallet_id) VALUES(?,?) ON CONFLICT(share_id,pallet_id) DO NOTHING',[$share,$p['id']]);
-            }
-        }
-    }elseif(!team_role($db,$user,(int)$p['branch_id'])){
-        // Existing owner/invited access remains valid; scanning alone grants no foreign access.
-        stock_editable($db,(int)$p['id'],$user);
+        team_request_start($db,$user,$p,$branch);
+        return ['code'=>$code,'assigned'=>false,'pending_approval'=>true,'pallet'=>team_request_detail($db,$code,$user,$branch)];
     }
-    return ['code'=>$code,'assigned'=>$assigned,'pallet'=>stock_detail($db,$code,$user)];
+    return ['code'=>$code,'assigned'=>false,'pallet'=>stock_detail($db,$code,$user)];
 }
 function team_overview(PDO $db,int $user,int $branch,int $cursor=0): array {
     team_require($db,$user,$branch,true);

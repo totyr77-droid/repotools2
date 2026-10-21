@@ -22,3 +22,5 @@
 <script src="js/stock-filter-popovers.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-filter-popovers.js'),0,12) ?>"></script>
 <script src="js/stock-tags.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-tags.js'),0,12) ?>"></script>
 <script src="js/stock-branches.js?v=<?= substr(sha1_file(__DIR__.'/../js/stock-branches.js'),0,12) ?>"></script>
+
+<script src="js/team-pallet-requests.js?v=<?= (int)app_release()['version'] ?>"></script>

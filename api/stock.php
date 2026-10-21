@@ -31,6 +31,21 @@ if ($method==='POST' && (!$uid || !valid_csrf())) stock_response($uid?403:401,['
 $csrf=csrf_token();$catalogPermit=$method==='POST'&&$uid?catalog_reference_take($uid,$_POST):null; session_write_close(); $db=null;
 try {
     $db=database(); $db->beginTransaction();
+    $teamBranch=(int)($_POST['team_branch_id']??$_GET['team_branch_id']??0);
+    if($teamBranch){
+        if(!$uid)throw new CatalogException('Ingresá para acceder al equipo.',401);
+        team_require($db,$uid,$teamBranch);
+        if($method==='GET'&&isset($_GET['code'])){$result=['pallet'=>team_request_detail($db,(string)$_GET['code'],$uid,$teamBranch),'csrf'=>$csrf,'user_id'=>$uid];$db->commit();stock_response(200,$result);}
+        if($method==='POST'){
+            if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
+            $key=$_POST['operation_key']??'';if(!is_string($key)||!preg_match('/^[a-f0-9-]{36}$/D',$key))throw new CatalogException('Recargá el formulario.',422);
+            $payload=$_POST;unset($payload['csrf']);$hash=hash('sha256',json_encode($payload));
+            $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
+            if($cached!==false&&isset(json_decode($cached,true)['_team_payload'])){$previous=json_decode($cached,true);if(!hash_equals($previous['_team_payload'],$hash))throw new CatalogException('La operación ya fue utilizada. Revisá el palet.',409);unset($previous['_team_payload']);$db->commit();stock_response(200,[...$previous,'csrf'=>$csrf,'user_id'=>$uid]);}
+            $pending=team_request_edit($db,$uid,$teamBranch,$_POST);
+            if($pending!==null){stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode([...$pending,'_team_payload'=>$hash],JSON_UNESCAPED_UNICODE)]);$db->commit();stock_response(200,[...$pending,'csrf'=>$csrf,'user_id'=>$uid]);}
+        }
+    }
     $expiryDue=$method==='POST'||stock_query($db,'SELECT 1 FROM pallet_labels WHERE (pallet_id IS NULL AND reserved_until>0 AND reserved_until<=?) OR pallet_id IN (SELECT id FROM pallets WHERE released=1 OR (released=0 AND activated=0 AND prepared_until<=? AND NOT EXISTS(SELECT 1 FROM pallet_products b WHERE b.pallet_id=pallets.id))) LIMIT 1',[time(),time()])->fetchColumn();
     if($expiryDue){if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');stock_expire($db);}
     if ($method==='GET') {

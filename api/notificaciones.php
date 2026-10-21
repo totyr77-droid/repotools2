@@ -26,6 +26,7 @@ try {
     $stmt = $db->prepare('SELECT n.event_key, n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? ORDER BY n.id DESC LIMIT 40');
     $stmt->execute([$userId]); $items = $stmt->fetchAll();
     foreach ($items as &$item) {
+        if($item['type']==='team_pallet_request'&&preg_match('/^team-pallet-request:([0-9]+)$/',$item['event_key'],$match))$item['team_request_id']=(int)$match[1];
         if($item['type']==='library_invitation'&&preg_match('/^library-share:([0-9]+):/',$item['event_key'],$match)){
             $q=$db->prepare('SELECT token FROM library_shares WHERE source_library_id=?');$q->execute([(int)$match[1]]);$item['library_token']=$q->fetchColumn()?:null;
         }
