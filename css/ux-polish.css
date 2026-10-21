@@ -868,3 +868,13 @@ body[data-hand=left] .team-request-dialog:not([data-conflict=true]) .team-reques
 .team-request-title::before,.stock-explicit-heading::before{display:none!important}
 .team-request-dialog .team-request-title svg,.stock-explicit-heading svg{width:21px;height:21px;flex:none;color:inherit}
 .team-request-dialog .team-request-actions>button{display:inline-flex;align-items:center;justify-content:center;gap:6px}.team-request-actions>button svg{width:18px;height:18px;flex:none}
+
+.team-request-list-dialog{width:min(540px,calc(100vw - 24px));max-height:calc(var(--dialog-visible-height,100dvh) - 24px);box-sizing:border-box;padding:16px;overflow:auto}
+.team-request-list-dialog .stock-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.team-request-list-dialog h2{font-size:1.1rem;min-width:0}.team-request-list-dialog .stock-icon{width:44px;height:44px;min-height:44px;flex:none;padding:10px}
+.team-request-list-dialog .team-request-title{display:flex;align-items:center;gap:7px;color:#27187e}.team-request-list-dialog .team-request-title svg{width:20px;height:20px;flex:none}
+.team-request-modal-items{display:grid;gap:7px}.team-request-modal-items .team-request-link{display:flex;align-items:center;gap:10px;width:100%;min-width:0;min-height:56px;padding:10px 12px;text-align:left;border:1px solid #e3dfed;background:#fff;border-radius:10px;box-sizing:border-box}
+.team-request-modal-items .team-request-link>svg{width:20px;height:20px;flex:none}.team-request-modal-items .team-request-link>span:not(.team-request-arrow){display:grid;gap:3px;min-width:0;overflow-wrap:anywhere}.team-request-modal-items .team-request-link strong{font-size:.95rem}.team-request-modal-items .team-request-link small{font-size:.8rem;color:#676577}.team-request-modal-items .team-request-arrow{margin-left:auto;flex:none;font-size:1.4rem;color:#655d80}
+.team-request-list-dialog>p:empty{display:none}
+
+.team-request-list-dialog[open]{display:flex;flex-direction:column;overflow:hidden}.team-request-list-dialog>.stock-dialog-heading{flex:none}.team-request-list-dialog>.team-request-modal-items{min-height:0;overflow-y:auto;overscroll-behavior:contain}
