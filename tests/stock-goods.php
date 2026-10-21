@@ -3,6 +3,7 @@ require __DIR__.'/stock-recent-order.php';require_once __DIR__.'/../includes/tea
 stock_save_product($db,1,['pallet_id'=>$a['id'],'ean'=>'96385074','amount'=>3,'expires'=>'2031-01-01']);
 $goods=team_inventory_page($db,1,0,'mercaderia',[],true)['items'];order_check(count($goods)===1&&(int)$goods[0]['units']===34&&(int)$goods[0]['pallets']===3&&(int)$goods[0]['date_count']===4,'one product, all dates, own exact totals');
 $dates=team_inventory_page($db,1,0,'fechas',['ean'=>'96385074'],true)['items'];order_check(count($dates)===4&&end($dates)['expires']==='2020-01-01','dates split with expired last');
+$dueDates=team_inventory_page($db,1,0,'fechas',['ean'=>'96385074','expiry'=>'due','sort'=>'expiry_asc'],true)['items'];$orderedDates=array_column($dueDates,'expires');$sortedDates=$orderedDates;sort($sortedDates);order_check($orderedDates===$sortedDates,'quick expiry dates chronological including expired');
 $lots=team_inventory_page($db,1,0,'lotes',['ean'=>'96385074','expires'=>'2031-01-01'],true)['items'];order_check(count($lots)===1&&$lots[0]['code']===$a['code']&&(int)$lots[0]['units']===3,'exact pallet/expiry drilldown');
 order_check((int)team_inventory_page($db,2,0,'mercaderia',[],true)['items'][0]['units']===15,'accepted shared scope');
 stock_query($db,"UPDATE users SET role='manager' WHERE id=2");order_check((int)team_inventory_page($db,2,0,'mercaderia',[],true)['items'][0]['units']===15,'platform manager still uses personal Stock scope');

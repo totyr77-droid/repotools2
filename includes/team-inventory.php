@@ -42,7 +42,8 @@ function team_inventory_page(PDO $db,int $user,int $branch,string $view,array $i
             $group=' GROUP BY b.ean ORDER BY '.$order;
         }elseif($view==='fechas'){
             $select="b.ean,b.expires,COALESCE(MIN(NULLIF(b.name,'')),MIN(c.name),'Producto sin nombre') AS name,SUM(b.units) AS units,COUNT(DISTINCT p.id) AS pallets";
-            $group=" GROUP BY b.ean,b.expires ORDER BY CASE WHEN b.expires='' THEN 1 WHEN b.expires<'$today' THEN 2 ELSE 0 END,b.expires $direction,b.ean";
+            $dateOrder=$expiry==='due'&&$sort?"b.expires $direction,b.ean":"CASE WHEN b.expires='' THEN 1 WHEN b.expires<'$today' THEN 2 ELSE 0 END,b.expires $direction,b.ean";
+            $group=" GROUP BY b.ean,b.expires ORDER BY $dateOrder";
         }
         $rows=$query('SELECT '.$select.' FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN products c ON c.ean=b.ean WHERE '.implode(' AND ',$where).$group." LIMIT 31 OFFSET $offset",$params)->fetchAll();
     }else{

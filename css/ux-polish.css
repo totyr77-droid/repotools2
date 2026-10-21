@@ -900,3 +900,21 @@ body[data-hand=left] .team-request-dialog:not([data-conflict=true]) .team-reques
 
 /* Optional branch hint stays inside the relevant pallet task. */
 #palletDialog .pallet-missing-branch{padding:12px 0;margin:5px 0;border-top:1px solid #e9e5f0;color:#27197f;text-align:start}#palletDialog .pallet-missing-branch-heading{display:flex;align-items:center;gap:6px;font-size:.88rem}#palletDialog .pallet-missing-branch svg{width:17px;height:17px;flex:none}#palletDialog .pallet-missing-branch p{margin:5px 0 7px;font-size:.8rem;line-height:1.4;color:#726b80}#palletDialog .pallet-missing-branch-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}#palletDialog .pallet-missing-branch-actions button{display:flex;align-items:center;justify-content:center;gap:5px;margin:0;padding:8px 10px;font-size:.8rem;min-height:44px;border-radius:9px}#palletDialog #palletMissingBranchDismiss{background:none;color:#726b80}body[data-hand=left] #palletDialog .pallet-missing-branch-actions{flex-direction:row-reverse}
+
+/* Stock: iconos visibles y metadata compacta a la derecha del producto. */
+.stock-filter-popover #stockFilterPanel .branch-stock-filter>label>svg{display:block}
+#stockApp .stock-tabs>button>svg{width:19px;height:19px;flex:none;vertical-align:middle;margin-inline-end:5px}
+.repo-mobile-subnav button[data-target="#ownedTab"]>svg,.repo-mobile-subnav button[data-target="#goodsTab"]>svg,.repo-mobile-subnav button[data-target="#pendingTab"]>svg,.repo-mobile-subnav button[data-target="#sharedTab"]>svg{display:block;width:19px;height:19px;margin:0 auto 3px}
+#stockApp .stock-card.stock-search-result{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);align-items:center;gap:10px;text-align:start}
+.stock-result-content{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;overflow-wrap:anywhere}
+.stock-result-badges{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:6px;max-width:120px;min-width:0}
+.stock-result-badges:empty{display:none}
+#stockApp .stock-result-badges>:is(.stock-result-branch,.stock-result-tag){position:static;display:inline-flex;flex-direction:row-reverse;align-items:center;gap:4px;margin:0;max-width:100%;width:fit-content;white-space:normal;overflow-wrap:anywhere;font-size:.73rem;line-height:1.3;text-align:end}
+#stockApp .stock-result-badges svg{width:15px;height:15px;flex:none}
+.stock-goods-total>.stock-goods-days.stock-expiry-safe{color:#246b45;background:transparent}
+.stock-goods-total>.stock-goods-days.stock-expiry-near{color:#99620c;background:transparent}
+.stock-goods-total>.stock-goods-days.stock-expiry-today{color:#a8440a;background:transparent}
+.stock-goods-total>.stock-goods-days.stock-expiry-past{color:#b42332;background:transparent}
+@media(max-width:360px){.stock-result-badges{max-width:94px}#stockApp .stock-card.stock-search-result{gap:8px}}
+
+#stockApp .stock-card.stock-search-result:not(:has(.stock-result-badges>*)){grid-template-columns:minmax(0,1fr)}

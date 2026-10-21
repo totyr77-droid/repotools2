@@ -1,6 +1,12 @@
 {
-  "version": 130,
+  "version": 131,
   "changes": [
+    {
+      "version": 131,
+      "label": "2.26",
+      "date": "2026-10-21",
+      "summary": "Stock: iconos consistentes, vencimientos ordenados y etiquetas compactas."
+    },
     {
       "version": 130,
       "label": "2.25",
@@ -294,15 +300,9 @@
       "label": "1.77",
       "date": "2026-10-18",
       "summary": "Referencias de productos al sincronizar y progreso visible del OCR"
-    },
-    {
-      "version": 81,
-      "label": "1.76",
-      "date": "2026-10-18",
-      "summary": "Conserva búsqueda, filtros y borradores de Stock al pasar offline, con resultados locales y sin duplicar cargas."
     }
   ],
   "major": 2,
-  "minor": 25,
-  "label": "2.25"
+  "minor": 26,
+  "label": "2.26"
 }
