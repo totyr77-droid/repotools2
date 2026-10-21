@@ -24,3 +24,13 @@ $summary=team_inventory_page($db,1,0,'mercaderia',['q'=>'12345670'],true)['items
 $dates=team_inventory_page($db,1,0,'fechas',['ean'=>'12345670'],true)['items'];order_check(array_column($dates,'expires')===[$date(3),$date(5),$date(730),$date(731),$date(-2),$date(-1)],'active then expired date groups');
 $due=team_inventory_page($db,1,0,'mercaderia',['q'=>'12345670','expiry'=>'due'],true)['items'][0];order_check((int)$due['units']===5&&(int)$due['safe_dates']===0,'quick expiry includes upcoming/expired only');
 echo "OK: distinct date badges, nearest active, expired last and quick expiry scope.\n";
+
+stock_query($db,"INSERT INTO stock_branches(id,owner_id,name,address,locality,province) VALUES(1,1,'Local visible','A','B','C'),(12,1,'Test privado','A','B','C')");
+stock_query($db,'UPDATE pallets SET branch_id=1 WHERE id=?',[$a['id']]);
+$lot=team_inventory_page($db,1,0,'lotes',['ean'=>'96385074','expires'=>'2031-01-01'],true)['items'][0];
+order_check($lot['branch_name']==='Local visible'&&$lot['tag']==='Personal','lot shows visible branch and own tag');
+stock_query($db,'UPDATE pallets SET branch_id=12 WHERE id=?',[$a['id']]);
+stock_query($db,"UPDATE users SET role='usuario' WHERE id=1");
+$lot=team_inventory_page($db,1,0,'lotes',['ean'=>'96385074','expires'=>'2031-01-01'],true)['items'][0];
+order_check($lot['branch_name']===null&&$lot['tag']===null,'restricted branch and rank-private tag remain hidden');
+echo "OK: lot badges respect branch visibility and private label scope.\n";

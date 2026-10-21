@@ -1,6 +1,12 @@
 {
-  "version": 121,
+  "version": 122,
   "changes": [
+    {
+      "version": 122,
+      "label": "2.17",
+      "date": "2026-10-21",
+      "summary": "Sucursal y etiqueta por lote y acceso QR junto a Usar palet"
+    },
     {
       "version": 121,
       "label": "2.16",
@@ -294,15 +300,9 @@
       "label": "1.68",
       "date": "2026-10-18",
       "summary": "Búsqueda de Stock con descripción coincidente, total completo de palets y unidades por EAN y apertura del producto destacado."
-    },
-    {
-      "version": 72,
-      "label": "1.67",
-      "date": "2026-10-18",
-      "summary": "Agrega Guardar y escanear otro para cargar productos seguidos en el mismo palet, también sin conexión."
     }
   ],
   "major": 2,
-  "minor": 16,
-  "label": "2.16"
+  "minor": 17,
+  "label": "2.17"
 }
