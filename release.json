@@ -1,6 +1,12 @@
 {
-  "version": 114,
+  "version": 115,
   "changes": [
+    {
+      "version": 115,
+      "label": "2.10",
+      "date": "2026-10-21",
+      "summary": "Solicitudes de palet más claras y compactas"
+    },
     {
       "version": 114,
       "label": "2.09",
@@ -294,15 +300,9 @@
       "label": "1.61",
       "date": "2026-10-18",
       "summary": "Conserva la misma lista de EAN al pasar entre Inicio online y offline, sin recuperar listas anteriores al vaciar."
-    },
-    {
-      "version": 65,
-      "label": "1.60",
-      "date": "2026-10-18",
-      "summary": "Permite buscar mercadería en Stock por la descripción del palet, combinada con sucursal y etiqueta."
     }
   ],
   "major": 2,
-  "minor": 9,
-  "label": "2.09"
+  "minor": 10,
+  "label": "2.10"
 }
