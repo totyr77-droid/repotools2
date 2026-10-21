@@ -29,6 +29,9 @@ function account_icon(string $name): string {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$paths[$name].'</svg>';
 }
 function account_destination(string $next): string {
+    if(in_array($next,['','biblioteca'],true)&&is_string($_SESSION['library_share']??null)&&preg_match('/^[a-f0-9]{64}$/D',$_SESSION['library_share'])){
+        $token=$_SESSION['library_share'];unset($_SESSION['library_share']);return 'biblioteca.php?share='.rawurlencode($token);
+    }
     if($next==='stock-compartido'){ $token=$_SESSION['pending_stock_report_token']??'';unset($_SESSION['pending_stock_report_token']);return is_string($token)&&preg_match('/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{64})$/D',$token)?'stock-compartido.php?token='.rawurlencode($token):'index.php'; }
     if($next==='palet'){ $code=$_SESSION['pending_report_code']??'';unset($_SESSION['pending_report_code']);return is_string($code)&&preg_match('/^[0-9]{8}$/D',$code)?'palet.php?codigo='.rawurlencode($code):'index.php'; }
     if($next==='stock'&&is_string($_SESSION['pending_label_codes']??null)){ $codes=$_SESSION['pending_label_codes'];unset($_SESSION['pending_label_codes']);if(preg_match('/^[0-9]{8}(?:,[0-9]{8}){0,99}$/D',$codes))return 'etiqueta.php?codigos='.rawurlencode($codes); }

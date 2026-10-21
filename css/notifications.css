@@ -44,3 +44,14 @@
 #openNotifications{margin:0;padding:0;border:0;line-height:1}
 #openNotifications svg{display:block}
 .notification-item .notification-badge{width:44px;height:50px;object-fit:contain;flex:none}.notification-item .notification-achievement-detail{font-size:.76rem;color:#747086;margin-top:5px}
+
+/* Shared hierarchy: title/state, branch context, short message and date. */
+.notification-item-heading{display:flex;align-items:center;gap:8px;min-width:0}
+.notification-item-heading strong{flex:1;min-width:0;font-size:.94rem;line-height:1.3}
+.notification-unread-dot{width:6px;height:6px;flex:none;border-radius:50%;background:#27187e}
+.notification-item .notification-branch-label{display:inline-flex;align-items:center;gap:4px;max-width:100%;box-sizing:border-box;margin:5px 0 2px;padding:2px 7px;border-radius:6px;background:#e5f4f8;color:#246579;font-size:.78rem;line-height:1.35}
+.notification-branch-label svg{width:14px;height:14px;flex:none}
+.notification-item:focus-visible{outline:2px solid #6552b5;outline-offset:-2px;border-radius:6px}
+@media(hover:hover){.notification-item:hover{background:#f5f4fa}}
+
+.notification-item-heading{align-items:flex-start;gap:6px}.notification-item .notification-item-heading time{margin:2px 0 0;font-size:.67rem;line-height:1.4;white-space:nowrap;flex:none}.notification-item-heading .notification-unread-dot{margin-top:6px}

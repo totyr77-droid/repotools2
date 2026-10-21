@@ -1,6 +1,12 @@
 {
-  "version": 112,
+  "version": 113,
   "changes": [
+    {
+      "version": 113,
+      "label": "2.08",
+      "date": "2026-10-21",
+      "summary": "Sucursal TEST para managers, notificaciones compactas y enlaces de colecciones"
+    },
     {
       "version": 112,
       "label": "2.07",
@@ -294,15 +300,9 @@
       "label": "1.59",
       "date": "2026-10-18",
       "summary": "Rescata QR en perspectiva, reduce esperas OCR y mejora métricas de Sistema con mediana, P90 y acción local."
-    },
-    {
-      "version": 63,
-      "label": "1.58",
-      "date": "2026-10-18",
-      "summary": "Entrega lecturas sin espera artificial y endereza números de palet inclinados, verticales o invertidos conservando confirmaciones."
     }
   ],
   "major": 2,
-  "minor": 7,
-  "label": "2.07"
+  "minor": 8,
+  "label": "2.08"
 }

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
+require_once __DIR__.'/stock.php';
 function tops_legacy_categories(): array {
     return ['codigos'=>['Códigos','Cada EAN diferente escaneado en el período cuenta una vez.'], 'escaneos'=>['Escaneos','Cuenta cada escaneo registrado, también los repetidos.'], 'reportes'=>['Reportes','Solo cuentan correcciones aprobadas; enviar reportes no suma puntos.']];
 }
@@ -27,7 +28,7 @@ function tops_ranking(PDO $db,string $category,string $period,?int $viewer=null,
     $now=($now??new DateTimeImmutable())->setTimezone(new DateTimeZone('America/Argentina/Buenos_Aires'));
     $start=$period==='semana'?$now->modify('monday this week')->setTime(0,0):($period==='mes'?$now->modify('first day of this month')->setTime(0,0):null);
     if($category==='referidos'){$where="state='validated' AND email_verified_at IS NOT NULL";$params=[];if($start){$where.=' AND email_verified_at>=?';$params[]=$start->getTimestamp();}$where.=' AND email_verified_at<=?';$params[]=$now->getTimestamp();$scores='SELECT referrer_id AS subject_id,COUNT(*) AS value FROM referrals WHERE '.$where.' GROUP BY referrer_id';}
-    else{$kind=$category==='actividad'?'activity':'branches';$where='kind=?';$params=[$kind];if($start){$where.=' AND day>=?';$params[]=$start->format('Y-m-d');}$where.=' AND day<=?';$params[]=$now->format('Y-m-d');$scores='SELECT subject_id,SUM(value) AS value FROM ranking_daily WHERE '.$where.' GROUP BY subject_id';}
+    else{$kind=$category==='actividad'?'activity':'branches';$where='kind=?';$params=[$kind];if($start){$where.=' AND day>=?';$params[]=$start->format('Y-m-d');}$where.=' AND day<=?';if($category==='sucursales')$where.=' AND '.branch_visibility_sql($db,$viewer,'subject_id');$params[]=$now->format('Y-m-d');$scores='SELECT subject_id,SUM(value) AS value FROM ranking_daily WHERE '.$where.' GROUP BY subject_id';}
     $cte='WITH scores AS ('.$scores.'),ranked AS (SELECT subject_id,value,RANK() OVER(ORDER BY value DESC) AS position FROM scores) ';
     $branch=$category==='sucursales';$join=$branch?'stock_branches':'users';$name=$branch?'u.name':'u.public_name';$select='SELECT r.*,'.$name.' AS name FROM ranked r LEFT JOIN '.$join.' u ON u.id=r.subject_id ';
     $q=$db->prepare($cte.$select.'ORDER BY value DESC,subject_id LIMIT 10');$q->execute($params);$rows=$q->fetchAll();$own=null;

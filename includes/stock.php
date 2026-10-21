@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/catalog.php';
 require_once __DIR__ . '/public-names.php';
+require_once __DIR__.'/branch-visibility.php';
 require_once __DIR__.'/branch-team.php';
 
 function stock_public_identity(array $row): array {
@@ -96,6 +97,7 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     unset($product);
     if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.public_name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
     if(isset($p['members']))foreach($p['members'] as &$member){$member['name']=get_public_user_name($member);unset($member['public_name']);}unset($member);
+    if(!branch_visible($db,(int)($p['branch_id']??0),$user))$p['branch_id']=null;
     if ($p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch() ?: null;
     if (!$p['can_edit']) unset($p['description'],$p['branch_id'],$p['owner_company'],$p['created_at']);
     // Read-only visitors receive merchandise, not internal account metadata.

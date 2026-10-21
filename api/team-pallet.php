@@ -16,9 +16,9 @@ try{
         $db->beginTransaction();if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
         team_request_resolve($db,$uid,(int)($_POST['id']??0),(string)($_POST['decision']??''),(int)($_POST['revision']??0));$db->commit();
     }
-    $items=stock_query($db,"SELECT r.id,r.revision,r.branch_id,p.code,b.name AS branch_name FROM team_pallet_requests r JOIN pallets p ON p.id=r.pallet_id JOIN stock_branches b ON b.id=r.branch_id WHERE r.owner_id=? AND p.owner_id=? AND p.released=0 AND r.status='pending' ORDER BY r.id DESC",[$uid,$uid])->fetchAll();
+    $items=stock_query($db,"SELECT r.id,r.revision,r.branch_id,p.code,b.name AS branch_name FROM team_pallet_requests r JOIN pallets p ON p.id=r.pallet_id JOIN stock_branches b ON b.id=r.branch_id WHERE r.owner_id=? AND p.owner_id=? AND p.released=0 AND r.status='pending' AND ".branch_visibility_sql($db,$uid,'b.id')." ORDER BY r.id DESC",[$uid,$uid])->fetchAll();
     if(isset($_GET['id'])){
-        $r=stock_query($db,"SELECT r.*,p.code,p.revision AS current_revision,b.name AS branch_name FROM team_pallet_requests r JOIN pallets p ON p.id=r.pallet_id JOIN stock_branches b ON b.id=r.branch_id WHERE r.id=? AND r.owner_id=? AND p.owner_id=? AND p.released=0 AND r.status='pending'",[(int)$_GET['id'],$uid,$uid])->fetch();
+        $r=stock_query($db,"SELECT r.*,p.code,p.revision AS current_revision,b.name AS branch_name FROM team_pallet_requests r JOIN pallets p ON p.id=r.pallet_id JOIN stock_branches b ON b.id=r.branch_id WHERE r.id=? AND r.owner_id=? AND p.owner_id=? AND p.released=0 AND r.status='pending' AND ".branch_visibility_sql($db,$uid,'b.id'),[(int)$_GET['id'],$uid,$uid])->fetch();
         if(!$r)throw new CatalogException('La solicitud ya no está disponible.',404);
         $r['original']=stock_detail($db,$r['code'],$uid)['products'];$r['proposed']=team_request_products($db,(int)$r['id']);
         $result=['request'=>$r];

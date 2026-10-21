@@ -1,7 +1,10 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__.'/includes/stock-icons.php';
-if (is_string($_GET['share'] ?? null) && preg_match('/^[a-f0-9]{64}$/D', $_GET['share'])) $_SESSION['library_share'] = $_GET['share'];
+$sharedCollection = is_string($_GET['share'] ?? null) && preg_match('/^[a-f0-9]{64}$/D', $_GET['share']);
+if ($sharedCollection) $_SESSION['library_share'] = $_GET['share'];
+// A shared collection needs an account, not the unrelated guest demo.
+if($sharedCollection&&!current_user()) require_account('biblioteca');
 if(!current_user()){
     require_once __DIR__.'/includes/stock-icons.php';
     $demoSection='biblioteca';$paginaDemo=true;$paginaBiblioteca=true;

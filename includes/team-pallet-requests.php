@@ -5,6 +5,7 @@ function team_pallet_request(PDO $db,int $pallet,int $branch): ?array {
 }
 function team_request_start(PDO $db,int $user,array $p,int $branch): array {
     team_require($db,$user,$branch);
+    branch_require_visible($db,$branch,(int)$p['owner_id']);
     stock_query($db,"UPDATE team_pallet_requests SET status='cancelled',revision=revision+1 WHERE pallet_id=? AND owner_id<>? AND status='pending'",[$p['id'],$p['owner_id']]);
     if($r=team_pallet_request($db,(int)$p['id'],$branch))return $r;
     $id=(int)stock_query($db,'INSERT INTO team_pallet_requests(pallet_id,branch_id,owner_id,requested_by,base_revision) VALUES(?,?,?,?,?) RETURNING id',[$p['id'],$branch,$p['owner_id'],$user,$p['revision']])->fetchColumn();
@@ -69,6 +70,7 @@ function team_request_edit(PDO $db,int $user,int $branch,array $input): ?array {
 function team_request_resolve(PDO $db,int $user,int $id,string $decision,int $revision): void {
     $r=stock_query($db,"SELECT * FROM team_pallet_requests WHERE id=? AND status='pending'",[$id])->fetch();
     if(!$r)throw new CatalogException('La solicitud ya no está pendiente.',409);
+    branch_require_visible($db,(int)$r['branch_id'],$user);
     $p=stock_query($db,'SELECT * FROM pallets WHERE id=? AND released=0',[$r['pallet_id']])->fetch();
     $owner=$p&&(int)$p['owner_id']===$user&&(int)$r['owner_id']===$user;
     if(!$owner&&($decision!=='cancelled'||!in_array(team_role($db,$user,(int)$r['branch_id']),['admin','manager'],true)))throw new CatalogException('Solo el propietario puede aceptar o rechazar esta solicitud.',403);

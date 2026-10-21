@@ -4,6 +4,7 @@ require_once __DIR__.'/stock.php';
 require_once __DIR__.'/share-links.php';
 
 function branch_owned(PDO $db, int $id, int $user): array {
+    branch_require_visible($db,$id,$user);
     // Legacy helper name: entries are now shared, not scoped to their creator.
     $branch=stock_query($db,'SELECT * FROM stock_branches WHERE id=?',[$id])->fetch();
     if (!$branch) throw new CatalogException('Esta sucursal no está disponible.',404);
@@ -27,7 +28,7 @@ function branch_management(PDO $db,int $user,array $query): array {
     $page=filter_var($query['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);$q=$query['q']??'';
     if($page===false||!is_string($q)||mb_strlen($q)>160)throw new CatalogException('Busqueda no valida.',422);
     $q=mb_strtolower(trim($q));$offset=$page*20;
-    $items=stock_query($db,"SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.latitude,b.longitude,b.revision,(SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.released=0) AS pallet_count FROM stock_branches b WHERE LOWER(b.name || ' ' || b.address || ' ' || b.locality || ' ' || b.province) LIKE ? ESCAPE '!' ORDER BY LOWER(b.name),b.id LIMIT 21 OFFSET {$offset}",['%'.strtr($q,['!'=>'!!','%'=>'!%','_'=>'!_']).'%'])->fetchAll();
+    $items=stock_query($db,"SELECT b.id,b.name,b.address,b.locality,b.province,b.description,b.latitude,b.longitude,b.revision,(SELECT COUNT(*) FROM pallets p WHERE p.branch_id=b.id AND p.released=0) AS pallet_count FROM stock_branches b WHERE ".branch_visibility_sql($db,$user,'b.id')." AND LOWER(b.name || ' ' || b.address || ' ' || b.locality || ' ' || b.province) LIKE ? ESCAPE '!' ORDER BY LOWER(b.name),b.id LIMIT 21 OFFSET {$offset}",['%'.strtr($q,['!'=>'!!','%'=>'!%','_'=>'!_']).'%'])->fetchAll();
     return ['items'=>array_slice($items,0,20),'has_more'=>count($items)>20,'page'=>$page];
 }
 function branch_input(array $input): array {
@@ -56,7 +57,7 @@ function branch_save(PDO $db, int $user, array $input): array {
     $before=$id?branch_owned($db,$id,$user):null;
     $values=branch_input($input);
     $key=fn($v)=>strtr(mb_strtolower(preg_replace('/\s+/u',' ',trim($v))),['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u']);
-    foreach (stock_query($db,'SELECT id,name,address,locality,province FROM stock_branches WHERE id<>? ORDER BY id',[$id])->fetchAll() as $existing) {
+    foreach (stock_query($db,'SELECT id,name,address,locality,province FROM stock_branches WHERE id<>? AND '.branch_visibility_sql($db,$user,'id').' ORDER BY id',[$id])->fetchAll() as $existing) {
         $same=true;foreach(['name','address','locality','province'] as $field) if($key($values[$field])!==$key($existing[$field])){$same=false;break;}
         if($same){if(!$id)return ['branch'=>branch_owned($db,(int)$existing['id'],$user),'reused'=>true];throw new CatalogException('Esa sucursal ya existe con el mismo nombre y dirección. Selecciónala en la lista.',422);}
     }
@@ -135,8 +136,8 @@ function branch_public(PDO $db,string $token,int $page=0,?int $viewer=null,array
     if (!stock_share_token_valid($token)) throw new CatalogException('El enlace no está disponible.',404);
     $share=stock_query($db,'SELECT * FROM stock_shares WHERE token=? AND active=1',[$token])->fetch();
     if (!$share) throw new CatalogException('Este enlace fue desactivado o no existe.',404);
-    $branch=$share['branch_id']?branch_owned($db,(int)$share['branch_id'],(int)$share['owner_id']):null;
-    $sql='SELECT p.id,p.code,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1';
+    $branch=$share['branch_id']?branch_owned($db,(int)$share['branch_id'],(int)($viewer??0)):null;
+    $sql='SELECT p.id,p.code,b.name AS branch_name,b.address AS branch_address,b.locality AS branch_locality,b.province AS branch_province,b.description AS branch_description FROM pallets p LEFT JOIN stock_branches b ON b.id=p.branch_id WHERE p.owner_id=? AND p.released=0 AND p.activated=1 AND '.branch_visibility_sql($db,$viewer,'p.branch_id');
     $args=[$share['owner_id']];
     if ($branch) { $sql.=' AND p.branch_id=? AND NOT EXISTS(SELECT 1 FROM stock_share_exclusions x WHERE x.share_id=? AND x.pallet_id=p.id)'; $args[]=$branch['id'];$args[]=$share['id']; }
     else { $sql.=' AND EXISTS(SELECT 1 FROM stock_share_pallets sp WHERE sp.share_id=? AND sp.pallet_id=p.id)'; $args[]=$share['id']; }
