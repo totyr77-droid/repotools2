@@ -1,6 +1,12 @@
 {
-  "version": 132,
+  "version": 133,
   "changes": [
+    {
+      "version": 133,
+      "label": "2.28",
+      "date": "2026-10-22",
+      "summary": "Recordar cajas internas y bultos independientes también sin conexión"
+    },
     {
       "version": 132,
       "label": "2.27",
@@ -294,15 +300,9 @@
       "label": "1.79",
       "date": "2026-10-19",
       "summary": "Logos oficiales SVG e iconos PWA violetas"
-    },
-    {
-      "version": 83,
-      "label": "1.78",
-      "date": "2026-10-18",
-      "summary": "Referencias independientes de cajas y bultos sin conexión"
     }
   ],
   "major": 2,
-  "minor": 27,
-  "label": "2.27"
+  "minor": 28,
+  "label": "2.28"
 }
