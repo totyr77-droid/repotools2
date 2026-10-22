@@ -146,6 +146,19 @@ function stock_product_input(array $input): array {
     if($inner===false||($inner>0&&($kind!=='boxes'||$inner>$pack||$pack%$inner!==0)))throw new CatalogException('Revisá los paquetes internos y las unidades por paquete.',422);
     return ['ean'=>$ean,'name'=>catalog_text($input['name']??'',120),'expires'=>$expires,'units'=>$amount*$pack,'kind'=>$kind,'pack_size'=>$pack,'inner_pack_size'=>$inner];
 }
+function stock_combined_packing(PDO $db,array $old,array $input,int $units): array {
+    $plain=['kind'=>'units','pack_size'=>1,'inner_pack_size'=>0];
+    $a=in_array($old['kind']??'', ['boxes','packs'],true)?$old:null;
+    $b=in_array($input['kind']??'', ['boxes','packs'],true)?$input:null;
+    if($a&&$b&&($a['kind']!==$b['kind']||(int)$a['pack_size']!==(int)$b['pack_size']||(int)($a['inner_pack_size']??0)!==(int)($b['inner_pack_size']??0)))return $plain;
+    $packing=$a??$b;
+    if(!$packing){
+        $reference=stock_query($db,"SELECT pack_size,inner_pack_size FROM stock_product_references WHERE ean=? AND kind='boxes'",[$input['ean']])->fetch();
+        if(!$reference||(int)$reference['pack_size']<=1||$units%(int)$reference['pack_size']!==0)return $plain;
+        $packing=['kind'=>'boxes',...$reference];
+    }
+    return ['kind'=>$packing['kind'],'pack_size'=>(int)$packing['pack_size'],'inner_pack_size'=>(int)($packing['inner_pack_size']??0)];
+}
 function stock_save_product(PDO $db,int $user,array $input): array {
     $v=stock_product_input($input); $id=(int)($input['pallet_id']??0); $relocated=false;
     if (!$id) {
@@ -175,12 +188,15 @@ function stock_save_product(PDO $db,int $user,array $input): array {
             if ($units>1000000000) throw new CatalogException('La cantidad es demasiado grande.',422);
             stock_query($db,'UPDATE pallet_products SET units=?,name=?,kind=\'units\',pack_size=1,inner_pack_size=0,revision=revision+1 WHERE id=?',[$units,$v['name'],$existing['id']]);
             stock_query($db,'DELETE FROM pallet_products WHERE id=?',[$productId]);
-        } else stock_query($db,'UPDATE pallet_products SET name=?,expires=?,units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=?',[$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$v['inner_pack_size'],$productId]);
+        } else {
+            $packing=$v['kind']==='units'?stock_combined_packing($db,$old,$v,$v['units']):$v;
+            stock_query($db,'UPDATE pallet_products SET name=?,expires=?,units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=?',[$v['name'],$v['expires'],$v['units'],$packing['kind'],$packing['pack_size'],$packing['inner_pack_size'],$productId]);
+        }
     } elseif ($existing) {
         $units=(int)$existing['units']+$v['units'];
         if ($units>1000000000) throw new CatalogException('La cantidad es demasiado grande.',422);
-        $samePacking=$v['inner_pack_size']>0&&$existing['kind']===$v['kind']&&(int)$existing['pack_size']===$v['pack_size']&&(int)$existing['inner_pack_size']===$v['inner_pack_size'];
-        stock_query($db,'UPDATE pallet_products SET units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=?',[$units,$samePacking?$v['kind']:'units',$samePacking?$v['pack_size']:1,$samePacking?$v['inner_pack_size']:0,$existing['id']]);
+        $packing=stock_combined_packing($db,$existing,$v,$units);
+        stock_query($db,'UPDATE pallet_products SET units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=?',[$units,$packing['kind'],$packing['pack_size'],$packing['inner_pack_size'],$existing['id']]);
     } else stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size,inner_pack_size) VALUES(?,?,?,?,?,?,?,?)',[$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$v['inner_pack_size']]);
     if ($v['kind']!=='units') stock_query($db,'INSERT INTO stock_product_references(ean,kind,pack_size,inner_pack_size,updated_by) VALUES(?,?,?,?,?) ON CONFLICT(ean,kind) DO UPDATE SET pack_size=excluded.pack_size,inner_pack_size=excluded.inner_pack_size,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP',[$v['ean'],$v['kind'],$v['pack_size'],$v['inner_pack_size'],$user]);
     stock_query($db,'UPDATE pallets SET activated=1 WHERE id=?',[$id]); stock_touch($db,$id,$user);
