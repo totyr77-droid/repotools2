@@ -33,5 +33,5 @@ order_check($lot['branch_name']==='Local visible'&&$lot['tag']==='Personal','lot
 stock_query($db,'UPDATE pallets SET branch_id=12 WHERE id=?',[$a['id']]);
 stock_query($db,"UPDATE users SET role='usuario' WHERE id=1");
 $lot=team_inventory_page($db,1,0,'lotes',['ean'=>'96385074','expires'=>'2031-01-01'],true)['items'][0];
-order_check($lot['branch_name']===null&&$lot['tag']===null,'restricted branch and rank-private tag remain hidden');
+order_check($lot['branch_name']===null&&$lot['tag']==='Personal','restricted branch stays hidden and user retains own label');
 echo "OK: lot badges respect branch visibility and private label scope.\n";
