@@ -9,7 +9,7 @@ function team_request_start(PDO $db,int $user,array $p,int $branch): array {
     stock_query($db,"UPDATE team_pallet_requests SET status='cancelled',revision=revision+1 WHERE pallet_id=? AND owner_id<>? AND status='pending'",[$p['id'],$p['owner_id']]);
     if($r=team_pallet_request($db,(int)$p['id'],$branch))return $r;
     $id=(int)stock_query($db,'INSERT INTO team_pallet_requests(pallet_id,branch_id,owner_id,requested_by,base_revision) VALUES(?,?,?,?,?) RETURNING id',[$p['id'],$branch,$p['owner_id'],$user,$p['revision']])->fetchColumn();
-    stock_query($db,'INSERT INTO team_pallet_products(request_id,pallet_id,ean,name,expires,units,kind,pack_size) SELECT ?,pallet_id,ean,name,expires,units,kind,pack_size FROM pallet_products WHERE pallet_id=?',[$id,$p['id']]);
+    stock_query($db,'INSERT INTO team_pallet_products(request_id,pallet_id,ean,name,expires,units,kind,pack_size,inner_pack_size) SELECT ?,pallet_id,ean,name,expires,units,kind,pack_size,inner_pack_size FROM pallet_products WHERE pallet_id=?',[$id,$p['id']]);
     $name=stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branch])->fetchColumn();
     stock_query($db,'INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?)',[$p['owner_id'],'team-pallet-request:'.$id,'team_pallet_request','Solicitud de acceso a tu palet',$name.' solicita editar el palet '.$p['code'].'. Revisá los cambios pendientes antes de aceptar.']);
     team_event($db,$user,$branch,'pallet_access_requested',(int)$p['owner_id'],(int)$p['id'],['request_id'=>$id,'status'=>'pending']);
@@ -48,11 +48,11 @@ function team_request_edit(PDO $db,int $user,int $branch,array $input): ?array {
         $v=stock_product_input($input);
         if($old&&$old['ean']!==$v['ean'])throw new CatalogException('El EAN del producto no puede cambiar.',422);
         $existing=stock_query($db,'SELECT * FROM team_pallet_products WHERE request_id=? AND ean=? AND expires=?',[$r['id'],$v['ean'],$v['expires']])->fetch();
-        if($pid&&$existing&&(int)$existing['id']!==$pid){$v['units']+=(int)$existing['units'];$v['kind']='units';$v['pack_size']=1;stock_query($db,'DELETE FROM team_pallet_products WHERE id=? AND request_id=?',[$pid,$r['id']]);$pid=(int)$existing['id'];}
-        if(!$pid){$old=stock_query($db,'SELECT * FROM team_pallet_products WHERE request_id=? AND ean=? AND expires=?',[$r['id'],$v['ean'],$v['expires']])->fetch();if($old){$pid=(int)$old['id'];$v['units']+=(int)$old['units'];}}
+        if($pid&&$existing&&(int)$existing['id']!==$pid){$v['units']+=(int)$existing['units'];$v['kind']='units';$v['pack_size']=1;$v['inner_pack_size']=0;stock_query($db,'DELETE FROM team_pallet_products WHERE id=? AND request_id=?',[$pid,$r['id']]);$pid=(int)$existing['id'];}
+        if(!$pid){$old=stock_query($db,'SELECT * FROM team_pallet_products WHERE request_id=? AND ean=? AND expires=?',[$r['id'],$v['ean'],$v['expires']])->fetch();if($old){$pid=(int)$old['id'];$v['units']+=(int)$old['units'];if((int)$old['inner_pack_size']!==$v['inner_pack_size']||(int)$old['pack_size']!==$v['pack_size']||$old['kind']!==$v['kind']){$v['kind']='units';$v['pack_size']=1;$v['inner_pack_size']=0;}}}
         if($v['units']>1000000000)throw new CatalogException('La cantidad supera el límite permitido.',422);
-        if($pid)stock_query($db,'UPDATE team_pallet_products SET ean=?,name=?,expires=?,units=?,kind=?,pack_size=?,revision=revision+1 WHERE id=? AND request_id=?',[$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$pid,$r['id']]);
-        else $pid=(int)stock_query($db,'INSERT INTO team_pallet_products(request_id,pallet_id,ean,name,expires,units,kind,pack_size) VALUES(?,?,?,?,?,?,?,?) RETURNING id',[$r['id'],$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size']])->fetchColumn();
+        if($pid)stock_query($db,'UPDATE team_pallet_products SET ean=?,name=?,expires=?,units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=? AND request_id=?',[$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$v['inner_pack_size'],$pid,$r['id']]);
+        else $pid=(int)stock_query($db,'INSERT INTO team_pallet_products(request_id,pallet_id,ean,name,expires,units,kind,pack_size,inner_pack_size) VALUES(?,?,?,?,?,?,?,?,?) RETURNING id',[$r['id'],$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$v['inner_pack_size']])->fetchColumn();
     }elseif($action==='deduct_product'){
         if(!$old)throw new CatalogException('Seleccioná un producto.',422);
         $amount=filter_var($input['amount']??null,FILTER_VALIDATE_INT);$kind=$input['kind']??'units';$pack=$kind==='units'?1:filter_var($input['pack_size']??null,FILTER_VALIDATE_INT);
@@ -83,8 +83,8 @@ function team_request_resolve(PDO $db,int $user,int $id,string $decision,int $re
         stock_query($db,'DELETE FROM pallet_products WHERE pallet_id=? AND NOT EXISTS(SELECT 1 FROM team_pallet_products d WHERE d.request_id=? AND d.ean=pallet_products.ean AND d.expires=pallet_products.expires)',[$p['id'],$id]);
         foreach(stock_query($db,'SELECT * FROM team_pallet_products WHERE request_id=?',[$id])->fetchAll() as $v){
             $existing=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? AND ean=? AND expires=?',[$p['id'],$v['ean'],$v['expires']])->fetch();
-            if(!$existing)stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size) VALUES(?,?,?,?,?,?,?)',[$p['id'],$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size']]);
-            elseif($existing['name']!==$v['name']||(int)$existing['units']!==(int)$v['units']||$existing['kind']!==$v['kind']||(int)$existing['pack_size']!==(int)$v['pack_size'])stock_query($db,'UPDATE pallet_products SET name=?,units=?,kind=?,pack_size=?,revision=revision+1 WHERE id=?',[$v['name'],$v['units'],$v['kind'],$v['pack_size'],$existing['id']]);
+            if(!$existing)stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size,inner_pack_size) VALUES(?,?,?,?,?,?,?,?)',[$p['id'],$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$v['inner_pack_size']]);
+            elseif($existing['name']!==$v['name']||(int)$existing['units']!==(int)$v['units']||$existing['kind']!==$v['kind']||(int)$existing['pack_size']!==(int)$v['pack_size']||(int)$existing['inner_pack_size']!==(int)$v['inner_pack_size'])stock_query($db,'UPDATE pallet_products SET name=?,units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=?',[$v['name'],$v['units'],$v['kind'],$v['pack_size'],$v['inner_pack_size'],$existing['id']]);
         }
         stock_query($db,'UPDATE pallets SET branch_id=?,activated=1,revision=revision+1,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=?',[$r['branch_id'],$user,$p['id']]);
         // An approval never publishes merchandise through pre-existing public share links.

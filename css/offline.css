@@ -89,3 +89,8 @@ body[data-hand="left"] .offline-stock-tools>input,body[data-hand-preference="lef
 body[data-hand="left"] .offline-stock-tools>details:not([open]),body[data-hand-preference="left"] .offline-stock-tools>details:not([open]){grid-column:1;grid-row:1}
 body[data-hand="left"] .offline-stock-tools>details[open],body[data-hand-preference="left"] .offline-stock-tools>details[open]{grid-column:1/-1;grid-row:2}
 body[data-hand="left"] .offline-stock-tools>button,body[data-hand-preference="left"] .offline-stock-tools>button{justify-self:start}
+
+#offlineProductForm .stock-inner-toggle{display:flex;align-items:center;gap:9px;min-height:44px;margin:4px 0;color:#62577e}
+#offlineProductForm .stock-inner-toggle input{width:20px;height:20px;min-height:20px;margin:0;flex:none;accent-color:#27187e}
+#offlineInnerFields input{min-width:0;width:100%}
+body[data-hand=left] #offlineProductForm .stock-inner-toggle{flex-direction:row-reverse}

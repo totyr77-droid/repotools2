@@ -164,8 +164,8 @@ function branch_public(PDO $db,string $token,int $page=0,?int $viewer=null,array
     $rows=array_slice($rows,0,20); $products=[];
     if ($rows) {
         $ids=array_column($rows,'id'); $marks=implode(',',array_fill(0,count($ids),'?'));
-        foreach (stock_query($db,"SELECT b.pallet_id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$marks}) ORDER BY ".(($filters['sort']??'')==='quantity'?'b.units DESC,':'')."CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,b.name,b.id",$ids)->fetchAll() as $product) {
-            $products[$product['pallet_id']][]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','reference_name','catalog_name','expires','units','kind','pack_size']));
+        foreach (stock_query($db,"SELECT b.pallet_id,b.ean,b.name,b.expires,b.units,b.kind,b.pack_size,b.inner_pack_size,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id IN ({$marks}) ORDER BY ".(($filters['sort']??'')==='quantity'?'b.units DESC,':'')."CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,b.name,b.id",$ids)->fetchAll() as $product) {
+            $products[$product['pallet_id']][]=array_intersect_key(stock_product_names($product),array_flip(['ean','display_name','reference_name','catalog_name','expires','units','kind','pack_size','inner_pack_size']));
         }
     }
     foreach ($rows as $row) {

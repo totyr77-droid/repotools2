@@ -1,6 +1,12 @@
 {
-  "version": 131,
+  "version": 132,
   "changes": [
+    {
+      "version": 132,
+      "label": "2.27",
+      "date": "2026-10-22",
+      "summary": "Cajas con paquetes internos, cantidades claras y retiro por paquete"
+    },
     {
       "version": 131,
       "label": "2.26",
@@ -294,15 +300,9 @@
       "label": "1.78",
       "date": "2026-10-18",
       "summary": "Referencias independientes de cajas y bultos sin conexión"
-    },
-    {
-      "version": 82,
-      "label": "1.77",
-      "date": "2026-10-18",
-      "summary": "Referencias de productos al sincronizar y progreso visible del OCR"
     }
   ],
   "major": 2,
-  "minor": 26,
-  "label": "2.26"
+  "minor": 27,
+  "label": "2.27"
 }

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=41;
+const REPOTOOLS_SCHEMA_VERSION=42;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -333,6 +333,12 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX team_pallet_branch ON team_pallet_requests(branch_id,status,pallet_id)');
             $db->exec("CREATE TABLE team_pallet_products(id {$id},request_id {$ref} NOT NULL REFERENCES team_pallet_requests(id),pallet_id {$ref} NOT NULL REFERENCES pallets(id),ean TEXT NOT NULL,name TEXT NOT NULL DEFAULT '',expires TEXT NOT NULL DEFAULT '',units INTEGER NOT NULL CHECK(units>0 AND units<=1000000000),kind TEXT NOT NULL,pack_size INTEGER NOT NULL CHECK(pack_size>0),revision INTEGER NOT NULL DEFAULT 1,UNIQUE(request_id,ean,expires))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(41)');
+        }
+        if(!isset($applied[42])){
+            foreach(['pallet_products','team_pallet_products','stock_product_references'] as $table){
+                $db->exec("ALTER TABLE $table ADD COLUMN inner_pack_size INTEGER NOT NULL DEFAULT 0 CHECK(inner_pack_size>=0 AND inner_pack_size<=1000000)");
+            }
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(42)');
         }
         $db->commit();
     } catch (Throwable $error) {
