@@ -1,6 +1,12 @@
 {
-  "version": 138,
+  "version": 139,
   "changes": [
+    {
+      "version": 139,
+      "label": "2.34",
+      "date": "2026-10-22",
+      "summary": "Elegir columnas del Excel y descargar todas las fechas y palets con sus cantidades"
+    },
     {
       "version": 138,
       "label": "2.33",
@@ -294,15 +300,9 @@
       "label": "1.85",
       "date": "2026-10-19",
       "summary": "Restringir toda transferencia al propietario del palet"
-    },
-    {
-      "version": 89,
-      "label": "1.84",
-      "date": "2026-10-19",
-      "summary": "Transferir mercadería entre palets y propiedad por correo"
     }
   ],
   "major": 2,
-  "minor": 33,
-  "label": "2.33"
+  "minor": 34,
+  "label": "2.34"
 }
