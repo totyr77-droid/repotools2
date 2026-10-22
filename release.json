@@ -1,6 +1,12 @@
 {
-  "version": 143,
+  "version": 144,
   "changes": [
+    {
+      "version": 144,
+      "label": "2.39",
+      "date": "2026-10-22",
+      "summary": "Activación de avisos desde la app, sin interrumpir la introducción ni el trabajo."
+    },
     {
       "version": 143,
       "label": "2.38",
@@ -294,15 +300,9 @@
       "label": "1.90",
       "date": "2026-10-20",
       "summary": "Managers: detalle de sucursal e ingreso con funciones de administrador"
-    },
-    {
-      "version": 94,
-      "label": "1.89",
-      "date": "2026-10-20",
-      "summary": "Corrige cajas abiertas, correo de empresa, error de conexión y origen de equipo en historial"
     }
   ],
   "major": 2,
-  "minor": 38,
-  "label": "2.38"
+  "minor": 39,
+  "label": "2.39"
 }

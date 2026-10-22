@@ -127,6 +127,7 @@
 <?php foreach(['branch','chevron','trash']as$supervisionIcon): ?><span hidden data-supervision-icon="<?= $supervisionIcon ?>"><?= stock_icon($supervisionIcon) ?></span><?php endforeach;endif; ?><script src="js/supervision.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php endif; ?>
 <?php include __DIR__.'/team-shortcut.vista.php'; ?>
+<?php if(current_user()&&empty($paginaCuenta)): include __DIR__.'/push-notice.vista.php'; endif; ?>
 <script src="js/push-settings.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
 </html>

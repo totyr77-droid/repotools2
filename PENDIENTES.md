@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 22/10/2026. Entrega actual: **v2.38 / interna 143**, notificaciones push y limpieza de continuidad. Última versión pública comprobada antes de esta entrega: v2.37 / 142. No afirmar despliegue de143 sin volver a consultarlo.
+Actualizado: 22/10/2026. Entrega actual: **v2.39 / interna 144**, notificaciones push y limpieza de continuidad. Última versión pública comprobada antes de esta entrega: v2.38 / 143. Verificar 144 después de publicar.
 
 ## Trabajo actual
 
@@ -41,3 +41,7 @@ Push voluntario en Avisos y respuesta, vencimientos agrupados diarios e invitaci
 Pruebas PHPpush/stock-notifications/unified-core/audit-records y APIStock/logout aprobadas; UIpush Chromium/WebKit con APIreal/dispositivo simulado,320–1366/ambasmanos/modos y destino vencimientos; serviceworker verificación/nolectura/privacidad, regresión Ajustes y sintaxisPHPJS/shell/diff. PostgreSQL44 y dedupe en tablas temporales de rama prueba, sin tocar datos reales. Cifrado/firma reales con HTTPsimulado, no envíos reales ni construcción Docker local. Recepción física/Render pendiente. Fixture Ajustes bloquea SW solo en pruebas para que POST503 simulado sea interceptado.
 
 Reversión: docs/NOTIFICACIONES-PUSH.md. Mantener tablas44/claves VAPID/colas/inventario y publicar versión/cache superior; detener worker por variable si hace falta. Historial previo preservado sin credenciales.
+
+## Entrega v2.39
+
+Aviso voluntario de activación desde la app para cuentas sin push activo, espera ante intro/otros avisos/cámara/escritura; posposición 30 días. Mantiene activación manual y campana sin lectura. Validación y reversión en docs/NOTIFICACIONES-PUSH.md. Sin cambios de DB.

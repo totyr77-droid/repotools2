@@ -39,3 +39,14 @@ En Windows de desarrollo, ejecutar pruebas PHP con OPENSSL_CONF apuntando a la c
 Desactivar worker con REPOTOOLS_PUSH_WORKER=0 y revertir código publicando versión/cache superior. Mantener tablas aditivas44, claves VAPID, inventario y colas offline. No rotar/borrar las claves al desplegar ni al revertir, para no invalidar suscripciones existentes. No bajar REPOTOOLS_SCHEMA_VERSION ni borrar datos de usuarios.
 
 Referencias primarias: [WebKit: Web Push iOS/iPadOS](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/), [MDN Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API), [librería PHP y requisitos](https://github.com/web-push-libs/web-push-php/tree/v9.0.4).
+
+
+## Aviso dentro de la app (v2.39)
+
+Para cuentas existentes y nuevas sin una suscripción activa en este dispositivo, ofrecer “Te avisamos por tu mercadería”. Activación con el mismo flujo autenticado/CSRF de Ajustes; permiso nativo exclusivamente por clic. No solicita permiso al entrar automáticamente. Ahora no/Escape posponen 30 días por usuario y navegador; desactivar voluntariamente desde Ajustes también pospone. Activación confirmada con toast. No cambia lectura de campana ni permisos del servidor.
+
+Esperar introducción, carga, instalación/ubicación visibles y otros modales. No interrumpir cámara activa ni escritura en un campo. Excluir navegadores incompatibles, permiso bloqueado, iOS sin PWA instalada y dispositivo ya activado. Permanecen las instrucciones manuales en Ajustes. Sin migraciones ni dependencias nuevas.
+
+Validación: PHP de vistas, sintaxis JS, push PHP y service worker; UI Chromium/WebKit con API real y permiso simulado, espera ante otro modal, ausencia de petición nativa automática, posposición persistente, activación desde el aviso y diseño 320/390/1366 para ambas manos. Captura móvil revisada. Recepción física sigue pendiente; estas pruebas no son envíos reales.
+
+Revertir esta entrega y publicar una versión/cache superior. Conservar claves, suscripciones, trabajos push y datos del usuario; la clave local de posposición puede permanecer.
