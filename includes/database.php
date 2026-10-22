@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=42;
+const REPOTOOLS_SCHEMA_VERSION=43;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -339,6 +339,14 @@ function initialize_database(PDO $db): void {
                 $db->exec("ALTER TABLE $table ADD COLUMN inner_pack_size INTEGER NOT NULL DEFAULT 0 CHECK(inner_pack_size>=0 AND inner_pack_size<=1000000)");
             }
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(42)');
+        }
+        if(!isset($applied[43])){
+            $db->exec("CREATE TABLE supervisor_teams(id {$id},owner_id {$ref} NOT NULL UNIQUE REFERENCES users(id),name TEXT NOT NULL,active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)),revision INTEGER NOT NULL DEFAULT 1,created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE supervisor_members(team_id {$ref} NOT NULL REFERENCES supervisor_teams(id),user_id {$ref} NOT NULL REFERENCES users(id),status TEXT NOT NULL CHECK(status IN ('pending','accepted','declined','revoked')),revision INTEGER NOT NULL DEFAULT 1,created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(team_id,user_id))");
+            $db->exec('CREATE INDEX supervisor_members_user ON supervisor_members(user_id,status,team_id)');
+            $db->exec("CREATE TABLE supervisor_lists(id {$id},team_id {$ref} NOT NULL REFERENCES supervisor_teams(id),name TEXT NOT NULL,source_base64 TEXT NOT NULL,sheet_path TEXT NOT NULL,ean_column TEXT NOT NULL,ean_rows TEXT NOT NULL,row_count INTEGER NOT NULL,created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX supervisor_lists_team ON supervisor_lists(team_id,id)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(43)');
         }
         $db->commit();
     } catch (Throwable $error) {

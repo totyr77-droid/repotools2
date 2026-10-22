@@ -1,5 +1,5 @@
 <?php
-if(current_user()&&empty($paginaInicio)&&empty($paginaEquipo)){
+if(current_user()&&empty($paginaInicio)&&empty($paginaEquipo)&&empty($paginaSupervision)){
     require_once __DIR__.'/../includes/branch-team.php';
     require_once __DIR__.'/../includes/stock-icons.php';
     $teamShortcutLocations=array_filter(team_locations(database(),(int)current_user()['id']),static fn($location)=>in_array($location['role'],['admin','manager'],true));

@@ -88,3 +88,6 @@ body.home-page .home-list-heading p{display:none}
 #installAppHelpDialog h2{display:flex;align-items:center;gap:8px;font-size:1.1rem}
 #installAppHelpDialog svg{width:22px;height:22px;flex:none}
 #installAppHelpDialog p{font-size:.95rem;line-height:1.5;margin-top:12px}
+
+/* Company access can coexist with the manager shortcut on compact screens. */
+.home-shortcuts:has(>a[href="supervision.php"]){flex-wrap:wrap}

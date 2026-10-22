@@ -7,7 +7,7 @@ require_once __DIR__.'/includes/referrals.php';
 require_once __DIR__.'/includes/email-verification.php';
 $referralsEnabled=referrals_enabled();
 $register = ($_GET['mode'] ?? '') === 'registro';
-$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion', 'palet', 'stock-compartido', 'sucursales', 'gestion-empresas'], true) ? $_GET['next'] : '';
+$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion', 'palet', 'stock-compartido', 'sucursales', 'gestion-empresas', 'supervision'], true) ? $_GET['next'] : '';
 $error = $_SESSION['logout_error'] ?? '';
 unset($_SESSION['logout_error']);
 $invitation=$_SESSION['referral_invitation']??null;
@@ -131,7 +131,7 @@ include __DIR__ . '/vistas/header.vista.php';
     </section>
     <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2>
     <?php require_once __DIR__.'/includes/branch-team.php';$accountTeamLocations=team_locations(database(),(int)current_user()['id']);$accountTeamInvites=team_incoming(database(),(int)current_user()['id']); ?>
-    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><?php if($accountTeamLocations||$accountTeamInvites): ?><a href="sucursales.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Mi equipo</a><?php if($accountTeamLocations&&team_can_assign(database(),(int)current_user()['id'])): ?><a href="gestion-empresas.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Empresas y sucursales</a><?php endif;endif; ?>
+    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><?php require_once __DIR__.'/includes/supervision.php';$accountSupervisor=supervisor_team(database(),(int)current_user()['id']);$accountSupervisorLinks=supervisor_links(database(),(int)current_user()['id']);if($accountSupervisor||$accountSupervisorLinks): ?><a href="supervision.php" class="account-team-shortcut"><?= stock_icon('users') ?><?= $accountSupervisor?'Mi empresa':'Supervisores' ?></a><?php endif; ?><?php if($accountTeamLocations||$accountTeamInvites): ?><a href="<?= !empty($accountSupervisor)?'sucursales.php?ambito=sucursales':'sucursales.php' ?>" class="account-team-shortcut"><?= stock_icon('branch') ?>Mi equipo</a><?php if($accountTeamLocations&&team_can_assign(database(),(int)current_user()['id'])): ?><a href="gestion-empresas.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Empresas y sucursales</a><?php endif;endif; ?>
     <a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
     <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
     <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>

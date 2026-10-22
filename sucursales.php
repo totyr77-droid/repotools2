@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__.'/includes/auth.php';
 require_once __DIR__.'/includes/branch-team.php';
+require_once __DIR__.'/includes/supervision.php';
 require_once __DIR__.'/includes/stock-icons.php';
 $token=$_GET['invitacion']??($_SESSION['branch_team_invitation']??'');
 if(!is_string($token)||!preg_match('/^[a-f0-9]{64}$/D',$token))$token='';
 if($token)$_SESSION['branch_team_invitation']=$token;
 if(!current_user()){header('Location: cuenta.php?next=sucursales');exit;}
+if(!$token&&($_GET['ambito']??'')!=='sucursales'&&supervisor_team(database(),(int)current_user()['id'])){header('Location: supervision.php');exit;}
 $invite=$token?stock_query(database(),'SELECT i.branch_id,i.recipient_id,b.name,i.role,i.access_seconds,i.revoked,i.used_by,i.expires FROM branch_team_invites i JOIN stock_branches b ON b.id=i.branch_id WHERE i.token_hash=?',[hash('sha256',$token)])->fetch():false;
 $teamPendingInvite=$invite&&!$invite['revoked']&&!$invite['used_by']&&$invite['expires']>time();
 $teamIncoming=team_incoming(database(),(int)current_user()['id']);
@@ -17,6 +19,7 @@ $paginaEquipo=true;$stockEmbedded=true;$publicPageTitle='Mi equipo';include 'vis
 ?>
 <main class="library-main team-page" data-team-page data-csrf="<?= escape(csrf_token()) ?>">
 <div class="team-page-title"><div class="team-title-identity"><h1><?= stock_icon('users') ?>Mi equipo</h1><span id="teamRole" class="team-role-badge" hidden></span></div><div class="team-title-branch-actions"><label class="team-title-location team-branch-badge"><span class="sr-only">Sucursal</span><?= stock_icon('branch') ?><select id="teamLocation" aria-label="Sucursal activa"></select></label><button type="button" id="teamSecurity" class="team-settings-button" aria-label="Configurar sucursal" title="Configurar sucursal" hidden><?= stock_icon('settings') ?><span id="teamSecurityPending" class="team-settings-pending" hidden><?= stock_icon('info') ?><span class="sr-only">Revisá la configuración de la sucursal</span></span></button><button type="button" id="teamManagerExit" class="team-manager-exit" title="Salir de la gestión del equipo" aria-label="Salir de la gestión del equipo" hidden><?= stock_icon('logout') ?><span class="sr-only">Salir de gestión</span></button></div></div>
+<?php if(supervisor_team(database(),(int)current_user()['id'])): ?><nav class="supervision-context"><a href="supervision.php"><?= stock_icon('users') ?>Empresa</a><strong><?= stock_icon('branch') ?>Sucursales</strong></nav><?php endif; ?>
 <p id="teamStatus" role="status">Cargando sucursales…</p>
 <?php if($token): ?>
 <section id="teamInvitation" class="team-section">
