@@ -1,6 +1,12 @@
 {
-  "version": 135,
+  "version": 136,
   "changes": [
+    {
+      "version": 136,
+      "label": "2.31",
+      "date": "2026-10-22",
+      "summary": "Excel de listas: detectar hojas y encabezados, revisar códigos y corregir o excluir filas"
+    },
     {
       "version": 135,
       "label": "2.30",
@@ -294,15 +300,9 @@
       "label": "1.82",
       "date": "2026-10-19",
       "summary": "Mejorar centrado y aviso RT al consultar palet"
-    },
-    {
-      "version": 86,
-      "label": "1.81",
-      "date": "2026-10-19",
-      "summary": "Corregir ancho del buscador y filtro de sucursales"
     }
   ],
   "major": 2,
-  "minor": 30,
-  "label": "2.30"
+  "minor": 31,
+  "label": "2.31"
 }
