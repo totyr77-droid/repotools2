@@ -1,6 +1,12 @@
 {
-  "version": 140,
+  "version": 141,
   "changes": [
+    {
+      "version": 141,
+      "label": "2.36",
+      "date": "2026-10-22",
+      "summary": "Aviso de referido informativo sin navegación al tocarlo."
+    },
     {
       "version": 140,
       "label": "2.35",
@@ -294,15 +300,9 @@
       "label": "1.87",
       "date": "2026-10-20",
       "summary": "Ordenar Stock por creación o movimiento reciente, sin priorizar vencimientos automáticamente."
-    },
-    {
-      "version": 91,
-      "label": "1.86",
-      "date": "2026-10-20",
-      "summary": "Integrar Mi equipo, perfiles, insignias y mejoras de escaneo de beta."
     }
   ],
   "major": 2,
-  "minor": 35,
-  "label": "2.35"
+  "minor": 36,
+  "label": "2.36"
 }

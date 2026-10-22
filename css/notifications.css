@@ -52,6 +52,6 @@
 .notification-item .notification-branch-label{display:inline-flex;align-items:center;gap:4px;max-width:100%;box-sizing:border-box;margin:5px 0 2px;padding:2px 7px;border-radius:6px;background:#e5f4f8;color:#246579;font-size:.78rem;line-height:1.35}
 .notification-branch-label svg{width:14px;height:14px;flex:none}
 .notification-item:focus-visible{outline:2px solid #6552b5;outline-offset:-2px;border-radius:6px}
-@media(hover:hover){.notification-item:hover{background:#f5f4fa}}
+@media(hover:hover){a.notification-item:hover{background:#f5f4fa}}
 
 .notification-item-heading{align-items:flex-start;gap:6px}.notification-item .notification-item-heading time{margin:2px 0 0;font-size:.67rem;line-height:1.4;white-space:nowrap;flex:none}.notification-item-heading .notification-unread-dot{margin-top:6px}
