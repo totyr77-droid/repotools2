@@ -11,6 +11,7 @@ foreach([-3,0,1,60] as $offset)stock_save_product($db,1,['pallet_id'=>$p['id'],'
 $alerts=stock_notify($db,1);
 verify_alert(count($alerts)===3,'Solo vencido, hoy y próximo dentro del plazo.');
 verify_alert(array_column(array_values($alerts),'expiry_state')===['expired','today','warning'],'Tres estados diferenciados.');
+verify_alert(array_column(array_values($alerts),'expiry_urgent')===[false,true,true],'Urgencia visual para hoy y los próximos siete días.');
 foreach($alerts as $alert)verify_alert($alert['pallet_code']===$p['code'] && $alert['product_id']>0,'Destino identifica palet y lote.');
 $db->exec('UPDATE notifications SET read_at=CURRENT_TIMESTAMP');stock_notify($db,1);stock_notify($db,1);
 verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications')->fetchColumn()===3,'No duplica avisos.');

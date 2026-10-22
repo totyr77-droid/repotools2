@@ -1,6 +1,12 @@
 {
-  "version": 144,
+  "version": 145,
   "changes": [
+    {
+      "version": 145,
+      "label": "2.40",
+      "date": "2026-10-22",
+      "summary": "Etiquetas naranjas para vencimientos urgentes y ejemplos de colores en configuración."
+    },
     {
       "version": 144,
       "label": "2.39",
@@ -294,15 +300,9 @@
       "label": "1.91",
       "date": "2026-10-20",
       "summary": "Correo: logo oficial integrado y ayuda para verificación bloqueada por spam"
-    },
-    {
-      "version": 95,
-      "label": "1.90",
-      "date": "2026-10-20",
-      "summary": "Managers: detalle de sucursal e ingreso con funciones de administrador"
     }
   ],
   "major": 2,
-  "minor": 39,
-  "label": "2.39"
+  "minor": 40,
+  "label": "2.40"
 }

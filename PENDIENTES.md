@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 22/10/2026. Entrega actual: **v2.39 / interna 144**, notificaciones push y limpieza de continuidad. Última versión pública comprobada antes de esta entrega: v2.38 / 143. Verificar 144 después de publicar.
+Actualizado: 22/10/2026. Entrega actual: **v2.40 / interna 145**, notificaciones push y limpieza de continuidad. Última versión pública comprobada antes de esta entrega: v2.38 / 143. Verificar 144 después de publicar.
 
 ## Trabajo actual
 
@@ -45,3 +45,7 @@ Reversión: docs/NOTIFICACIONES-PUSH.md. Mantener tablas44/claves VAPID/colas/in
 ## Entrega v2.39
 
 Aviso voluntario de activación desde la app para cuentas sin push activo, espera ante intro/otros avisos/cámara/escritura; posposición 30 días. Mantiene activación manual y campana sin lectura. Validación y reversión en docs/NOTIFICACIONES-PUSH.md. Sin cambios de DB.
+
+## Entrega v2.40
+
+Urgencia naranja hasta7 días en etiquetas de fechas/cantidades/días y +N por fechas distintas, ejemplos en configuración y lectura del plazo0–365 corregida. Sin migración. Detalle, validación y reversión: docs/VENCIMIENTOS-URGENTES.md. Comprobar145 después de publicar; no confundir pruebas de navegador con recepción/pruebas físicas.

@@ -920,3 +920,16 @@ body[data-hand=left] .team-request-dialog:not([data-conflict=true]) .team-reques
 #stockApp .stock-card.stock-search-result:not(:has(.stock-result-badges>*)){grid-template-columns:minmax(0,1fr)}
 
 body[data-hand=left] .pallet-tag-input input{padding-left:48px!important;padding-right:12px!important}body[data-hand=left] .pallet-tag-input #clearPalletTag{left:0;right:auto}
+
+/* Urgencia por vencimiento: mismo tono en fechas, cantidades y días. */
+.stock-expiry-urgent,.stock-expiry-today{color:#9a430b!important;background:#ffead6!important;border-radius:6px}
+.stock-product .stock-expiry-urgent{display:table;padding:3px 7px;font-size:.82rem;font-weight:600}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span){width:fit-content;max-width:100%;box-sizing:border-box;padding:3px 7px;border-radius:6px;font-size:.78rem;font-weight:600;line-height:1.35}
+.expiry-quantity{display:table}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span).stock-expiry-safe{color:#246b45!important;background:#e8f7ee!important}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span).stock-expiry-near{color:#85610d!important;background:#fff4d6!important}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span).stock-expiry-past{color:#b42332!important;background:#fff0f2!important}
+.stock-goods-total>.stock-goods-days{margin-inline-start:auto}
+body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-urgent{margin-left:auto}
+.expiry-color-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.expiry-color-preview [hidden]{display:none!important}
+.notification-item[data-state=urgent] .notification-icon{color:#9a430b;background:#ffead6}.notification-item[data-state=urgent][data-unread]{background:#fff7ee;border-left-color:#dd761d}.notification-item[data-state=urgent] .notification-expiry-label{background:#ffead6;color:#9a430b}

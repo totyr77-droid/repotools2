@@ -210,7 +210,7 @@ function stock_save_product(PDO $db,int $user,array $input): array {
 }
 function stock_warning_days(PDO $db,int $user): int {
     $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
-    return $days===false?30:min(30,max(0,(int)$days));
+    return $days===false?30:min(365,max(0,(int)$days));
 }
 function stock_list(PDO $db,int $user,bool $all=false): array {
     $all=$all&&stock_is_admin($db,$user);
@@ -236,7 +236,7 @@ function stock_notify(PDO $db,int $user): array {
         $key='expiry:'.$user.':'.$item['id'].':'.$item['expires'];
         $body='Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']);
         stock_query($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO UPDATE SET title=excluded.title,body=excluded.body,read_at=CASE WHEN notifications.title<>excluded.title THEN NULL ELSE notifications.read_at END",[$user,$key,'stock_expiry',$title,$body]);
-        $current[$key]=['pallet_code'=>$item['code'],'product_id'=>(int)$item['id'],'expiry_state'=>$state,'expiry_label'=>$label];
+        $current[$key]=['pallet_code'=>$item['code'],'product_id'=>(int)$item['id'],'expiry_state'=>$state,'expiry_urgent'=>$remaining>=0&&$remaining<=7,'expiry_label'=>$label];
     }
     foreach(stock_query($db,"SELECT id,event_key FROM notifications WHERE user_id=? AND type='stock_expiry'",[$user])->fetchAll() as $old) {
         if(!isset($current[$old['event_key']]))stock_query($db,'DELETE FROM notifications WHERE user_id=? AND id=?',[$user,$old['id']]);

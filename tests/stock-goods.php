@@ -35,3 +35,15 @@ stock_query($db,"UPDATE users SET role='usuario' WHERE id=1");
 $lot=team_inventory_page($db,1,0,'lotes',['ean'=>'96385074','expires'=>'2031-01-01'],true)['items'][0];
 order_check($lot['branch_name']===null&&$lot['tag']==='Personal','restricted branch stays hidden and user retains own label');
 echo "OK: lot badges respect branch visibility and private label scope.\n";
+
+foreach([-1,0,1,7,8,30,31]as$day)stock_save_product($db,1,['pallet_id'=>$a['id'],'ean'=>'4006381333931','name'=>'Umbrales','amount'=>1,'expires'=>$date($day)]);
+stock_save_product($db,1,['pallet_id'=>$b['id'],'ean'=>'4006381333931','amount'=>1,'expires'=>$date(7)]);
+$bands=team_inventory_page($db,1,0,'mercaderia',['q'=>'4006381333931'],true)['items'][0];
+order_check((int)$bands['urgent_dates']===3&&(int)$bands['near_dates']===2&&(int)$bands['safe_dates']===1&&(int)$bands['expired_dates']===1,'urgency includes today and seven, yellow starts eight, distinct dates');
+stock_query($db,'INSERT INTO stock_preferences(user_id,expiry_days) VALUES(1,0) ON CONFLICT(user_id) DO UPDATE SET expiry_days=0');
+$bands=team_inventory_page($db,1,0,'mercaderia',['q'=>'4006381333931'],true)['items'][0];
+order_check((int)$bands['urgent_dates']===3&&(int)$bands['near_dates']===0&&(int)$bands['safe_dates']===3,'urgent color remains distinct with warning preference under seven');
+echo "OK: urgent/yellow/safe/expired boundaries and small warning preference.\n";
+
+stock_query($db,'UPDATE stock_preferences SET expiry_days=365 WHERE user_id=1');
+$bands=team_inventory_page($db,1,0,'mercaderia',['q'=>'4006381333931'],true)['items'][0];order_check((int)$bands['near_dates']===3&&(int)$bands['safe_dates']===0,'configured warning period beyond thirty is honored');
