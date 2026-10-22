@@ -55,3 +55,8 @@
 @media(hover:hover){a.notification-item:hover{background:#f5f4fa}}
 
 .notification-item-heading{align-items:flex-start;gap:6px}.notification-item .notification-item-heading time{margin:2px 0 0;font-size:.67rem;line-height:1.4;white-space:nowrap;flex:none}.notification-item-heading .notification-unread-dot{margin-top:6px}
+
+.push-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.push-controls button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;margin:0}.push-controls svg{width:18px;height:18px}#pushPreferences h3{display:flex;align-items:center;gap:6px}#pushPreferences h3 svg{width:18px;height:18px;flex:none}body[data-hand=left] .push-controls{flex-direction:row-reverse;justify-content:flex-end}
+.push-controls [hidden]{display:none!important}
+
+#pushPreferences .push-controls button{width:auto;padding:10px 12px;font-size:.85rem}#pushPreferences .library-secondary{background:#eeebf7;color:#27187e}

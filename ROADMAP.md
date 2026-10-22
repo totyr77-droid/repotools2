@@ -1,32 +1,34 @@
-# Pendientes de Repotools
+# Pendientes vigentes de RepoTools
 
-Consultar [ARCHITECTURE.md](ARCHITECTURE.md) para el estado actual y [CHANGELOG.md](CHANGELOG.md) para entregas realizadas. Esta lista no representa funciones ya terminadas.
+Revisado contra la entrega v2.38 el 22/10/2026. Lo implementado se documenta en ARCHITECTURE.md; no figura aquí como desarrollo pendiente.
 
-## Verificación en dispositivos y despliegue
+## Próxima validación: notificaciones del celular
 
-- Probar instalación PWA en iPhone y Android reales, apertura desde su icono, sesión y cámara. La configuración existe; falta validar la experiencia física.
-- Confirmar en Safari iPhone el aviso de preparación offline y la recarga en modo avión desde el mismo dominio. Chrome simulado no prueba Safari.
-- Probar cámara real, QR lejanos, pistola USB/Bluetooth y conexión celular-PC en ambos sistemas. Las pruebas automatizadas utilizan lectores simulados.
-- Verificar configuración de `GEOAPIFY_API_KEY` en Render y cobertura de locales reales en Stock/Moderación; probar selector de tres sugerencias, confirmación visible y dos locales cercanos distintos.
-- Verificar las nuevas cabeceras HTTP tras el despliegue Apache/Render, incluido `no-referrer` en recuperación.
-- Ejecutar las pruebas pendientes de conexión celular-PC y cambios recientes en una base PostgreSQL aislada; las últimas integraciones usaron SQLite temporal.
+- Notificaciones push en celular con la app cerrada: vencimientos, invitaciones y solicitudes; permiso voluntario, bajas/privacidad por dispositivo, envío desde servidor y recordatorios agrupados. La campana no se marca leída al recibir el aviso. Implementadas en v2.38; falta confirmar recepción real tras despliegue en iPhone/Android instalados, con app cerrada y pantalla bloqueada. Ver docs/NOTIFICACIONES-PUSH.md.
 
-## Límites offline actuales
+## Validación de campo prioritaria
 
-- Considerar edición de productos, alta/reclamación de palets y fotos offline. Hoy se agregan productos a palets/colecciones previamente consultados; no se realizan estas otras operaciones offline.
-- Definir si los escaneos de Inicio sin conexión deben sumar al TOP al reconectar. Hoy permanecen en la lista local y no suman.
-- Evaluar exportación/respaldo de cargas locales antes de borrar datos del navegador. El almacenamiento local no constituye un respaldo remoto.
+- iPhone/Android: instalación PWA, apertura desde icono, sesión, actualización sin reiniciar y navegación/cámara.
+- Escáner: etiquetas juntas/elección correcta, altura, zoom progresivo, temblor, luz/reflejos; pistola USB/Bluetooth y conexión celular-PC con cámaras reales.
+- Offline: preparación con conexión, carga de cajas/paquetes internos, cierre y reapertura en modo avión, reconexión intermitente y ausencia de duplicados; retención real de IndexedDB en Safari.
+- Mi equipo/Empresas: recorrido con cuentas de Usuario, operador, encargado, administrador, manager y supervisor; solicitudes aceptadas/rechazadas/revocadas, etiquetas y ambas manos/modos en teléfono.
+- Excel: abrir descargas en Excel real y probar más plantillas de proveedores; comprobar cantidades por presentación, fecha, palet y persona con filtros. XLSX ya implementado y validado automáticamente.
+- Impresión/AirPrint: A4, varias etiquetas y lectura de impresiones reales a distancia.
 
-## Funciones por definir
+## Operación y medición
 
-- Supervisión como permiso adicional: vínculo por enlace, varios supervisores, desvinculación y lectura de palets vinculados. La edición debe aprobarla exclusivamente el propietario. El rango actual no implementa todavía esta vinculación.
-- Empresa como permiso adicional: propuesta aplazada; definir consentimiento y alcance antes de programar. El campo Empresa del perfil es descriptivo.
-- Transferencia de palets: definir aceptación del nuevo propietario antes de implementarla.
-- Suscripciones y límites comerciales: por definir. El cupo técnico actual de una sesión PC y una móvil ya existe; no hay planes de pago implementados.
-- Tendencias por período en General de Moderación, únicamente si se decide ampliar los conteos actuales.
+- Correo: recepción real Gmail/Outlook/Apple Mail, botón/enlace/logo y bandeja de entrada. Revisar DNS/DMARC y alineación SPF/DKIM con Resend; no atribuir spam a una sola causa ni afirmar configuración actual sin consultarla. Ver docs/CORREO-VERIFICACION-20261020.md.
+- Ubicaciones: verificar configuración del proveedor en Render y coincidencia/sugerencias con locales reales; no copiar claves privadas.
+- Rendimiento: medir endpoints autenticados en Render/Neon con inventario/historial grandes y red móvil lenta, antes de optimizar. Mantener pruebas aisladas y sin datos personales en telemetría.
 
-## Offline inteligente — validación pendiente en campo
-Implementación progresiva en desarrollo: shell, copias autorizadas, colas compartidas, reintentos y conflictos. Probar Safari físico, red móvil lenta/intermitente y retención de IndexedDB. La lista EAN offline aún es separada de Inicio online; evaluar unificación por identidad sin perder listas existentes. Ver docs/OFFLINE-INTELIGENTE.md.
+## Opcionales, todavía no comprometidos
 
-## Equipos de sucursal en beta — 18/10/2026
-Primera implementación en desarrollo: roles por vínculo, varias sucursales por espacio, invitaciones, sucursal activa, escaneo/asignación y consulta de equipo. Ver docs/EQUIPOS-SUCURSAL-BETA.md. Validar en beta con cuentas ficticias antes de autorizar main. Marcas queda como próxima etapa, todavía por definir. Edición offline, uso de pendientes y generación mediante reserva de códigos permanecen propuestas pospuestas.
+- Exportar/resguardar cargas locales pendientes antes de borrar el navegador o cambiar de equipo.
+- Ampliar offline a ediciones, fotos o activación/generación de palets: hoy no se promete esa capacidad.
+- Definir si lecturas de Inicio offline deben sumar al TOP al reconectar; no cambiar rankings implícitamente.
+- Importación de listas de supervisión desde CSV/.xls además de .xlsx, si se solicita.
+- Planes comerciales/suscripciones y tendencias por período en General, solo si se decide desarrollarlos.
+
+## Quitado de la lista antigua porque ya existe
+
+Empresas/supervisores con consentimiento y desvinculación, equipos de sucursal en main, transferencias de stock/propiedad, comparación y exportación XLSX configurable, cajas con paquetes internos, etiquetas personales para Usuario y nuevos registros de moderación. Sus pruebas físicas pendientes están arriba; no son funciones por implementar de nuevo.
