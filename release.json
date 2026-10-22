@@ -1,6 +1,12 @@
 {
-  "version": 136,
+  "version": 137,
   "changes": [
+    {
+      "version": 137,
+      "label": "2.32",
+      "date": "2026-10-22",
+      "summary": "Comparar y descargar stock con filtros de integrantes, sucursales y vencimientos en un modal"
+    },
     {
       "version": 136,
       "label": "2.31",
@@ -294,15 +300,9 @@
       "label": "1.83",
       "date": "2026-10-19",
       "summary": "RT estático y barra de carga global blanca"
-    },
-    {
-      "version": 87,
-      "label": "1.82",
-      "date": "2026-10-19",
-      "summary": "Mejorar centrado y aviso RT al consultar palet"
     }
   ],
   "major": 2,
-  "minor": 31,
-  "label": "2.31"
+  "minor": 32,
+  "label": "2.32"
 }
