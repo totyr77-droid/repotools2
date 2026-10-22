@@ -1,6 +1,12 @@
 {
-  "version": 137,
+  "version": 138,
   "changes": [
+    {
+      "version": 138,
+      "label": "2.33",
+      "date": "2026-10-22",
+      "summary": "Mi equipo más compacto: filtros por sección, acciones claras y etiquetas de sucursal"
+    },
     {
       "version": 137,
       "label": "2.32",
@@ -294,15 +300,9 @@
       "label": "1.84",
       "date": "2026-10-19",
       "summary": "Transferir mercadería entre palets y propiedad por correo"
-    },
-    {
-      "version": 88,
-      "label": "1.83",
-      "date": "2026-10-19",
-      "summary": "RT estático y barra de carga global blanca"
     }
   ],
   "major": 2,
-  "minor": 32,
-  "label": "2.32"
+  "minor": 33,
+  "label": "2.33"
 }

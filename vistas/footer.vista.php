@@ -123,7 +123,7 @@
 <?php if(!empty($paginaSupervision)||!empty($paginaGestionEmpresas)): ?>
 <link rel="stylesheet" href="css/supervision.css?v=<?= (int)app_release()['version'] ?>">
 <?php if(!empty($paginaSupervision)): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
-<?php foreach(['branch','chevron']as$supervisionIcon): ?><span hidden data-supervision-icon="<?= $supervisionIcon ?>"><?= stock_icon($supervisionIcon) ?></span><?php endforeach;endif; ?><script src="js/supervision.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php foreach(['branch','chevron','trash']as$supervisionIcon): ?><span hidden data-supervision-icon="<?= $supervisionIcon ?>"><?= stock_icon($supervisionIcon) ?></span><?php endforeach;endif; ?><script src="js/supervision.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php endif; ?>
 <?php include __DIR__.'/team-shortcut.vista.php'; ?>
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
