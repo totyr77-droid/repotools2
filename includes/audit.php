@@ -55,3 +55,8 @@ function audit_denied(PDO $db,int $actor,string $action,string $key,int $status,
 function audit_from_activity(?array $snapshot): array {
     if(!$snapshot)return [];$p=array_intersect_key($snapshot,array_flip(['id','code','branch_id','description','released','activated','owner_id']));$p['products']=[];$products=$snapshot['products']??[];ksort($products);foreach($products as $id=>$row)$p['products'][]=['id'=>(int)$id,...$row];$p['accesses']=[];$accesses=$snapshot['accesses']??[];ksort($accesses);foreach($accesses as $id=>$status)$p['accesses'][]=['user_id'=>(int)$id,'status'=>$status];return $p;
 }
+
+function audit_session(PDO $db,int $user,string $action,string $kind): void {
+    // No cookies, session identifiers, credentials, IPs or device tokens are stored.
+    $own=!$db->inTransaction();try{if($own)$db->beginTransaction();audit_event($db,$user,$action,bin2hex(random_bytes(16)),['category'=>'users'],[],['device_kind'=>$kind==='mobile'?'mobile':'desktop']);if($own)$db->commit();}catch(Throwable $e){if($own&&$db->inTransaction())$db->rollBack();error_log('Repotools session audit unavailable');}
+}

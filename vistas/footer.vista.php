@@ -61,6 +61,7 @@
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-management.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/audit-records.js?v=<?= substr(sha1_file(__DIR__.'/../js/audit-records.js'),0,12) ?>"></script>
 <script src="js/reports-page.js?v=<?= substr(sha1_file(__DIR__.'/../js/reports-page.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaSupervision)): ?>
 <!-- Empresa: stock de consulta y listas, sin lector de Inicio. -->

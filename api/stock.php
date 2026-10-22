@@ -185,7 +185,7 @@ try {
                 $ids=array_unique($ids);
                 // Authorize the entire batch before changing anything. The existing transaction is atomic.
                 foreach($ids as $target)stock_editable($db,$target,$uid,true);
-                foreach($ids as $target){$before=pallet_activity_snapshot($db,$target);stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$target]);stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$target]);$after=$before;$after['released']=1;pallet_activity_record($db,$uid,$target,$before,$after);audit_stock($db,$uid,'delete',$key.':'.$target,audit_from_activity($before),audit_from_activity($after),[]);}
+                foreach($ids as $target){$before=pallet_activity_snapshot($db,$target);stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$target]);stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$target]);$after=$before;$after['released']=1;pallet_activity_record($db,$uid,$target,$before,$after);audit_stock($db,$uid,'delete',$key.':'.$target,audit_from_activity($before),[...audit_from_activity($after),'transaction_id'=>$key],[]);}
                 break;
             case 'delete':
                 stock_editable($db,$id,$uid,true); stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$id]);
@@ -225,7 +225,10 @@ try {
             $details=$_POST;unset($details['csrf'],$details['operation_key']);
             stock_query($db,'INSERT INTO pallet_admin_events(user_id,pallet_id,code,action,details) VALUES(?,?,?,?,?)',[$uid,$id?:null,$target?:'',(string)$action,json_encode($details,JSON_UNESCAPED_UNICODE)]);
         }
-        if(!in_array($action,['preferences','delete_many','tag'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id))),$_POST);
+        $auditAfter=$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id)));
+        if($action==='delete_labels')$auditAfter=['labels'=>$codes];
+        if($action==='transfer_commit')$auditAfter['transfer']=['mode'=>$result['mode'],'source_code'=>$result['code'],'target_code'=>$result['target_code']??'', 'target_name'=>$result['target_name']??'','units'=>$result['units']??array_sum(array_column($auditBefore['products']??[],'units'))];
+        if(!in_array($action,['preferences','delete_many','tag','transfer_preview'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$auditAfter,$_POST);
         $result['ok']=true;if($transferPayload!==null)$result['_transfer_payload']=$transferPayload;if($deductPayload!==null)$result['_deduct_payload']=$deductPayload;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }
     if($method==='POST' && $offlinePayload!==null)$result=stock_offline_confirmation($db,$result,$key,$uid);

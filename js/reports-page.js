@@ -25,13 +25,19 @@
   const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
   let moderationView = 'pending', auditPage = 0, reportState = 'pending';
   document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
-  const logFilter=document.getElementById('reportLogFilter');logFilter?.addEventListener('change',()=>{if(logActor)logActor.value='';auditPage=0;load();});
+  const logFilter=document.getElementById('reportLogFilter');logFilter?.addEventListener('change',scheduleAuditLoad);
+  let auditSection=new URL(location.href).searchParams.get('records')||'goods';if(!['users','goods','moderation','management'].includes(auditSection))auditSection='goods';
+  const sectionHints={users:'Altas, verificación, perfil y sesiones.',goods:'Cargas, retiros, palets y transferencias por operación.',moderation:'Intervenciones del personal, rangos y decisiones.',management:'Sucursales, invitaciones y enlaces compartidos.'};
+  function syncAuditSection(){document.querySelectorAll('[data-audit-section]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.auditSection===auditSection)));const hint=document.getElementById('auditSectionHint');if(hint)hint.textContent=sectionHints[auditSection];}
+  document.querySelectorAll('[data-audit-section]').forEach(b=>b.addEventListener('click',()=>{auditSection=b.dataset.auditSection;auditPage=0;for(const field of document.querySelectorAll('[data-audit-filter],#reportLogFilter,#reportLogActor'))field.value='';syncAuditSection();const url=new URL(location.href);url.searchParams.set('records',auditSection);history.replaceState({...history.state},'',url);load();}));syncAuditSection();
+  document.getElementById('clearAuditFilters')?.addEventListener('click',()=>{for(const field of document.querySelectorAll('[data-audit-filter],#reportLogFilter,#reportLogActor'))field.value='';auditPage=0;load();});
   const auditQuery=()=>{const params=new URLSearchParams();for(const field of document.querySelectorAll('[data-audit-filter]'))if(field.value)params.set(field.dataset.auditFilter,field.value);return params.toString();};
-  let auditTimer;for(const field of document.querySelectorAll('[data-audit-filter]'))field.addEventListener(field.tagName==='SELECT'?'change':'input',()=>{clearTimeout(auditTimer);auditTimer=setTimeout(()=>{auditPage=0;load();},250);});page?.onLeave(()=>clearTimeout(auditTimer));
-  const logActor=document.getElementById('reportLogActor');logActor?.addEventListener('change',()=>{auditPage=0;load();});
+  let auditTimer;function scheduleAuditLoad(){clearTimeout(auditTimer);auditTimer=setTimeout(()=>{auditPage=0;load();},250);}
+  for(const field of document.querySelectorAll('[data-audit-filter]'))field.addEventListener(field.tagName==='SELECT'?'change':'input',scheduleAuditLoad);page?.onLeave(()=>clearTimeout(auditTimer));
+  document.addEventListener('click',event=>{const menu=document.getElementById('auditFilters');if(menu?.open&&!menu.closest('.one-hand-sheet')&&!menu.contains(event.target))menu.open=false;});
+  document.addEventListener('keydown',event=>{const menu=document.getElementById('auditFilters');if(event.key==='Escape'&&menu&&!menu.closest('.one-hand-sheet'))menu.open=false;});
+  const logActor=document.getElementById('reportLogActor');logActor?.addEventListener('change',scheduleAuditLoad);
   const stamp = value => window.RepoDateTime.stamp(value);
-  const logLabels = {branch:'Sucursal',product_edit:'Producto editado',report_review:'Reporte revisado',report_block:'Permiso de reportes',pallet_admin:'Gestión de palet',user_role:'Cambio de rango',user_profile:'Datos de cuenta'};
-  const actionLabels = {branch_created:'Sucursal creada',branch_updated:'Sucursal actualizada',branch_deleted:'Sucursal eliminada',approved:'Aprobado',rejected:'Rechazado',blocked:'Bloqueado',unblocked:'Habilitado',profile_updated:'Perfil actualizado',edited:'Editado',save_product:'Producto guardado',delete_product:'Producto eliminado',description:'Descripción actualizada',delete:'Palet eliminado',invite:'Invitación enviada',revoke:'Acceso eliminado'};
   document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
     moderationView = button.dataset.moderationView; auditPage = 0;button.scrollIntoView({block:'nearest',inline:'nearest',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});
     if(queue){const url=new URL(location.href);url.searchParams.set('view',moderationView);history.replaceState({...history.state},'',url);}
@@ -53,6 +59,8 @@
   function clearPhotos() { photos.forEach(url => URL.revokeObjectURL(url)); photos = []; }
   page?.onLeave(() => { ++version; ++listVersion; clearPhotos(); });
   async function load() {
+    clearTimeout(auditTimer);
+    const auditControls=document.getElementById('auditRecordsControls');if(auditControls)auditControls.hidden=moderationView!=='logs';
     const filterBox=document.getElementById('reportLogFilters');if(filterBox)filterBox.hidden=moderationView!=='logs';
     const attempt = ++listVersion; const branches=moderationView==='branches';const branchWorkspace=document.getElementById('branchManagement');if(branchWorkspace)branchWorkspace.hidden=!branches;document.dispatchEvent(new CustomEvent('moderation:branches',{detail:branches}));const users=moderationView==='users'; const workspace=document.getElementById('userWorkspace'); if(workspace)workspace.hidden=!users; const system=moderationView==='system';const systemWorkspace=document.getElementById('systemWorkspace');if(systemWorkspace)systemWorkspace.hidden=!system;document.dispatchEvent(new CustomEvent('moderation:system',{detail:system}));list.hidden=users||branches||system; document.getElementById('moderationPagination').hidden=true; if(users||branches||system){status.textContent='';return;} status.textContent = ''; list.replaceChildren();
     const finishLoading = window.RepotoolsLoader?.start(list, {type:'skeleton'});
@@ -66,41 +74,18 @@
       }
       delete list.dataset.general;
       if (queue && moderationView !== 'pending') {
-        const result = await RepoReports.request(`?view=${moderationView}&page=${auditPage}${moderationView==='logs'?'&filter='+encodeURIComponent(logFilter?.value||'')+'&actor='+encodeURIComponent(logActor?.value.trim()||'')+'&'+auditQuery():''}`); if(attempt !== listVersion)return; csrf=result.csrf;if(moderationView==='logs'&&logActor){const selected=logActor.value;logActor.replaceChildren(new Option('Todos los usuarios',''));for(const actor of result.actors||[]){const duplicate=result.actors.filter(a=>a.name===actor.name).length>1;logActor.add(new Option(actor.name+(duplicate?' (#'+actor.id+')':''),String(actor.id)));}logActor.value=selected;}
-        status.textContent=result.items.length?'':moderationView==='history'?'Todavía no hay reportes revisados.':'Todavía no hay actividad registrada.';
+        const result = await RepoReports.request(`?view=${moderationView}&page=${auditPage}${moderationView==='logs'?'&action='+encodeURIComponent(logFilter?.value||'')+'&actor='+encodeURIComponent(logActor?.value.trim()||'')+'&grouped=1&section='+auditSection+'&'+auditQuery():''}`); if(attempt !== listVersion)return; csrf=result.csrf;if(moderationView==='logs'&&logActor){const selected=logActor.value;logActor.replaceChildren(new Option('Todos los usuarios',''));for(const actor of result.actors||[]){const duplicate=result.actors.filter(a=>a.name===actor.name).length>1;logActor.add(new Option(actor.name+(duplicate?' (#'+actor.id+')':''),String(actor.id)));}logActor.value=selected;}
+        if(moderationView==='logs'){const field=document.getElementById('auditBranchFilter');if(field){const selected=field.value;field.replaceChildren(new Option('Todas las sucursales',''));for(const branch of result.branches||[])field.add(new Option(branch.name,String(branch.id)));field.value=selected;}}
+        if(moderationView==='logs'&&logFilter){const selected=logFilter.value;logFilter.replaceChildren(new Option('Todas las acciones',''));for(const action of result.actions||[])logFilter.add(new Option(action.label,action.value));logFilter.value=selected;}
+        status.textContent=result.items.length?'':moderationView==='history'?'Todavía no hay reportes revisados.':auditQuery()||logFilter?.value||logActor?.value?'No hay registros con estos filtros.':'Todavía no hay actividad registrada en esta sección.';
         for(const item of result.items){
+          if(moderationView==='logs'){window.RepoAuditRecords.render(item,list,{document,request:RepoReports.request,stamp,icon});continue;}
           const card=document.createElement('article');card.className='report-card';card.dataset.layout=moderationView;list.append(card);const info=document.createElement('div');info.className='report-card-info';card.append(info);
           if(moderationView==='history'){
             const heading=document.createElement('div');heading.className='report-card-heading';info.append(heading);text('h2',`#${item.id}`,heading);badge(heading,item.status);
             const ean=text('p',item.ean,info);ean.className='report-inline';icon(ean,'ean');text('p',`${item.submitter_name} · Revisado por ${item.reviewer_name||'Staff'}`,info);text('p',stamp(item.reviewed_at),info);
             const changes=text('div','',info);changes.className='report-change-tags';for(const change of item.changes||[]){const chip=text('span',fields[change.field],changes);chip.className='report-change-tag';icon(chip,'edit');}if(!item.changes?.length)text('span','Fotos o comentarios',changes);
             makeReportCard(card, item.id);
-          }else{
-            const heading=text('div','',info);heading.className='report-card-heading report-log-heading';
-            const typeIcon=item.event_type==='audit'?({movements:'pallet',roles:'shield',users:'user',links:'share'}[item.category]||'file'):{branch:'brand',product_edit:'edit',report_review:'file',report_block:'shield',pallet_admin:'pallet',user_role:'user',user_profile:'edit'}[item.event_type]||'file';
-            const title=text('h2',item.event_type==='audit'?({roles:'Rangos',movements:'Movimientos',users:'Usuarios',links:'Enlaces y QR'}[item.category]||'Actividad'):logLabels[item.event_type]||'Actividad',heading);icon(title,typeIcon);
-            const tone=['denied','rejected','conflict'].includes(item.result)?'danger':['approved','unblocked','save_product','branch_created'].includes(item.action)?'success':['rejected','blocked','delete','delete_product','branch_deleted'].includes(item.action)?'danger':['revoke','leave'].includes(item.action)?'warning':['user_role','user_profile'].includes(item.event_type)?'role':'info';
-            const label=text('span',({denied:'Acción sin permiso',rejected:'Movimiento rechazado',conflict:'Movimiento en conflicto'}[item.result])||item.action_label||actionLabels[item.action]||({deduct_product:'Mercadería retirada',account_created:'Cuenta creada',email_verified:'Correo verificado',referral_credited:'Referido acreditado',branch_assign:'Sucursal modificada',branch_share:'Enlace creado',branch_revoke:'Enlace revocado',role_changed:'Rango actualizado',generate:'QR generados'}[item.action])||(item.event_type==='user_role'?'Rango actualizado':'Cambio registrado'),heading);label.className='report-activity-badge report-activity-'+tone;icon(label,tone==='success'?'check':tone==='danger'?'cross':typeIcon);
-            if(item.event_type==='audit'){title.replaceChildren(document.createTextNode(item.action_label||actionLabels[item.action]||label.textContent));icon(title,typeIcon);if(item.result==='confirmed')label.remove();}
-            const actor=text('p',(item.event_type==='audit'?'Por ':'')+(item.actor||'Staff'),info);actor.className='report-inline';icon(actor,'user');
-            const targetValue=item.event_type==='audit'?(item.pallet_code?'Palet '+item.pallet_code:item.ean?'EAN '+item.ean:item.target_user?(item.target_name||'Usuario #'+item.target_user):''):(item.event_type==='pallet_admin'?'Palet ':['product_edit','report_review'].includes(item.event_type)?'EAN ':'')+(item.target||'');const target=text('p',(item.event_type==='audit'&&targetValue?'Sobre: ':'')+targetValue,info);target.className='report-inline';if(targetValue)icon(target,item.event_type==='audit'?(item.pallet_code?'pallet':item.ean?'ean':'user'):item.event_type==='pallet_admin'?'pallet':['product_edit','report_review'].includes(item.event_type)?'ean':'user');
-            if(item.event_type==='audit'){
-              card.classList.add('report-audit-card');
-              const detail=text('details','',info);detail.className='audit-event-detail';const summary=text('summary','',detail);summary.append(heading,actor);if(targetValue)summary.append(target);else target.remove();const content=text('div','',detail);
-              if(item.account)text('p','Invitador: '+item.account.inviter+' · '+(item.account.verified?'Correo verificado':'Verificación pendiente'),content);
-              if(item.actor_role&&item.actor_role!=='No registrado')text('p','Rango al realizar la acción: '+item.actor_role,content);
-              if(item.synced_at!==item.occurred_at)text('p','Sincronizado: '+stamp(item.synced_at),content);
-              card.addEventListener('click',event=>{if(event.target.closest('summary,button,a,input,select,textarea,.audit-event-detail>div'))return;detail.open=!detail.open;});
-              detail.addEventListener('toggle',async()=>{if(!detail.open||detail.dataset.loaded||detail.dataset.loading)return;detail.dataset.loading='1';const pending=text('p','Cargando detalle…',content);try{const response=await RepoReports.request('?view=logs&event='+encodeURIComponent(item.event_id)),event=response.items?.[0];if(!detail.isConnected)return;if(!event)throw Error('El movimiento ya no está disponible con tus permisos.');
-                const value=(v,key)=>v===null||v===''?'Sin dato':typeof v==='boolean'||['released','activated','blocked','verified'].includes(key)?(v===true||v===1||v==='1'?'Sí':'No'):key==='role'?({usuario:'Usuario',moderador:'Moderador',administrador:'Administrador',manager:'Manager'}[v]||String(v)):String(v);
-                for(const change of event.changes||[]){const row=text('div','',content);row.className='audit-change';text('strong',change.label,row);text('p',value(change.before,change.field)+' → '+value(change.after,change.field),row);if(change.delta!==null&&change.delta!==undefined)text('small',(change.delta>0?'+':'')+change.delta+' unidades',row);}
-                if(!event.changes?.length)text('p',event.action_label+' · Sin diferencias de estado registradas.',content);
-                if(event.can_technical){const technical=text('details','',content);technical.className='audit-technical';text('summary','Auditoría técnica',technical);for(const [label,value] of [['Evento',event.event_id],['Operación',event.operation_id],['Antes',event.before],['Después',event.after]]){text('strong',label,technical);text('pre',typeof value==='string'?value:JSON.stringify(value,null,2),technical);}}
-                detail.dataset.loaded='1';pending.remove();}catch(e){pending.textContent=e.message;}finally{delete detail.dataset.loading;}});
-
-            }
-            if(item.event_type==='user_role')text('p',item.action,info);
-            const date=text('p',stamp(item.created_at),item.event_type==='audit'?info.querySelector('.audit-event-detail>summary'):info);date.className='report-inline report-log-date';icon(date,'clock');
           }
         }
         const pagination=document.getElementById('moderationPagination');pagination.hidden=!auditPage&&!result.has_more;document.getElementById('moderationPrevious').disabled=auditPage===0;document.getElementById('moderationNext').disabled=!result.has_more;document.getElementById('moderationPageNumber').textContent=String(auditPage+1);return;

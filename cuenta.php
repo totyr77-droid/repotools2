@@ -16,7 +16,7 @@ $name = '';
 $email = '';
 $company = '';
 $deviceConflict=false;
-function finish_account_login(array $user,string $token,string $kind,string $next): void { session_regenerate_id(true);unset($_SESSION['pending_device_login']);$_SESSION['user']=$user;$_SESSION['device_token']=$token;$_SESSION['device_kind']=$kind;$_SESSION['csrf']=bin2hex(random_bytes(32));header('Location: '.account_destination($next));exit; }
+function finish_account_login(array $user,string $token,string $kind,string $next): void { require_once __DIR__.'/includes/audit.php';audit_session(database(),(int)$user['id'],'session_started',$kind);session_regenerate_id(true);unset($_SESSION['pending_device_login']);$_SESSION['user']=$user;$_SESSION['device_token']=$token;$_SESSION['device_kind']=$kind;$_SESSION['csrf']=bin2hex(random_bytes(32));header('Location: '.account_destination($next));exit; }
 if($_SERVER['REQUEST_METHOD']==='POST'&&isset($_POST['device_decision'])&&!current_user()){
     $pending=$_SESSION['pending_device_login']??null;
     if(!valid_csrf()||!$pending||(int)$pending['expires']<time()){$error='La confirmación venció. Ingresa nuevamente.';unset($_SESSION['pending_device_login']);}

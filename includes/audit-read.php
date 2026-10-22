@@ -1,15 +1,22 @@
 <?php
 require_once __DIR__.'/audit.php';
 require_once __DIR__.'/audit-presentation.php';
-function audit_read(PDO $db,int $viewer,array $input): array {
+require_once __DIR__.'/audit-records.php';
+function audit_read_scope(PDO $db,int $viewer,array $input): array {
     $role=audit_q($db,'SELECT role FROM users WHERE id=?',[$viewer])->fetchColumn();$rank=audit_rank((string)$role);if($rank<1)throw new CatalogException('No tenés permiso para consultar registros.',403);
     $where=[];$params=[];
     if($rank<2){$where[]='(e.actor_id=? OR (e.actor_rank<? AND COALESCE(current_actor.role,\'usuario\') NOT IN (\'moderador\',\'administrador\',\'manager\') AND e.result<>\'denied\'))';$params[]=$viewer;$params[]=$rank;}
-    foreach(['actor'=>'actor_id','branch'=>'branch_id','pallet'=>'pallet_code','ean'=>'ean','action'=>'action','role'=>'actor_role','category'=>'category'] as $key=>$column){$value=$input[$key]??'';if(!is_string($value)||strlen($value)>100)throw new CatalogException('Filtro no válido.',422);if(in_array($key,['actor','branch'],true)&&$value!==''&&(!ctype_digit($value)||(int)$value<1))throw new CatalogException('Filtro numérico no válido.',422);if($value!==''){$where[]='e.'.$column.'=?';$params[]=$value;}}
+    foreach(['actor'=>'actor_id','branch'=>'branch_id','pallet'=>'pallet_code','ean'=>'ean','action'=>'action','role'=>'actor_role','category'=>'category','result'=>'result'] as $key=>$column){$value=$input[$key]??'';if(!is_string($value)||strlen($value)>100)throw new CatalogException('Filtro no válido.',422);if(in_array($key,['actor','branch'],true)&&$value!==''&&(!ctype_digit($value)||(int)$value<1))throw new CatalogException('Filtro numérico no válido.',422);if($value!==''){$where[]='e.'.$column.'=?';$params[]=$value;}}
     if(isset($input['family'])){if(!is_string($input['family'])||!preg_match('/^[a-z_]{1,30}$/D',$input['family']))throw new CatalogException('Acción no válida.',422);$where[]='e.action LIKE ?';$params[]=$input['family'].'%';}
     $q=$input['q']??'';if(!is_string($q)||mb_strlen($q)>100)throw new CatalogException('Búsqueda no válida.',422);if($q!==''){$where[]='(LOWER(e.actor_name) LIKE ? OR e.pallet_code LIKE ? OR e.ean LIKE ?)';array_push($params,'%'.mb_strtolower($q).'%','%'.$q.'%','%'.$q.'%');}
     foreach(['from'=>'>=','to'=>'<'] as $key=>$op)if(!empty($input[$key])){$v=$input[$key];if(!is_string($v)||!preg_match('/^\d{4}-\d{2}-\d{2}$/D',$v)||!checkdate((int)substr($v,5,2),(int)substr($v,8,2),(int)substr($v,0,4)))throw new CatalogException('Fecha no válida.',422);$date=new DateTimeImmutable($v.' 00:00:00',new DateTimeZone('America/Argentina/Buenos_Aires'));if($key==='to')$date=$date->modify('+1 day');$where[]='e.occurred_at'.$op.'?';$params[]=$date->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');}
+    $section=$input['section']??'';if(!is_string($section)||!in_array($section,['','users','goods','moderation','management'],true))throw new CatalogException('Sección no válida.',422);if($section!==''){$where[]='('.audit_section_sql($db).')=?';$params[]=$section;}
     $detail=$input['event']??'';if(!is_string($detail)||strlen($detail)>120)throw new CatalogException('Evento no válido.',422);if($detail!==''){$where[]='e.event_id=?';$params[]=$detail;}
+    return [$where,$params,$rank,$detail];
+}
+function audit_read(PDO $db,int $viewer,array $input): array {
+    if(($input['grouped']??'')==='1')return audit_grouped_read($db,$viewer,$input);
+    [$where,$params,$rank,$detail]=audit_read_scope($db,$viewer,$input);
     $page=filter_var($input['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);if($page===false)throw new CatalogException('Página no válida.',422);
     $base=' FROM audit_events e LEFT JOIN users current_actor ON current_actor.id=e.actor_id LEFT JOIN users audit_target ON audit_target.id=e.target_user'.($where?' WHERE '.implode(' AND ',$where):'');
     $columns=$detail!==''?'e.*,audit_target.public_name AS target_name':'audit_target.public_name AS target_name,e.event_id,e.actor_id,e.actor_name,e.actor_role,e.actor_rank,e.action,e.category,e.result,e.occurred_at,e.synced_at,e.operation_id,e.branch_id,e.pallet_id,e.pallet_code,e.ean,e.target_user';
