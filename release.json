@@ -1,6 +1,12 @@
 {
-  "version": 151,
+  "version": 152,
   "changes": [
+    {
+      "version": 152,
+      "label": "2.47",
+      "date": "2026-10-23",
+      "summary": "Comprobantes sincronizados más claros, con iconos, cantidades destacadas y fecha compacta."
+    },
     {
       "version": 151,
       "label": "2.46",
@@ -294,15 +300,9 @@
       "label": "1.98",
       "date": "2026-10-20",
       "summary": "Stock: Mercadería por producto, vencimientos y palets con filtros compactos"
-    },
-    {
-      "version": 102,
-      "label": "1.97",
-      "date": "2026-10-20",
-      "summary": "Biblioteca: compartir por usuario con QR o enlace y mejorar recepción"
     }
   ],
   "major": 2,
-  "minor": 46,
-  "label": "2.46"
+  "minor": 47,
+  "label": "2.47"
 }
