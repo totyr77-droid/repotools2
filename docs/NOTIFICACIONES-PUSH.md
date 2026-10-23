@@ -69,3 +69,6 @@ El worker conserva etapa y SQLSTATE (formato restringido) en su estado local. El
 
 ### v2.50: entorno al bajar privilegios
 ENTRYPOINT usa setpriv de util-linux para ejecutar el loop como www-data, conservando el entorno sin sesión PAM. No eleva privilegios ni guarda variables. Agregados motivos seguros de configuración ausente/inválida y driver ausente. Pruebas con stubs y CLI temporal; falta confirmar en Render. El fallo reportado era fase database sin SQLSTATE: la pérdida de entorno todavía es hipótesis. Reversión: revertir entrega y publicar caché superior.
+
+### v2.51: carpeta personal del worker
+Se asigna HOME=/var/www, USER/LOGNAME www-data al hijo de setpriv; evita que libpq busque archivos SSL bajo /root sin permisos. Ver https://www.postgresql.org/docs/current/libpq-ssl.html. No se modifica TLS ni se deshabilita validación. Causa de Render todavía no confirmada. SQLSTATE usa errorInfo y se clasifican mensajes internamente devolviendo solo categorías fijas, nunca texto de excepción. Pruebas de categorías, health y startup aprobadas; identidad HOME se revisa estáticamente por limitación de Git Bash, sin Docker local. Reversión: revertir y publicar caché superior.

@@ -12,7 +12,7 @@ case "${1:-}" in
         if [ "${REPOTOOLS_PUSH_WORKER:-1}" = "1" ]; then
             echo 'Repotools push: starting automatic delivery loop' >&2
             if [ "$(id -u)" = "0" ]; then
-                setpriv --reuid=www-data --regid=www-data --init-groups sh "$app_dir/scripts/push-loop.sh" &
+                HOME=/var/www USER=www-data LOGNAME=www-data setpriv --reuid=www-data --regid=www-data --init-groups sh "$app_dir/scripts/push-loop.sh" &
             else
                 sh "$app_dir/scripts/push-loop.sh" &
             fi

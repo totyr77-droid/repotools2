@@ -107,3 +107,9 @@ El estado de error reportado confirma que el proceso arranca; todavía no identi
 Push: reemplazado su por setpriv (util-linux explícito en Docker) para bajar privilegios a www-data sin sesión PAM y conservar directamente las variables heredadas. Motivación: fallo de Render en fase database, sin SQLSTATE informado; pérdida de entorno es hipótesis, no causa demostrada. Diagnóstico seguro diferencia DATABASE_URL ausente/inválida y controlador PostgreSQL ausente, sin exponer valores. No cambia credenciales, datos, esquema ni permisos de usuarios.
 
 Validación: startup con stubs y URL ficticia comprueba herencia tanto root/no root y CMD reemplazado; CLI/HTTP con SQLite temporal y suscripción ficticia comprueba avance, fallos de configuración ausente/inválida, permisos y exclusión de secretos. Sintaxis JS/PHP y diff aprobados. Sin Docker local: comportamiento real en Render y entrega automática pendientes de confirmar. Reversión: revertir entrega y publicar caché superior; sin migración.
+
+## Entrega v2.51
+
+Worker root→www-data: HOME=/var/www, USER y LOGNAME de www-data solo para el hijo, manteniendo variables de conexión. Evita heredar /root al consultar archivos SSL de libpq. Es un defecto real del entorno anterior, pero falta confirmar que explique el error PDO sin código reportado en Render. SQLSTATE ahora usa errorInfo como prioridad; clasificación fija de errores de permisos, autenticación, DNS, timeout, rechazo y TLS sin persistir mensajes ni valores privados. Sistema y logs muestran categoría segura.
+
+Validación: tests/push-connection-reason.php, startup/health temporales, sintaxis y diff aprobados. Git Bash reinicia HOME en shells stub: la asignación de identidad se verifica estáticamente; no afirmar prueba Linux/Docker real. Sin Docker instalado, validación Render y recepción física pendientes. Reversión: revertir entrega y publicar caché superior; no altera DB ni credenciales.

@@ -11,7 +11,8 @@ try{
     push_health_write(['status'=>'ok','at'=>time(),'sent'=>$sent]);
 }catch(Throwable $e){
     $error=$e instanceof PDOException?'database_unavailable':'worker_error';
-    $code=preg_match('/^[A-Z0-9]{5}$/D',(string)$e->getCode())?(string)$e->getCode():'unavailable';
+    $rawCode=$e instanceof PDOException?($e->errorInfo[0]??$e->getCode()):$e->getCode();
+    $code=preg_match('/^[A-Z0-9]{5}$/D',(string)$rawCode)?(string)$rawCode:'unavailable';
     $reason=null;
     if($phase==='database'){
         $url=trim(getenv('DATABASE_URL')?:'');
@@ -20,7 +21,8 @@ try{
             try{postgres_connection($url);}catch(PDOException $ignored){$reason='configuration_invalid';}
             if(!$reason&&!in_array('pgsql',PDO::getAvailableDrivers(),true))$reason='driver_missing';
         }
+        $reason=$reason??push_connection_reason($e);
     }
     push_health_write(['status'=>'error','at'=>time(),'error'=>$error,'phase'=>$phase,'code'=>$code,'reason'=>$reason,'failure'=>$e instanceof PDOException?'query':($e instanceof Error?'runtime':'application')]);
-    error_log('Repotools push: '.$error.' phase='.$phase.' class='.get_class($e).' code='.$code);exit(1);
+    error_log('Repotools push: '.$error.' phase='.$phase.' class='.get_class($e).' code='.$code.' reason='.($reason??'unknown'));exit(1);
 }

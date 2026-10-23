@@ -1,6 +1,12 @@
 {
-  "version": 155,
+  "version": 156,
   "changes": [
+    {
+      "version": 156,
+      "label": "2.51",
+      "date": "2026-10-23",
+      "summary": "Corregir carpeta personal del worker y clasificar errores de conexión"
+    },
     {
       "version": 155,
       "label": "2.50",
@@ -294,15 +300,9 @@
       "label": "2.02",
       "date": "2026-10-20",
       "summary": "Configuración de sucursal, mapa modal, filtros compactos y salida de gestión"
-    },
-    {
-      "version": 106,
-      "label": "2.01",
-      "date": "2026-10-20",
-      "summary": "Historial desde Mi equipo y explicación del origen en los tickets"
     }
   ],
   "major": 2,
-  "minor": 50,
-  "label": "2.50"
+  "minor": 51,
+  "label": "2.51"
 }
