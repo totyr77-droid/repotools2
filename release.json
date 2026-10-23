@@ -1,6 +1,12 @@
 {
-  "version": 150,
+  "version": 151,
   "changes": [
+    {
+      "version": 151,
+      "label": "2.46",
+      "date": "2026-10-23",
+      "summary": "Moderación: ingresar como usuario con cambios auditados, sesión separada y búsqueda en vivo."
+    },
     {
       "version": 150,
       "label": "2.45",
@@ -294,15 +300,9 @@
       "label": "1.97",
       "date": "2026-10-20",
       "summary": "Biblioteca: compartir por usuario con QR o enlace y mejorar recepción"
-    },
-    {
-      "version": 101,
-      "label": "1.96",
-      "date": "2026-10-20",
-      "summary": "OCR: tolerancia gradual según zoom aplicado de cámara"
     }
   ],
   "major": 2,
-  "minor": 45,
-  "label": "2.45"
+  "minor": 46,
+  "label": "2.46"
 }

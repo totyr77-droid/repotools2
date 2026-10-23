@@ -11,11 +11,16 @@ function audit_time(?int $millis=null): string {
 }
 function audit_event(PDO $db,int $actor,string $action,string $operation,array $context=[],array $before=[],array $after=[],string $result='confirmed',?string $original=null,int $activity=0,int $units=0): void {
     if(!$db->inTransaction())throw new LogicException('Audit requires the business transaction.');
+    $businessActor=$actor;
+    $supportActor=$GLOBALS['repo_support_actor']??null;$supportTarget=$GLOBALS['repo_support_target']??null;
+    if($supportActor&&$supportTarget){$actor=(int)$supportActor['id'];$after['support_account']=['id'=>(int)$supportTarget['id'],'name'=>get_public_user_name($supportTarget)];}
     $u=audit_q($db,'SELECT id,name,role,public_name FROM users WHERE id=?',[$actor])->fetch();
+    if($supportActor&&$supportTarget)$u['public_name']=get_public_user_name($u).' · como '.get_public_user_name($supportTarget);
     $id=hash('sha256',$actor.'|'.$action.'|'.$operation.'|'.$result);
     $at=$original??gmdate('Y-m-d H:i:s');
     $insert=audit_q($db,'INSERT INTO audit_events(event_id,actor_id,actor_name,actor_role,actor_rank,action,category,result,occurred_at,synced_at,operation_id,branch_id,pallet_id,pallet_code,ean,target_user,before_data,after_data) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(event_id) DO NOTHING',[$id,$actor,$u?get_public_user_name($u):'Usuario eliminado',$u['role']??'usuario',audit_rank($u['role']??'usuario'),$action,$context['category']??'movements',$result,$at,gmdate('Y-m-d H:i:s'),$operation,$context['branch_id']??null,$context['pallet_id']??null,$context['code']??'',$context['ean']??'',$context['target_user']??null,json_encode(audit_clean($before),JSON_UNESCAPED_UNICODE),json_encode(audit_clean($after),JSON_UNESCAPED_UNICODE)])->rowCount();
     if(!$insert||$result!=='confirmed')return;
+    $actor=$businessActor;
     require_once __DIR__.'/achievements.php';
     if(in_array($action,['save_product','deduct_product','transfer_commit','edited'],true))achievement_day($db,$actor);
     if($action==='referral_credited'){

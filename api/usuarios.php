@@ -23,8 +23,10 @@ try {
         if (!is_string($role) || !in_array($role,['','usuario','moderador','administrador','manager'],true)) throw new CatalogException('Rango no válido.',422);
         if($actor['role']!=='manager'&&in_array($role,['administrador','manager'],true))throw new CatalogException('Tu rango no permite consultar ese grupo.',403);
         $where=[];$args=[];if($actor['role']!=='manager'){$where[]="(role IN ('usuario','moderador') OR id=?)";$args[]=$actor['id'];}if($role!==''){$where[]='role=?';$args[]=$role;}
+        $term=$_GET['q']??'';if(!is_string($term)||mb_strlen($term)>100)throw new CatalogException('Búsqueda no válida.',422);
+        $term=mb_strtolower(trim($term));if($term!==''){$like='%'.str_replace(['!','%','_'],['!!','!%','!_'],$term).'%';$where[]="(LOWER(name) LIKE ? ESCAPE '!' OR LOWER(email) LIKE ? ESCAPE '!' OR LOWER(company) LIKE ? ESCAPE '!' OR LOWER(public_name) LIKE ? ESCAPE '!')";array_push($args,$like,$like,$like,$like);}
         $s=$db->prepare('SELECT id,name,email,company,role FROM users'.($where?' WHERE '.implode(' AND ',$where):'').' ORDER BY LOWER(name),id LIMIT 21 OFFSET '.($page*20));$s->execute($args);$users=$s->fetchAll(PDO::FETCH_ASSOC);
-        user_response(200,['users'=>array_slice($users,0,20),'page'=>$page,'page_size'=>20,'has_more'=>count($users)>20]);
+        user_response(200,['users'=>array_slice($users,0,20),'page'=>$page,'page_size'=>20,'has_more'=>count($users)>20,'can_enter'=>$actor['role']==='manager'&&!support_active(),'self_id'=>(int)$actor['id'],'csrf'=>$csrf]);
     }
     if ($method==='POST') {
         $action=$_POST['action']??'';

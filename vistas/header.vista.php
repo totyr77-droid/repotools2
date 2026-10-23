@@ -24,6 +24,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <meta charset="utf-8">
     <?php include __DIR__ . '/page-loader-head.vista.php'; ?>
     <?php if(isset($publicShareBase)): ?><base href="<?= escape($publicShareBase) ?>"><?php endif; ?>
+    <?php if(support_active()): ?><script>window.RepoSupport=<?= json_encode(['context'=>support_context()],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script><script src="js/support-session.js?v=<?= substr(sha1_file(__DIR__.'/../js/support-session.js'),0,12) ?>"></script><?php endif; ?>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
     <title><?= escape($previewTitle) ?></title>
@@ -103,6 +104,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/development.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
 </head>
   <?php require_once __DIR__.'/../includes/app-release.php'; ?><body data-app-updates="<?= current_user() && isset($roleLabels[$navRole]) ? '1' : '0' ?>" data-app-version="<?= (int)app_release()['version'] ?>" data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-hand-preference="<?= in_array($userHand,['left','right'],true)?$userHand:'' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : ((!empty($paginaBiblioteca)||!empty($paginaEquipo)||!empty($paginaGestionEmpresas)||!empty($paginaSupervision)) ? ' class="library-page"' : '') ?>>
+    <?php include __DIR__.'/../includes/support-banner.php'; ?>
     <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <header>
       <div class="header-contenedor">

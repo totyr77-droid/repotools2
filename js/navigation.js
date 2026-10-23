@@ -1,5 +1,5 @@
 (() => {
-  if (window.RepoNavigation) return;
+  if (window.RepoNavigation || window.RepoSupport) return;
   const routes = new Set(['index.php', 'index.html', 'biblioteca.php', 'stock.php', 'palet.php', 'stock-compartido.php', 'tops.php', 'reportes.php', 'cuenta.php', 'referidos.php', '']);
   const base = new URL('.', location.href);
   const loaded = new Set([...document.scripts].filter(script => script.src && new URL(script.src).origin !== location.origin).map(script => script.src));

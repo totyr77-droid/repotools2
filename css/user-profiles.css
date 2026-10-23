@@ -46,3 +46,7 @@
 .user-edit-dialog{box-sizing:border-box}.user-edit-dialog form,.user-edit-dialog label{min-width:0}.user-edit-dialog input{margin-top:0}.user-edit-dialog .library-heading h2{min-width:0}.user-edit-dialog .library-heading{gap:10px}
 #userEditDialog{--dialog-padding-x:20px;--dialog-padding-y:20px}
 .user-edit-label{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.user-edit-label svg{width:16px;height:16px;color:#62577e}
+
+.user-directory-entry{display:flex;align-items:center;gap:8px;border-bottom:1px solid #eceaf2;min-width:0}.user-directory-entry>.user-directory-row{flex:1;min-width:0;border-bottom:0}.user-enter-account{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;max-width:140px;flex:none;font-size:.8rem;padding:8px}.user-enter-account svg{width:20px;height:20px;flex:none}body[data-hand=left] .user-directory-entry{flex-direction:row-reverse}@media(max-width:480px){.user-enter-account{max-width:100px}.user-directory-details .user-role-badge{width:fit-content}}
+
+#userSearch input[type=search]{appearance:none;-webkit-appearance:none;border-radius:10px}

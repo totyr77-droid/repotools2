@@ -62,7 +62,7 @@
     return result.libraries;
   }
   async function mutate(data) {
-    if(!navigator.onLine){if(data.action!=='add_product')throw Error('Esta acción necesita conexión.');await RepoLibraryQueue.add(data,libraries.find(l=>Number(l.id)===Number(data.library_id))?.name||'Biblioteca');const local=libraries.find(l=>Number(l.id)===Number(data.library_id));if(local&&!local.products.some(p=>p.ean===data.ean))local.products.push({ean:data.ean,name:data.name,pending:true});render();return;}
+    if(!navigator.onLine){if(window.RepoSupport)throw Error('Este acceso requiere conexión.');if(data.action!=='add_product')throw Error('Esta acción necesita conexión.');await RepoLibraryQueue.add(data,libraries.find(l=>Number(l.id)===Number(data.library_id))?.name||'Biblioteca');const local=libraries.find(l=>Number(l.id)===Number(data.library_id));if(local&&!local.products.some(p=>p.ean===data.ean))local.products.push({ean:data.ean,name:data.name,pending:true});render();return;}
     if (busy) throw new Error('Espera a que termine el cambio anterior.');
     busy = true;
     document.querySelectorAll('.library-app button, #newCollection, #scanLibraryProduct, #shareLibrary, #collectionSettings button, .library-dialog button[type="submit"]').forEach(b => b.disabled = true);

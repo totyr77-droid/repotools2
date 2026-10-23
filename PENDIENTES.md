@@ -79,3 +79,10 @@ Prueba anterior aprobada en Chromium y WebKit, con vistas320/390/1366 y ambas ma
 Vencimientos: al apagar el acceso rápido restaura el orden previo en Mis palets y Mercadería, retirando el filtro automático «Vencimiento más cercano». Conserva un orden distinto elegido manualmente mientras estaba activo y guarda el orden anterior en la sesión para poder volver tras recargar. Sin cambios de DB/permisos ni diseño.
 
 Validación: tests/stock-expiry-toggle-ui.cjs con API local/SQLite temporal en Chromium/WebKit: activar/desactivar en ambos paneles, restaurar orden habitual o descendente y ocultar etiqueta automática. Sintaxis JS y diff aprobados. Reversión: revertir entrega y publicar caché superior; el campo adicional de sesión queda ignorado por código anterior. Continúan pendientes teléfono físico y worker push de Render.
+
+
+## Entrega v2.46
+
+Moderación → Usuarios: Ingresar exclusivo de manager en cada fila y búsqueda parcial en vivo por nombre/correo/empresa combinada con rango, sin caracteres comodín involuntarios. Acceso con cambios reales, sesión/cookie/CSRF separados, permisos del usuario, aviso permanente y regreso a la cuenta principal, plazo30min y revocación por rango/dispositivo/seguridad. Dispositivos y sesión del usuario conservados. Auditoría identifica al manager real y la cuenta utilizada. Datos temporales separados; guardar requiere conexión, sin cola offline ni fallback del manager. Seguridad/rangos/push/dispositivos desde cuenta principal. Sin migración ni datos reales modificados en pruebas.
+
+Detalle, validación y reversión: docs/ACCESO-COMO-USUARIO.md. Chromium/WebKit con API temporal, edición real de formulario, aislamiento, permisos, cortes/vencimiento y una mano; worker y regresiones de sesiones/dispositivos/perfiles/staff/registros aprobados. Teléfono/PWA física y reparación del worker push de Render siguen pendientes.
