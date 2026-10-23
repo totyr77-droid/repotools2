@@ -31,38 +31,15 @@ try {
         report_response(200,['stats'=>$stats,'roles'=>$db->query('SELECT role,COUNT(*) AS total FROM users GROUP BY role ORDER BY role')->fetchAll(),'csrf'=>$csrf]);
     }
     if($method==='GET'&&($_GET['view']??'')==='logs'){require_once __DIR__.'/../includes/audit-read.php';$input=$_GET;$filter=$input['filter']??'';if(!is_string($filter))throw new CatalogException('Filtro no válido.',422);if($filter!==''&&isset(report_log_filters()[$filter])){$d=report_log_filters()[$filter];if(empty($input['category']))$input['category']=$d['type']==='user_role'?'roles':($d['type']==='user_profile'?'users':($d['type']==='pallet_admin'?'movements':($d['type']==='branch'?'movements':'')));if(isset($d['action']))$input['action']=$d['action'];if($filter==='branches')$input['family']='branch_';}report_response(200,audit_read($db,(int)$user['id'],$input)+['csrf'=>$csrf]);}
-    if ($method === 'GET' && in_array($_GET['view'] ?? '', ['history', 'logs'], true)) {
-        if (!$audit) throw new CatalogException('Solo administradores y managers pueden consultar esta sección.', 403);
-        $page = filter_var($_GET['page'] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 10000]]);
-        if ($page === false) throw new CatalogException('Página no válida.', 422);
-        $offset = $page * 50;
-        if ($_GET['view'] === 'history') {
-            $items = $db->query("SELECT r.id, r.ean, r.status, r.review_note, r.reviewed_at, r.original_data, r.proposed_data, COALESCE(u.name, 'Invitado') AS submitter_name, v.name AS reviewer_name FROM product_reports r LEFT JOIN users u ON u.id = r.user_id LEFT JOIN users v ON v.id = r.reviewed_by WHERE r.status IN ('approved','rejected') ORDER BY r.reviewed_at DESC, r.id DESC LIMIT 51 OFFSET {$offset}")->fetchAll();
-            foreach ($items as &$item) { $item['changes'] = report_proposed_changes(json_decode($item['original_data'], true), json_decode($item['proposed_data'], true) ?? []); unset($item['original_data'], $item['proposed_data']); } unset($item);
-        } else {
-            $filters=report_log_filters();$filter=$_GET['filter']??'';
-            if(!is_string($filter)||($filter!==''&&!isset($filters[$filter])))throw new CatalogException('Filtro no válido.',422);
-            $params=[];$where='';
-            if($filter!==''){$definition=$filters[$filter];$where=' WHERE event_type=?';$params[]=$definition['type'];if(isset($definition['action'])){$where.=' AND action=?';$params[]=$definition['action'];}}
-            $actionWhere=$where;$actionParams=$params;
-            $actor=$_GET['actor']??'';
-            if(!is_string($actor)||($actor!==''&&(!ctype_digit($actor)||(int)$actor<1)))throw new CatalogException('Usuario no válido.',422);
-            if($actor!==''){$where.=($where===''?' WHERE ':' AND ').'actor_id=?';$params[]=(int)$actor;}
-            $directEdit=catalog_direct_edit_condition($db,'e.after_data');
-            $events = "(
-                SELECT 'product_edit' AS event_type, u.name AS actor, e.ean AS target, e.created_at, NULL AS report_id, 'edited' AS action, e.id AS event_id, u.id AS actor_id FROM product_edits e JOIN users u ON u.id = e.user_id WHERE {$directEdit}
-                UNION ALL SELECT 'report_review', u.name, r.ean, r.reviewed_at, r.id, r.status, r.id, u.id FROM product_reports r JOIN users u ON u.id = r.reviewed_by WHERE r.reviewed_at IS NOT NULL
-                UNION ALL SELECT 'report_block', a.name, u.name, e.created_at, NULL, e.action, e.id, a.id FROM report_block_events e JOIN users a ON a.id = e.actor_id JOIN users u ON u.id = e.user_id
-                UNION ALL SELECT 'pallet_admin', u.name, e.code, e.created_at, NULL, e.action, e.id, u.id FROM pallet_admin_events e JOIN users u ON u.id = e.user_id
-            UNION ALL SELECT 'user_role', a.name, u.name, e.created_at, NULL, e.old_role || ' → ' || e.new_role, e.id, a.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
-            UNION ALL SELECT 'user_profile', a.name, u.name, e.created_at, NULL, 'profile_updated', e.id, a.id FROM user_profile_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id
-            UNION ALL SELECT 'branch', a.name, e.branch_name, e.created_at, NULL, e.action, e.id, a.id FROM branch_events e JOIN users a ON a.id=e.actor_id
-            ) events";
-            $actorsQuery=$db->prepare("SELECT DISTINCT actor_id AS id, actor AS name FROM {$events}{$actionWhere} ORDER BY name, id");$actorsQuery->execute($actionParams);$actors=$actorsQuery->fetchAll();
-            $query=$db->prepare("SELECT * FROM {$events}{$where} ORDER BY created_at DESC, event_type, event_id DESC LIMIT 51 OFFSET {$offset}");
-            $query->execute($params);$items=$query->fetchAll();
-        }
-        report_response(200, ['actors' => $actors ?? [], 'items' => array_slice($items, 0, 50), 'has_more' => count($items) > 50, 'can_audit' => true, 'csrf' => $csrf]);
+    if ($method === 'GET' && ($_GET['view']??'')==='history') {
+        if (!$audit) throw new CatalogException('Solo administradores y managers pueden consultar esta sección.',403);
+        $page=filter_var($_GET['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);
+        if($page===false)throw new CatalogException('Página no válida.',422);
+        $offset=$page*50;
+        $scope=report_is_manager($db,$user)?'':" AND (r.reviewed_by=".(int)$user['id']." OR (v.role='moderador' AND EXISTS(SELECT 1 FROM audit_events review_audit WHERE review_audit.operation_id='report:' || CAST(r.id AS TEXT) AND review_audit.actor_id=r.reviewed_by AND review_audit.actor_rank=1 AND review_audit.action=r.status AND review_audit.result='confirmed')))";
+        $items=$db->query("SELECT r.id,r.ean,r.status,r.review_note,r.reviewed_at,r.original_data,r.proposed_data,COALESCE(u.name,'Invitado') AS submitter_name,v.name AS reviewer_name FROM product_reports r LEFT JOIN users u ON u.id=r.user_id LEFT JOIN users v ON v.id=r.reviewed_by WHERE r.status IN ('approved','rejected'){$scope} ORDER BY r.reviewed_at DESC,r.id DESC LIMIT 51 OFFSET {$offset}")->fetchAll();
+        foreach($items as &$item){$item['changes']=report_proposed_changes(json_decode($item['original_data'],true),json_decode($item['proposed_data'],true)??[]);unset($item['original_data'],$item['proposed_data']);}unset($item);
+        report_response(200,['actors'=>[],'items'=>array_slice($items,0,50),'has_more'=>count($items)>50,'can_audit'=>true,'csrf'=>$csrf]);
     }
     if ($method === 'GET' && isset($_GET['pending_count'])) {
         if (!$moderator) throw new CatalogException('No tienes permiso para revisar reportes.', 403);

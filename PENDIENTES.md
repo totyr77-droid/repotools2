@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 22/10/2026. Entrega actual: **v2.41 / interna 146**, notificaciones push y limpieza de continuidad. Última versión pública comprobada antes de esta entrega: v2.38 / 143. Verificar 144 después de publicar.
+Actualizado: 23/10/2026. Entrega actual: **v2.42 / interna 147**, permisos del staff y registros. Última versión pública comprobada antes de esta entrega: v2.41 / 146. Comprobar147 después de publicar.
 
 ## Trabajo actual
 
@@ -55,3 +55,7 @@ Urgencia naranja hasta7 días en etiquetas de fechas/cantidades/días y +N por f
 Guías de cámara corregidas: número separado del marco QR, adaptación por altura y recorte QR/OCR consistente. Detalle/validación/reversión: docs/GUIAS-CAMARA-20261022.md. Sin DB ni cambios de permisos/inventario.
 
 Prioridad pendiente detectada en prueba física push: usuario confirmó recepción de pruebas enviadas manualmente (proveedor201); el worker automático no toma la cola (checked_at0/attempts0). Consultas de preparación verificadas en PostgreSQL sin cambios. Revisar arranque/logs/override del contenedor Render. No afirmar envío automático operativo hasta corregirlo y verificarlo.
+
+## Entrega v2.42
+
+Staff: moderador solo sus actuaciones; administrador sus actuaciones y las de moderadores; manager global. Usuarios/sesiones y asignación de rangos exclusivos de manager; perfiles superiores y vías alternativas de historial protegidas. Registros con iconos/tonos por acción, Antes/Después y enlaces a palet/perfil con permisos. Filtros adaptados para no taparse con menú móvil. Sin migración ni cambios de roles reales. Detalle, validación y reversión: docs/REGISTROS-MODERACION.md. Se mantiene pendiente la reparación del worker push de Render.

@@ -31,7 +31,7 @@ $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute(['administrador'
 check_report(!array_key_exists('submitter_ip', report_detail($db, (int) $report['id'], 'user:' . $admin['id'], true)), 'La IP se oculta inmediatamente al bajar el rango.');
 check_report($private['submitter']['email'] === $suffix . 'usuario@example.invalid', 'Moderación identifica al remitente.');
 denied_report(fn() => report_set_block($db, $user, (int) $report['id'], true), 403);
-report_set_block($db, $mod, (int) $report['id'], true);
+denied_report(fn()=>report_set_block($db, $mod, (int) $report['id'], true),403);report_set_block($db, $admin, (int) $report['id'], true);
 denied_report(fn() => submit_product_report($db, $user, $owner, $input, ['ean' => 'blocked-photo'], $storage), 403);
 check_report(count($objects) === 2 && !report_is_blocked($db, $users['administrador']), 'Bloqueo previo a subir fotos y exclusivo de la cuenta.');
 denied_report(fn() => report_set_block($db, $mod, (int) $report['id'], false),403);

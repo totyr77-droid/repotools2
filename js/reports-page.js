@@ -26,7 +26,7 @@
   let moderationView = 'pending', auditPage = 0, reportState = 'pending';
   document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
   const logFilter=document.getElementById('reportLogFilter');logFilter?.addEventListener('change',scheduleAuditLoad);
-  let auditSection=new URL(location.href).searchParams.get('records')||'goods';if(!['users','goods','moderation','management'].includes(auditSection))auditSection='goods';
+  const defaultAuditSection=document.getElementById('auditRecordsControls')?.dataset.defaultSection||'goods';let auditSection=new URL(location.href).searchParams.get('records')||defaultAuditSection;const allowedSections=[...document.querySelectorAll('[data-audit-section]')].map(b=>b.dataset.auditSection);if(!allowedSections.includes(auditSection))auditSection=defaultAuditSection;
   const sectionHints={users:'Altas, verificación, perfil y sesiones.',goods:'Cargas, retiros, palets y transferencias por operación.',moderation:'Intervenciones del personal, rangos y decisiones.',management:'Sucursales, invitaciones y enlaces compartidos.'};
   function syncAuditSection(){document.querySelectorAll('[data-audit-section]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.auditSection===auditSection)));const hint=document.getElementById('auditSectionHint');if(hint)hint.textContent=sectionHints[auditSection];}
   document.querySelectorAll('[data-audit-section]').forEach(b=>b.addEventListener('click',()=>{auditSection=b.dataset.auditSection;auditPage=0;for(const field of document.querySelectorAll('[data-audit-filter],#reportLogFilter,#reportLogActor'))field.value='';syncAuditSection();const url=new URL(location.href);url.searchParams.set('records',auditSection);history.replaceState({...history.state},'',url);load();}));syncAuditSection();
@@ -36,6 +36,9 @@
   for(const field of document.querySelectorAll('[data-audit-filter]'))field.addEventListener(field.tagName==='SELECT'?'change':'input',scheduleAuditLoad);page?.onLeave(()=>clearTimeout(auditTimer));
   document.addEventListener('click',event=>{const menu=document.getElementById('auditFilters');if(menu?.open&&!menu.closest('.one-hand-sheet')&&!menu.contains(event.target))menu.open=false;});
   document.addEventListener('keydown',event=>{const menu=document.getElementById('auditFilters');if(event.key==='Escape'&&menu&&!menu.closest('.one-hand-sheet'))menu.open=false;});
+  const auditMenu=document.getElementById('auditFilters');
+  function placeAuditFilters(){if(!auditMenu?.open||auditMenu.closest('.one-hand-sheet'))return;const rect=auditMenu.getBoundingClientRect(),nav=document.getElementById('nav-celular')?.getBoundingClientRect(),header=document.querySelector('header')?.getBoundingClientRect(),bottom=nav?.height&&nav.top<innerHeight?Math.max(0,innerHeight-nav.top):0,top=header?.bottom>0?Math.min(header.bottom,innerHeight*.3):0,below=innerHeight-rect.bottom-bottom-18,above=rect.top-top-18,up=below<180&&above>below;auditMenu.dataset.placement=up?'up':'down';auditMenu.style.setProperty('--audit-filter-max',Math.max(44,Math.floor(up?above:below))+'px');}
+  auditMenu?.addEventListener('toggle',placeAuditFilters);(page?.listen||window.addEventListener.bind(window))('resize',placeAuditFilters);
   const logActor=document.getElementById('reportLogActor');logActor?.addEventListener('change',scheduleAuditLoad);
   const stamp = value => window.RepoDateTime.stamp(value);
   document.querySelectorAll('[data-moderation-view]').forEach(button => button.addEventListener('click', () => {
@@ -205,7 +208,7 @@
   }
   close.addEventListener('click', () => { if (!busy) dialog.close(); }); dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); }); dialog.addEventListener('close', () => { ++version; active = null; clearPhotos(); });
   form.addEventListener('submit', event => { event.preventDefault(); review('approved'); }); reject.addEventListener('click', () => review('rejected'));
-  const savedView=new URL(location.href).searchParams.get('view');const savedTab=queue&&['pending','history','logs','users','branches','general','system'].includes(savedView)?document.querySelector(`[data-moderation-view=${savedView}]`):null;if(savedTab)savedTab.click();else load();
+  const savedView=new URL(location.href).searchParams.get('view');const savedTab=queue&&['pending','history','logs','users','branches','general','system'].includes(savedView)?document.querySelector(`[data-moderation-view=${savedView}]`):null;if(savedTab&&!savedTab.hidden)savedTab.click();else load();
   const linkedReport = new URL(location.href).searchParams.get('report');
   if (/^[1-9]\d*$/.test(linkedReport || '')) open(Number(linkedReport));
 })();

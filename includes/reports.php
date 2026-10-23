@@ -36,6 +36,7 @@ function report_require_submission(PDO $db, ?array $user): void {
     if (report_is_blocked($db, $user)) throw new CatalogException('Tu cuenta tiene bloqueado el envío de reportes. Puedes seguir usando las demás funciones.', 403);
 }
 function report_can_manage_sender(string $actorRole, int $actorId, array $target, bool $blocking = true): bool {
+    if(!in_array($actorRole,['administrador','manager'],true))return false;
     if ($actorRole === 'manager') return !empty($target['id']);
     $ranks = ['usuario' => 1, 'moderador' => 2, 'administrador' => 3, 'manager' => 4];
     if (!$blocking && !in_array($actorRole, ['administrador', 'manager'], true)) return false;
