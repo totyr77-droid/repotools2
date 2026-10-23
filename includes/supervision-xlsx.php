@@ -44,7 +44,7 @@ function supervisor_parse_xlsx(string $bytes,string $column='',array $options=[]
  $eanRows=[];$issues=[];$samples=[];foreach($rows as$r=>$cells){if($r<=$header)continue;$cell=$cells[$chosen]??['value'=>'','formula'=>false];$raw=trim($cell['value']);if($raw==='')continue;if(supervisor_ean_heading($raw))continue;
  $ean=supervisor_ean($fixes[$r]??$raw);$reason=$cell['formula']?'El código contiene una fórmula.':(!preg_match('/^[0-9]{8}$|^[0-9]{13}$/D',$ean)?'Código incompleto o con caracteres extraños.':(!valid_product_ean($ean)?'El dígito de control no coincide.':''));
  if($reason!==''){$issues[]=['row'=>$r,'value'=>mb_substr($raw,0,80),'reason'=>$reason];continue;}$eanRows[(string)$r]=$ean;if(count($samples)<5)$samples[]=['row'=>$r,'ean'=>$ean];}
- $preview=['columns'=>$columns,'suggested'=>$chosen,'sheet_path'=>$path,'sheets'=>$sheets,'header'=>$header,'row_count'=>count($eanRows),'issues'=>array_slice($issues,0,100),'issue_count'=>count($issues),'samples'=>$samples];
+ $preview=['columns'=>$columns,'suggested'=>$chosen,'sheet_path'=>$path,'sheets'=>$sheets,'header'=>$header,'row_count'=>count($eanRows),'issues'=>array_slice($issues,0,100),'issue_count'=>count($issues),'samples'=>$samples,'ean_rows'=>$eanRows];
  if($column===''||!empty($options['preview']))return $preview;
  if($issues&&($options['exclude_invalid']??'')!=='1')throw new CatalogException('Corregí los EAN señalados o elegí excluir las filas pendientes.',422);
  if(!$eanRows)throw new CatalogException('No encontramos EAN válidos en esa columna.',422);return ['sheet_path'=>$path,'ean_column'=>$chosen,'ean_rows'=>$eanRows,'row_count'=>count($eanRows),'header'=>$header];});

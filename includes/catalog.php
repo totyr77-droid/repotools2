@@ -14,7 +14,7 @@ function valid_product_ean(string $ean): bool {
 }
 
 function catalog_product(PDO $db, string $ean): ?array {
-    $stmt = $db->prepare('SELECT ean, name, brand, quantity, category, packaging, image, source, source_url, revision FROM products WHERE ean = ?');
+    $stmt = $db->prepare('SELECT ean, name, brand, quantity, category, packaging, uxb, uxc, image, source, source_url, revision FROM products WHERE ean = ?');
     $stmt->execute([$ean]);
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$product) return null;
@@ -22,6 +22,11 @@ function catalog_product(PDO $db, string $ean): ?array {
     return $product;
 }
 
+function catalog_pack_value(mixed $value): string {
+    if($value==='')return '';
+    if(!is_string($value)||!preg_match('/^[1-9][0-9]{0,6}$/D',$value)||(int)$value>1000000)throw new CatalogException('UXB y UXC deben ser unidades enteras entre 1 y 1.000.000.',422);
+    return (string)(int)$value;
+}
 function catalog_text($value, int $max): string {
     return is_string($value) ? mb_substr(trim($value), 0, $max) : '';
 }
@@ -154,13 +159,14 @@ function edit_catalog_product(PDO $db, string $ean, array $fields, int $revision
     if ($ownTransaction) $db->beginTransaction();
     try {
         $before = catalog_product($db, $ean);
+        foreach(['uxb','uxc'] as $key)$values[$key]=catalog_pack_value($fields[$key]??($before[$key]??''));
         if ($before) {
             if ($before['revision'] !== $revision) throw new CatalogException('Otra persona modificó esta ficha. Revisa la versión actual antes de guardar.', 409);
-            $stmt = $db->prepare('UPDATE products SET name = ?, quantity = ?, brand = ?, category = ?, packaging = ?, revision = revision + 1, updated_by = ?, updated_at = CURRENT_TIMESTAMP WHERE ean = ? AND revision = ?');
+            $stmt = $db->prepare('UPDATE products SET name = ?, quantity = ?, brand = ?, category = ?, packaging = ?, uxb = ?, uxc = ?, revision = revision + 1, updated_by = ?, updated_at = CURRENT_TIMESTAMP WHERE ean = ? AND revision = ?');
             $stmt->execute([...array_values($values), $userId, $ean, $revision]);
         } else {
             if ($revision !== 0) throw new CatalogException('La ficha cambió. Revisa la versión actual.', 409);
-            $stmt = $db->prepare('INSERT INTO products (name, quantity, brand, category, packaging, updated_by, ean) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(ean) DO NOTHING');
+            $stmt = $db->prepare('INSERT INTO products (name, quantity, brand, category, packaging, uxb, uxc, updated_by, ean) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(ean) DO NOTHING');
             $stmt->execute([...array_values($values), $userId, $ean]);
         }
         if ($stmt->rowCount() !== 1) throw new CatalogException('Otra persona modificó esta ficha. Revisa la versión actual antes de guardar.', 409);

@@ -21,7 +21,8 @@ function report_is_blocked(PDO $db, ?array $user): bool {
 }
 function report_proposed_changes(?array $original, array $proposed): array {
     $changes = [];
-    foreach (['brand','name','quantity','category','packaging'] as $field) {
+    foreach (['brand','name','quantity','category','packaging','uxb','uxc'] as $field) {
+        if(in_array($field,['uxb','uxc'],true)&&!array_key_exists($field,$proposed))continue;
         $before = trim((string)($original[$field] ?? '')); $after = trim((string)($proposed[$field] ?? ''));
         if ($before !== $after) $changes[] = ['field'=>$field,'before'=>$before,'after'=>$after];
     }
@@ -77,6 +78,7 @@ function report_fields(array $input): array {
         if (!is_string($value) || mb_strlen(trim($value)) > $max) throw new CatalogException('Revisa los datos del producto.', 422);
         $fields[$key] = trim($value);
     }
+    foreach(['uxb','uxc'] as $key)if(array_key_exists($key,$input))$fields[$key]=catalog_pack_value($input[$key]);
     return $fields;
 }
 function report_lock(PDO $db): void {

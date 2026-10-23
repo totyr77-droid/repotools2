@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=44;
+const REPOTOOLS_SCHEMA_VERSION=45;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -355,6 +355,14 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE push_jobs(id TEXT PRIMARY KEY,subscription_id {$ref} NOT NULL REFERENCES push_subscriptions(id) ON DELETE CASCADE,event_key TEXT NOT NULL,notification_id {$ref},kind TEXT NOT NULL,payload TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','sending','sent','cancelled','failed')),attempts INTEGER NOT NULL DEFAULT 0,available_at BIGINT NOT NULL,lease_until BIGINT NOT NULL DEFAULT 0,expires_at BIGINT NOT NULL,sent_at BIGINT,error_code TEXT,UNIQUE(subscription_id,event_key))");
             $db->exec('CREATE INDEX push_jobs_ready ON push_jobs(status,available_at,lease_until)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(44)');
+        }
+        if(!isset($applied[45])){
+            $db->exec("ALTER TABLE products ADD COLUMN uxb TEXT NOT NULL DEFAULT ''");
+            $db->exec("ALTER TABLE products ADD COLUMN uxc TEXT NOT NULL DEFAULT ''");
+            $db->exec("ALTER TABLE supervisor_members ADD COLUMN branch_scope TEXT NOT NULL DEFAULT 'all'");
+            $db->exec('ALTER TABLE supervisor_members ADD COLUMN scope_revision INTEGER NOT NULL DEFAULT 1');
+            $db->exec("CREATE TABLE supervisor_member_branches(team_id {$ref} NOT NULL,user_id {$ref} NOT NULL,branch_id {$ref} NOT NULL,PRIMARY KEY(team_id,user_id,branch_id),FOREIGN KEY(team_id,user_id) REFERENCES supervisor_members(team_id,user_id) ON DELETE CASCADE)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(45)');
         }
         $db->commit();
     } catch (Throwable $error) {

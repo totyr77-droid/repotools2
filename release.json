@@ -1,6 +1,12 @@
 {
-  "version": 156,
+  "version": 157,
   "changes": [
+    {
+      "version": 157,
+      "label": "2.52",
+      "date": "2026-10-23",
+      "summary": "Locales por integrante y propuestas de catálogo desde Excel"
+    },
     {
       "version": 156,
       "label": "2.51",
@@ -294,15 +300,9 @@
       "label": "2.03",
       "date": "2026-10-20",
       "summary": "Filtros aplicados desplazables sin recortar sus nombres"
-    },
-    {
-      "version": 107,
-      "label": "2.02",
-      "date": "2026-10-20",
-      "summary": "Configuración de sucursal, mapa modal, filtros compactos y salida de gestión"
     }
   ],
   "major": 2,
-  "minor": 51,
-  "label": "2.51"
+  "minor": 52,
+  "label": "2.52"
 }

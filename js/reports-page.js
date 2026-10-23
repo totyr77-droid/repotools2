@@ -22,7 +22,7 @@
     });
   }
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
-  const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase' };
+  const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase', uxb:'Unidades por bulto (UXB)', uxc:'Unidades por caja (UXC)' };
   let moderationView = 'pending', auditPage = 0, reportState = 'pending';
   document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
   const logFilter=document.getElementById('reportLogFilter');logFilter?.addEventListener('change',scheduleAuditLoad);
@@ -155,7 +155,7 @@
         } else if (sender.blocked) { const state = text('span', 'Reportes bloqueados', section); state.className = 'report-blocked-state'; }
       }
       const resolved=active.status!=='pending', baseline=resolved?active.original:active.current;
-      const changed = Object.keys(fields).filter(key => (baseline?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
+      const changed = Object.keys(fields).filter(key => (!['uxb','uxc'].includes(key)||Object.hasOwn(active.proposed||{},key)) && (baseline?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
       const shownFields = Object.keys(fields).filter(key => baseline?.[key] || active.proposed?.[key]);
       const changedFields=shownFields.filter(key=>changed.includes(key)),unchangedFields=shownFields.filter(key=>!changed.includes(key));
       function compare(keys,container) {
@@ -190,7 +190,7 @@
         }).catch(error => { if (attempt === version) hint.textContent = error.message; });
       }
       if (queue && result.can_review && active.status === 'pending') {
-        form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] || '';
+        form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] ?? active.current?.[key] ?? '';
         form.hidden = false;
       }
     } catch (error) { if (attempt === version) message.textContent = error.message; } finally { finishLoading?.(); }
