@@ -66,3 +66,6 @@ Reversión: revertir esta entrega y publicar versión/cache superior. No borrar 
 
 ### v2.49: causa segura en Sistema
 El worker conserva etapa y SQLSTATE (formato restringido) en su estado local. El endpoint mantiene acceso exclusivo de manager y no expone mensajes de excepción ni datos del aviso. Sistema muestra esa etapa/código cuando falla. La prueba CLI incluye una suscripción activa ficticia y verifica avance de checked_at sin envíos. Sigue pendiente identificar el fallo real del contenedor y confirmar entrega automática. Revertir esta entrega y publicar caché superior para retirar este diagnóstico; no cambia datos ni esquema.
+
+### v2.50: entorno al bajar privilegios
+ENTRYPOINT usa setpriv de util-linux para ejecutar el loop como www-data, conservando el entorno sin sesión PAM. No eleva privilegios ni guarda variables. Agregados motivos seguros de configuración ausente/inválida y driver ausente. Pruebas con stubs y CLI temporal; falta confirmar en Render. El fallo reportado era fase database sin SQLSTATE: la pérdida de entorno todavía es hipótesis. Reversión: revertir entrega y publicar caché superior.

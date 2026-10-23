@@ -101,3 +101,9 @@ Push automático: lectura de producción confirma suscripciones vigentes sin rev
 ## Diagnóstico automático v2.49
 
 El estado de error reportado confirma que el proceso arranca; todavía no identifica la causa. El worker registra ahora etapa (dependencia/conexión/preparación/entrega), categoría y SQLSTATE validado. Sistema muestra etapa y código para manager, sin mensajes de excepción, contenido de avisos ni credenciales. Prueba de salud con suscripción ficticia activa, notificación no enviable y SQLite temporal: checked_at avanza, permisos 401/403/200 y campos privados excluidos. Sintaxis PHP/JS y diff aprobados. No se enviaron pruebas ni se alteraron datos de cuentas. Falta conocer el error de Render y corregir su causa; esta entrega es diagnóstico, no reparación confirmada. Reversión: revertir entrega y publicar caché superior; no requiere migración.
+
+## Entrega v2.50
+
+Push: reemplazado su por setpriv (util-linux explícito en Docker) para bajar privilegios a www-data sin sesión PAM y conservar directamente las variables heredadas. Motivación: fallo de Render en fase database, sin SQLSTATE informado; pérdida de entorno es hipótesis, no causa demostrada. Diagnóstico seguro diferencia DATABASE_URL ausente/inválida y controlador PostgreSQL ausente, sin exponer valores. No cambia credenciales, datos, esquema ni permisos de usuarios.
+
+Validación: startup con stubs y URL ficticia comprueba herencia tanto root/no root y CMD reemplazado; CLI/HTTP con SQLite temporal y suscripción ficticia comprueba avance, fallos de configuración ausente/inválida, permisos y exclusión de secretos. Sintaxis JS/PHP y diff aprobados. Sin Docker local: comportamiento real en Render y entrega automática pendientes de confirmar. Reversión: revertir entrega y publicar caché superior; sin migración.
