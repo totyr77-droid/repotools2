@@ -59,3 +59,9 @@ Prioridad pendiente detectada en prueba física push: usuario confirmó recepci�
 ## Entrega v2.42
 
 Staff: moderador solo sus actuaciones; administrador sus actuaciones y las de moderadores; manager global. Usuarios/sesiones y asignación de rangos exclusivos de manager; perfiles superiores y vías alternativas de historial protegidas. Registros con iconos/tonos por acción, Antes/Después y enlaces a palet/perfil con permisos. Filtros adaptados para no taparse con menú móvil. Sin migración ni cambios de roles reales. Detalle, validación y reversión: docs/REGISTROS-MODERACION.md. Se mantiene pendiente la reparación del worker push de Render.
+
+## Entrega v2.43
+
+Biblioteca: papelera en el visor EAN, igual a la de cada producto, a la izquierda para mano derecha y a la derecha para mano izquierda. Confirmación compartida con los boxes; elimina solo de la colección, conserva el siguiente producto (o el anterior al borrar el último), actualiza contador y cierra el visor si queda vacía. Evita doble envío y conserva el producto ante error/sin conexión. Se mantiene la validación de propietario y CSRF del servidor existente, sin cambios de DB.
+
+Validación: PHP/JS y diff; tests/library-viewer-remove-ui.cjs con API local y SQLite temporal en Chromium/WebKit,320/390/1366, ambas manos, nombres largos, cancelar/error/reintento/último producto. Service worker bloqueado solo en el fixture para simular503. Revisión visual local; teléfono físico pendiente. Reversión: revertir esta entrega y publicar versión/cache superior; productos ya quitados no se recuperan con el revert. Sigue pendiente worker push de Render.
