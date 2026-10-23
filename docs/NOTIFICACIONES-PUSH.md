@@ -50,3 +50,16 @@ Esperar introducción, carga, instalación/ubicación visibles y otros modales. 
 Validación: PHP de vistas, sintaxis JS, push PHP y service worker; UI Chromium/WebKit con API real y permiso simulado, espera ante otro modal, ausencia de petición nativa automática, posposición persistente, activación desde el aviso y diseño 320/390/1366 para ambas manos. Captura móvil revisada. Recepción física sigue pendiente; estas pruebas no son envíos reales.
 
 Revertir esta entrega y publicar una versión/cache superior. Conservar claves, suscripciones, trabajos push y datos del usuario; la clave local de posposición puede permanecer.
+
+
+## Arranque y diagnóstico v2.48
+
+Consulta de producción solo lectura confirmó suscripciones vigentes sin checked_at y avisos nuevos sin revisar, junto a trabajos pendientes con cero intentos. Esto confirma ausencia de procesamiento; no identifica por sí solo la causa del arranque. No se enviaron avisos manuales ni se alteraron suscripciones para diagnosticar.
+
+El arranque pasa de CMD a scripts/container-entrypoint.sh como ENTRYPOINT. Así se conserva cuando Render reemplaza el comando de Apache, también si lo envuelve en sh. Conserva docker-php-entrypoint y el comando recibido. Ejecuta el loop como www-data y usa la ruta absoluta de PHP. Los comandos CLI php/composer no inician el loop; REPOTOOLS_PUSH_WORKER=0 sigue deteniéndolo. Un override del ENTRYPOINT o esa variable todavía puede impedirlo y debe revisarse en Render si no aparece actividad tras el despliegue.
+
+El worker ya no sale silenciosamente si falta Composer: registra una categoría de error y estado local fuera de la carpeta pública. Cada pasada marca inicio/resultado/envíos; no registra claves, endpoints, cuerpos privados ni cadenas de conexión. API action=health requiere manager y devuelve solo estado agregado, fecha de actividad, cantidad pendiente y categoría de error. Visible en Moderación → Sistema y al Actualizar. Un estado activo comprueba actividad del proceso, no recepción física del teléfono.
+
+Validación: tests/push-startup.cjs simula arranque normal, comando Apache reemplazado, root/no-root, variable de desactivación y CLI, preservando argumentos y sin procesos reales. tests/push-health.cjs ejecuta una pasada CLI real sobre SQLite temporal vacío (sin envíos), verifica estado/error/antigüedad, acceso manager y ausencia de campos privados. tests/push.php con criptografía real y HTTP simulado; tests/push-worker.cjs y sintaxis PHP/JS/shell. No hay Docker local para construir la imagen; verificar tras Render que checked_at avance y que una invitación nueva llegue por el flujo automático. No afirmar corrección del runtime solo por las pruebas locales.
+
+Reversión: revertir esta entrega y publicar versión/cache superior. No borrar claves, cola ni suscripciones. La entrega no modifica esquema. El archivo de estado es temporal y puede ignorarse al volver al código anterior.

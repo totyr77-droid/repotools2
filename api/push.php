@@ -9,6 +9,14 @@ if((int)($_SERVER['CONTENT_LENGTH']??0)>8192)push_response(413,['error'=>'La sus
 $uid=(int)$user['id'];$device=hash('sha256',$_SESSION['device_token']??'');$csrf=csrf_token();session_write_close();
 try{
  $db=database();$action=$method==='GET'?($_GET['action']??'config'):($_POST['action']??'');if(!is_string($action))throw new CatalogException('Acción no válida.',422);
+ if($method==='GET'&&$action==='health'){
+  if(stock_query($db,'SELECT role FROM users WHERE id=?',[$uid])->fetchColumn()!=='manager')throw new CatalogException('Solo managers pueden consultar el envío automático.',403);
+  require_once __DIR__.'/../includes/push-health.php';$state=push_health_read();
+  $state['enabled']=(getenv('REPOTOOLS_PUSH_WORKER')?:'1')==='1';
+  $state['last_checked']=(int)stock_query($db,'SELECT COALESCE(MAX(checked_at),0) FROM push_subscriptions')->fetchColumn();
+  $state['pending']=(int)stock_query($db,"SELECT COUNT(*) FROM push_jobs WHERE status='pending'")->fetchColumn();
+  push_response(200,$state);
+ }
  if($method==='GET'&&$action==='verify'){
   $receipt=$_GET['receipt']??'';if(!is_string($receipt)||!preg_match('/^[a-f0-9]{32}$/D',$receipt))throw new CatalogException('Aviso no válido.',422);
   $allowed=(bool)stock_query($db,"SELECT 1 FROM push_jobs j JOIN push_subscriptions s ON s.id=j.subscription_id WHERE j.id=? AND s.user_id=? AND s.device_hash=? AND j.status IN ('sending','sent') AND j.expires_at>? AND ".push_active_sql(),[$receipt,$uid,$device,time()])->fetchColumn();

@@ -21,4 +21,6 @@ ENV REPOTOOLS_DB_PATH=/var/lib/repotools/accounts.sqlite
 ENV REPOTOOLS_REQUIRE_DATABASE_URL=1
 RUN printf 'upload_max_filesize=6M\npost_max_size=14M\n' > /usr/local/etc/php/conf.d/uploads.ini
 EXPOSE 80
-CMD ["sh", "-c", "chown www-data:www-data /var/lib/repotools; if [ \"${REPOTOOLS_PUSH_WORKER:-1}\" = \"1\" ]; then su -p -s /bin/sh www-data -c 'exec sh /var/www/html/scripts/push-loop.sh' & fi; exec apache2-foreground"]
+RUN chmod +x /var/www/html/scripts/container-entrypoint.sh /var/www/html/scripts/push-loop.sh
+ENTRYPOINT ["/var/www/html/scripts/container-entrypoint.sh"]
+CMD ["apache2-foreground"]

@@ -18,7 +18,9 @@
     }catch{target.hidden=true;}
   }
   lastAction();
-  async function load(){lastAction();
+  let healthRevision=0;
+  async function loadPushHealth(){const target=doc.getElementById('systemPushHealth');if(!target)return;const version=++healthRevision;try{const response=await fetch(new URL('api/push.php?action=health',doc.baseURI),{credentials:'same-origin',cache:'no-store'}),data=await response.json();if(!response.ok)throw Error();if(version!==healthRevision||!target.isConnected||root.hidden)return;target.dataset.state=data.enabled?data.state:'disabled';const label=!data.enabled?'Avisos automáticos desactivados':({running:'Envío automático activo',starting:'Iniciando envío automático',unknown:'Envío automático sin iniciar',stale:'Envío automático sin actividad reciente',error:'El envío automático necesita revisión'}[data.state]||'Estado del envío no disponible');target.querySelector('span').textContent=label+(data.last_run?' · '+new Date(data.last_run*1000).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23'}):'')+(data.pending?' · '+data.pending+' pendientes':'');}catch{if(version===healthRevision&&target.isConnected){target.dataset.state='error';target.querySelector('span').textContent='No pudimos consultar el envío automático.';}}}
+  async function load(){lastAction();loadPushHealth();
     controller?.abort();controller=new AbortController();const current=++revision;
     status.textContent='Consultando rendimiento…';doc.getElementById('refreshSystem').disabled=true;
     try{
