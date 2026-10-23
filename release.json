@@ -1,6 +1,12 @@
 {
-  "version": 149,
+  "version": 150,
   "changes": [
+    {
+      "version": 150,
+      "label": "2.45",
+      "date": "2026-10-23",
+      "summary": "Vencimientos restaura el orden anterior al desactivarlo y quita el filtro automático."
+    },
     {
       "version": 149,
       "label": "2.44",
@@ -294,15 +300,9 @@
       "label": "1.96",
       "date": "2026-10-20",
       "summary": "OCR: tolerancia gradual según zoom aplicado de cámara"
-    },
-    {
-      "version": 100,
-      "label": "1.95",
-      "date": "2026-10-20",
-      "summary": "OCR: conservar coincidencias con temblor y zoom digital"
     }
   ],
   "major": 2,
-  "minor": 44,
-  "label": "2.44"
+  "minor": 45,
+  "label": "2.45"
 }
