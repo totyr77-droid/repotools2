@@ -13,7 +13,20 @@
     let numberGuide;
     if(isQR&&pallet){guide.classList.add('repo-pallet-qr-guide');guide.innerHTML='<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 24V3h21M76 3h21v21M3 76v21h21M76 97h21V76"/><path d="M12 12h14v14H12ZM74 12h14v14H74ZM12 74h14v14H12Z"/></svg>';numberGuide=document.createElement('div');numberGuide.className='repo-pallet-number-guide';numberGuide.setAttribute('aria-hidden','true');numberGuide.innerHTML='<span>········</span><small>Número de palet</small>';element.append(numberGuide);}
     element.append(guide,marker); let timer;
-    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=pallet&&isQR?Math.min(width*.62,height*.58):Math.min(width,height)*.85;if(numberGuide){guide.style.top=height*.40+'px';numberGuide.style.width=side+'px';numberGuide.style.top=(height*.40+side/2-6)+'px';numberGuide.style.transform='translate(-50%,-100%)';}guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
+    function layout() {
+      const width=element.clientWidth,height=element.clientHeight;
+      let side=Math.min(width,height)*.85;
+      if(numberGuide){
+        // Keep the QR square and the optional number strip in separate rows.
+        const showNumber=height>=280&&width>=220,topPadding=Math.min(48,height*.22),bottomPadding=Math.min(68,height*.3),available=height-topPadding-bottomPadding-(showNumber?52:0);
+        side=Math.max(1,Math.min(width*.62,height*.58,available));
+        const top=topPadding+Math.max(0,(available-side)/2);
+        guide.style.top=top+side/2+'px';numberGuide.hidden=!showNumber;
+        numberGuide.style.width=side+'px';numberGuide.style.top=top+side+8+'px';
+        numberGuide.querySelector('span').style.fontSize=Math.min(24,side/8)+'px';
+      }
+      guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px';
+    }
     layout(); const observer=typeof ResizeObserver==='function'?new ResizeObserver(layout):null;observer?.observe(element);
     function reset() { clearTimeout(timer); marker.hidden = true; guide.hidden = false; }
     return {
@@ -116,7 +129,8 @@
   function palletFrame(video,element){
     const frame=visibleFrame(video),v=video.getBoundingClientRect?.(),g=element.querySelector?.('.repo-pallet-qr-guide')?.getBoundingClientRect?.();
     if(!v?.width||!v.height||!g?.width||!g.height)return null;
-    const left=Math.max(v.left,g.left),top=Math.max(v.top,g.top),right=Math.min(v.right,g.right),bottom=Math.min(v.bottom,g.bottom);
+    const number=element.querySelector?.('.repo-pallet-number-guide'),n=number&&!number.hidden?number.getBoundingClientRect?.():null;
+    const left=Math.max(v.left,g.left),top=Math.max(v.top,g.top),right=Math.min(v.right,g.right),bottom=Math.min(v.bottom,Math.max(g.bottom,n?.bottom||g.bottom));
     if(right<=left||bottom<=top)return null;
     return {x:frame.x+(left-v.left)/v.width*frame.width,y:frame.y+(top-v.top)/v.height*frame.height,width:(right-left)/v.width*frame.width,height:(bottom-top)/v.height*frame.height};
   }

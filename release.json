@@ -1,6 +1,12 @@
 {
-  "version": 145,
+  "version": 146,
   "changes": [
+    {
+      "version": 146,
+      "label": "2.41",
+      "date": "2026-10-23",
+      "summary": "Guías QR y número del palet separadas y adaptadas a la altura de la cámara."
+    },
     {
       "version": 145,
       "label": "2.40",
@@ -294,15 +300,9 @@
       "label": "1.92",
       "date": "2026-10-20",
       "summary": "Logros: aviso flotante independiente de notificaciones sin leer"
-    },
-    {
-      "version": 96,
-      "label": "1.91",
-      "date": "2026-10-20",
-      "summary": "Correo: logo oficial integrado y ayuda para verificación bloqueada por spam"
     }
   ],
   "major": 2,
-  "minor": 40,
-  "label": "2.40"
+  "minor": 41,
+  "label": "2.41"
 }

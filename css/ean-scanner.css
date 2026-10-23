@@ -93,3 +93,8 @@
 
 /* The middle of the shared target identifies the intended label. */
 .repo-pallet-qr-guide:after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);background:linear-gradient(currentColor,currentColor) center/12px 2px no-repeat,linear-gradient(currentColor,currentColor) center/2px 12px no-repeat;filter:drop-shadow(0 1px 1px #0008)}
+
+/* The eight-digit fallback sits below the QR, without covering its corners. */
+.repo-pallet-number-guide{height:44px;padding:2px 8px;transform:translateX(-50%)}
+.repo-pallet-number-guide>span{line-height:24px;letter-spacing:2px;white-space:nowrap}
+.repo-pallet-number-guide[hidden]{display:none!important}

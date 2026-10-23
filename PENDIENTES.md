@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 22/10/2026. Entrega actual: **v2.40 / interna 145**, notificaciones push y limpieza de continuidad. Última versión pública comprobada antes de esta entrega: v2.38 / 143. Verificar 144 después de publicar.
+Actualizado: 22/10/2026. Entrega actual: **v2.41 / interna 146**, notificaciones push y limpieza de continuidad. Última versión pública comprobada antes de esta entrega: v2.38 / 143. Verificar 144 después de publicar.
 
 ## Trabajo actual
 
@@ -49,3 +49,9 @@ Aviso voluntario de activación desde la app para cuentas sin push activo, esper
 ## Entrega v2.40
 
 Urgencia naranja hasta7 días en etiquetas de fechas/cantidades/días y +N por fechas distintas, ejemplos en configuración y lectura del plazo0–365 corregida. Sin migración. Detalle, validación y reversión: docs/VENCIMIENTOS-URGENTES.md. Comprobar145 después de publicar; no confundir pruebas de navegador con recepción/pruebas físicas.
+
+## Entrega v2.41
+
+Guías de cámara corregidas: número separado del marco QR, adaptación por altura y recorte QR/OCR consistente. Detalle/validación/reversión: docs/GUIAS-CAMARA-20261022.md. Sin DB ni cambios de permisos/inventario.
+
+Prioridad pendiente detectada en prueba física push: usuario confirmó recepción de pruebas enviadas manualmente (proveedor201); el worker automático no toma la cola (checked_at0/attempts0). Consultas de preparación verificadas en PostgreSQL sin cambios. Revisar arranque/logs/override del contenedor Render. No afirmar envío automático operativo hasta corregirlo y verificarlo.
