@@ -65,3 +65,11 @@ Staff: moderador solo sus actuaciones; administrador sus actuaciones y las de mo
 Biblioteca: papelera en el visor EAN, igual a la de cada producto, a la izquierda para mano derecha y a la derecha para mano izquierda. Confirmación compartida con los boxes; elimina solo de la colección, conserva el siguiente producto (o el anterior al borrar el último), actualiza contador y cierra el visor si queda vacía. Evita doble envío y conserva el producto ante error/sin conexión. Se mantiene la validación de propietario y CSRF del servidor existente, sin cambios de DB.
 
 Validación: PHP/JS y diff; tests/library-viewer-remove-ui.cjs con API local y SQLite temporal en Chromium/WebKit,320/390/1366, ambas manos, nombres largos, cancelar/error/reintento/último producto. Service worker bloqueado solo en el fixture para simular503. Revisión visual local; teléfono físico pendiente. Reversión: revertir esta entrega y publicar versión/cache superior; productos ya quitados no se recuperan con el revert. Sigue pendiente worker push de Render.
+
+## Entrega v2.44
+
+Stock recuerda por cuenta/dispositivo la última presentación elegida explícitamente para cargas nuevas (cajas, bultos o unidades). Comparte preferencia con la página offline, sin trasladar unidades por caja entre productos. Las ediciones conservan su presentación, cajas parciales y borradores mantienen su comportamiento; retiros no cambian la preferencia. Sin nuevo control ni migración; permisos y cálculos servidor conservados.
+
+Validación: sintaxis JS/diff y stock-pack-references-offline-ui con API SQLite temporal, continuidad entre cargas, cajas/paquetes/bultos independientes, fallback offline, sincronización exacta e aislamiento por cuenta. Reversión: revertir entrega y publicar caché superior; la clave local de presentación puede quedar ignorada, no afecta stock. Teléfono físico pendiente. Worker push de Render continúa pendiente.
+
+Prueba anterior aprobada en Chromium y WebKit, con vistas320/390/1366 y ambas manos. No requiere cambios visuales: reutiliza el selector de presentación existente.

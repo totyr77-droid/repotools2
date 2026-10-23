@@ -1,6 +1,12 @@
 {
-  "version": 148,
+  "version": 149,
   "changes": [
+    {
+      "version": 149,
+      "label": "2.44",
+      "date": "2026-10-23",
+      "summary": "Stock recuerda cajas, bultos o unidades para las próximas cargas, también sin conexión."
+    },
     {
       "version": 148,
       "label": "2.43",
@@ -294,15 +300,9 @@
       "label": "1.95",
       "date": "2026-10-20",
       "summary": "OCR: conservar coincidencias con temblor y zoom digital"
-    },
-    {
-      "version": 99,
-      "label": "1.94",
-      "date": "2026-10-20",
-      "summary": "Notificación al invitador cuando su referido confirma el correo"
     }
   ],
   "major": 2,
-  "minor": 43,
-  "label": "2.43"
+  "minor": 44,
+  "label": "2.44"
 }
