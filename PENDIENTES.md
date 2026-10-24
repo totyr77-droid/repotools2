@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.95 / interna200**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.96 / interna201**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -474,3 +474,14 @@ Corrige regresión del ajuste v2.93: selector de alineación .home-scan-actions 
 En Empresas, botón de apertura, título del modal y submit pasan a Asignar supervisor; progreso Asignando. Asignar empresa de Sucursales conserva su función/nombre distintos. API enable/permisos/confirmación del servidor sin cambios.
 
 Validación: home-scan-pair-ui aprobado, ahora incluye hoja home.css y estructura real del modo de una mano, sin simular dicho DOM en PC donde no aplica. Página PHP real Chromium/WebKit320/390/1366, ambas manos y preferencias persistidas0/1, aviso PWA visible/oculto: Producto/Palet con misma fila/altura, sin desborde horizontal; rótulos del modal comprobados. Captura final revisada, sintaxis PHP/JS y diff aprobados. No datos reales modificados ni nueva dependencia. Reversión: revertir esta entrega y publicar contador de caché superior; conservar corrección de flex si se revierte solo terminología.
+
+
+## Entrega v2.96 — Ajustes con menos accesos y prioridad a preferencias
+
+Retira de Accesos los atajos duplicados Biblioteca/Palets/Escáner (navegación principal) y Estadísticas y TOPs (Inicio). Conserva Mi empresa/Supervisores, Mi equipo, gestión de empresas según condiciones previas, Mis reportes, Compartir app y Ver introducción. No elimina rutas ni funciones. Preferencias pasa al primer bloque del formulario en orden de DOM/teclado/móvil y primera columna en PC. Avisos y respuesta permanece debajo de Nombre público, respetando la ubicación solicitada.
+
+Perfil propio conserva identidad, editar y compartir arriba. Actividad/contadores/insignias quedan en details opcional Mi actividad e insignias, cerrado inicialmente, reutilizando el perfil existente con parámetro compacto optativo. Perfil público conserva presentación anterior. Modales de insignias permanecen fuera del bloque cerrado para mantener cuenta.php#insignias y notificaciones de logros. Sin cambios de permisos, datos, cálculos ni preferencias guardadas.
+
+Validación: settings-ui Chromium/WebKit aprobado (nuevo orden, ausencia de duplicados, avisos, guardado y reintentos, mano, defaults, CSRF/identidad y sesión). achievements-ui aprobado (destacar, límites, privacidad pública, sincronización y modalidades). Página real Chromium/WebKit320/390/1366 ambas manos con actividad abierta/cerrada, enlaces de equipos, cuenta.php#insignias y edición en modal, sin desborde. Captura final revisada; PHP/diff aprobados. Pruebas con base temporal, sin datos reales. Acceso flotante superpuesto detectado en auditoría sigue como mejora2, no se modifica en este alcance3.
+
+Reversión: revertir cuenta.php, includes/profile-card.php y estilos de esta entrega y publicar caché superior; no datos que revertir. Tests actualizados al bloque plegable y a la nueva jerarquía, no a nuevos permisos.
