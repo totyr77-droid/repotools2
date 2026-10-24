@@ -80,7 +80,7 @@ function supervisor_list(PDO $db,int $user,int $id,bool $source=false):array {$t
 function supervisor_list_rows(array $list):array {$data=json_decode($list['ean_rows'],true,512,JSON_THROW_ON_ERROR);return isset($data['format'])?$data['rows']:$data;}
 function supervisor_list_header(array $list):int {$data=json_decode($list['ean_rows'],true,512,JSON_THROW_ON_ERROR);return isset($data['format'])?(int)$data['header']:1;}
 function supervisor_export_columns(array $input,bool $comparison=false):array {
- $available=['ean'=>'EAN','name'=>'Producto','uxb'=>'UXB','stock'=>'Unidades','expires'=>'Vencimientos','pallets'=>'Palets (unidades por fecha)','branches'=>'Sucursales (unidades)','members'=>'Integrantes (unidades)','boxes'=>'Cajas'];
+ $available=['ean'=>'EAN','name'=>'Producto','uxb'=>'UXB','stock'=>'Unidades','boxes'=>'Cajas','expires'=>'Vencimientos','pallets'=>'Palets (unidades por fecha)','branches'=>'Sucursales (unidades)','members'=>'Integrantes (unidades)'];
  $chosen=isset($input['columns'])?array_unique(explode(',',$input['columns'])):($comparison?['stock']:array_keys($available));if(!$chosen||in_array('', $chosen,true)||array_diff($chosen,array_keys($available)))throw new CatalogException('Elegí al menos una columna válida para descargar.',422);return array_intersect_key($available,array_flip($chosen));
 }
 function supervisor_export_lines(array $amounts,bool $dates=false):string {
@@ -88,9 +88,10 @@ function supervisor_export_lines(array $amounts,bool $dates=false):string {
  $lines=[];foreach($amounts as$label=>$units){if($dates)$label=$label?(new DateTimeImmutable($label))->format('d/m/Y'):'Sin vencimiento';$lines[]=$label.': '.$units.($units===1?' unidad':' unidades');}return implode("\n",$lines);
 }
 function supervisor_export_boxes(array $bySize,int $unknown):int|string {
- if(count($bySize)===1&&!$unknown){$size=(int)array_key_first($bySize);$units=(int)reset($bySize);if($units%$size===0)return intdiv($units,$size);}
- ksort($bySize,SORT_NUMERIC);$parts=[];foreach($bySize as$size=>$units){$size=(int)$size;$boxes=intdiv($units,$size);$rest=$units%$size;$part=$boxes.' '.($boxes===1?'caja':'cajas').' × '.$size;if($rest)$part.=' + '.$rest.' '.($rest===1?'unidad':'unidades');$parts[]=$part;}if($unknown)$parts[]=$unknown.' unidades sin equivalencia';return implode("\n",$parts);
+ $boxes=0;$loose=$unknown;foreach($bySize as$size=>$units){$size=(int)$size;$boxes+=intdiv($units,$size);$loose+=$units%$size;}
+ if(!$loose)return $boxes;$units=$loose.' '.($loose===1?'unidad':'unidades');return $boxes?$boxes.' + '.$units:$units;
 }
+
 function supervisor_export_groups(iterable $rows):array {
  $groups=[];$count=0;foreach($rows as$r){if(++$count>20000)throw new CatalogException('El detalle supera 20.000 lotes. Elegí menos integrantes o sucursales.',422);$ean=(string)$r['ean'];if(!isset($groups[$ean]))$groups[$ean]=['ean'=>$ean,'stock'=>0,'names'=>[],'uxbs'=>[],'packs'=>[],'unknown_uxb'=>0,'box_units'=>[],'unknown_boxes'=>0,'dates'=>[],'lots'=>[],'locations'=>[],'people'=>[]];$g=&$groups[$ean];$units=(int)$r['units'];$g['stock']+=$units;$g['names'][stock_product_names($r)['display_name']]=true;
  $pack=(int)$r['pack_size'];$inner=(int)($r['inner_pack_size']??0);if(in_array($r['kind'],['boxes','packs'],true)&&$pack>0){$label=($r['kind']==='boxes'?'Caja: ':'Bulto: ').$pack;if($r['kind']==='boxes'&&$inner>0&&$pack%$inner===0)$label.=' ('.intdiv($pack,$inner).' × '.$inner.')';$g['uxbs'][$label]=($g['uxbs'][$label]??0)+$units;$g['packs'][$pack]=true;}else $g['unknown_uxb']+=$units;

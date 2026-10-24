@@ -156,3 +156,11 @@ Descarga muestra Preparando Excel, evita doble envío, cierra el modal solo tras
 Exportación: UXB solo muestra valores conocidos:14 en el ejemplo224 unidades con UXB14 más1 unidad sin UXB; blanco si no hay ninguno; varios tamaños se listan como12 /18 sin cantidades ni leyendas. Vencimientos: una única fecha del producto se muestra sola; varias fechas mantienen cantidades por fecha. Sin vencimiento se explicita; no altera detalle por palet, stock ni permisos.
 
 Validación: UI Chromium y WebKit320/390/1366 ambas manos, sin selección masiva inicial, columnas básicas, buscador con8 integrantes y selección voluntaria, descarga correcta/cierre/único aviso, error503 sin cierre ni pérdida y reintento. Pruebas supervision/export/import/layout para UXB conocido+desconocido, varios tamaños y fecha única/múltiple; sintaxis/diff aprobados. Sin cambios de DB. Teléfono físico pendiente. Reversión: revertir entrega y publicar caché superior; los Excel previos no se modifican.
+
+## Entrega v2.56 — Cajas junto a Unidades y anchos por contenido
+
+Cajas usa resumen compacto:22 +1 unidad, sin repetir tamaño de caja ni «sin equivalencia». Cajas completas sin sobrantes siguen numéricas; si solo hay unidades muestra su cantidad con singular/plural correcto. Suma cajas físicas de las presentaciones conocidas y unidades restantes, conservando total numérico independiente en Unidades. No inventa equivalencia para unidades desconocidas.
+
+Cajas queda inmediatamente después de Unidades en información a descargar y en orden canónico del XLSX. Anchos de las columnas exportadas calculados según encabezado y línea de contenido más larga, con mínimos/máximos por tipo y ajuste multilínea para detalles largos; altura existente y columnas originales se conservan. Funciona tanto en comparación como exportación independiente, incluso solo Unidades.
+
+Validación: supervision/export/layout, lectura cruzada XLSX comprimido y preservación de fuente con supervision-xlsx, UI completa Chromium con selección conjunta/orden real de celdas y descarga, singular/sobrantes/desconocidos, ancho real10 para Unidades y14 para cajas del fixture. Sintaxis/diff aprobados. Sin DB/migración. Reversión: revertir entrega y publicar caché superior; archivos ya descargados requieren exportar de nuevo, no se modifica el original.

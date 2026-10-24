@@ -1,6 +1,12 @@
 {
-  "version": 160,
+  "version": 161,
   "changes": [
+    {
+      "version": 161,
+      "label": "2.56",
+      "date": "2026-10-24",
+      "summary": "Cajas junto a Unidades, resumen compacto y columnas ajustadas al contenido"
+    },
     {
       "version": 160,
       "label": "2.55",
@@ -294,15 +300,9 @@
       "label": "2.07",
       "date": "2026-10-21",
       "summary": "Cambios pendientes más claros, compartir colección unificado y sucursal cercana opcional"
-    },
-    {
-      "version": 111,
-      "label": "2.06",
-      "date": "2026-10-21",
-      "summary": "Solicitudes al propietario y ediciones pendientes de Mi equipo sin GPS"
     }
   ],
   "major": 2,
-  "minor": 55,
-  "label": "2.55"
+  "minor": 56,
+  "label": "2.56"
 }
