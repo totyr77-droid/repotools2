@@ -257,3 +257,12 @@ Comparar lista incorpora opción Incluir productos fuera de la lista, desactivad
 Bloque con título y encabezados violetas, columnas elegidas en sus posiciones de exportación; si EAN no fue seleccionado, lo incluye en la columna EAN original para identificar cada producto. Mantiene ceros iniciales, composición y detalle de varias fechas. Anchos contemplan también faltantes y se actualiza dimensión final. Agrega después de filas y combinaciones existentes y rechaza exceder el límite de filas de Excel. Sin nuevas consultas de permisos ni migración.
 
 Validación: supervision-unlisted PHP (opción apagada, EAN faltante único, cero excluido, datos originales y notas, columnas elegidas, solo Unidades y ceros iniciales), supervision/export/layout aprobados. UI puntual Chromium/WebKit con descarga real de EAN fuera de lista, cantidad25, cierre y reinicio desmarcado; geometría WebKit320/390/1366 ambas manos, captura revisada. SDK Microsoft OpenXML2.20 valida archivo nuevo con0 errores; sintaxis PHP/JS y diff aprobados. Excel de escritorio interactivo pendiente de prueba del usuario. Reversión: revertir entrega y publicar caché superior; regenerar descargas.
+
+
+## Entrega v2.70 — Bloque fuera de lista sin cientos de filas vacías
+
+Corregida ubicación del bloque adicional: se calcula el final según celdas con contenido o fórmulas, respetando combinaciones existentes, y se eliminan solo filas vacías finales con formato al agregar productos fuera de lista. No se agrega después del relleno invisible del Excel. Sin productos adicionales se conserva el archivo como antes. Mantiene notas, valores, fórmulas, stock y selección de alcance.
+
+Diagnóstico del archivo aportado: el bloque sí estaba generado, pero después de cientos de filas vacías, lo que lo hacía difícil de encontrar. Se reprodujo con la planilla concreta de forma local; el mismo producto y cantidad quedaron junto al final real de la lista. No se guardaron archivos ni datos personales en Git, ni se modificó la base.
+
+Validación: regresión con921 filas de formato vacío y nota final; bloque vuelve a fila6 del fixture y conserva su nota. supervision-unlisted y supervision-export-layout aprobados. Reproducción local con archivo aportado, cantidades conservadas y SDK Microsoft OpenXML2.20 con0 errores. Sintaxis PHP/diff aprobados. No se repitieron pruebas UI porque no cambian controles. Reversión: revertir entrega y publicar caché superior; descargar de nuevo para regenerar.

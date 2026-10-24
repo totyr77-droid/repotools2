@@ -1,6 +1,12 @@
 {
-  "version": 174,
+  "version": 175,
   "changes": [
+    {
+      "version": 175,
+      "label": "2.70",
+      "date": "2026-10-24",
+      "summary": "Ubica productos fuera de lista junto al contenido, sin filas vacías intermedias"
+    },
     {
       "version": 174,
       "label": "2.69",
@@ -294,15 +300,9 @@
       "label": "2.21",
       "date": "2026-10-21",
       "summary": "Los filtros de Stock conservan la sección seleccionada."
-    },
-    {
-      "version": 125,
-      "label": "2.20",
-      "date": "2026-10-21",
-      "summary": "Ubicación opcional después de la intro y ayuda de sucursal solo al usar palets"
     }
   ],
   "major": 2,
-  "minor": 69,
-  "label": "2.69"
+  "minor": 70,
+  "label": "2.70"
 }
