@@ -6,7 +6,7 @@
   const get = id => document.getElementById(id);
   const dialog = get('productEditDialog');
   if (!dialog) return;
-  const fields = { name: 'catalogName', quantity: 'catalogQuantity', brand: 'catalogBrand', category: 'catalogCategory', packaging: 'catalogPackaging' };
+  const fields = { name: 'catalogName', quantity: 'catalogQuantity', uxb: 'catalogUxb', brand: 'catalogBrand', category: 'catalogCategory', packaging: 'catalogPackaging' };
   let ean = '', revision = 0, operation = 0, saving = false;
   let cropSession=null,photo=null,previewUrl=null,currentImage='',photoVersion=0;
   function resetPhoto(){++photoVersion;cropSession?.dispose();cropSession=null;photo=null;if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=null;get('catalogPhotoFile').value='';get('catalogPhotoChanged').value='0';get('catalogPhotoPreview').hidden=!currentImage;if(currentImage)get('catalogPhotoPreview').src=currentImage;else get('catalogPhotoPreview').removeAttribute('src');get('catalogAdjustPhoto').hidden=!currentImage;get('catalogUndoPhoto').hidden=true;get('catalogChoosePhoto').textContent=currentImage?'Cambiar foto':'Agregar foto';}

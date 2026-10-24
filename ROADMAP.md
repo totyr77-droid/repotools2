@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.79. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v2.88. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -45,3 +45,5 @@ Moderación General: estadísticas por período, actividad agrupada, resolucione
 ## Últimas funciones solicitadas
 
 Cámara del buscador supervisor y listas CSV/XLS implementadas en v2.87. Detalles y límites en docs/IMPORTACION-CSV-XLS.md. Respaldo offline y unificación de listas/integrantes permanecen pospuestos por el usuario.
+
+UXB visible junto a contenido neto en formulario de producto, edición y revisión: implementado en v2.88.

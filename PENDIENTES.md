@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.87 / interna192**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.88 / interna193**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -408,3 +408,10 @@ Buscador de Supervisores agrega cámara con lector existente y selección Produc
 CSV y XLS pasan a estar disponibles junto con XLSX en Agregar lista. Normalización de servidor preserva XLSX sin cambios, CSV literal con separador/codificación y XLS mediante lector mantenido; vista previa informa conversión, CSV permite corregir separador. Comparación/exportación/aportes usan flujo existente. Dependencia PhpSpreadsheet5.10.0 y zip en Docker; detalles/límites/reversión en docs/IMPORTACION-CSV-XLS.md. Sin migraciones ni consultas externas para datos del usuario.
 
 Validación: supervision-ui Chromium/WebKit con cámara simulada EAN/QR/manual/cierre y comparación descargada de CSV/XLS con EAN normalizado y150 unidades de fixture; importación/catalog/export PHP, formatos con comillas/BOM/Windows1252/ceros/texto tipo fórmula/límites/archivos inválidos, XLS hojas/estilos/fórmulas y XLSX intacto aprobados. Composer audit sin vulnerabilidades conocidas, requisitos locales con gd/zip aprobados, sintaxis/diff. Cámara física y Docker local no disponibles; no afirmar prueba de hardware ni construcción local. No datos reales cambiados. Reversión: revertir entrega y publicar caché superior; listas convertidas quedan XLSX compatibles.
+
+
+## Entrega v2.88 — Unidades por bulto junto a contenido neto
+
+Reporte/alta de producto, edición del catálogo y revisión de moderación muestran Contenido neto y Unidades por bulto juntos, sin ocultar UXB en Más datos ni duplicar controles. Campo opcional entero1–1.000.000, precarga UXB existente y envía su valor por el flujo de permisos/revisión del servidor. Explicación automática de reportes reconoce cambios solo de UXB para no exigir nota escrita. Conserva UXC histórico y subcajas/paquetes internos sin conversiones ni migraciones.
+
+Validación: reports/catalog PHP aprobados, regresión de propuesta solo UXB14 sin explicación; editor-photo y report-success UI con precarga12/cambio14 y envío conservando foto. product-pack-fields-ui Chromium/WebKit verifica3 formularios, campos únicos alineados, entero/opcional y320/390/1366 ambas manos sin desborde. Sintaxis PHP/JS/diff aprobados. Reversión: revertir entrega y publicar caché superior; UXB ya guardada permanece compatible con catálogo/revisión existentes.

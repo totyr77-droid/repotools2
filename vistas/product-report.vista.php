@@ -7,7 +7,7 @@
     <p id="reportInstructions" class="product-edit-note">Propón los datos correctos. Un moderador los revisará.</p>
     <label>Marca<input name="brand" maxlength="160" placeholder="Ej.: Red Bull"></label>
     <label>Producto<input name="name" maxlength="120" placeholder="Ej.: Energizante Lata"></label>
-    <label>Contenido neto<input name="quantity" maxlength="80" placeholder="Ej.: 250 ml, 500 g o 1 kg"></label>
+    <div class="product-measure-fields"><label>Contenido neto<input name="quantity" maxlength="80" placeholder="Ej.: 250 ml, 500 g o 1 kg"></label><label>Unidades por bulto<input name="uxb" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="Ej.: 12"></label></div>
     <details class="library-disclosure report-more-data"><summary>Más datos<svg class="library-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><label>Categoría<input name="category" maxlength="240" placeholder="Ej.: Bebidas, limpieza o alimentos"></label><label>Envase<input name="packaging" maxlength="240" placeholder="Ej.: Lata, botella o bolsa"></label></details>
     <fieldset id="reportPhotos"><legend>Fotos opcionales</legend><p class="product-edit-note">Muestra el código y el frente del producto.</p>
       <div class="report-photo"><p>Foto del EAN</p><img id="reportPreviewEan" class="report-photo-preview" alt="Foto del código EAN" hidden><div class="report-photo-actions"><button type="button" class="library-secondary" data-report-camera="ean">Tomar foto del EAN</button><button type="button" class="library-secondary" data-report-remove="ean" hidden>Quitar foto</button></div></div>

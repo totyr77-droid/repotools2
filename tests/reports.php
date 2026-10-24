@@ -79,6 +79,7 @@ $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute(['usuario', $mod
 denied_report(fn() => review_product_report($db, $mod, (int) $self['id'], $review), 403);
 $withoutNote = submit_product_report($db, null, report_owner(null, str_repeat('c', 64)), [...$input, 'description' => '', 'quantity' => '250 ml', 'submission_key' => $uuid()], [], $storage);
 check_report(str_contains($withoutNote['description'], 'contenido neto'), 'La explicación es opcional cuando hay una corrección.');
+$bulkOnly=submit_product_report($db,null,report_owner(null,str_repeat('f',64)),[...$input,'description'=>'','uxb'=>'14','submission_key'=>$uuid()],[],$storage);check_report(str_contains($bulkOnly['description'],'unidades por bulto')&&$bulkOnly['proposed']['uxb']==='14','UXB-only proposal does not require a written explanation');
 $photoOnly = submit_product_report($db, null, report_owner(null, str_repeat('d', 64)), [...$input, 'description' => '', 'submission_key' => $uuid()], ['ean' => 'photo-only'], $storage);
 check_report($photoOnly['description'] === 'Revisar las fotos adjuntas del producto.', 'Acepta evidencia sin explicación ni cambios.');
 denied_report(fn() => submit_product_report($db, null, report_owner(null, str_repeat('e', 64)), [...$input, 'description' => '', 'submission_key' => $uuid()], [], $storage), 422);

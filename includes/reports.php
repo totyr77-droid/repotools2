@@ -136,7 +136,8 @@ function submit_product_report(PDO $db, ?array $user, string $owner, array $inpu
             $description = 'Solicitud de alta de producto.';
         } else {
             $changed = [];
-            foreach (['name' => 'producto', 'brand' => 'marca', 'quantity' => 'contenido neto', 'category' => 'categoría', 'packaging' => 'envase'] as $field => $label) {
+            foreach (['name' => 'producto', 'brand' => 'marca', 'quantity' => 'contenido neto', 'category' => 'categoría', 'packaging' => 'envase', 'uxb' => 'unidades por bulto'] as $field => $label) {
+                if(!array_key_exists($field,$fields))continue;
                 if ($fields[$field] !== ($current[$field] ?? '')) $changed[] = $label;
             }
             if (!$changed && !$photos) throw new CatalogException('Cambia algún dato, agrega una foto o explica qué hay que revisar.', 422);

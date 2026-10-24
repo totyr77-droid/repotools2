@@ -1,6 +1,12 @@
 {
-  "version": 192,
+  "version": 193,
   "changes": [
+    {
+      "version": 193,
+      "label": "2.88",
+      "date": "2026-10-24",
+      "summary": "Muestra unidades por bulto junto al contenido neto del producto"
+    },
     {
       "version": 192,
       "label": "2.87",
@@ -294,15 +300,9 @@
       "label": "2.39",
       "date": "2026-10-22",
       "summary": "Activación de avisos desde la app, sin interrumpir la introducción ni el trabajo."
-    },
-    {
-      "version": 143,
-      "label": "2.38",
-      "date": "2026-10-22",
-      "summary": "Notificaciones del dispositivo para vencimientos, invitaciones y solicitudes; pendientes actualizados."
     }
   ],
   "major": 2,
-  "minor": 87,
-  "label": "2.87"
+  "minor": 88,
+  "label": "2.88"
 }
