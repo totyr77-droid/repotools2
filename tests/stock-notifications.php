@@ -16,6 +16,23 @@ foreach($alerts as $alert)verify_alert($alert['pallet_code']===$p['code'] && $al
 $db->exec('UPDATE notifications SET read_at=CURRENT_TIMESTAMP');stock_notify($db,1);stock_notify($db,1);
 verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications')->fetchColumn()===3,'No duplica avisos.');
 verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications WHERE read_at IS NULL')->fetchColumn()===0,'La consulta conserva avisos leídos.');
+// Repeated refreshes should perform no UPDATE and never commit an outer transaction.
+$db->exec("CREATE TABLE notify_updates(n INTEGER); CREATE TRIGGER count_notification_updates AFTER UPDATE ON notifications BEGIN INSERT INTO notify_updates VALUES(1); END");
+stock_notify($db,1);
+verify_alert((int)$db->query('SELECT COUNT(*) FROM notify_updates')->fetchColumn()===0,'Unchanged alerts do not write again.');
+$db->beginTransaction();
+$db->exec("UPDATE pallet_products SET name='Nombre actualizado'");
+stock_notify($db,1);
+verify_alert($db->inTransaction(),'Keeps caller transaction open.');
+verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications WHERE read_at IS NULL')->fetchColumn()===0,'Body change preserves read state.');
+$db->rollBack();
+verify_alert((int)$db->query('SELECT COUNT(*) FROM notify_updates')->fetchColumn()===0,'Caller rollback also undoes notification updates.');
+$db->exec("CREATE TRIGGER fail_second_notification BEFORE UPDATE ON notifications WHEN OLD.id=2 BEGIN SELECT RAISE(ABORT,'synthetic failure'); END");
+$db->exec("UPDATE pallet_products SET name='Nombre nuevo'");
+$failed=false;try{stock_notify($db,1);}catch(PDOException $error){$failed=true;}
+verify_alert($failed&&!$db->inTransaction(),'Failure rolls back owned transaction.');
+verify_alert((int)$db->query('SELECT COUNT(*) FROM notify_updates')->fetchColumn()===0,'Failure leaves no partial notification updates.');
+$db->exec('DROP TRIGGER fail_second_notification');
 $expiredKey=array_key_first($alerts);
 stock_query($db,'UPDATE notifications SET title=? WHERE event_key=?',['Mercadería próxima a vencer',$expiredKey]);stock_notify($db,1);
 verify_alert((int)$db->query('SELECT COUNT(*) FROM notifications WHERE read_at IS NULL')->fetchColumn()===1,'Escalar a vencido vuelve a avisar una sola vez.');

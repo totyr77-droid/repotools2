@@ -1,6 +1,12 @@
 {
-  "version": 203,
+  "version": 204,
   "changes": [
+    {
+      "version": 204,
+      "label": "2.99",
+      "date": "2026-10-24",
+      "summary": "Agiliza avisos y registros grandes; consolida estilos de Mi equipo"
+    },
     {
       "version": 203,
       "label": "2.98",
@@ -294,15 +300,9 @@
       "label": "2.50",
       "date": "2026-10-23",
       "summary": "Conservar configuración del proceso de avisos y precisar fallos de conexión"
-    },
-    {
-      "version": 154,
-      "label": "2.49",
-      "date": "2026-10-23",
-      "summary": "Diagnóstico concreto del envío automático en Sistema"
     }
   ],
   "major": 2,
-  "minor": 98,
-  "label": "2.98"
+  "minor": 99,
+  "label": "2.99"
 }

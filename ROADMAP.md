@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.98. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v2.99. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -15,9 +15,9 @@ Estas confirmaciones cubren lo probado por el usuario; no acreditan todos los mo
 
 ## Próximo mantenimiento interno
 
-1. Revisar la prueba expiry-alerts-ui.cjs: espera una notificación con estado today que no estaba presente en su fixture durante la última ejecución documentada. No atribuirlo a un defecto del producto sin reproducirlo.
+1. Prueba expiry-alerts-ui.cjs corregida y aprobada en v2.99: las fechas estaban en la fixture; la expectativa visual no contemplaba urgent (hoy/<=7 días). No era un fallo del aviso.
 2. Mantener documentación de continuidad y prioridades al día, sin reabrir funciones implementadas.
-3. Medir rendimiento con inventarios/historiales grandes y red móvil lenta antes de optimizar.
+3. Medición grande completada en v2.99, correcciones de avisos/registros aplicadas. Ver docs/RENDIMIENTO-INVENTARIOS.md. Próxima oportunidad: primera carga de recursos y renderizado progresivo de Stock, preservando offline/filtros/enlaces; no ejecutado aún.
 
 ## Mejora de rapidez push consultada
 
@@ -70,3 +70,5 @@ Zoom (punto6) descartado explícitamente por el usuario: conservar comportamient
 Nombres v2.97: Mi equipo = empresa supervisada; Mi sucursal = equipo de sucursal; Mis supervisores = vínculos recibidos. Sucursales visibles como nombre único del alcance. Punto6 (zoom) descartado por el usuario.
 
 Moderación General v2.98: cuatro cifras y tres desgloses en modal; todas las métricas y accesos a registros conservados, sin repetir movimientos de stock.
+
+Estilos v2.99: consolidados buscador/toolbar, comparación, textarea y controles repetidos de Mi equipo, sin cambio visual comprobado en Chromium/WebKit. Limpieza restante gradual por componente, no tarea para reescribir todo el CSS.

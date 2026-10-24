@@ -228,20 +228,29 @@ function stock_notify(PDO $db,int $user): array {
     $today=new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
     $limit=$today->modify("+{$days} days")->format('Y-m-d');
     $items=stock_query($db,"SELECT b.id,b.name,b.ean,b.expires,p.code FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND b.expires<>'' AND b.expires<=? AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$limit,$user,$user])->fetchAll();
-    $current=[];
-    foreach($items as $item) {
-        $expiry=stock_expiry_state($item['expires'],$days,$today);$remaining=$expiry['days'];$state=$expiry['state'];
-        $title=$remaining<0?'Mercadería vencida':($remaining===0?'Mercadería que vence hoy':'Mercadería próxima a vencer');
-        $label=$remaining<0?'Vencido hace '.(-$remaining).' día'.($remaining===-1?'':'s'):($remaining===0?'Vence hoy':'Vence en '.$remaining.' día'.($remaining===1?'':'s'));
-        $key='expiry:'.$user.':'.$item['id'].':'.$item['expires'];
-        $body='Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']);
-        stock_query($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO UPDATE SET title=excluded.title,body=excluded.body,read_at=CASE WHEN notifications.title<>excluded.title THEN NULL ELSE notifications.read_at END",[$user,$key,'stock_expiry',$title,$body]);
-        $current[$key]=['pallet_code'=>$item['code'],'product_id'=>(int)$item['id'],'expiry_state'=>$state,'expiry_urgent'=>$remaining>=0&&$remaining<=7,'expiry_label'=>$label];
+    $ownTransaction=!$db->inTransaction();
+    if($ownTransaction)$db->beginTransaction();
+    try {
+        $upsert=$db->prepare("INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO UPDATE SET title=excluded.title,body=excluded.body,read_at=CASE WHEN notifications.title<>excluded.title THEN NULL ELSE notifications.read_at END WHERE notifications.title<>excluded.title OR notifications.body<>excluded.body");
+        $current=[];
+        foreach($items as $item) {
+            $expiry=stock_expiry_state($item['expires'],$days,$today);$remaining=$expiry['days'];$state=$expiry['state'];
+            $title=$remaining<0?'Mercadería vencida':($remaining===0?'Mercadería que vence hoy':'Mercadería próxima a vencer');
+            $label=$remaining<0?'Vencido hace '.(-$remaining).' día'.($remaining===-1?'':'s'):($remaining===0?'Vence hoy':'Vence en '.$remaining.' día'.($remaining===1?'':'s'));
+            $key='expiry:'.$user.':'.$item['id'].':'.$item['expires'];
+            $body='Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']);
+            $upsert->execute([$user,$key,'stock_expiry',$title,$body]);
+            $current[$key]=['pallet_code'=>$item['code'],'product_id'=>(int)$item['id'],'expiry_state'=>$state,'expiry_urgent'=>$remaining>=0&&$remaining<=7,'expiry_label'=>$label];
+        }
+        foreach(stock_query($db,"SELECT id,event_key FROM notifications WHERE user_id=? AND type='stock_expiry'",[$user])->fetchAll() as $old) {
+            if(!isset($current[$old['event_key']]))stock_query($db,'DELETE FROM notifications WHERE user_id=? AND id=?',[$user,$old['id']]);
+        }
+        if($ownTransaction)$db->commit();
+        return $current;
+    } catch(Throwable $error) {
+        if($ownTransaction&&$db->inTransaction())$db->rollBack();
+        throw $error;
     }
-    foreach(stock_query($db,"SELECT id,event_key FROM notifications WHERE user_id=? AND type='stock_expiry'",[$user])->fetchAll() as $old) {
-        if(!isset($current[$old['event_key']]))stock_query($db,'DELETE FROM notifications WHERE user_id=? AND id=?',[$user,$old['id']]);
-    }
-    return $current;
 }
 
 function stock_deduct_product(PDO $db,int $user,array $input): array {

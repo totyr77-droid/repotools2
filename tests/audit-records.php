@@ -8,6 +8,7 @@ $db->exec("INSERT INTO stock_branches(id,owner_id,name,address,locality,province
 $root='12345678-1234-1234-1234-123456789012';
 for($i=1;$i<=3;$i++)emit_record(1,'delete',$root.':'.$i,['pallet_id'=>$i,'code'=>str_pad((string)$i,8,'0',STR_PAD_LEFT)],['owner_id'=>1,'products'=>[['id'=>$i,'ean'=>'96385074','name'=>'Prueba','units'=>20,'expires'=>'2027-01-01']]],['released'=>1,'transaction_id'=>$root]);
 $group=audit_read($db,5,['grouped'=>'1','section'=>'goods']);record_check(count($group['items'])===1&&(int)$group['items'][0]['event_count']===3,'batch groups before pagination');
+$multipleMatches=audit_read($db,5,['grouped'=>'1','section'=>'goods','action'=>'delete']);record_check(count($multipleMatches['items'])===1&&(int)$multipleMatches['items'][0]['event_count']===3,'multiple matching members do not multiply joined events');
 $filter=audit_read($db,5,['grouped'=>'1','section'=>'goods','pallet'=>'00000001']);record_check((int)$filter['items'][0]['event_count']===3,'filter retains whole operation');
 $detail=audit_read($db,5,['grouped'=>'1','event'=>$group['items'][0]['event_id']])['items'][0];record_check(count($detail['events'])===3,'all members');record_check($detail['events'][0]['products'][0]['delta']===-20,'removed units');
 record_check(!isset($group['items'][0]['before_data'])&&!isset($group['items'][0]['after']),'no eager snapshots');

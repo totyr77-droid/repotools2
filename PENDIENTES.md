@@ -509,3 +509,19 @@ Modal nativo con cierre, Escape y devolución de foco al origen explícita para 
 Validación: moderation-stats PHP aprobado (límites Argentina, períodos, transacciones agrupadas, actividad confirmada, resolución y vacíos). moderation-stats-ui Chromium/WebKit aprobado: cuatro cifras/tres accesos, sin desgloses inline, modales320/390/1366 ambas manos, stock y rangos conservados, Escape/foco, períodos personalizados, navegación a registros de mercadería/usuarios y403 a administrador/moderador/usuario. Sintaxis PHP/JS/diff y captura móvil aprobados. Solo fixture local; no medición de rendimiento ni cambio de datos reales.
 
 Acceso flotante aceptado por el usuario por su posición movible: no retirarlo ni rediseñarlo como pendiente. Zoom sigue descartado. Reversión: revertir reportes.php/js/reports-page.js y estilos de esta entrega, publicar contador de caché superior; no hay datos que revertir.
+
+## Entrega v2.99 — Rendimiento de inventarios grandes y estilos consolidados
+
+Benchmark reproducible con base ficticia aislada: 21 cuentas, 2.000 palets, 20.000 lotes, 5.000 EAN y 50.000 eventos. Mide APIs y carga móvil local/conexión lenta con caché vacía. Documentación y límites en docs/RENDIMIENTO-INVENTARIOS.md; no mide PostgreSQL real ni CPU móvil.
+
+Detecta escrituras por aviso de vencimiento: stock_notify reutiliza sentencia, agrupa en transacción y omite avisos sin cambios. Mantiene lectura, escalamiento, permisos, eliminación y transacciones del llamador; rollback propio ante fallo. Comparación aislada de 2.520 avisos: inicial21.810→80ms, repetición20.517→72ms, solo SQLite local.
+
+Registros agrupados sustituyen búsqueda correlacionada por JOIN a identidades DISTINCT; cuando filtro y alcance coinciden omiten cruce redundante. Conserva operaciones completas, jerarquía, actor/resultado/sección, orden y paginación. Código anterior supera15s en fixture50k; versión nueva mediana HTTP2,00s sin filtro extra y2,93s con acción. No se ejecutó en PostgreSQL de producción ni se modificaron índices/esquema.
+
+Consolida reglas de búsqueda/toolbar de supervisores, comparación, textarea y controles idénticos de exportación/sucursales en css/supervision.css. Sin rediseño ni unificación de Listas/Integrantes. Comparación visual calculada en30 estados por navegador Chromium/WebKit (320/390/1366, ambas manos, modales de descarga/invitación, empresas y sucursal) conserva geometría y estilos.
+
+Validación: stock-notifications (sin escrituras repetidas, lectura, fallo/rollback y transacción externa), stock, audit-records (incluye múltiples coincidencias sin multiplicar eventos), audit-records-ui y moderation-stats aprobados. expiry-alerts-ui corregida: esperaba today/warning pero el diseño actual usa urgent para hoy/<=7d; fixture ya contenía esas fechas. Recorrido completo aprobado. Benchmark verifica contenido/paginación, errores JS y desborde. Sintaxis y diff revisados. Solo datos ficticios.
+
+La carga inicial lenta/caché vacía sigue siendo oportunidad: Stock15s, Mi equipo9,3s, registros11s en una muestra de150ms/1,6Mbps. No presentarla como instantánea ni puntuación objetiva. Futuro: revisar recursos por pantalla y renderizado progresivo de Stock sin romper offline/filtros/enlaces. Acceso flotante movible aceptado y zoom descartado se conservan.
+
+Reversión: revertir archivos de aplicación de la entrega y publicar contador de caché superior; no datos ni migraciones que revertir. Los benchmarks pueden conservarse.
