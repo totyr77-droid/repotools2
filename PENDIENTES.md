@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.83 / interna188**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.84 / interna189**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -373,3 +373,10 @@ Validación: geometría Chromium320/390/1366 ambas manos, texto separado12px, bo
 Separa Agregar lista14px de pestañas. Cada lista usa fila estable con nombre/filas, configuración, Comparar y papelera sin salto inferior; títulos largos con elipsis. Papelera alejada de mano hábil, acciones>=44px. Reutiliza eventos/confirmación/modal sin cambios de servidor/datos.
 
 Validación: sintaxis JS/diff y geometría Chromium320/390/1366 ambas manos, nombre largo y tres acciones en una fila sin desborde, controles>=44px. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.84 — Invitación de integrante en modal
+
+Integrantes conserva sección propia. Invitar integrante pasa de desplegable a botón principal con modal dedicado, mismo patrón de Agregar lista, iconos existentes y separación de pestañas. Formulario de correo con foco, Enviar invitación, progreso y errores dentro del modal, cierre/reset solo al enviar correctamente y confirmación en pantalla; datos se conservan ante error. Estado vacío abre el mismo modal. No altera consentimiento, permisos ni API.
+
+Validación: sintaxis PHP/JS y diff; supervision-ui Chromium con nuevo botón/modal y flujo real local de invitación/aceptación, listas, consulta y permisos. Reversión: revertir entrega y publicar caché superior.

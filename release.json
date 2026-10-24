@@ -1,6 +1,12 @@
 {
-  "version": 188,
+  "version": 189,
   "changes": [
+    {
+      "version": 189,
+      "label": "2.84",
+      "date": "2026-10-24",
+      "summary": "Abre invitar integrante en un modal independiente"
+    },
     {
       "version": 188,
       "label": "2.83",
@@ -294,15 +300,9 @@
       "label": "2.35",
       "date": "2026-10-22",
       "summary": "Etiquetas personales para usuarios y controles adaptados a ambas manos."
-    },
-    {
-      "version": 139,
-      "label": "2.34",
-      "date": "2026-10-22",
-      "summary": "Elegir columnas del Excel y descargar todas las fechas y palets con sus cantidades"
     }
   ],
   "major": 2,
-  "minor": 83,
-  "label": "2.83"
+  "minor": 84,
+  "label": "2.84"
 }
