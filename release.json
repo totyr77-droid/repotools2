@@ -1,6 +1,12 @@
 {
-  "version": 162,
+  "version": 163,
   "changes": [
+    {
+      "version": 163,
+      "label": "2.58",
+      "date": "2026-10-24",
+      "summary": "Comparación con selectores en modales, sucursales automáticas y encabezados Excel destacados"
+    },
     {
       "version": 162,
       "label": "2.57",
@@ -294,15 +300,9 @@
       "label": "2.09",
       "date": "2026-10-21",
       "summary": "Palets disponibles compactos y vínculo de sucursal con etiqueta"
-    },
-    {
-      "version": 113,
-      "label": "2.08",
-      "date": "2026-10-21",
-      "summary": "Sucursal TEST para managers, notificaciones compactas y enlaces de colecciones"
     }
   ],
   "major": 2,
-  "minor": 57,
-  "label": "2.57"
+  "minor": 58,
+  "label": "2.58"
 }

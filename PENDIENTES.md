@@ -171,3 +171,12 @@ Validación: supervision/export/layout, lectura cruzada XLSX comprimido y preser
 Corregida regla de escritorio que forzaba la fila Presentación a ocupar ambas columnas y superponía Cantidad. La grilla existente vuelve a distribuir cada campo en su área; conserva campos internos y diseño móvil, sin controles nuevos ni cambios de datos.
 
 Validación: prueba de geometría Chromium/WebKit en 320/390/1366, ambas manos, unidades/cajas/bultos; stock-inner-packs-ui Chromium aprobado (guardar, editar y retirar paquete interno). Captura de escritorio revisada y diff sin errores. Teléfono físico pendiente. Reversión: revertir esta entrega y publicar con caché superior; no requiere migración.
+
+
+## Entrega v2.58 — Comparación con selectores separados y Excel legible
+
+Integrantes, Sucursales e Información a descargar se eligen en modales independientes, con iconos existentes, resumen compacto y botón Listo. Conserva búsqueda, selección voluntaria, filtros, vista previa y descarga. Al cambiar integrantes consulta sus locales con stock y selecciona la unión de sucursales permitidas por su alcance; incluye Sin sucursal si corresponde. Se pueden ajustar después. No marca todas las sucursales indiscriminadamente. Descarga y selector de sucursales esperan la consulta; respuestas obsoletas se ignoran y ante error se exige volver a elegir. Permisos siguen validados por servidor.
+
+Encabezados nuevos de comparación y exportación independiente usan fondo violeta RepoTools y texto blanco en negrita. Respeta columnas originales, fórmulas y estilos previos; agrega estilos sin reemplazarlos. Conserva columnas numéricas y anchos por contenido.
+
+Validación: UI completa Chromium/WebKit, modales 320/390/1366 ambas manos, búsqueda con8 integrantes, sucursal automática, ajuste manual, exportación/cierre/error/reintento; supervision, supervision-export, supervision-export-layout y lectura cruzada openpyxl aprobadas. Verificado color/negrita de encabezados y preservación del resto del libro. Capturas móvil revisadas, sintaxis/diff aprobados. Teléfono físico pendiente. Sin migración. Reversión: revertir entrega y publicar caché superior; descargar de nuevo para regenerar Excel.
