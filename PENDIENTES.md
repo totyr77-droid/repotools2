@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.81 / interna186**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.82 / interna187**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -359,3 +359,10 @@ Validación: sintaxis PHP/JS y diff; geometría Chromium320/390/1366 ambas manos
 Título y actualizar comparten primera línea; debajo rol discreto y descarga pequeña con texto/icono, sin fondo de botón que compita con pestañas. Espaciado/alineación uniformes;44px táctiles preservados, ambas manos. Elimina estilos anteriores de acciones y conserva ID/eventos/modal. Actualizar oculto sin empresa. Sin datos/permisos nuevos.
 
 Validación: PHP/JS/diff y geometría Chromium320/390/1366 ambas manos, título sobre acciones y objetivos44px sin desborde; captura local revisada. No se repite suite funcional de exportación. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.82 — Espacio interno en invitaciones de Stock
+
+Invitaciones incorporan12px de espacio interno horizontal/vertical y separación12px entre información y acciones. Corrige texto pegado a la franja izquierda de la invitación resaltada; aplica también a invitaciones normales. Conserva acciones, foco, permisos y área táctil. Sin datos ni JS modificados.
+
+Validación: geometría Chromium320/390/1366 ambas manos, texto separado12px, botones>=44px y sin desborde; diff aprobado. Reversión: revertir entrega y publicar caché superior.

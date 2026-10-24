@@ -1,6 +1,12 @@
 {
-  "version": 186,
+  "version": 187,
   "changes": [
+    {
+      "version": 187,
+      "label": "2.82",
+      "date": "2026-10-24",
+      "summary": "Corrige espacio interno de invitaciones en Stock"
+    },
     {
       "version": 186,
       "label": "2.81",
@@ -294,15 +300,9 @@
       "label": "2.33",
       "date": "2026-10-22",
       "summary": "Mi equipo más compacto: filtros por sección, acciones claras y etiquetas de sucursal"
-    },
-    {
-      "version": 137,
-      "label": "2.32",
-      "date": "2026-10-22",
-      "summary": "Comparar y descargar stock con filtros de integrantes, sucursales y vencimientos en un modal"
     }
   ],
   "major": 2,
-  "minor": 81,
-  "label": "2.81"
+  "minor": 82,
+  "label": "2.82"
 }
