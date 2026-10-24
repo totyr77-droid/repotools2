@@ -1,6 +1,12 @@
 {
-  "version": 176,
+  "version": 177,
   "changes": [
+    {
+      "version": 177,
+      "label": "2.72",
+      "date": "2026-10-24",
+      "summary": "Reduce a 15 segundos la espera entre revisiones de notificaciones"
+    },
     {
       "version": 176,
       "label": "2.71",
@@ -294,15 +300,9 @@
       "label": "2.23",
       "date": "2026-10-21",
       "summary": "Inicio se adapta al aviso de instalación y ubicación, también en modo de una mano."
-    },
-    {
-      "version": 127,
-      "label": "2.22",
-      "date": "2026-10-21",
-      "summary": "Menú de filtros completo y sin desplazamiento interno innecesario."
     }
   ],
   "major": 2,
-  "minor": 71,
-  "label": "2.71"
+  "minor": 72,
+  "label": "2.72"
 }

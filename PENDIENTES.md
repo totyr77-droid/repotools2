@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.71 / interna176**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.72 / interna177**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -11,7 +11,7 @@ Pruebas indicadas de Excel/API, escáner e impresión confirmadas por el usuario
 - Pendientes reales y opcionales: [ROADMAP.md](ROADMAP.md).
 - Arquitectura: [ARCHITECTURE.md](ARCHITECTURE.md).
 - Próximo trabajo interno: revisar fixture antiguo de notificaciones de vencimiento y mantener documentación; medir rendimiento antes de optimizar.
-- Consulta nueva: posible reducción de espera del worker push de60 a15 segundos. Solo revisada; no aplicada todavía.
+- Push: espera entre revisiones reducida de60 a15 segundos en v2.72. Resumen diario de vencimientos conservado; medir entrega y carga en producción.
 - Empresas, comparaciones/exportación XLSX, selección por integrante/sucursal, cajas internas, etiquetas y moderación están implementadas. Ver entregas recientes para validación y reversión.
 
 ## Entorno y reglas de continuidad
@@ -279,3 +279,10 @@ Validación: supervision-unlisted/export/layout/supervision/catalog aprobados; c
 ## Revisión de pendientes — 24/10/2026
 
 Actualizados encabezado y ROADMAP con confirmaciones del usuario, distinguiendo pruebas realizadas, mantenimiento interno y mejoras opcionales. No se alteró código ni configuración. Inspección push: espera60 segundos entre pasadas y resumen diario desde09:00 Argentina; reducir espera a15 es propuesta, no cambio aplicado. Reversión: revertir esta actualización documental; no afecta datos ni versión de la app.
+
+
+## Entrega v2.72 — Revisión de notificaciones cada15 segundos
+
+Worker push reduce de60 a15 segundos la espera entre pasadas, conservando ejecución secuencial (no superpone procesos), conexión corta, identidad del proceso y configuración de desactivación. No altera preparación/cola, deduplicación, permisos, reintentos ni resumen diario de vencimientos desde09:00 Argentina. La espera del servidor se reduce; tiempo de procesamiento y entrega del proveedor/teléfono siguen siendo adicionales. Mantener observación de carga por mayor frecuencia de consultas.
+
+Validación: bash -n y push-startup aprobados. push PHP aprobado para cola/dedupe, tipos, vencimientos agrupados, no lectura automática, bajas y cifrado con HTTP simulado; en Windows requiere OPENSSL_CONF de la instalación XAMPP para generar claves de prueba, sin cambio de configuración de la app. Diff sin errores. No se enviaron avisos reales ni se modificaron datos. Recepción física tras despliegue pendiente de medir. Reversión: restaurar sleep60 y publicar caché superior; no borrar claves, suscripciones ni cola.

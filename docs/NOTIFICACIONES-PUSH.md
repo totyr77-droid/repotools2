@@ -14,7 +14,7 @@ Migración aditiva44: push_app_keys, push_subscriptions, push_jobs e índices. L
 
 Composer fija minishlink/web-push9.0.4 y dependencias en composer.lock, sin plugins/scripts al instalar. Docker instala vendor durante build; vendor se excluye de Git y del contexto de build y su acceso HTTP está bloqueado. El cifrado/firma Web Push los hace esa librería; no se implementa criptografía propia.
 
-El mismo contenedor inicia scripts/push-loop.sh como www-data, una ejecución corta de scripts/push-worker.php cada60segundos. No necesita un segundo servicio pago ni una tarea de Codex. REPOTOOLS_PUSH_WORKER=0 permite detenerlo operativamente. Su ejecución CLI no es accesible por HTTP. No probar el worker con endpoints de terceros reales sin autorización.
+El mismo contenedor inicia scripts/push-loop.sh como www-data, una ejecución corta de scripts/push-worker.php, con15 segundos de espera entre pasadas. No necesita un segundo servicio pago ni una tarea de Codex. REPOTOOLS_PUSH_WORKER=0 permite detenerlo operativamente. Su ejecución CLI no es accesible por HTTP. No probar el worker con endpoints de terceros reales sin autorización.
 
 Cada pasada prepara hasta100suscripciones autorizadas, procesa hasta50avisos nuevos por suscripción y hasta20envíos. No reenvía el historial previo a la activación. Cola con clave única por suscripción/evento, lease120s, reintentos espaciados hasta5intentos y TTL; respuestas404/410 deshabilitan endpoints vencidos. Un crash tras entregar y antes de confirmar puede reintentar; tag estable y renotify:false coalescen el aviso visible. No promete latencia exacta con backlog/red móvil.
 

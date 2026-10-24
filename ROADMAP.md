@@ -21,7 +21,7 @@ Estas confirmaciones cubren lo probado por el usuario; no acreditan todos los mo
 
 ## Mejora de rapidez push consultada
 
-- Estado actual: scripts/push-loop.sh espera60 segundos entre ejecuciones; cada ejecución prepara y despacha pendientes. Propuesta pendiente de aplicar: reducir la espera a15 segundos, considerando la frecuencia de consultas a la base. No prometer entrega instantánea del proveedor/teléfono.
+- Aplicado en v2.72: scripts/push-loop.sh espera15 segundos entre ejecuciones; cada ejecución prepara y despacha pendientes. Vigilar carga de la base con la mayor frecuencia; no prometer entrega instantánea del proveedor/teléfono.
 - El resumen de vencimientos se prepara una vez al día desde las09:00 de Argentina; es independiente de la espera entre revisiones.
 
 ## Verificaciones operativas sin incidencia confirmada
