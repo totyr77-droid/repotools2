@@ -22,9 +22,12 @@ function catalog_product(PDO $db, string $ean): ?array {
     return $product;
 }
 
+function catalog_outer_units(?array $product):int {
+ foreach(['uxb','uxc']as$key){$value=(string)($product[$key]??'');if(preg_match('/^[1-9][0-9]{0,6}$/D',$value)&&(int)$value<=1000000)return (int)$value;}return 0;
+}
 function catalog_pack_value(mixed $value): string {
     if($value==='')return '';
-    if(!is_string($value)||!preg_match('/^[1-9][0-9]{0,6}$/D',$value)||(int)$value>1000000)throw new CatalogException('UXB y UXC deben ser unidades enteras entre 1 y 1.000.000.',422);
+    if(!is_string($value)||!preg_match('/^[1-9][0-9]{0,6}$/D',$value)||(int)$value>1000000)throw new CatalogException('Las unidades por bulto deben ser enteras entre 1 y 1.000.000.',422);
     return (string)(int)$value;
 }
 function catalog_text($value, int $max): string {

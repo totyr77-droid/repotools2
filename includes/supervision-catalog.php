@@ -11,7 +11,7 @@ function supervisor_catalog_columns(array $columns): array {
 }
 function supervisor_catalog_candidates(string $bytes,array $parsed,array $mapping): array {
     $used=[$parsed['ean_column']??$parsed['suggested']];
-    foreach(['name','uxb','uxc']as$key){$column=$mapping[$key]??'';if($column!==''&&(!preg_match('/^[A-Z]{1,2}$/D',$column)||in_array($column,$used,true)))throw new CatalogException('Elegí columnas distintas para EAN, descripción, UXB y UXC.',422);if($column!=='')$used[]=$column;}
+    foreach(['name','uxb','uxc']as$key){$column=$mapping[$key]??'';if($column!==''&&(!preg_match('/^[A-Z]{1,2}$/D',$column)||in_array($column,$used,true)))throw new CatalogException('Elegí columnas distintas para el EAN, la descripción y las unidades por bulto.',422);if($column!=='')$used[]=$column;}
     return supervisor_archive($bytes,function($zip)use($parsed,$mapping){[, $rows,$max]=supervisor_cells($zip,$parsed['sheet_path']);foreach($mapping as$column)if($column!==''&&supervisor_column_number($column)>$max)throw new CatalogException('La columna elegida no existe en esta hoja.',422);$items=[];$invalid=[];$conflicts=[];
         foreach($parsed['ean_rows']as$row=>$ean){$fields=[];
             foreach(['name','uxb','uxc']as$key){$column=$mapping[$key]??'';if($column==='')continue;$cell=$rows[$row][$column]??['value'=>'','formula'=>false];$value=trim($cell['value']);if($value==='')continue;

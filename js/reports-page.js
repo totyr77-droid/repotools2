@@ -22,7 +22,7 @@
     });
   }
   const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
-  const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase', uxb:'Unidades por bulto (UXB)', uxc:'Unidades por caja (UXC)' };
+  const fields = { brand: 'Marca', name: 'Producto', quantity: 'Contenido neto', category: 'Categoría', packaging: 'Envase', uxb:'Unidades por bulto (UXB)', uxc:'Unidades por bulto (registro anterior)' };
   let moderationView = 'pending', auditPage = 0, reportState = 'pending';
   document.getElementById('moderationReports')?.addEventListener('click',()=>document.querySelector(`[data-moderation-view=${reportState}]`).click());
   const logFilter=document.getElementById('reportLogFilter');logFilter?.addEventListener('change',scheduleAuditLoad);
@@ -191,7 +191,7 @@
         }).catch(error => { if (attempt === version) hint.textContent = error.message; });
       }
       if (queue && result.can_review && active.status === 'pending') {
-        form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] ?? active.current?.[key] ?? '';
+        form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] ?? active.current?.[key] ?? '';if(!form.elements.uxb.value&&!Object.hasOwn(active.proposed||{},'uxb'))form.elements.uxb.value=active.proposed.uxc??active.current?.uxc??'';
         form.hidden = false;
       }
     } catch (error) { if (attempt === version) message.textContent = error.message; } finally { finishLoading?.(); }

@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.72 / interna177**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.73 / interna178**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -286,3 +286,14 @@ Actualizados encabezado y ROADMAP con confirmaciones del usuario, distinguiendo 
 Worker push reduce de60 a15 segundos la espera entre pasadas, conservando ejecución secuencial (no superpone procesos), conexión corta, identidad del proceso y configuración de desactivación. No altera preparación/cola, deduplicación, permisos, reintentos ni resumen diario de vencimientos desde09:00 Argentina. La espera del servidor se reduce; tiempo de procesamiento y entrega del proveedor/teléfono siguen siendo adicionales. Mantener observación de carga por mayor frecuencia de consultas.
 
 Validación: bash -n y push-startup aprobados. push PHP aprobado para cola/dedupe, tipos, vencimientos agrupados, no lectura automática, bajas y cifrado con HTTP simulado; en Windows requiere OPENSSL_CONF de la instalación XAMPP para generar claves de prueba, sin cambio de configuración de la app. Diff sin errores. No se enviaron avisos reales ni se modificaron datos. Recepción física tras despliegue pendiente de medir. Reversión: restaurar sleep60 y publicar caché superior; no borrar claves, suscripciones ni cola.
+
+
+## Entrega v2.73 — Unidades por bulto sin duplicar UXC
+
+Stock online/offline y retiros muestran Unidades por bulto para el total exterior, tanto en cajas como bultos. Mantienen presentaciones internas boxes/packs, cantidades por presentación, pack_size e inner_pack_size y controles de paquetes por caja/unidades por paquete. No convierte ni modifica lotes, subcajas, borradores ni colas existentes.
+
+Aportes Excel y revisión muestran una sola entrada visible UXB; UXC queda como compatibilidad interna. El mapeo UXC de aportes está deshabilitado y no se envía automáticamente. Archivo con solo UXC puede proponerse en UXB; si trae UXB y UXC exige elección explícita del total exterior, sin adivinar equivalencia de subcajas. Backend conserva clientes, propuestas e historial antiguos; revisión mantiene registro anterior y su dato sin duplicar el control visible. Descripciones del selector/exportación unificadas.
+
+Nuevo helper de lectura de catálogo prioriza UXB y usa UXC antiguo solo si UXB no está informado. Referencias reales ya cargadas por presentación conservan prioridad; referencias de catálogo y cálculo de cajas sin composición propia usan ese total canónico. Exportación acepta cabeceras antiguas como alias sin reescribir el Excel original. Sin migración, borrado ni fusión masiva de datos.
+
+Validación: stock-inner-packs-ui Chromium/WebKit360 unidades, edición y retiro de30; stock-pack-references-offline-ui Chromium con cajas/paquetes/bultos independientes, referencias y sincronización exacta. supervision-ui Chromium con UXC oculto, UXB ambiguo sin preselección, elección explícita y propuesta sin UXC nuevo. supervision-export/unlisted/catalog y catalog-reference/catalog/reports aprobados, incluida prioridad UXB y respaldo UXC. Sintaxis PHP/JS/diff sin errores. Reversión: revertir entrega y publicar caché superior; no borrar datos ni colas offline.

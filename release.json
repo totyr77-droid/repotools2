@@ -1,6 +1,12 @@
 {
-  "version": 177,
+  "version": 178,
   "changes": [
+    {
+      "version": 178,
+      "label": "2.73",
+      "date": "2026-10-24",
+      "summary": "Unifica unidades por bulto y elimina controles duplicados conservando subcajas"
+    },
     {
       "version": 177,
       "label": "2.72",
@@ -294,15 +300,9 @@
       "label": "2.24",
       "date": "2026-10-21",
       "summary": "Inicio sin scroll, avisos opcionales de a uno y ayuda de instalación independiente."
-    },
-    {
-      "version": 128,
-      "label": "2.23",
-      "date": "2026-10-21",
-      "summary": "Inicio se adapta al aviso de instalación y ubicación, también en modo de una mano."
     }
   ],
   "major": 2,
-  "minor": 72,
-  "label": "2.72"
+  "minor": 73,
+  "label": "2.73"
 }
