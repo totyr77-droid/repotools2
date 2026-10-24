@@ -1,19 +1,18 @@
 # Continuidad de RepoTools
 
-Actualizado: 23/10/2026. Entrega actual: **v2.42 / interna 147**, permisos del staff y registros. Última versión pública comprobada antes de esta entrega: v2.41 / 146. Comprobar147 después de publicar.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.71 / interna176**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
-1. Documentación obsoleta limpiada y archivada, contrastada con el código y las entregas actuales.
-2. Notificaciones push de celular con la app cerrada, autorizadas por el usuario para **vencimientos, invitaciones y solicitudes**. Reutilizar service worker y notificaciones internas; recibir un aviso no marca leído. Activación voluntaria en Ajustes y soporte de instalación en iPhone. Implementadas y validadas automáticamente; publicar y probar recepción física. No afirmar recepción real hasta comprobarla.
+Pruebas indicadas de Excel/API, escáner e impresión confirmadas por el usuario; offline marcado listo a su pedido. Push automático ya confirmado en su cuenta/dispositivo. No reabrir estos pendientes por notas antiguas.
 
 ## Estado y prioridades
 
-- Pendientes reales y funciones opcionales: [ROADMAP.md](ROADMAP.md).
-- Arquitectura vigente: [ARCHITECTURE.md](ARCHITECTURE.md).
-- Última entrega: Registros separados en Usuarios/Mercadería/Moderación/Gestión, operaciones agrupadas antes de paginar, detalle siempre en modal, sin desplegar página. Deltas/antes-después/vencimientos/transferencias, filtros y sesiones nuevas; permisos existentes conservados. [Detalle y reversión](docs/REGISTROS-MODERACION.md).
-- Supervisión/Empresas, consentimiento de integrantes, listas XLSX, filtros/columnas de exportación y transferencias **ya están implementados en main**. No volver a tratarlos como funciones pendientes.
-- Cajas con paquetes internos, referencias online/offline y etiquetas personales para Usuario también están implementadas. Falta la validación física descrita en ROADMAP.
+- Pendientes reales y opcionales: [ROADMAP.md](ROADMAP.md).
+- Arquitectura: [ARCHITECTURE.md](ARCHITECTURE.md).
+- Próximo trabajo interno: revisar fixture antiguo de notificaciones de vencimiento y mantener documentación; medir rendimiento antes de optimizar.
+- Consulta nueva: posible reducción de espera del worker push de60 a15 segundos. Solo revisada; no aplicada todavía.
+- Empresas, comparaciones/exportación XLSX, selección por integrante/sucursal, cajas internas, etiquetas y moderación están implementadas. Ver entregas recientes para validación y reversión.
 
 ## Entorno y reglas de continuidad
 
@@ -275,3 +274,8 @@ El bloque adicional completa las columnas originales de descripción y UXB/BXU a
 Para productos agregados prioriza descripción y UXB aprobadas del catálogo, luego referencias/composición conocidas de Stock; si no hay datos escribe No tenemos información. No inventa UXB a partir de peso, packaging ni UXC. El servidor enumera EAN fuera de lista solo dentro del alcance autorizado; antes de exportar el cliente consulta fichas ausentes mediante api/productos.php existente, con progreso local y cancelación por cambio/cierre de modal. lookup_product ya persiste automáticamente fichas válidas de la API, respeta caché negativa y límites y no otorga puntos ni logros. Se vuelve a leer el catálogo al exportar. La API actual no proporciona UXB fiable: ese dato solo se completa si está disponible en catálogo o composición conocida. Fallos/límite externo permiten descargar con datos disponibles y aviso en el toast. No se modificaron reglas globales de lookup ni permisos. Sin migración.
 
 Validación: supervision-unlisted/export/layout/supervision/catalog aprobados; catálogo canónico y UXB14, originales intactos, descripción con título libre y BXU, campos desconocidos explícitos. UI Chromium con consulta API simulada que persiste ficha y descarga que vuelve a leerla en columna original; opción, alcance, reinicio/cierre conservados. SDK Microsoft OpenXML2.20 valida fichero con0 errores; sintaxis PHP/JS y diff sin errores. Sin consultas externas reales durante pruebas. Reversión: revertir entrega y publicar caché superior; fichas API obtenidas por el circuito existente permanecen en catálogo.
+
+
+## Revisión de pendientes — 24/10/2026
+
+Actualizados encabezado y ROADMAP con confirmaciones del usuario, distinguiendo pruebas realizadas, mantenimiento interno y mejoras opcionales. No se alteró código ni configuración. Inspección push: espera60 segundos entre pasadas y resumen diario desde09:00 Argentina; reducir espera a15 es propuesta, no cambio aplicado. Reversión: revertir esta actualización documental; no afecta datos ni versión de la app.
