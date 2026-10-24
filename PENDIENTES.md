@@ -389,3 +389,6 @@ Confirmaciones y errores de Supervisores/gestión de empresas usan RepoToast exp
 AGENTS.md registra criterio para futuros desarrollos: avisos rutinarios por alertas existentes, texto inline solo cuando es necesario para entender/corregir contenido, progreso local y modales para decisiones/tareas. Reduce separación del encabezado a pestañas y elimina márgenes de estado global vacío, sin reducir controles44px.
 
 Validación: supervision-ui Chromium real local con confirmaciones y error de descarga en RepoToast, importación, invitaciones y permisos; sintaxis JS/diff. Conserva contexto de revisión/importación. Sin DB. Reversión: revertir código de entrega y publicar caché superior; criterio de UX puede conservarse. Respaldo offline pospuesto por usuario, siguiente función CSV/XLS.
+
+
+Continuidad: CSV/XLS solicitado como próximo desarrollo. Investigación inicial documentada en ROADMAP.md; sin cambios de importador/dependencias. Pausa preventiva por límite de uso incluido, no consumo adicional autorizado. Alertas y márgenes ya publicados en v2.85. Respaldo offline pospuesto.
