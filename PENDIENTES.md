@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.80 / interna185**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.81 / interna186**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -352,3 +352,10 @@ Validación: moderation-stats PHP con límites UTC/Argentina,7 días inclusivos,
 Supervisor muestra Mi equipo - nombre de empresa en título principal, sin repetir nombre en otro encabezado. Debajo botón Descargar stock con icono y texto pequeño del tamaño de Supervisor · Consulta, conservando área táctil44px, ID y modal existentes. Acciones adaptadas a mano elegida. Cuentas sin empresa mantienen Supervisores. Nombre escapado en PHP y actualizado con textContent. Sin cambios de datos/permisos.
 
 Validación: sintaxis PHP/JS y diff; geometría Chromium320/390/1366 ambas manos con botón debajo del título, área44px y sin desborde. No se repite flujo de exportación porque conserva ID/eventos. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.81 — Armonía del encabezado de equipo
+
+Título y actualizar comparten primera línea; debajo rol discreto y descarga pequeña con texto/icono, sin fondo de botón que compita con pestañas. Espaciado/alineación uniformes;44px táctiles preservados, ambas manos. Elimina estilos anteriores de acciones y conserva ID/eventos/modal. Actualizar oculto sin empresa. Sin datos/permisos nuevos.
+
+Validación: PHP/JS/diff y geometría Chromium320/390/1366 ambas manos, título sobre acciones y objetivos44px sin desborde; captura local revisada. No se repite suite funcional de exportación. Reversión: revertir entrega y publicar caché superior.

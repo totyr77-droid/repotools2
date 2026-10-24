@@ -1,6 +1,12 @@
 {
-  "version": 185,
+  "version": 186,
   "changes": [
+    {
+      "version": 186,
+      "label": "2.81",
+      "date": "2026-10-24",
+      "summary": "Armoniza encabezado y acciones del equipo supervisor"
+    },
     {
       "version": 185,
       "label": "2.80",
@@ -294,15 +300,9 @@
       "label": "2.32",
       "date": "2026-10-22",
       "summary": "Comparar y descargar stock con filtros de integrantes, sucursales y vencimientos en un modal"
-    },
-    {
-      "version": 136,
-      "label": "2.31",
-      "date": "2026-10-22",
-      "summary": "Excel de listas: detectar hojas y encabezados, revisar códigos y corregir o excluir filas"
     }
   ],
   "major": 2,
-  "minor": 80,
-  "label": "2.80"
+  "minor": 81,
+  "label": "2.81"
 }
