@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.85 / interna190**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.86 / interna191**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -392,3 +392,10 @@ Validación: supervision-ui Chromium real local con confirmaciones y error de de
 
 
 Continuidad: CSV/XLS solicitado como próximo desarrollo. Investigación inicial documentada en ROADMAP.md; sin cambios de importador/dependencias. Pausa preventiva por límite de uso incluido, no consumo adicional autorizado. Alertas y márgenes ya publicados en v2.85. Respaldo offline pospuesto.
+
+
+## Entrega v2.86 — Orden de vencimientos compatible con PostgreSQL
+
+Orden de inventario supervisor usaba expires agregado como alias dentro de CASE en ORDER BY, válido en SQLite pero no en PostgreSQL. Agrupación pasa a tabla derivada inventory_groups y orden se aplica afuera, donde expires y units son columnas disponibles. Conserva permisos, filtros, fechas ausentes al final, desempates y paginación.
+
+Validación: supervision PHP con ambas vistas/órdenes aprobado, sintaxis/diff. No se ejecutó PostgreSQL de producción; corrección de estructura SQL por restricción de alias identificada. Reversión: revertir entrega y publicar caché superior. Cámara faltante en buscador de Supervisores confirmada en markup: queda solicitada, antes de CSV/XLS. Se difiere incorporación por apenas3% de uso incluido y prohibición de créditos adicionales.

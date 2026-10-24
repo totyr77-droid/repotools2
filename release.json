@@ -1,6 +1,12 @@
 {
-  "version": 190,
+  "version": 191,
   "changes": [
+    {
+      "version": 191,
+      "label": "2.86",
+      "date": "2026-10-24",
+      "summary": "Corrige orden por vencimiento del supervisor en PostgreSQL"
+    },
     {
       "version": 190,
       "label": "2.85",
@@ -294,15 +300,9 @@
       "label": "2.37",
       "date": "2026-10-22",
       "summary": "Registros por categoría, operaciones agrupadas y detalles en modal."
-    },
-    {
-      "version": 141,
-      "label": "2.36",
-      "date": "2026-10-22",
-      "summary": "Aviso de referido informativo sin navegación al tocarlo."
     }
   ],
   "major": 2,
-  "minor": 85,
-  "label": "2.85"
+  "minor": 86,
+  "label": "2.86"
 }

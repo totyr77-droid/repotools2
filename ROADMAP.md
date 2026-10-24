@@ -45,3 +45,5 @@ Moderación General: estadísticas por período, actividad agrupada, resolucione
 ## Próximo desarrollo autorizado
 
 CSV y XLS en Listas del supervisor, mismo flujo de vista previa/columnas, comparación y aportes, salida XLSX. Investigación inicial: actual importador solo acepta XLSX y preserva el archivo; CSV necesita separador/codificación y texto literal para EAN/ceros; XLS requiere lector BIFF mantenido y conversión controlada. Evaluar dependencia de servidor y extensiones del contenedor antes de implementar, preservando estilos/fórmulas cuando corresponda y límites de recursos. No se instaló dependencia ni se modificó importador. Trabajo detenido preventivamente con96% de ventana incluida consumida para respetar pedido de no usar créditos adicionales; reanudar cuando haya uso incluido.
+
+Prioridad antes de CSV/XLS: agregar cámara en buscador de Supervisores para EAN y QR/número de palet, reutilizando escáner existente; actualmente falta botón y conexión. Orden por vencimiento corregido en v2.86 para PostgreSQL.
