@@ -65,7 +65,7 @@ function team_invite(PDO $db,int $user,int $branch,string $role,string $email=''
     }
     $token=bin2hex(random_bytes(32));
     stock_query($db,'INSERT INTO branch_team_invites(token_hash,branch_id,role,invited_by,expires,recipient_id,access_seconds) VALUES(?,?,?,?,?,?,?)',[hash('sha256',$token),$branch,$role,$user,team_invite_deadline($db,$user,$branch),$recipient,$seconds]);
-    if($recipient){$name=stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branch])->fetchColumn();stock_query($db,'INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?)',[$recipient,'team-invite:'.hash('sha256',$token),'team_invitation','Invitación a una sucursal','Te invitaron a '.$name.'. Abrí Mi equipo para revisar y aceptar.']);}
+    if($recipient){$name=stock_query($db,'SELECT name FROM stock_branches WHERE id=?',[$branch])->fetchColumn();stock_query($db,'INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?)',[$recipient,'team-invite:'.hash('sha256',$token),'team_invitation','Invitación a una sucursal','Te invitaron a '.$name.'. Abrí Mi sucursal para revisar y aceptar.']);}
     team_event($db,$user,$branch,'invite_created',$recipient,null,['role'=>$role,'access_seconds'=>$seconds,'channel'=>$recipient?'solicitud':'token']);return $token;
 }
 function team_accept(PDO $db,int $user,string $token,array $position=[]): void {

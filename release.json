@@ -1,6 +1,12 @@
 {
-  "version": 201,
+  "version": 202,
   "changes": [
+    {
+      "version": 202,
+      "label": "2.97",
+      "date": "2026-10-24",
+      "summary": "Unifica Mi equipo, Mi sucursal y Mis supervisores sin cambiar zoom"
+    },
     {
       "version": 201,
       "label": "2.96",
@@ -294,15 +300,9 @@
       "label": "2.48",
       "date": "2026-10-23",
       "summary": "Corregir el arranque del envío automático y mostrar su estado en Sistema."
-    },
-    {
-      "version": 152,
-      "label": "2.47",
-      "date": "2026-10-23",
-      "summary": "Comprobantes sincronizados más claros, con iconos, cantidades destacadas y fecha compacta."
     }
   ],
   "major": 2,
-  "minor": 96,
-  "label": "2.96"
+  "minor": 97,
+  "label": "2.97"
 }

@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.96 / interna201**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.97 / interna202**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -485,3 +485,16 @@ Perfil propio conserva identidad, editar y compartir arriba. Actividad/contadore
 Validación: settings-ui Chromium/WebKit aprobado (nuevo orden, ausencia de duplicados, avisos, guardado y reintentos, mano, defaults, CSRF/identidad y sesión). achievements-ui aprobado (destacar, límites, privacidad pública, sincronización y modalidades). Página real Chromium/WebKit320/390/1366 ambas manos con actividad abierta/cerrada, enlaces de equipos, cuenta.php#insignias y edición en modal, sin desborde. Captura final revisada; PHP/diff aprobados. Pruebas con base temporal, sin datos reales. Acceso flotante superpuesto detectado en auditoría sigue como mejora2, no se modifica en este alcance3.
 
 Reversión: revertir cuenta.php, includes/profile-card.php y estilos de esta entrega y publicar caché superior; no datos que revertir. Tests actualizados al bloque plegable y a la nueva jerarquía, no a nuevos permisos.
+
+
+## Entrega v2.97 — Nombres de equipos consistentes; zoom descartado
+
+Mi equipo identifica exclusivamente el panel de empresa del supervisor y conserva título Mi equipo - nombre de empresa. Mi sucursal identifica el equipo de sucursal. Mis supervisores identifica invitaciones y vínculos recibidos por el integrante. Inicio/Ajustes, navegación de ámbito, encabezados, título de navegador y accesibilidad usan esta distinción. El acceso flotante de sucursal pasa a icono de sucursal, etiqueta Mi sucursal y destino explícito sucursales.php?ambito=sucursales para evitar redirección al panel de empresa; posición/arrastre siguen igual (mejora2 pendiente).
+
+Locales visibles/seleccionados pasa a Sucursales visibles/seleccionadas en integrantes y modal. Detalles de movimientos y contexto de cámara distinguen Mi sucursal; nuevas invitaciones indican Mi sucursal o Mis supervisores según origen. No se reescriben avisos históricos, nombres elegidos por usuarios, enums, IDs, consultas, permisos ni relaciones. Título dinámico usa document nativo durante carga, no el proxy de navegación.
+
+Punto6 descartado explícitamente por el usuario: no habilitar zoom de página; viewport y comportamiento de app se conservan. No reabrirlo como mejora pendiente.
+
+Validación: supervision-ui y supervision-home-ui Chromium aprobados, consentimiento/consulta/listas/descarga, permisos, ambos modos/manos y navegación. supervision-unlisted-ui Chromium aprobado con nombres/modal/alertas actuales y puerto propio para evitar interferencia de fixtures; comparación real con producto fuera de lista y alcance conservados. stock-partial-box-ui aprobado, detalle Mi sucursal y cantidades exactas conservadas. Página real Chromium/WebKit320/390/1366 ambas manos: accesos de empresa/sucursal, integrante con Mis supervisores, atajo flotante a sucursal, panel cargado, títulos y viewport anterior. Sintaxis PHP/JS y diff aprobados; solo base temporal, sin datos reales.
+
+Reversión: revertir textos/rutas de interfaz de esta entrega y publicar caché superior; sin datos que revertir. Mantener decisión del usuario de descartar zoom.

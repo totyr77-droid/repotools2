@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.96. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v2.97. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -53,7 +53,7 @@ UXB visible junto a contenido neto en formulario de producto, edición y revisi�
 
 Limpieza técnica aplicada en v2.90: script antiguo sin uso, estilos de desarrollo, inclusión duplicada, reglas de grilla reemplazadas y carga de recorte solo en sus editores. Consolidación general de CSS queda gradual, por componente; no retirar reglas activas en bloque.
 
-Encabezado de sucursal corregido en v2.91. Ajustes simplificado en v2.96. Quedan por decidir nombres consistentes de equipo de empresa/sucursal y estadísticas con menos repetición. No se aplicó rediseño ni se retiraron funciones de negocio. Correcciones detectadas aún por hacer: incluir hoja específica del escáner de Supervisores y permitir zoom. Revisar acceso flotante para evitar superponer contenido. No inferir desuso de funciones sin datos reales.
+Encabezado de sucursal corregido en v2.91. Ajustes simplificado en v2.96. Nombres unificados en v2.97. Queda decidir estadísticas con menos repetición. No se aplicó rediseño ni se retiraron funciones de negocio. Correcciones detectadas aún por hacer: incluir hoja específica del escáner de Supervisores. Revisar acceso flotante para evitar superponer contenido. No inferir desuso de funciones sin datos reales.
 
 Accesos de Inicio unificados en v2.92: misma fila, dimensiones e iconografía, respetando mano y permisos existentes.
 
@@ -64,3 +64,7 @@ Gestión de empresas v2.94: asignación en modal, sin actualización manual redu
 Inicio v2.95: resuelto salto de Palet debajo de Escanear producto; alturas móviles iguales incluso con PWA visible. Empresas usa Asignar supervisor en botón/modal.
 
 Ajustes v2.96: retirados cuatro atajos repetidos; Preferencias primero, actividad/insignias plegables y accesos propios conservados. Perfil público sin cambios.
+
+Zoom (punto6) descartado explícitamente por el usuario: conservar comportamiento actual de aplicación y no habilitar ampliación de página.
+
+Nombres v2.97: Mi equipo = empresa supervisada; Mi sucursal = equipo de sucursal; Mis supervisores = vínculos recibidos. Sucursales visibles como nombre único del alcance. Punto6 (zoom) descartado por el usuario.
