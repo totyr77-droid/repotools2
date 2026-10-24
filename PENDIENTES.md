@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.77 / interna182**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.78 / interna183**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -329,3 +329,10 @@ Validación: sintaxis JS/PHP y diff aprobados; supervision-ui Chromium comprueba
 Stock sincroniza el icono de búsqueda/filtros al comenzar cada búsqueda, también cuando el texto fue asignado por escáner o restaurado desde sesión, antes de consultar resultados. Se reutiliza RepoStockTags.apply existente: misma acción de borrar búsqueda/filtros, estado accesible e icono, en Palets y Mercadería. Sin cambios en API, cantidades, permisos ni datos.
 
 Validación: stock-empty-search-ui Chromium con escáner simulado completa EAN ausente, verifica Borrar búsqueda y filtros, cancela y recupera lupa/campo vacío en ambas pestañas; conserva comprobaciones móvil/una mano. Sintaxis/diff aprobados. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.78 — Descarga compacta junto a empresa
+
+Mueve Descargar stock al lado del nombre de empresa, con icono SVG existente, control44px y nombre accesible/título. Conserva ID y flujo del modal de descarga. Barra de inventario deja Filtros, buscador flexible y limpiar; corrige orientación de label que apilaba lupa e input y evita que descarga quite espacio. Adaptación de mano en encabezado y barra, nombre largo con elipsis. Sin cambios en consultas ni permisos.
+
+Validación: sintaxis PHP y diff aprobados; geometría Chromium con markup real y CSS de supervisión320/390/1366 ambas manos, limpiar visible, input>=90px, filtro alineado y descarga junto al nombre, sin desborde. Cambio visual: no se repitió suite completa de exportación ya aprobada, conserva eventos/ID. Reversión: revertir entrega y publicar caché superior.

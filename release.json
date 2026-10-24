@@ -1,6 +1,12 @@
 {
-  "version": 182,
+  "version": 183,
   "changes": [
+    {
+      "version": 183,
+      "label": "2.78",
+      "date": "2026-10-24",
+      "summary": "Compacta descarga junto a empresa y da espacio al buscador y filtros"
+    },
     {
       "version": 182,
       "label": "2.77",
@@ -294,15 +300,9 @@
       "label": "2.29",
       "date": "2026-10-22",
       "summary": "Recuperar cajas completas al sumar unidades y conservar la composición del lote"
-    },
-    {
-      "version": 133,
-      "label": "2.28",
-      "date": "2026-10-22",
-      "summary": "Recordar cajas internas y bultos independientes también sin conexión"
     }
   ],
   "major": 2,
-  "minor": 77,
-  "label": "2.77"
+  "minor": 78,
+  "label": "2.78"
 }
