@@ -27,8 +27,10 @@
 <!-- SCRIPTS -->
 
 <script src="js/navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/navigation.js'),0,12) ?>"></script>
+<?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?>
 <link rel="stylesheet" href="css/product-crop.css?v=<?= (int)app_release()['version'] ?>">
 <script src="js/product-crop.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php endif; ?>
 <script src="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/mobile-navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/mobile-navigation.js'),0,12) ?>"></script>
 <script src="js/account-sharing.js?v=<?= (int)app_release()['version'] ?>"></script>

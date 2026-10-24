@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.88. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v2.92. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -47,3 +47,12 @@ Moderación General: estadísticas por período, actividad agrupada, resolucione
 Cámara del buscador supervisor y listas CSV/XLS implementadas en v2.87. Detalles y límites en docs/IMPORTACION-CSV-XLS.md. Respaldo offline y unificación de listas/integrantes permanecen pospuestos por el usuario.
 
 UXB visible junto a contenido neto en formulario de producto, edición y revisión: implementado en v2.88.
+
+
+## Revisión general del 24/10 — próxima decisión de interfaz
+
+Limpieza técnica aplicada en v2.90: script antiguo sin uso, estilos de desarrollo, inclusión duplicada, reglas de grilla reemplazadas y carga de recorte solo en sus editores. Consolidación general de CSS queda gradual, por componente; no retirar reglas activas en bloque.
+
+Encabezado de sucursal corregido en v2.91. Propuesta visual pendiente de decisión: Ajustes con menos accesos repetidos, nombres consistentes de equipo de empresa/sucursal y estadísticas con menos repetición. No se aplicó rediseño ni se retiraron funciones de negocio. Correcciones detectadas aún por hacer: incluir hoja específica del escáner de Supervisores y permitir zoom. Revisar acceso flotante para evitar superponer contenido. No inferir desuso de funciones sin datos reales.
+
+Accesos de Inicio unificados en v2.92: misma fila, dimensiones e iconografía, respetando mano y permisos existentes.

@@ -1,6 +1,0 @@
-/* Development-only marker. Never publish this file or its header integration to main. */
-.header-contenedor .logo{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
-.development-badge{display:inline-flex;align-items:center;justify-content:center;padding:5px 8px;border-radius:7px;background:#fff0bd;color:#77530a;font:700 14px/1 Arial,sans-serif;letter-spacing:.04em;white-space:nowrap}
-@media(max-width:1023px){.development-badge{font-size:12px;padding:5px 6px}}
-@media(max-width:380px){.header-contenedor .logo{padding-inline:12px;gap:6px}.header-contenedor .logo img{width:120px}}
-.development-badge{border:0;cursor:pointer;min-height:44px;margin-inline-start:6px}.development-badge:focus-visible{outline:2px solid #fff;outline-offset:2px}.development-badge[aria-busy=true]{opacity:.65;cursor:wait}

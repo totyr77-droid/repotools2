@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.89 / interna194**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.92 / interna197**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -422,3 +422,28 @@ Validación: reports/catalog PHP aprobados, regresión de propuesta solo UXB14 s
 Menú principal de Moderación cambia grilla de dos filas por fila horizontal única. En móvil se desplaza dentro de la barra para mantener nombres legibles y botones>=44px; en escritorio distribuye espacio disponible. Reserva espacio para insignia de pendientes, mantiene navegación/eventos y preferencia de mano, sin desborde horizontal de página. Respeta movimiento reducido.
 
 Validación: geometría Chromium con seis pestañas/insignia320/390/1366 ambas manos, misma fila, objetivos44px y scroll local sin desborde; diff aprobado. Sin lógica ni permisos modificados. Reversión: revertir CSS y publicar caché superior.
+
+
+## Entrega v2.90 — Limpieza técnica tras revisión general
+
+Retira js/hand-preferences.js sin referencias (la preferencia activa sigue en stock-preferences.js), inclusión duplicada de stock-branches.css en Supervisores y css/development.css de Main. Conserva el ajuste funcional del logo en ux-polish.css, sin distintivo de desarrollo ni modificación de beta. Elimina reglas de columnas de grilla ya reemplazadas por el menú horizontal y su tamaño de letra antiguo; conserva separación vigente. Recorte de fotos carga únicamente en Inicio/Biblioteca, donde se incluyen sus editores; permanece disponible en caché offline. Sin cambios en permisos, datos, equivalencias ni funciones de negocio. No se hace una reescritura global de CSS.
+
+Validación: settings-ui Chromium aprobado (incluye mano hábil y avisos), moderation-stats-ui Chromium aprobado (320/390/1366 ambas manos y permisos), product-editor-photo aprobado (recorte/guardado/reintento). Revisión local de pantallas principales y demo sin desbordes; Supervisores con una sola hoja de sucursales. Navegación Stock→Biblioteca comprobada: recorte ausente en Stock y disponible al entrar al editor; encabezado sin desborde320/390/1366 ambas manos. Sintaxis PHP y diff aprobados. Propuesta visual de encabezado de sucursal/Ajustes/Moderación preparada fuera del repositorio; no aplicada. Cámara del supervisor sin hoja específica y zoom bloqueado siguen identificados para corrección posterior, no quedan solucionados por esta limpieza.
+
+Reversión: restaurar archivos de esta entrega desde su revisión anterior y publicar con contador de caché superior. No hay datos que revertir. No eliminar index.html (demo estática documentada), preferencias activas, subcajas ni funciones por supuesto desuso.
+
+
+## Entrega v2.91 — Encabezado de sucursal sin recorte
+
+Mi equipo de sucursal usa título/rol en primera fila y sucursal/configuración/salida en segunda en móvil; en PC reparte ambas zonas según ancho. Nombre largo puede ocupar varias líneas y selector de varias sucursales se adapta al espacio disponible. Se eliminan reglas previas que comprimían el título y reducían el rol a .65rem; se conserva tamaño .72rem, controles44px, SVG, preferencia de mano e IDs/eventos. Ajustes/Moderación de la propuesta no se modifican. Sin permisos ni datos nuevos.
+
+Validación local Chromium/WebKit320/390/1366, ambas manos, modo una mano0/1, sucursal única/selector múltiple y nombres largos: sin recorte de título, solapamientos ni desborde, controles44px con tolerancia de redondeo subpíxel y configuración abre. Captura final revisada; diff aprobado. No prueba de dispositivo físico. Reversión: restaurar css/branch-team.css anterior y publicar caché superior. Conserva limpieza local de v2.90, sin desplegar desde este trabajo.
+
+
+## Entrega v2.92 — Accesos de Inicio unificados
+
+TOPs, Supervisores/Mi empresa y Asignar empresa comparten una fila de anchos iguales, icono SVG arriba y texto centrado; se adapta a uno/dos/tres accesos sin dejar posiciones vacías. Grupo semántico de accesos, separación6px, mínimo70px de alto y orden reflejado según mano. Mantiene destinos y condiciones PHP de visibilidad, selector de sucursal y acción principal de escanear. Elimina regla anterior que permitía repartir esos accesos entre filas desparejas.
+
+Validación: supervision-home-ui Chromium aprobado (empresa/sucursal/manager, ambos modos y manos320–1366 sin scroll de página); geometría con página real y fixture del caso de captura en Chromium/WebKit,1/2/3 enlaces,320/390/1366, ambas manos y modo una mano0/1: misma fila/ancho/alto, sin desborde ni recorte, área táctil>=44px. Captura local revisada. Sintaxis index.php y diff aprobados. Sin datos reales, permisos nuevos ni publicación. Reversión: restaurar markup de accesos en index.php y reglas correspondientes de home.css/branch-team.css; publicar contador de caché superior. Preservar limpieza y encabezado de entregas locales anteriores.
+
+Publicación autorizada por el usuario: v2.90–v2.92 se agrupan para publicar limpieza técnica, encabezado de sucursal y accesos unificados de Inicio. Validaciones documentadas en cada entrega. El resto del rediseño propuesto sigue pendiente de decisión.

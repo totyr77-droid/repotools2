@@ -1,6 +1,24 @@
 {
-  "version": 194,
+  "version": 197,
   "changes": [
+    {
+      "version": 197,
+      "label": "2.92",
+      "date": "2026-10-24",
+      "summary": "Unifica accesos de Inicio con botones del mismo tamaño"
+    },
+    {
+      "version": 196,
+      "label": "2.91",
+      "date": "2026-10-24",
+      "summary": "Corrige encabezado de Mi equipo en móvil sin recortar el título"
+    },
+    {
+      "version": 195,
+      "label": "2.90",
+      "date": "2026-10-24",
+      "summary": "Limpia recursos duplicados, preferencias antiguas y estilos de desarrollo"
+    },
     {
       "version": 194,
       "label": "2.89",
@@ -282,27 +300,9 @@
       "label": "2.43",
       "date": "2026-10-23",
       "summary": "Biblioteca: quitar productos desde el visor EAN, del lado contrario a la mano hábil."
-    },
-    {
-      "version": 147,
-      "label": "2.42",
-      "date": "2026-10-23",
-      "summary": "Permisos del staff y registros con iconos, antes/después y accesos a palets y perfiles."
-    },
-    {
-      "version": 146,
-      "label": "2.41",
-      "date": "2026-10-23",
-      "summary": "Guías QR y número del palet separadas y adaptadas a la altura de la cámara."
-    },
-    {
-      "version": 145,
-      "label": "2.40",
-      "date": "2026-10-22",
-      "summary": "Etiquetas naranjas para vencimientos urgentes y ejemplos de colores en configuración."
     }
   ],
   "major": 2,
-  "minor": 89,
-  "label": "2.89"
+  "minor": 92,
+  "label": "2.92"
 }

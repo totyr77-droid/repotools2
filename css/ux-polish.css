@@ -933,3 +933,7 @@ body[data-hand=left] .pallet-tag-input input{padding-left:48px!important;padding
 body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-urgent{margin-left:auto}
 .expiry-color-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.expiry-color-preview [hidden]{display:none!important}
 .notification-item[data-state=urgent] .notification-icon{color:#9a430b;background:#ffead6}.notification-item[data-state=urgent][data-unread]{background:#fff7ee;border-left-color:#dd761d}.notification-item[data-state=urgent] .notification-expiry-label{background:#ffead6;color:#9a430b}
+
+/* Production logo layout, independent of development markers. */
+.header-contenedor .logo{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+@media(max-width:380px){.header-contenedor .logo{padding-inline:12px;gap:6px}.header-contenedor .logo img{width:120px}}

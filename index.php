@@ -14,9 +14,12 @@ include 'vistas/header.vista.php';
     <div class="app-resumen">
       <div class="home-intro"><h1>Herramientas para repositores</h1><p>Escaneá productos, controlá stock y organizá tu trabajo.</p></div>
       <div class="home-shortcuts">
-      <?php include __DIR__.'/vistas/branch-team-home.vista.php'; ?><?php if(current_user()): require_once __DIR__.'/includes/supervision.php';$homeSupervisor=supervisor_team(database(),(int)current_user()['id']);$homeSupervisorLinks=supervisor_links(database(),(int)current_user()['id']);if(($homeSupervisor||$homeSupervisorLinks)&&(!isset($teamHomeCompany)||!$teamHomeCompany||empty($teamHomeLocations))): ?><a class="home-tops" href="supervision.php"><?= stock_icon('users') ?><?= $homeSupervisor?'Mi empresa':'Supervisores' ?></a><?php endif;endif; ?>
-      <a class="home-tops" href="tops.php">TOPs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v6m-4 1h8"/></svg></a>
+      <?php include __DIR__.'/vistas/branch-team-home.vista.php'; ?>
+      <nav class="home-shortcut-links" aria-label="Accesos de inicio">
+      <a class="home-tops" href="tops.php"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v6m-4 1h8"/></svg><span>TOPs</span></a>
+      <?php if(current_user()): require_once __DIR__.'/includes/supervision.php';$homeSupervisor=supervisor_team(database(),(int)current_user()['id']);$homeSupervisorLinks=supervisor_links(database(),(int)current_user()['id']);if(($homeSupervisor||$homeSupervisorLinks)&&(!isset($teamHomeCompany)||!$teamHomeCompany||empty($teamHomeLocations))): ?><a class="home-tops" href="supervision.php"><?= stock_icon('users') ?><span><?= $homeSupervisor?'Mi empresa':'Supervisores' ?></span></a><?php endif;endif; ?>
       <?php if($teamHomeUser&&$teamHomeAssign): ?><a class="home-tops" href="gestion-empresas.php"><?= stock_icon('branch') ?><span data-team-home-label>Asignar empresa</span></a><?php endif; ?>
+      </nav>
       </div>
       <?php if (current_user()): ?><p id="scanStatsStatus" class="scan-stats-status" role="status"></p><?php endif; ?>
     </div>
