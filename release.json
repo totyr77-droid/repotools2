@@ -1,6 +1,12 @@
 {
-  "version": 189,
+  "version": 190,
   "changes": [
+    {
+      "version": 190,
+      "label": "2.85",
+      "date": "2026-10-24",
+      "summary": "Unifica alertas de supervisores y compacta encabezado"
+    },
     {
       "version": 189,
       "label": "2.84",
@@ -294,15 +300,9 @@
       "label": "2.36",
       "date": "2026-10-22",
       "summary": "Aviso de referido informativo sin navegación al tocarlo."
-    },
-    {
-      "version": 140,
-      "label": "2.35",
-      "date": "2026-10-22",
-      "summary": "Etiquetas personales para usuarios y controles adaptados a ambas manos."
     }
   ],
   "major": 2,
-  "minor": 84,
-  "label": "2.84"
+  "minor": 85,
+  "label": "2.85"
 }

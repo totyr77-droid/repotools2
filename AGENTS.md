@@ -17,6 +17,7 @@ Repotools debe sentirse rápido, simple, limpio y predecible. Aplicar estos crit
 - Cada pantalla debe tener una acción principal clara, acciones secundarias menos destacadas, estados importantes visibles e información secundaria discreta. No destacar todos los botones por igual.
 - Mostrar opciones avanzadas solo cuando hagan falta, mediante despliegue progresivo.
 - Reservar modales para decisiones importantes, confirmaciones necesarias, riesgo de pérdida de datos o tareas que requieran foco. Para acciones simples, feedback inline, toast o actualización directa.
+- Confirmaciones, avisos y errores de acciones deben usar las alertas flotantes existentes (RepoToast), sin agregar mensajes persistentes en div/párrafos ni duplicarlos. Mantener texto inline solo si es necesario para entender/corregir el contenido: estados vacíos, resultados de filtros/comparación, filas pendientes de un Excel, instrucciones de formulario o un error ligado a un campo. Progreso en botón/loader local. Modales solo para decisiones/confirmaciones o tareas con foco, no para avisos rutinarios. Aplicar este criterio en futuras funciones también.
 - Feedback inmediato en cada acción y errores claros: Guardado, Producto agregado, Sincronizado, Sin conexión, No se pudo guardar.
 - Estados vacíos con mensaje corto, explicación mínima y acción clara; nunca una pantalla vacía.
 - Mantener el sistema de carga: fullscreen solo cuando corresponda, skeletons de contenido, loaders locales y botones con estado de carga. No bloquear toda la interfaz innecesariamente.

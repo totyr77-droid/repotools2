@@ -32,7 +32,7 @@ Estas confirmaciones cubren lo probado por el usuario; no acreditan todos los mo
 
 ## Opcionales no comprometidos
 
-- Resguardar/exportar cargas locales pendientes antes de borrar el navegador o cambiar de equipo.
+- Resguardar/exportar cargas locales pendientes: pospuesto por el usuario; prioriza sincronización habitual con internet.
 - Ampliar offline a ediciones, fotos o activación/generación de palets.
 - Definir si lecturas de Inicio offline suman al TOP al reconectar.
 - Importar CSV/.xls además de .xlsx.

@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.84 / interna189**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.85 / interna190**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -380,3 +380,12 @@ Validación: sintaxis JS/diff y geometría Chromium320/390/1366 ambas manos, nom
 Integrantes conserva sección propia. Invitar integrante pasa de desplegable a botón principal con modal dedicado, mismo patrón de Agregar lista, iconos existentes y separación de pestañas. Formulario de correo con foco, Enviar invitación, progreso y errores dentro del modal, cierre/reset solo al enviar correctamente y confirmación en pantalla; datos se conservan ante error. Estado vacío abre el mismo modal. No altera consentimiento, permisos ni API.
 
 Validación: sintaxis PHP/JS y diff; supervision-ui Chromium con nuevo botón/modal y flujo real local de invitación/aceptación, listas, consulta y permisos. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.85 — Alertas de Supervisores y encabezado compacto
+
+Confirmaciones y errores de Supervisores/gestión de empresas usan RepoToast explícito, sin depender de detectar frases ni dejar mensajes globales persistentes. Progreso de invitación/configuración/locales en el botón, con restauración y bloqueo de doble envío. Errores no se duplican en modal y párrafo; se conservan valores para reintentar. Filas de Excel por revisar, datos de comparación, vacíos y explicaciones necesarios permanecen inline. Descargas conservan su alerta existente. Revisión adicional encontró errores de nombre público inline: pasan a alerta, con fallback accesible si RepoToast falta. Otros textos revisados eran estados de copia offline/resultados o confirmaciones ya cubiertas por alertas; se conservan.
+
+AGENTS.md registra criterio para futuros desarrollos: avisos rutinarios por alertas existentes, texto inline solo cuando es necesario para entender/corregir contenido, progreso local y modales para decisiones/tareas. Reduce separación del encabezado a pestañas y elimina márgenes de estado global vacío, sin reducir controles44px.
+
+Validación: supervision-ui Chromium real local con confirmaciones y error de descarga en RepoToast, importación, invitaciones y permisos; sintaxis JS/diff. Conserva contexto de revisión/importación. Sin DB. Reversión: revertir código de entrega y publicar caché superior; criterio de UX puede conservarse. Respaldo offline pospuesto por usuario, siguiente función CSV/XLS.
