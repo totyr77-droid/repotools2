@@ -164,3 +164,10 @@ Cajas usa resumen compacto:22 +1 unidad, sin repetir tamaño de caja ni «sin eq
 Cajas queda inmediatamente después de Unidades en información a descargar y en orden canónico del XLSX. Anchos de las columnas exportadas calculados según encabezado y línea de contenido más larga, con mínimos/máximos por tipo y ajuste multilínea para detalles largos; altura existente y columnas originales se conservan. Funciona tanto en comparación como exportación independiente, incluso solo Unidades.
 
 Validación: supervision/export/layout, lectura cruzada XLSX comprimido y preservación de fuente con supervision-xlsx, UI completa Chromium con selección conjunta/orden real de celdas y descarga, singular/sobrantes/desconocidos, ancho real10 para Unidades y14 para cajas del fixture. Sintaxis/diff aprobados. Sin DB/migración. Reversión: revertir entrega y publicar caché superior; archivos ya descargados requieren exportar de nuevo, no se modifica el original.
+
+
+## Entrega v2.57 — Ajuste de mercadería en escritorio
+
+Corregida regla de escritorio que forzaba la fila Presentación a ocupar ambas columnas y superponía Cantidad. La grilla existente vuelve a distribuir cada campo en su área; conserva campos internos y diseño móvil, sin controles nuevos ni cambios de datos.
+
+Validación: prueba de geometría Chromium/WebKit en 320/390/1366, ambas manos, unidades/cajas/bultos; stock-inner-packs-ui Chromium aprobado (guardar, editar y retirar paquete interno). Captura de escritorio revisada y diff sin errores. Teléfono físico pendiente. Reversión: revertir esta entrega y publicar con caché superior; no requiere migración.

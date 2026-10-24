@@ -1,6 +1,12 @@
 {
-  "version": 161,
+  "version": 162,
   "changes": [
+    {
+      "version": 162,
+      "label": "2.57",
+      "date": "2026-10-24",
+      "summary": "Corrige campos superpuestos al ajustar mercadería en PC"
+    },
     {
       "version": 161,
       "label": "2.56",
@@ -294,15 +300,9 @@
       "label": "2.08",
       "date": "2026-10-21",
       "summary": "Sucursal TEST para managers, notificaciones compactas y enlaces de colecciones"
-    },
-    {
-      "version": 112,
-      "label": "2.07",
-      "date": "2026-10-21",
-      "summary": "Cambios pendientes más claros, compartir colección unificado y sucursal cercana opcional"
     }
   ],
   "major": 2,
-  "minor": 56,
-  "label": "2.56"
+  "minor": 57,
+  "label": "2.57"
 }
