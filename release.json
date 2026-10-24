@@ -1,6 +1,12 @@
 {
-  "version": 163,
+  "version": 164,
   "changes": [
+    {
+      "version": 164,
+      "label": "2.59",
+      "date": "2026-10-24",
+      "summary": "Excel con códigos de palet y nombres de sucursales e integrantes sin cantidades"
+    },
     {
       "version": 163,
       "label": "2.58",
@@ -294,15 +300,9 @@
       "label": "2.10",
       "date": "2026-10-21",
       "summary": "Solicitudes de palet más claras y compactas"
-    },
-    {
-      "version": 114,
-      "label": "2.09",
-      "date": "2026-10-21",
-      "summary": "Palets disponibles compactos y vínculo de sucursal con etiqueta"
     }
   ],
   "major": 2,
-  "minor": 58,
-  "label": "2.58"
+  "minor": 59,
+  "label": "2.59"
 }
