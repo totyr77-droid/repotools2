@@ -1,6 +1,12 @@
 {
-  "version": 164,
+  "version": 165,
   "changes": [
+    {
+      "version": 165,
+      "label": "2.60",
+      "date": "2026-10-24",
+      "summary": "Una sola descripción por producto en el Excel aunque tenga varias fechas"
+    },
     {
       "version": 164,
       "label": "2.59",
@@ -294,15 +300,9 @@
       "label": "2.11",
       "date": "2026-10-21",
       "summary": "Retiro con revisión clara y descarte de solicitudes simplificado"
-    },
-    {
-      "version": 115,
-      "label": "2.10",
-      "date": "2026-10-21",
-      "summary": "Solicitudes de palet más claras y compactas"
     }
   ],
   "major": 2,
-  "minor": 59,
-  "label": "2.59"
+  "minor": 60,
+  "label": "2.60"
 }

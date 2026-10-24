@@ -187,3 +187,10 @@ Validación: UI completa Chromium/WebKit, modales 320/390/1366 ambas manos, bús
 Excel de comparación y descarga: Palets muestra solo códigos de8 dígitos como texto, conservando ceros iniciales; Sucursales e Integrantes muestran solo nombres públicos. Valores únicos ordenados, uno por línea, sin unidades, fechas ni prefijo Palet. Encabezados y selección usan Palets/Sucursales/Integrantes. Vencimientos conserva su detalle de cantidades cuando hay varias fechas y Unidades/Cajas mantienen sus totales.
 
 Validación: supervision-export con varios lotes/fechas del mismo palet, varios locales e integrantes, código05121614 y texto real del XLSX; supervision-export-layout y lectura cruzada openpyxl aprobadas. UI completa Chromium con descarga comparativa y exportación independiente; sintaxis/diff aprobados. Sin cambios de permisos ni DB. Reversión: revertir entrega y publicar caché superior; regenerar descargas para aplicar formato nuevo.
+
+
+## Entrega v2.60 — Una descripción por producto exportado
+
+Comparación y exportación independiente muestran una sola descripción por EAN aunque existan varios lotes o fechas con nombres de referencia diferentes. Se conserva la primera descripción disponible no vacía; totales y detalle de vencimientos mantienen todos los lotes. No modifica las descripciones originales del Excel fuente.
+
+Validación: supervision-export con referencias distintas, varias fechas, primera descripción vacía y contenido real del XLSX; supervision y supervision-export-layout aprobados, sintaxis/diff sin errores. Sin DB. Reversión: revertir entrega y publicar caché superior; regenerar exportaciones.
