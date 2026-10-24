@@ -1,6 +1,12 @@
 {
-  "version": 181,
+  "version": 182,
   "changes": [
+    {
+      "version": 182,
+      "label": "2.77",
+      "date": "2026-10-24",
+      "summary": "Corrige icono para cancelar búsquedas completadas por escáner"
+    },
     {
       "version": 181,
       "label": "2.76",
@@ -294,15 +300,9 @@
       "label": "2.28",
       "date": "2026-10-22",
       "summary": "Recordar cajas internas y bultos independientes también sin conexión"
-    },
-    {
-      "version": 132,
-      "label": "2.27",
-      "date": "2026-10-22",
-      "summary": "Cajas con paquetes internos, cantidades claras y retiro por paquete"
     }
   ],
   "major": 2,
-  "minor": 76,
-  "label": "2.76"
+  "minor": 77,
+  "label": "2.77"
 }

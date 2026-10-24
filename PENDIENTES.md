@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.76 / interna181**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.77 / interna182**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -322,3 +322,10 @@ Validación: geometría Chromium320/390/1366 ambas manos con nombre largo, sin d
 Barra de Palets/Mercadería incorpora botón compacto con SVG de cierre, título y nombre accesible Limpiar filtros, visible solo con búsqueda, integrante, sucursal, vencimiento u orden activo. Restablece todo en un toque, limpia parámetros de URL, cierra menú y actualiza inventario sin cambiar sección. Reutiliza la misma acción del estado vacío. Cancela búsqueda pendiente al usar el botón. Barra móvil distribuye búsqueda en primera fila y acciones en otra, evitando desborde; respeta mano elegida. Sin cambios de servidor ni datos.
 
 Validación: sintaxis JS/PHP y diff aprobados; supervision-ui Chromium comprueba búsqueda sin resultados, botón limpiar, inventario recuperado, orden predeterminado, botón oculto y Mercadería activa, además del flujo existente. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.77 — Cancelar búsqueda después de escanear
+
+Stock sincroniza el icono de búsqueda/filtros al comenzar cada búsqueda, también cuando el texto fue asignado por escáner o restaurado desde sesión, antes de consultar resultados. Se reutiliza RepoStockTags.apply existente: misma acción de borrar búsqueda/filtros, estado accesible e icono, en Palets y Mercadería. Sin cambios en API, cantidades, permisos ni datos.
+
+Validación: stock-empty-search-ui Chromium con escáner simulado completa EAN ausente, verifica Borrar búsqueda y filtros, cancela y recupera lupa/campo vacío en ambas pestañas; conserva comprobaciones móvil/una mano. Sintaxis/diff aprobados. Reversión: revertir entrega y publicar caché superior.
