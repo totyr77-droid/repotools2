@@ -1,6 +1,12 @@
 {
-  "version": 197,
+  "version": 198,
   "changes": [
+    {
+      "version": 198,
+      "label": "2.93",
+      "date": "2026-10-24",
+      "summary": "Integra Mi equipo y Mi empresa en la misma fila de Inicio"
+    },
     {
       "version": 197,
       "label": "2.92",
@@ -294,15 +300,9 @@
       "label": "2.44",
       "date": "2026-10-23",
       "summary": "Stock recuerda cajas, bultos o unidades para las próximas cargas, también sin conexión."
-    },
-    {
-      "version": 148,
-      "label": "2.43",
-      "date": "2026-10-23",
-      "summary": "Biblioteca: quitar productos desde el visor EAN, del lado contrario a la mano hábil."
     }
   ],
   "major": 2,
-  "minor": 92,
-  "label": "2.92"
+  "minor": 93,
+  "label": "2.93"
 }

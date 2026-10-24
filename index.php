@@ -17,7 +17,8 @@ include 'vistas/header.vista.php';
       <?php include __DIR__.'/vistas/branch-team-home.vista.php'; ?>
       <nav class="home-shortcut-links" aria-label="Accesos de inicio">
       <a class="home-tops" href="tops.php"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v6m-4 1h8"/></svg><span>TOPs</span></a>
-      <?php if(current_user()): require_once __DIR__.'/includes/supervision.php';$homeSupervisor=supervisor_team(database(),(int)current_user()['id']);$homeSupervisorLinks=supervisor_links(database(),(int)current_user()['id']);if(($homeSupervisor||$homeSupervisorLinks)&&(!isset($teamHomeCompany)||!$teamHomeCompany||empty($teamHomeLocations))): ?><a class="home-tops" href="supervision.php"><?= stock_icon('users') ?><span><?= $homeSupervisor?'Mi empresa':'Supervisores' ?></span></a><?php endif;endif; ?>
+      <?php if($teamHomeUser&&($teamHomeLocations||$teamHomeInvites)): ?><a class="home-tops" href="sucursales.php?ambito=sucursales" data-team-home-link title="Equipo de sucursal"><?= stock_icon('branch') ?><span>Mi equipo</span></a><?php endif; ?>
+      <?php if(current_user()): require_once __DIR__.'/includes/supervision.php';$homeSupervisor=supervisor_team(database(),(int)current_user()['id']);$homeSupervisorLinks=supervisor_links(database(),(int)current_user()['id']);if($homeSupervisor||$homeSupervisorLinks): ?><a class="home-tops" href="supervision.php"><?= stock_icon('users') ?><span><?= $homeSupervisor?'Mi empresa':'Supervisores' ?></span></a><?php endif;endif; ?>
       <?php if($teamHomeUser&&$teamHomeAssign): ?><a class="home-tops" href="gestion-empresas.php"><?= stock_icon('branch') ?><span data-team-home-label>Asignar empresa</span></a><?php endif; ?>
       </nav>
       </div>

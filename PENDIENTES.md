@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.92 / interna197**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.93 / interna198**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -447,3 +447,10 @@ TOPs, Supervisores/Mi empresa y Asignar empresa comparten una fila de anchos igu
 Validación: supervision-home-ui Chromium aprobado (empresa/sucursal/manager, ambos modos y manos320–1366 sin scroll de página); geometría con página real y fixture del caso de captura en Chromium/WebKit,1/2/3 enlaces,320/390/1366, ambas manos y modo una mano0/1: misma fila/ancho/alto, sin desborde ni recorte, área táctil>=44px. Captura local revisada. Sintaxis index.php y diff aprobados. Sin datos reales, permisos nuevos ni publicación. Reversión: restaurar markup de accesos en index.php y reglas correspondientes de home.css/branch-team.css; publicar contador de caché superior. Preservar limpieza y encabezado de entregas locales anteriores.
 
 Publicación autorizada por el usuario: v2.90–v2.92 se agrupan para publicar limpieza técnica, encabezado de sucursal y accesos unificados de Inicio. Validaciones documentadas en cada entrega. El resto del rediseño propuesto sigue pendiente de decisión.
+
+
+## Entrega v2.93 — Inicio con equipo de sucursal y supervisor
+
+Acceso Mi equipo sale del bloque de selector y comparte fila con TOPs y Mi empresa/Supervisores; Asignar empresa se agrega para manager con el mismo patrón. Mi equipo usa SVG de sucursal y destino explícito sucursales.php?ambito=sucursales; Mi empresa/Supervisores conserva SVG de personas y supervision.php. Se elimina la condición que ocultaba empresa cuando ya existía equipo: son accesos distintos sin duplicar destino. Selector de sucursal conserva IDs y eventos, ocupa su fila solo con locales; invitaciones pendientes mantienen el acceso al equipo sin dejar bloque vacío. JS actualiza visibilidad del nuevo enlace fuera del selector. Limpia estilos del enlace anterior.
+
+Validación: supervision-home-ui Chromium aprobado, empresa/sucursal/manager sin doble acceso de empresa ni scroll de página en320/390/1366 ambas manos/modos. Prueba local Chromium/WebKit con equipo y supervisor simultáneos, cuatro accesos de manager iguales y cuenta normal con tres: sin desbordes, fila/ancho/alto iguales y controles>=44px. Navegación comprobada a sucursales explícitas y supervision.php; captura WebKit revisada. Sintaxis PHP/JS y diff aprobados. Solo fixture temporal, sin datos reales ni cambios de permisos. Publicación solicitada en continuidad de v2.92. Reversión: revertir archivos de esta entrega y publicar caché superior; sin datos que revertir.

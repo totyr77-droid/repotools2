@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.92. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v2.93. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -56,3 +56,5 @@ Limpieza técnica aplicada en v2.90: script antiguo sin uso, estilos de desarrol
 Encabezado de sucursal corregido en v2.91. Propuesta visual pendiente de decisión: Ajustes con menos accesos repetidos, nombres consistentes de equipo de empresa/sucursal y estadísticas con menos repetición. No se aplicó rediseño ni se retiraron funciones de negocio. Correcciones detectadas aún por hacer: incluir hoja específica del escáner de Supervisores y permitir zoom. Revisar acceso flotante para evitar superponer contenido. No inferir desuso de funciones sin datos reales.
 
 Accesos de Inicio unificados en v2.92: misma fila, dimensiones e iconografía, respetando mano y permisos existentes.
+
+Inicio con equipo de sucursal y supervisor corregido en v2.93: accesos juntos y destinos explícitos, selector independiente.
