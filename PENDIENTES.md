@@ -199,3 +199,10 @@ Validación: supervision-export con referencias distintas, varias fechas, primer
 ## Entrega v2.61 — Texto breve en Información a descargar
 
 La opción de fechas se llama Vencimiento, sin la aclaración de cantidades. Cambio solo de etiqueta en el selector; conserva contenido y formato del Excel. Validación: sintaxis PHP y diff sin errores. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.62 — Resaltar lote al abrir desde Mercadería
+
+Ver palet/Ver en Stock y el contenido del lote transmiten EAN y fecha al abrir el detalle. Stock y Mercadería de sucursal resaltan y centran únicamente el lote elegido con la animación existente, conservando sección y despliegues. Resaltado compartido conserva soporte del identificador numérico usado por enlaces previos y respeta movimiento reducido. Los resúmenes de sucursal, incluidos cambios pendientes, exponen EAN/fecha para el mismo comportamiento. Sin cambios de permisos ni consultas de datos.
+
+Validación: stock-goods-ui Chromium/WebKit con mismo EAN y varias fechas, una sola fila resaltada para la fecha elegida; team-inventory-ui Chromium con resaltado, móvil/PC y ambas manos. Sintaxis JS y diff aprobados. Prueba adicional expiry-alerts-ui no alcanzó la apertura por enlace: espera una notificación data-state=today ausente en su fixture actual; no se modificó esa prueba ni notificaciones. Teléfono físico pendiente. Reversión: revertir entrega y publicar caché superior. Sin DB.

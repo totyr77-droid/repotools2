@@ -1,6 +1,12 @@
 {
-  "version": 166,
+  "version": 167,
   "changes": [
+    {
+      "version": 167,
+      "label": "2.62",
+      "date": "2026-10-24",
+      "summary": "Resalta el lote elegido al abrir un palet desde Mercadería"
+    },
     {
       "version": 166,
       "label": "2.61",
@@ -294,15 +300,9 @@
       "label": "2.13",
       "date": "2026-10-21",
       "summary": "Mercadería con fechas agrupadas y cambios de stock destacados"
-    },
-    {
-      "version": 117,
-      "label": "2.12",
-      "date": "2026-10-21",
-      "summary": "Solicitudes agrupadas en modal desde la tercera"
     }
   ],
   "major": 2,
-  "minor": 61,
-  "label": "2.61"
+  "minor": 62,
+  "label": "2.62"
 }
