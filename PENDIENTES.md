@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.82 / interna187**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.83 / interna188**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -366,3 +366,10 @@ Validación: PHP/JS/diff y geometría Chromium320/390/1366 ambas manos, título 
 Invitaciones incorporan12px de espacio interno horizontal/vertical y separación12px entre información y acciones. Corrige texto pegado a la franja izquierda de la invitación resaltada; aplica también a invitaciones normales. Conserva acciones, foco, permisos y área táctil. Sin datos ni JS modificados.
 
 Validación: geometría Chromium320/390/1366 ambas manos, texto separado12px, botones>=44px y sin desborde; diff aprobado. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.83 — Espaciado y acciones de listas
+
+Separa Agregar lista14px de pestañas. Cada lista usa fila estable con nombre/filas, configuración, Comparar y papelera sin salto inferior; títulos largos con elipsis. Papelera alejada de mano hábil, acciones>=44px. Reutiliza eventos/confirmación/modal sin cambios de servidor/datos.
+
+Validación: sintaxis JS/diff y geometría Chromium320/390/1366 ambas manos, nombre largo y tres acciones en una fila sin desborde, controles>=44px. Reversión: revertir entrega y publicar caché superior.

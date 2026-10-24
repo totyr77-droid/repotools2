@@ -1,6 +1,12 @@
 {
-  "version": 187,
+  "version": 188,
   "changes": [
+    {
+      "version": 188,
+      "label": "2.83",
+      "date": "2026-10-24",
+      "summary": "Separa agregar lista y alinea acciones incluida papelera"
+    },
     {
       "version": 187,
       "label": "2.82",
@@ -294,15 +300,9 @@
       "label": "2.34",
       "date": "2026-10-22",
       "summary": "Elegir columnas del Excel y descargar todas las fechas y palets con sus cantidades"
-    },
-    {
-      "version": 138,
-      "label": "2.33",
-      "date": "2026-10-22",
-      "summary": "Mi equipo más compacto: filtros por sección, acciones claras y etiquetas de sucursal"
     }
   ],
   "major": 2,
-  "minor": 82,
-  "label": "2.82"
+  "minor": 83,
+  "label": "2.83"
 }
