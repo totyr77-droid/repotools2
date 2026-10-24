@@ -213,3 +213,10 @@ Validación: stock-goods-ui Chromium/WebKit con mismo EAN y varias fechas, una s
 La recarga de Stock invalida búsquedas anteriores y vuelve a consultar la búsqueda/vencimientos activos tras actualizar los palets. Eliminar un producto deja de mostrar la tarjeta y los totales previos; conserva texto, filtros y sección. También aplica a las otras acciones que recargan Stock. Mercadería conserva su mecanismo de actualización existente para evitar consultas duplicadas. Respuestas de búsquedas previas se descartan con el contador existente.
 
 Validación: stock-search-summary Chromium/WebKit con eliminación real y confirmación del único lote coincidente, resultado vacío, total actualizado, texto y sección conservados; búsquedas exactas, límites y permisos previos aprobados. stock-goods-ui Chromium para filtros, sección, sesión y ambos lados móvil/PC aprobado. Sintaxis JS/diff sin errores. Sin DB. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.64 — Quitar etiqueta sin insignia anterior
+
+El detalle no muestra una segunda etiqueta del propietario cuando el palet pertenece a la cuenta actual: el botón personal ya representa esa etiqueta. Tras guardar/quitar se actualizan la etiqueta del palet activo y el estado compartido de etiquetas antes de renderizar; no reaparece el nombre anterior como insignia separada. Los palets ajenos conservan su etiqueta de propietario y los filtros se actualizan por el evento existente.
+
+Validación: stock-tags-ui Chromium/WebKit con renombrado, borrado real, botón Etiqueta, ausencia de insignia anterior y etiqueta de tarjeta eliminada, luego restauración y flujo completo ambas manos/móvil/PC. stock-tags PHP aprobado para aislamiento personal, permisos, acceso revocado y privacidad. Sintaxis JS/diff sin errores. Sin DB. Reversión: revertir entrega y publicar caché superior.

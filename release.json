@@ -1,6 +1,12 @@
 {
-  "version": 168,
+  "version": 169,
   "changes": [
+    {
+      "version": 169,
+      "label": "2.64",
+      "date": "2026-10-24",
+      "summary": "Evita que reaparezca la etiqueta anterior al quitarla del palet"
+    },
     {
       "version": 168,
       "label": "2.63",
@@ -294,15 +300,9 @@
       "label": "2.15",
       "date": "2026-10-21",
       "summary": "Mercadería de sucursal unificada con fechas y días"
-    },
-    {
-      "version": 119,
-      "label": "2.14",
-      "date": "2026-10-21",
-      "summary": "Días restantes visibles en mercadería"
     }
   ],
   "major": 2,
-  "minor": 63,
-  "label": "2.63"
+  "minor": 64,
+  "label": "2.64"
 }
