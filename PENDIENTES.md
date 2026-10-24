@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.86 / interna191**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.87 / interna192**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -399,3 +399,12 @@ Continuidad: CSV/XLS solicitado como próximo desarrollo. Investigación inicial
 Orden de inventario supervisor usaba expires agregado como alias dentro de CASE en ORDER BY, válido en SQLite pero no en PostgreSQL. Agrupación pasa a tabla derivada inventory_groups y orden se aplica afuera, donde expires y units son columnas disponibles. Conserva permisos, filtros, fechas ausentes al final, desempates y paginación.
 
 Validación: supervision PHP con ambas vistas/órdenes aprobado, sintaxis/diff. No se ejecutó PostgreSQL de producción; corrección de estructura SQL por restricción de alias identificada. Reversión: revertir entrega y publicar caché superior. Cámara faltante en buscador de Supervisores confirmada en markup: queda solicitada, antes de CSV/XLS. Se difiere incorporación por apenas3% de uso incluido y prohibición de créditos adicionales.
+
+
+## Entrega v2.87 — Cámara del supervisor e importación CSV/XLS
+
+Buscador de Supervisores agrega cámara con lector existente y selección Producto/Palet. EAN validado o QR propio completa búsqueda respetando sección/filtros/permisos, cierra y detiene cámara; entrada manual devuelve foco, cierre/navegación detienen lector. Reutiliza modal y estilos de búsqueda de Mi equipo, iconos existentes,44px y mano elegida. No activa Inicio ni modifica inventario.
+
+CSV y XLS pasan a estar disponibles junto con XLSX en Agregar lista. Normalización de servidor preserva XLSX sin cambios, CSV literal con separador/codificación y XLS mediante lector mantenido; vista previa informa conversión, CSV permite corregir separador. Comparación/exportación/aportes usan flujo existente. Dependencia PhpSpreadsheet5.10.0 y zip en Docker; detalles/límites/reversión en docs/IMPORTACION-CSV-XLS.md. Sin migraciones ni consultas externas para datos del usuario.
+
+Validación: supervision-ui Chromium/WebKit con cámara simulada EAN/QR/manual/cierre y comparación descargada de CSV/XLS con EAN normalizado y150 unidades de fixture; importación/catalog/export PHP, formatos con comillas/BOM/Windows1252/ceros/texto tipo fórmula/límites/archivos inválidos, XLS hojas/estilos/fórmulas y XLSX intacto aprobados. Composer audit sin vulnerabilidades conocidas, requisitos locales con gd/zip aprobados, sintaxis/diff. Cámara física y Docker local no disponibles; no afirmar prueba de hardware ni construcción local. No datos reales cambiados. Reversión: revertir entrega y publicar caché superior; listas convertidas quedan XLSX compatibles.

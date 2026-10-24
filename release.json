@@ -1,6 +1,12 @@
 {
-  "version": 191,
+  "version": 192,
   "changes": [
+    {
+      "version": 192,
+      "label": "2.87",
+      "date": "2026-10-24",
+      "summary": "Agrega cámara al supervisor e importación de listas CSV y XLS"
+    },
     {
       "version": 191,
       "label": "2.86",
@@ -294,15 +300,9 @@
       "label": "2.38",
       "date": "2026-10-22",
       "summary": "Notificaciones del dispositivo para vencimientos, invitaciones y solicitudes; pendientes actualizados."
-    },
-    {
-      "version": 142,
-      "label": "2.37",
-      "date": "2026-10-22",
-      "summary": "Registros por categoría, operaciones agrupadas y detalles en modal."
     }
   ],
   "major": 2,
-  "minor": 86,
-  "label": "2.86"
+  "minor": 87,
+  "label": "2.87"
 }

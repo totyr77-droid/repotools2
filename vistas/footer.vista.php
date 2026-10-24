@@ -64,7 +64,9 @@
 <script src="js/audit-records.js?v=<?= substr(sha1_file(__DIR__.'/../js/audit-records.js'),0,12) ?>"></script>
 <script src="js/reports-page.js?v=<?= substr(sha1_file(__DIR__.'/../js/reports-page.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaSupervision)): ?>
-<!-- Empresa: stock de consulta y listas, sin lector de Inicio. -->
+<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
+<script src="js/vendor/quagga-1.12.1.min.js"></script>
+<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaGestionEmpresas)): ?>
 <!-- Gestión administrativa: sin lector ni formularios de mercadería. -->
 <?php elseif (!empty($paginaEquipo)): ?>
@@ -124,7 +126,7 @@
 <?php if(!empty($paginaSupervision)||!empty($paginaGestionEmpresas)): ?>
 <link rel="stylesheet" href="css/supervision.css?v=<?= (int)app_release()['version'] ?>">
 <?php if(!empty($paginaSupervision)): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
-<?php foreach(['branch','chevron','trash','settings']as$supervisionIcon): ?><span hidden data-supervision-icon="<?= $supervisionIcon ?>"><?= stock_icon($supervisionIcon) ?></span><?php endforeach;endif; ?><script src="js/supervision.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php foreach(['branch','chevron','trash','settings']as$supervisionIcon): ?><span hidden data-supervision-icon="<?= $supervisionIcon ?>"><?= stock_icon($supervisionIcon) ?></span><?php endforeach;endif; ?><script src="js/supervision.js?v=<?= (int)app_release()['version'] ?>"></script><?php if(!empty($paginaSupervision)): ?><script src="js/supervision-scanner.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php endif; ?>
 <?php include __DIR__.'/team-shortcut.vista.php'; ?>
 <?php if(current_user()&&empty($paginaCuenta)&&!support_active()): include __DIR__.'/push-notice.vista.php'; endif; ?>

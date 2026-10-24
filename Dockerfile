@@ -1,9 +1,9 @@
 FROM php:8.3-apache
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends util-linux libsqlite3-dev libonig-dev libpq-dev libcurl4-openssl-dev libjpeg62-turbo-dev libpng-dev libwebp-dev unzip \
+    && apt-get install -y --no-install-recommends util-linux libsqlite3-dev libonig-dev libpq-dev libcurl4-openssl-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libzip-dev unzip \
     && docker-php-ext-configure gd --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_sqlite pdo_pgsql mbstring curl gd \
+    && docker-php-ext-install pdo_sqlite pdo_pgsql mbstring curl gd zip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer

@@ -35,15 +35,13 @@ Estas confirmaciones cubren lo probado por el usuario; no acreditan todos los mo
 - Resguardar/exportar cargas locales pendientes: pospuesto por el usuario; prioriza sincronización habitual con internet.
 - Ampliar offline a ediciones, fotos o activación/generación de palets.
 - Definir si lecturas de Inicio offline suman al TOP al reconectar.
-- Importar CSV/.xls además de .xlsx: solicitado por el usuario, pasa a próximo desarrollo.
+- CSV/XLS implementados en v2.87; no queda como desarrollo pendiente.
 - Planes comerciales/suscripciones y tendencias por período, si se decide desarrollarlos.
 
 Empresas/supervisores, consentimiento, equipos de sucursal, transferencias, XLSX configurable, cajas con paquetes internos, etiquetas personales y registros de moderación ya están implementados; no son desarrollo pendiente.
 
 Moderación General: estadísticas por período, actividad agrupada, resoluciones y totales actuales implementados en v2.79; permisos globales exclusivos de manager conservados.
 
-## Próximo desarrollo autorizado
+## Últimas funciones solicitadas
 
-CSV y XLS en Listas del supervisor, mismo flujo de vista previa/columnas, comparación y aportes, salida XLSX. Investigación inicial: actual importador solo acepta XLSX y preserva el archivo; CSV necesita separador/codificación y texto literal para EAN/ceros; XLS requiere lector BIFF mantenido y conversión controlada. Evaluar dependencia de servidor y extensiones del contenedor antes de implementar, preservando estilos/fórmulas cuando corresponda y límites de recursos. No se instaló dependencia ni se modificó importador. Trabajo detenido preventivamente con96% de ventana incluida consumida para respetar pedido de no usar créditos adicionales; reanudar cuando haya uso incluido.
-
-Prioridad antes de CSV/XLS: agregar cámara en buscador de Supervisores para EAN y QR/número de palet, reutilizando escáner existente; actualmente falta botón y conexión. Orden por vencimiento corregido en v2.86 para PostgreSQL.
+Cámara del buscador supervisor y listas CSV/XLS implementadas en v2.87. Detalles y límites en docs/IMPORTACION-CSV-XLS.md. Respaldo offline y unificación de listas/integrantes permanecen pospuestos por el usuario.

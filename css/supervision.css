@@ -48,3 +48,5 @@
 #supervisionIntegrantes{padding-top:14px}#supervisionInviteOpen{margin:0}#supervisionMembers{margin-top:16px}#supervisionInviteDialog{max-height:calc(100dvh - 32px);overflow:auto}#supervisionInviteDialog input{width:100%;box-sizing:border-box}#supervisionInviteStatus:empty{display:none}
 
 .supervision-page>.team-page-title{margin-top:0;padding-block:0}.supervision-page .supervision-company-actions{margin-top:0;margin-bottom:4px;padding-block:0}.supervision-page #supervisionOwner{padding-top:0}.supervision-page #supervisionStatus:empty{margin:0;padding:0}.supervision-page .team-page-title h1{white-space:normal}
+
+.supervision-toolbar>.supervision-search{gap:6px}.supervision-toolbar>.supervision-search input{flex:1;min-width:0;width:0}#supervisionSearchScan{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:10px;margin:0;background:transparent;color:#27187e;border:0;border-radius:9px}#supervisionSearchScan svg{width:21px;height:21px}body[data-hand=left] .supervision-toolbar>.supervision-search{flex-direction:row-reverse}
