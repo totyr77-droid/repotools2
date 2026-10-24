@@ -1,6 +1,12 @@
 {
-  "version": 171,
+  "version": 172,
   "changes": [
+    {
+      "version": 172,
+      "label": "2.67",
+      "date": "2026-10-24",
+      "summary": "Conserva sección y filtros del supervisor al actualizar Mi equipo"
+    },
     {
       "version": 171,
       "label": "2.66",
@@ -294,15 +300,9 @@
       "label": "2.18",
       "date": "2026-10-21",
       "summary": "QR y OCR de palets centrados en la misma guía, con control de lecturas ambiguas"
-    },
-    {
-      "version": 122,
-      "label": "2.17",
-      "date": "2026-10-21",
-      "summary": "Sucursal y etiqueta por lote y acceso QR junto a Usar palet"
     }
   ],
   "major": 2,
-  "minor": 66,
-  "label": "2.66"
+  "minor": 67,
+  "label": "2.67"
 }
