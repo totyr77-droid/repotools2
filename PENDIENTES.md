@@ -206,3 +206,10 @@ La opción de fechas se llama Vencimiento, sin la aclaración de cantidades. Cam
 Ver palet/Ver en Stock y el contenido del lote transmiten EAN y fecha al abrir el detalle. Stock y Mercadería de sucursal resaltan y centran únicamente el lote elegido con la animación existente, conservando sección y despliegues. Resaltado compartido conserva soporte del identificador numérico usado por enlaces previos y respeta movimiento reducido. Los resúmenes de sucursal, incluidos cambios pendientes, exponen EAN/fecha para el mismo comportamiento. Sin cambios de permisos ni consultas de datos.
 
 Validación: stock-goods-ui Chromium/WebKit con mismo EAN y varias fechas, una sola fila resaltada para la fecha elegida; team-inventory-ui Chromium con resaltado, móvil/PC y ambas manos. Sintaxis JS y diff aprobados. Prueba adicional expiry-alerts-ui no alcanzó la apertura por enlace: espera una notificación data-state=today ausente en su fixture actual; no se modificó esa prueba ni notificaciones. Teléfono físico pendiente. Reversión: revertir entrega y publicar caché superior. Sin DB.
+
+
+## Entrega v2.63 — Actualizar resultados filtrados al cambiar Stock
+
+La recarga de Stock invalida búsquedas anteriores y vuelve a consultar la búsqueda/vencimientos activos tras actualizar los palets. Eliminar un producto deja de mostrar la tarjeta y los totales previos; conserva texto, filtros y sección. También aplica a las otras acciones que recargan Stock. Mercadería conserva su mecanismo de actualización existente para evitar consultas duplicadas. Respuestas de búsquedas previas se descartan con el contador existente.
+
+Validación: stock-search-summary Chromium/WebKit con eliminación real y confirmación del único lote coincidente, resultado vacío, total actualizado, texto y sección conservados; búsquedas exactas, límites y permisos previos aprobados. stock-goods-ui Chromium para filtros, sección, sesión y ambos lados móvil/PC aprobado. Sintaxis JS/diff sin errores. Sin DB. Reversión: revertir entrega y publicar caché superior.

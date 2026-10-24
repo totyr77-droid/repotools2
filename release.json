@@ -1,6 +1,12 @@
 {
-  "version": 167,
+  "version": 168,
   "changes": [
+    {
+      "version": 168,
+      "label": "2.63",
+      "date": "2026-10-24",
+      "summary": "Actualiza búsquedas y totales filtrados después de eliminar mercadería"
+    },
     {
       "version": 167,
       "label": "2.62",
@@ -294,15 +300,9 @@
       "label": "2.14",
       "date": "2026-10-21",
       "summary": "Días restantes visibles en mercadería"
-    },
-    {
-      "version": 118,
-      "label": "2.13",
-      "date": "2026-10-21",
-      "summary": "Mercadería con fechas agrupadas y cambios de stock destacados"
     }
   ],
   "major": 2,
-  "minor": 62,
-  "label": "2.62"
+  "minor": 63,
+  "label": "2.63"
 }
