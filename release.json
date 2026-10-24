@@ -1,6 +1,12 @@
 {
-  "version": 180,
+  "version": 181,
   "changes": [
+    {
+      "version": 181,
+      "label": "2.76",
+      "date": "2026-10-24",
+      "summary": "Agrega botón para limpiar filtros del supervisor sin cambiar de sección"
+    },
     {
       "version": 180,
       "label": "2.75",
@@ -294,15 +300,9 @@
       "label": "2.27",
       "date": "2026-10-22",
       "summary": "Cajas con paquetes internos, cantidades claras y retiro por paquete"
-    },
-    {
-      "version": 131,
-      "label": "2.26",
-      "date": "2026-10-21",
-      "summary": "Stock: iconos consistentes, vencimientos ordenados y etiquetas compactas."
     }
   ],
   "major": 2,
-  "minor": 75,
-  "label": "2.75"
+  "minor": 76,
+  "label": "2.76"
 }
