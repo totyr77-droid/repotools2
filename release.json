@@ -1,6 +1,12 @@
 {
-  "version": 158,
+  "version": 159,
   "changes": [
+    {
+      "version": 159,
+      "label": "2.54",
+      "date": "2026-10-24",
+      "summary": "Comparativa Excel alineada y columnas separadas de Unidades y Cajas"
+    },
     {
       "version": 158,
       "label": "2.53",
@@ -294,15 +300,9 @@
       "label": "2.05",
       "date": "2026-10-20",
       "summary": "Corrige el bloqueo por un modal invisible al abrir sucursal desde Inicio"
-    },
-    {
-      "version": 109,
-      "label": "2.04",
-      "date": "2026-10-20",
-      "summary": "Guía QR de palets centrada con su tamaño correcto"
     }
   ],
   "major": 2,
-  "minor": 53,
-  "label": "2.53"
+  "minor": 54,
+  "label": "2.54"
 }
