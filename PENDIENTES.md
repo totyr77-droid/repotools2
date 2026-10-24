@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.94 / interna199**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.95 / interna200**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -465,3 +465,12 @@ Sucursales retira botón Actualizar; conserva AJAX al guardar y al volver a vent
 Validación: branch-manager-ui Chromium aprobado (asignar/añadir, renombrar, error conserva borrador, sucursales, permisos401/403, CSRF, actualización por focus sin botón). supervision-ui Chromium aprobado con nuevo modal y resto del flujo de equipo/listas. Prueba de modal real Chromium/WebKit320/390/1366 ambas manos: encaje, error conserva valores, reintento habilita, cierre/reset al éxito, alerta flotante, actualización silenciosa. Captura final opaca y centrada revisada, sintaxis PHP/JS y diff aprobados. Solo cuentas/base temporales, no datos reales. Tests existentes ajustados a alertas y focus, sin conservar dependencia de controles retirados.
 
 Reversión: revertir archivos de esta entrega y publicar contador de caché superior; sin datos que revertir.
+
+
+## Entrega v2.95 — Escáneres alineados y Asignar supervisor
+
+Corrige regresión del ajuste v2.93: selector de alineación .home-scan-actions quedó precedido accidentalmente por .home-shortcuts al retirar estilos del enlace anterior. Restablece el componente independiente de escaneo con display:flex. En móvil iguala Producto/Palet a64px y fija ancho64px de Palet tanto en modo normal como una mano, conservando orden según mano, colores y eventos. No cambia lectura de cámara ni ubicación.
+
+En Empresas, botón de apertura, título del modal y submit pasan a Asignar supervisor; progreso Asignando. Asignar empresa de Sucursales conserva su función/nombre distintos. API enable/permisos/confirmación del servidor sin cambios.
+
+Validación: home-scan-pair-ui aprobado, ahora incluye hoja home.css y estructura real del modo de una mano, sin simular dicho DOM en PC donde no aplica. Página PHP real Chromium/WebKit320/390/1366, ambas manos y preferencias persistidas0/1, aviso PWA visible/oculto: Producto/Palet con misma fila/altura, sin desborde horizontal; rótulos del modal comprobados. Captura final revisada, sintaxis PHP/JS y diff aprobados. No datos reales modificados ni nueva dependencia. Reversión: revertir esta entrega y publicar contador de caché superior; conservar corrección de flex si se revierte solo terminología.

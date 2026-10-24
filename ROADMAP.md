@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.94. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v2.95. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -60,3 +60,5 @@ Accesos de Inicio unificados en v2.92: misma fila, dimensiones e iconografía, r
 Inicio con equipo de sucursal y supervisor corregido en v2.93: accesos juntos y destinos explícitos, selector independiente.
 
 Gestión de empresas v2.94: asignación en modal, sin actualización manual redundante ni mensajes globales persistentes; AJAX al guardar/volver/abrir pestaña.
+
+Inicio v2.95: resuelto salto de Palet debajo de Escanear producto; alturas móviles iguales incluso con PWA visible. Empresas usa Asignar supervisor en botón/modal.

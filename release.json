@@ -1,6 +1,12 @@
 {
-  "version": 199,
+  "version": 200,
   "changes": [
+    {
+      "version": 200,
+      "label": "2.95",
+      "date": "2026-10-24",
+      "summary": "Alinea escáneres de Inicio y aclara Asignar supervisor"
+    },
     {
       "version": 199,
       "label": "2.94",
@@ -294,15 +300,9 @@
       "label": "2.46",
       "date": "2026-10-23",
       "summary": "Moderación: ingresar como usuario con cambios auditados, sesión separada y búsqueda en vivo."
-    },
-    {
-      "version": 150,
-      "label": "2.45",
-      "date": "2026-10-23",
-      "summary": "Vencimientos restaura el orden anterior al desactivarlo y quita el filtro automático."
     }
   ],
   "major": 2,
-  "minor": 94,
-  "label": "2.94"
+  "minor": 95,
+  "label": "2.95"
 }

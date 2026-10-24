@@ -80,8 +80,8 @@ body.home-page .home-list-heading p{display:none}
 }
 
 @media(max-width:768px){
- body.home-page .home-scan-actions #boton,body.home-page .ux-home-actions .ux-home-scan-pair #boton{height:64px!important;min-height:64px!important}
- body.home-page .ux-home-scan-pair [data-team-scan]{flex:0 0 64px;width:64px;min-width:64px;height:64px;min-height:64px;padding:12px}
+ body.home-page .home-scan-actions #boton,body.home-page .home-scan-actions .home-pallet-scan,body.home-page .ux-home-actions .ux-home-scan-pair #boton,body.home-page .ux-home-actions .ux-home-scan-pair [data-team-scan]{height:64px!important;min-height:64px!important}
+ body.home-page .home-scan-actions .home-pallet-scan,body.home-page .ux-home-actions .ux-home-scan-pair [data-team-scan]{flex:0 0 64px;width:64px;min-width:64px;height:64px;min-height:64px;padding:12px}
 }
 #installAppHelpTitle::before{display:none}
 #installAppHelpDialog .library-heading{gap:10px}
