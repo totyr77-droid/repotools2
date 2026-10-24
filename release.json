@@ -1,6 +1,12 @@
 {
-  "version": 179,
+  "version": 180,
   "changes": [
+    {
+      "version": 180,
+      "label": "2.75",
+      "date": "2026-10-24",
+      "summary": "Acomoda integrantes en una fila con acciones compactas según mano hábil"
+    },
     {
       "version": 179,
       "label": "2.74",
@@ -294,15 +300,9 @@
       "label": "2.26",
       "date": "2026-10-21",
       "summary": "Stock: iconos consistentes, vencimientos ordenados y etiquetas compactas."
-    },
-    {
-      "version": 130,
-      "label": "2.25",
-      "date": "2026-10-21",
-      "summary": "Avisos y respuesta debajo de Nombre público, con el mismo desplegable del perfil."
     }
   ],
   "major": 2,
-  "minor": 74,
-  "label": "2.74"
+  "minor": 75,
+  "label": "2.75"
 }

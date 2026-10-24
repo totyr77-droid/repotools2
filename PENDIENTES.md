@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.74 / interna179**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.75 / interna180**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -308,3 +308,10 @@ Supervisor: buscador por referencia/descripción de catálogo, marca, EAN y núm
 Revisión de terminología: carga online/offline y retiro conservaban Cajas cerradas, Paquetes por caja y un título duplicado Unidades por bulto/bulto; corregidos a Bultos cerrados, Paquetes por bulto y Unidades por bulto. Se oculta la opción antigua packs sin eliminar su valor para editar lotes/borradores anteriores; datos, equivalencias por presentación, paquetes internos y colas se conservan. Mensajes de composición/cantidad y pendientes también corregidos. Alias de importación Unidades por caja se conserva para leer Excel antiguos.
 
 Validación: supervision PHP con edición propia/denegación ajena, EAN intactos, búsqueda por nombre/EAN/palet y comodines literales, orden en ambas vistas con stock real de fixture; supervision-export aprobado. UI Chromium/WebKit: crear/configurar lista, descripción persistida, modales320/390/1366 ambas manos, comparación/descarga y permisos. Bultos internos Chromium/WebKit360 unidades, edición y retiro30; referencias online/offline Chromium independientes y sincronización exacta. Sintaxis y diff aprobados. Sin modificación de datos reales. Reversión: revertir entrega y publicar caché superior; metadatos de descripción pueden permanecer sin afectar clientes anteriores, no borrar lotes ni colas.
+
+
+## Entrega v2.75 — Integrantes en una fila
+
+Se reemplazan botones largos Locales visibles/Quitar por iconos SVG existentes con nombres accesibles y títulos. Fila de tres columnas: nombre/estado central sin saltos (elipsis para nombres largos), acciones táctiles44px a los lados. Quitar permanece alejado de la mano hábil; configuración de locales del lado próximo. Invitaciones pendientes conservan cancelar con confirmación. Sin cambios de servidor, permisos ni datos.
+
+Validación: geometría Chromium320/390/1366 ambas manos con nombre largo, sin desborde y elementos en una fila; sintaxis JS/diff aprobados. Flujo supervision-ui Chromium mantiene configuración de locales, invitaciones y acciones existentes. Reversión: revertir entrega y publicar caché superior.
