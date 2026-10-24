@@ -1,6 +1,12 @@
 {
-  "version": 172,
+  "version": 173,
   "changes": [
+    {
+      "version": 173,
+      "label": "2.68",
+      "date": "2026-10-24",
+      "summary": "Separa el alcance de comparación de los filtros de consulta"
+    },
     {
       "version": 172,
       "label": "2.67",
@@ -294,15 +300,9 @@
       "label": "2.19",
       "date": "2026-10-21",
       "summary": "Evitar elegir una etiqueta lateral al encuadrar varios palets"
-    },
-    {
-      "version": 123,
-      "label": "2.18",
-      "date": "2026-10-21",
-      "summary": "QR y OCR de palets centrados en la misma guía, con control de lecturas ambiguas"
     }
   ],
   "major": 2,
-  "minor": 67,
-  "label": "2.67"
+  "minor": 68,
+  "label": "2.68"
 }

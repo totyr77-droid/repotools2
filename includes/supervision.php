@@ -102,6 +102,7 @@ function supervisor_export_groups(iterable $rows):array {
  $result[$ean]=['ean'=>(string)$ean,'name'=>$g['name'],'uxb'=>$uxb,'stock'=>$g['stock'],'boxes'=>supervisor_export_boxes($g['box_units'],$g['unknown_boxes']),'expires'=>count($g['dates'])===1?(array_key_first($g['dates'])?(new DateTimeImmutable((string)array_key_first($g['dates'])))->format('d/m/Y'):'Sin vencimiento'):supervisor_export_lines($g['dates'],true),'pallets'=>implode("\n",array_keys($g['lots'])),'branches'=>implode("\n",array_keys($g['locations'])),'members'=>implode("\n",array_keys($g['people']))];}return $result;
 }
 function supervisor_export_data(PDO $db,int $user,array $input,array $columns):array {
+ $input=array_intersect_key($input,array_flip(['members','member','branches','branch','expiry']));
  if(array_keys($columns)===['stock']){$data=[];foreach(supervisor_totals($db,$user,$input)as$ean=>$units){if(count($data)>=20000)throw new CatalogException('El stock supera 20.000 productos. Elegí menos integrantes o sucursales.',422);$data[$ean]=['ean'=>(string)$ean,'stock'=>$units];}ksort($data,SORT_STRING);return $data;}
  return supervisor_export_groups(supervisor_rows($db,$user,$input,'LIMIT 20001'));
 }
