@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.93 / interna198**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.94 / interna199**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -454,3 +454,14 @@ Publicación autorizada por el usuario: v2.90–v2.92 se agrupan para publicar l
 Acceso Mi equipo sale del bloque de selector y comparte fila con TOPs y Mi empresa/Supervisores; Asignar empresa se agrega para manager con el mismo patrón. Mi equipo usa SVG de sucursal y destino explícito sucursales.php?ambito=sucursales; Mi empresa/Supervisores conserva SVG de personas y supervision.php. Se elimina la condición que ocultaba empresa cuando ya existía equipo: son accesos distintos sin duplicar destino. Selector de sucursal conserva IDs y eventos, ocupa su fila solo con locales; invitaciones pendientes mantienen el acceso al equipo sin dejar bloque vacío. JS actualiza visibilidad del nuevo enlace fuera del selector. Limpia estilos del enlace anterior.
 
 Validación: supervision-home-ui Chromium aprobado, empresa/sucursal/manager sin doble acceso de empresa ni scroll de página en320/390/1366 ambas manos/modos. Prueba local Chromium/WebKit con equipo y supervisor simultáneos, cuatro accesos de manager iguales y cuenta normal con tres: sin desbordes, fila/ancho/alto iguales y controles>=44px. Navegación comprobada a sucursales explícitas y supervision.php; captura WebKit revisada. Sintaxis PHP/JS y diff aprobados. Solo fixture temporal, sin datos reales ni cambios de permisos. Publicación solicitada en continuidad de v2.92. Reversión: revertir archivos de esta entrega y publicar caché superior; sin datos que revertir.
+
+
+## Entrega v2.94 — Asignar empresa en modal y alertas de gestión
+
+Empresas cambia desplegable de Asignar empresa por botón principal con SVG y modal dedicado, foco en nombre, correo/QR existente y Habilitar supervisor. Envío bloquea doble acción, muestra Habilitando, conserva datos/modal ante error y cierra/reset al éxito. Sin cambios de API ni permisos.
+
+Sucursales retira botón Actualizar; conserva AJAX al guardar y al volver a ventana/visibilidad, y actualiza al entrar a su pestaña. Evita solicitudes superpuestas y refresco durante borradores/edición; no agrega polling ni promete actualización instantánea entre dispositivos. Actualización automática no genera Información actualizada. Confirmaciones/errores/avisos usan RepoToast explícito y limpian los antiguos párrafos duplicados; progreso de guardado en loader local de botón. Búsqueda, vacíos y estados necesarios de lista conservan texto inline.
+
+Validación: branch-manager-ui Chromium aprobado (asignar/añadir, renombrar, error conserva borrador, sucursales, permisos401/403, CSRF, actualización por focus sin botón). supervision-ui Chromium aprobado con nuevo modal y resto del flujo de equipo/listas. Prueba de modal real Chromium/WebKit320/390/1366 ambas manos: encaje, error conserva valores, reintento habilita, cierre/reset al éxito, alerta flotante, actualización silenciosa. Captura final opaca y centrada revisada, sintaxis PHP/JS y diff aprobados. Solo cuentas/base temporales, no datos reales. Tests existentes ajustados a alertas y focus, sin conservar dependencia de controles retirados.
+
+Reversión: revertir archivos de esta entrega y publicar contador de caché superior; sin datos que revertir.

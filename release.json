@@ -1,6 +1,12 @@
 {
-  "version": 198,
+  "version": 199,
   "changes": [
+    {
+      "version": 199,
+      "label": "2.94",
+      "date": "2026-10-24",
+      "summary": "Abre asignación de empresa en modal y simplifica actualizaciones y alertas"
+    },
     {
       "version": 198,
       "label": "2.93",
@@ -294,15 +300,9 @@
       "label": "2.45",
       "date": "2026-10-23",
       "summary": "Vencimientos restaura el orden anterior al desactivarlo y quita el filtro automático."
-    },
-    {
-      "version": 149,
-      "label": "2.44",
-      "date": "2026-10-23",
-      "summary": "Stock recuerda cajas, bultos o unidades para las próximas cargas, también sin conexión."
     }
   ],
   "major": 2,
-  "minor": 93,
-  "label": "2.93"
+  "minor": 94,
+  "label": "2.94"
 }
