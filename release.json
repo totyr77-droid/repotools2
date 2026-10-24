@@ -1,6 +1,12 @@
 {
-  "version": 159,
+  "version": 160,
   "changes": [
+    {
+      "version": 160,
+      "label": "2.55",
+      "date": "2026-10-24",
+      "summary": "Selección de comparación más cómoda, aviso de descarga y detalle limpio de UXB y fechas"
+    },
     {
       "version": 159,
       "label": "2.54",
@@ -294,15 +300,9 @@
       "label": "2.06",
       "date": "2026-10-21",
       "summary": "Solicitudes al propietario y ediciones pendientes de Mi equipo sin GPS"
-    },
-    {
-      "version": 110,
-      "label": "2.05",
-      "date": "2026-10-20",
-      "summary": "Corrige el bloqueo por un modal invisible al abrir sucursal desde Inicio"
     }
   ],
   "major": 2,
-  "minor": 54,
-  "label": "2.54"
+  "minor": 55,
+  "label": "2.55"
 }
