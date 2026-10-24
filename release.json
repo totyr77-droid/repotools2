@@ -1,6 +1,12 @@
 {
-  "version": 165,
+  "version": 166,
   "changes": [
+    {
+      "version": 166,
+      "label": "2.61",
+      "date": "2026-10-24",
+      "summary": "Simplifica la opción a Vencimiento en información a descargar"
+    },
     {
       "version": 165,
       "label": "2.60",
@@ -294,15 +300,9 @@
       "label": "2.12",
       "date": "2026-10-21",
       "summary": "Solicitudes agrupadas en modal desde la tercera"
-    },
-    {
-      "version": 116,
-      "label": "2.11",
-      "date": "2026-10-21",
-      "summary": "Retiro con revisión clara y descarte de solicitudes simplificado"
     }
   ],
   "major": 2,
-  "minor": 60,
-  "label": "2.60"
+  "minor": 61,
+  "label": "2.61"
 }

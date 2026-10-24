@@ -194,3 +194,8 @@ Validación: supervision-export con varios lotes/fechas del mismo palet, varios 
 Comparación y exportación independiente muestran una sola descripción por EAN aunque existan varios lotes o fechas con nombres de referencia diferentes. Se conserva la primera descripción disponible no vacía; totales y detalle de vencimientos mantienen todos los lotes. No modifica las descripciones originales del Excel fuente.
 
 Validación: supervision-export con referencias distintas, varias fechas, primera descripción vacía y contenido real del XLSX; supervision y supervision-export-layout aprobados, sintaxis/diff sin errores. Sin DB. Reversión: revertir entrega y publicar caché superior; regenerar exportaciones.
+
+
+## Entrega v2.61 — Texto breve en Información a descargar
+
+La opción de fechas se llama Vencimiento, sin la aclaración de cantidades. Cambio solo de etiqueta en el selector; conserva contenido y formato del Excel. Validación: sintaxis PHP y diff sin errores. Reversión: revertir entrega y publicar caché superior.
