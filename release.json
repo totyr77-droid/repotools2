@@ -1,6 +1,12 @@
 {
-  "version": 175,
+  "version": 176,
   "changes": [
+    {
+      "version": 176,
+      "label": "2.71",
+      "date": "2026-10-24",
+      "summary": "Completa descripción y UXB de productos agregados usando catálogo y consulta API"
+    },
     {
       "version": 175,
       "label": "2.70",
@@ -294,15 +300,9 @@
       "label": "2.22",
       "date": "2026-10-21",
       "summary": "Menú de filtros completo y sin desplazamiento interno innecesario."
-    },
-    {
-      "version": 126,
-      "label": "2.21",
-      "date": "2026-10-21",
-      "summary": "Los filtros de Stock conservan la sección seleccionada."
     }
   ],
   "major": 2,
-  "minor": 70,
-  "label": "2.70"
+  "minor": 71,
+  "label": "2.71"
 }
