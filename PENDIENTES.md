@@ -225,3 +225,12 @@ Validación: stock-tags-ui Chromium/WebKit con renombrado, borrado real, botón 
 ## Entrega v2.65 — Columnas del Excel sin ejemplos dentro de la lista
 
 Los selectores de columna de EAN y aportes muestran solo letra y título, sin el sufijo Ej. con valores. La ayuda de ejemplos y códigos válidos debajo del selector EAN se conserva. Actualizada la expectativa existente de UI. Validación: sintaxis JS, supervision-import y diff aprobados; cambio solo de texto, sin modificar importación ni datos. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.66 — Compatibilidad Microsoft Excel, títulos y columnas vacías
+
+Investigación con el XLSX aportado por el usuario, sin guardar su contenido en Git: el lector Microsoft OpenXML rechazaba el ZIP emitido por PharData (versión declarada0). Cambiar únicamente la versión de las cabeceras ZIP locales/centrales a2.0 permitió abrir el paquete, y el validador detectó el orden inválido de color dentro de la fuente del encabezado. Exportación ahora normaliza versiones ZIP preservando bytes de entradas, offsets y contenido, y genera fuentes b/sz/color/name en orden válido. Mantiene fondo violeta y texto blanco. Aplica a comparativa y descarga independiente. No modifica archivos ya descargados.
+
+Títulos: si la lista quedó con header0 pero existe una cabecera EAN real, se usa esa fila para las columnas exportadas. Conserva el caso legítimo sin encabezados y los datos originales. Información a descargar inicia con0 columnas tanto en comparación como exportación independiente; exige elegir al menos una para descargar. Vista previa conserva su comportamiento.
+
+Validación: reproducido rechazo del paquete exacto aportado y error de esquema de fuente tras aislar el ZIP; exportación nueva abre directamente con SDK Microsoft OpenXML2.20 y valida0 errores. supervision-export/layout/import y lectura cruzada openpyxl aprobadas, con fórmulas/otras hojas/estilos y ceros iniciales conservados. Regresiones de versión ZIP, orden de fuente y cabecera detectada con header0. UI completa Chromium móvil/PC ambas manos,0 columnas iniciales, elección y descargas correctas. Sintaxis/diff aprobados. No se afirma prueba interactiva en Excel de escritorio: pendiente confirmación del usuario con descarga nueva. Sin DB. Reversión: revertir entrega y publicar caché superior; volverían las incompatibilidades anteriores.

@@ -1,6 +1,12 @@
 {
-  "version": 170,
+  "version": 171,
   "changes": [
+    {
+      "version": 171,
+      "label": "2.66",
+      "date": "2026-10-24",
+      "summary": "Corrige compatibilidad de Excel y títulos, sin columnas preseleccionadas"
+    },
     {
       "version": 170,
       "label": "2.65",
@@ -294,15 +300,9 @@
       "label": "2.17",
       "date": "2026-10-21",
       "summary": "Sucursal y etiqueta por lote y acceso QR junto a Usar palet"
-    },
-    {
-      "version": 121,
-      "label": "2.16",
-      "date": "2026-10-21",
-      "summary": "Acceso continuo al lector, vencimientos por lote y controles compactos de equipo"
     }
   ],
   "major": 2,
-  "minor": 65,
-  "label": "2.65"
+  "minor": 66,
+  "label": "2.66"
 }
