@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.88 / interna193**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.89 / interna194**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -415,3 +415,10 @@ Validación: supervision-ui Chromium/WebKit con cámara simulada EAN/QR/manual/c
 Reporte/alta de producto, edición del catálogo y revisión de moderación muestran Contenido neto y Unidades por bulto juntos, sin ocultar UXB en Más datos ni duplicar controles. Campo opcional entero1–1.000.000, precarga UXB existente y envía su valor por el flujo de permisos/revisión del servidor. Explicación automática de reportes reconoce cambios solo de UXB para no exigir nota escrita. Conserva UXC histórico y subcajas/paquetes internos sin conversiones ni migraciones.
 
 Validación: reports/catalog PHP aprobados, regresión de propuesta solo UXB14 sin explicación; editor-photo y report-success UI con precarga12/cambio14 y envío conservando foto. product-pack-fields-ui Chromium/WebKit verifica3 formularios, campos únicos alineados, entero/opcional y320/390/1366 ambas manos sin desborde. Sintaxis PHP/JS/diff aprobados. Reversión: revertir entrega y publicar caché superior; UXB ya guardada permanece compatible con catálogo/revisión existentes.
+
+
+## Entrega v2.89 — Menú de Moderación en una fila
+
+Menú principal de Moderación cambia grilla de dos filas por fila horizontal única. En móvil se desplaza dentro de la barra para mantener nombres legibles y botones>=44px; en escritorio distribuye espacio disponible. Reserva espacio para insignia de pendientes, mantiene navegación/eventos y preferencia de mano, sin desborde horizontal de página. Respeta movimiento reducido.
+
+Validación: geometría Chromium con seis pestañas/insignia320/390/1366 ambas manos, misma fila, objetivos44px y scroll local sin desborde; diff aprobado. Sin lógica ni permisos modificados. Reversión: revertir CSS y publicar caché superior.

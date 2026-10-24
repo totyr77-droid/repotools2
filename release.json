@@ -1,6 +1,12 @@
 {
-  "version": 193,
+  "version": 194,
   "changes": [
+    {
+      "version": 194,
+      "label": "2.89",
+      "date": "2026-10-24",
+      "summary": "Deja el menú de Moderación en una sola fila"
+    },
     {
       "version": 193,
       "label": "2.88",
@@ -294,15 +300,9 @@
       "label": "2.40",
       "date": "2026-10-22",
       "summary": "Etiquetas naranjas para vencimientos urgentes y ejemplos de colores en configuración."
-    },
-    {
-      "version": 144,
-      "label": "2.39",
-      "date": "2026-10-22",
-      "summary": "Activación de avisos desde la app, sin interrumpir la introducción ni el trabajo."
     }
   ],
   "major": 2,
-  "minor": 88,
-  "label": "2.88"
+  "minor": 89,
+  "label": "2.89"
 }
