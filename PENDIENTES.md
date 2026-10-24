@@ -220,3 +220,8 @@ Validación: stock-search-summary Chromium/WebKit con eliminación real y confir
 El detalle no muestra una segunda etiqueta del propietario cuando el palet pertenece a la cuenta actual: el botón personal ya representa esa etiqueta. Tras guardar/quitar se actualizan la etiqueta del palet activo y el estado compartido de etiquetas antes de renderizar; no reaparece el nombre anterior como insignia separada. Los palets ajenos conservan su etiqueta de propietario y los filtros se actualizan por el evento existente.
 
 Validación: stock-tags-ui Chromium/WebKit con renombrado, borrado real, botón Etiqueta, ausencia de insignia anterior y etiqueta de tarjeta eliminada, luego restauración y flujo completo ambas manos/móvil/PC. stock-tags PHP aprobado para aislamiento personal, permisos, acceso revocado y privacidad. Sintaxis JS/diff sin errores. Sin DB. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.65 — Columnas del Excel sin ejemplos dentro de la lista
+
+Los selectores de columna de EAN y aportes muestran solo letra y título, sin el sufijo Ej. con valores. La ayuda de ejemplos y códigos válidos debajo del selector EAN se conserva. Actualizada la expectativa existente de UI. Validación: sintaxis JS, supervision-import y diff aprobados; cambio solo de texto, sin modificar importación ni datos. Reversión: revertir entrega y publicar caché superior.

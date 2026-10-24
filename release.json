@@ -1,6 +1,12 @@
 {
-  "version": 169,
+  "version": 170,
   "changes": [
+    {
+      "version": 170,
+      "label": "2.65",
+      "date": "2026-10-24",
+      "summary": "Quita ejemplos de las opciones de columnas al importar Excel"
+    },
     {
       "version": 169,
       "label": "2.64",
@@ -294,15 +300,9 @@
       "label": "2.16",
       "date": "2026-10-21",
       "summary": "Acceso continuo al lector, vencimientos por lote y controles compactos de equipo"
-    },
-    {
-      "version": 120,
-      "label": "2.15",
-      "date": "2026-10-21",
-      "summary": "Mercadería de sucursal unificada con fechas y días"
     }
   ],
   "major": 2,
-  "minor": 64,
-  "label": "2.64"
+  "minor": 65,
+  "label": "2.65"
 }
