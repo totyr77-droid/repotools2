@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.97. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v2.98. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -53,7 +53,7 @@ UXB visible junto a contenido neto en formulario de producto, edición y revisi�
 
 Limpieza técnica aplicada en v2.90: script antiguo sin uso, estilos de desarrollo, inclusión duplicada, reglas de grilla reemplazadas y carga de recorte solo en sus editores. Consolidación general de CSS queda gradual, por componente; no retirar reglas activas en bloque.
 
-Encabezado de sucursal corregido en v2.91. Ajustes simplificado en v2.96. Nombres unificados en v2.97. Queda decidir estadísticas con menos repetición. No se aplicó rediseño ni se retiraron funciones de negocio. Correcciones detectadas aún por hacer: incluir hoja específica del escáner de Supervisores. Revisar acceso flotante para evitar superponer contenido. No inferir desuso de funciones sin datos reales.
+Encabezado de sucursal corregido en v2.91. Ajustes simplificado en v2.96. Nombres unificados en v2.97. Estadísticas compactadas en v2.98 con desgloses en modal. No se aplicó rediseño ni se retiraron funciones de negocio. Revisión de cámara cerrada en la conversación; no reabrir como desarrollo pendiente sin una incidencia nueva. Acceso flotante aceptado por el usuario: su posición se puede mover. No inferir desuso de funciones sin datos reales.
 
 Accesos de Inicio unificados en v2.92: misma fila, dimensiones e iconografía, respetando mano y permisos existentes.
 
@@ -68,3 +68,5 @@ Ajustes v2.96: retirados cuatro atajos repetidos; Preferencias primero, activida
 Zoom (punto6) descartado explícitamente por el usuario: conservar comportamiento actual de aplicación y no habilitar ampliación de página.
 
 Nombres v2.97: Mi equipo = empresa supervisada; Mi sucursal = equipo de sucursal; Mis supervisores = vínculos recibidos. Sucursales visibles como nombre único del alcance. Punto6 (zoom) descartado por el usuario.
+
+Moderación General v2.98: cuatro cifras y tres desgloses en modal; todas las métricas y accesos a registros conservados, sin repetir movimientos de stock.

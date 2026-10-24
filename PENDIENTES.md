@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.97 / interna202**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.98 / interna203**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -498,3 +498,14 @@ Punto6 descartado explícitamente por el usuario: no habilitar zoom de página; 
 Validación: supervision-ui y supervision-home-ui Chromium aprobados, consentimiento/consulta/listas/descarga, permisos, ambos modos/manos y navegación. supervision-unlisted-ui Chromium aprobado con nombres/modal/alertas actuales y puerto propio para evitar interferencia de fixtures; comparación real con producto fuera de lista y alcance conservados. stock-partial-box-ui aprobado, detalle Mi sucursal y cantidades exactas conservadas. Página real Chromium/WebKit320/390/1366 ambas manos: accesos de empresa/sucursal, integrante con Mis supervisores, atajo flotante a sucursal, panel cargado, títulos y viewport anterior. Sintaxis PHP/JS y diff aprobados; solo base temporal, sin datos reales.
 
 Reversión: revertir textos/rutas de interfaz de esta entrega y publicar caché superior; sin datos que revertir. Mantener decisión del usuario de descartar zoom.
+
+
+## Entrega v2.98 — Moderación General compacta
+
+General conserva cuatro indicadores principales: usuarios nuevos, usuarios con actividad registrada, movimientos de stock y pendientes actuales. Movimientos de stock muestra su cifra una sola vez y permite abrir registros de mercadería del período; pendientes conserva acceso a su lista. Fecha/rango en una línea breve. Tres filas discretas abren desgloses en un modal reutilizado: Actividad y reportes (usuarios/moderación/gestión, resoluciones y tiempo medio), Stock actual (palets/productos/unidades/vencimientos) y Cuentas y equipos (catálogo, usuarios/vínculos y rangos). No expande la página ni elimina métricas.
+
+Modal nativo con cierre, Escape y devolución de foco al origen explícita para WebKit. Navegar a registros cierra modal y conserva categoría, fechas y resultado confirmado. Desgloses reutilizan respuesta ya obtenida, sin nuevas consultas, cálculos ni permisos. Diferencia período elegido de totales actuales; actividad modal muestra fechas y definición de actividad/agrupación por transacción. Sin librerías ni datos nuevos.
+
+Validación: moderation-stats PHP aprobado (límites Argentina, períodos, transacciones agrupadas, actividad confirmada, resolución y vacíos). moderation-stats-ui Chromium/WebKit aprobado: cuatro cifras/tres accesos, sin desgloses inline, modales320/390/1366 ambas manos, stock y rangos conservados, Escape/foco, períodos personalizados, navegación a registros de mercadería/usuarios y403 a administrador/moderador/usuario. Sintaxis PHP/JS/diff y captura móvil aprobados. Solo fixture local; no medición de rendimiento ni cambio de datos reales.
+
+Acceso flotante aceptado por el usuario por su posición movible: no retirarlo ni rediseñarlo como pendiente. Zoom sigue descartado. Reversión: revertir reportes.php/js/reports-page.js y estilos de esta entrega, publicar contador de caché superior; no hay datos que revertir.
