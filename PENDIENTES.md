@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.78 / interna183**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.79 / interna184**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -336,3 +336,12 @@ Validación: stock-empty-search-ui Chromium con escáner simulado completa EAN a
 Mueve Descargar stock al lado del nombre de empresa, con icono SVG existente, control44px y nombre accesible/título. Conserva ID y flujo del modal de descarga. Barra de inventario deja Filtros, buscador flexible y limpiar; corrige orientación de label que apilaba lupa e input y evita que descarga quite espacio. Adaptación de mano en encabezado y barra, nombre largo con elipsis. Sin cambios en consultas ni permisos.
 
 Validación: sintaxis PHP y diff aprobados; geometría Chromium con markup real y CSS de supervisión320/390/1366 ambas manos, limpiar visible, input>=90px, filtro alineado y descarga junto al nombre, sin desborde. Cambio visual: no se repitió suite completa de exportación ya aprobada, conserva eventos/ID. Reversión: revertir entrega y publicar caché superior.
+
+
+## Entrega v2.79 — Estadísticas compactas en Moderación General
+
+Panel General conserva acceso exclusivo de manager validado en servidor. Agrega Hoy/7 días/30 días/Personalizado (hasta un año, fechas reales, sin futuro), fechas interpretadas en Argentina y consultas UTC con final exclusivo. Cuatro cifras principales: usuarios nuevos, cuentas con actividad registrada, movimientos de stock y pendientes actuales. Bloques secundarios simples para actividad por sección, resoluciones y tiempo medio, stock y equipos actuales; iconos SVG ya existentes. Totales actuales explícitamente separados de métricas del período. Sin resultados de resolución muestra Sin datos. Pendientes enlaza a su lista y Ver registros mantiene fechas, sección y resultado confirmado.
+
+Actividad usa identidades de transacción existentes de audit_operation_sql y misma clasificación de registros, agrupando por actor/operación/sección; excluye resultados no confirmados y no deduce operaciones por hora. Usuarios activos se definen por auditoría confirmada, no sesiones concurrentes ni visitas sin evento. Nuevos usuarios según creación; resoluciones según fecha de revisión, promedio entre creación y resolución, sin inventar duración para ausencia de datos. Vínculos de integrantes cuenta relaciones aceptadas en empresas activas, puede repetir personas con varios supervisores. No migración, tablas nuevas, librerías ni modificaciones de datos de producción.
+
+Validación: moderation-stats PHP con límites UTC/Argentina,7 días inclusivos, fechas inválidas, futuro/invertidas, transacción con dos eventos contada una vez, exclusión de denegados y eventos fuera de período, usuarios únicos, resolución2h y vacío. moderation-stats-ui Chromium/WebKit con API real/SQLite temporal: panel, períodos, fechas, navegación a registros, anchos320/390/1366 ambas manos y denegación403 a administrador/moderador/usuario. Sintaxis PHP/JS y diff aprobados; revisión visual del panel móvil. PostgreSQL mantiene SQL por dialecto existente, no ejecutado contra producción. Reversión: revertir entrega y publicar caché superior; sin datos que deshacer.
