@@ -1,6 +1,12 @@
 {
-  "version": 157,
+  "version": 158,
   "changes": [
+    {
+      "version": 158,
+      "label": "2.53",
+      "date": "2026-10-24",
+      "summary": "Importación guiada con ejemplos, aportes en modal y sin puntos automáticos"
+    },
     {
       "version": 157,
       "label": "2.52",
@@ -294,15 +300,9 @@
       "label": "2.04",
       "date": "2026-10-20",
       "summary": "Guía QR de palets centrada con su tamaño correcto"
-    },
-    {
-      "version": 108,
-      "label": "2.03",
-      "date": "2026-10-20",
-      "summary": "Filtros aplicados desplazables sin recortar sus nombres"
     }
   ],
   "major": 2,
-  "minor": 52,
-  "label": "2.52"
+  "minor": 53,
+  "label": "2.53"
 }

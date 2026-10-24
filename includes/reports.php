@@ -19,6 +19,9 @@ function report_is_blocked(PDO $db, ?array $user): bool {
     $stmt = $db->prepare('SELECT user_id FROM report_blocks WHERE user_id = ?'); $stmt->execute([$user['id']]);
     return $stmt->fetchColumn() !== false;
 }
+function report_is_automated_import(array $report): bool {
+    return ($report['proposed']['_origin']??'')==='supervision_excel'||str_starts_with($report['description']??'','Importado de Excel · ');
+}
 function report_proposed_changes(?array $original, array $proposed): array {
     $changes = [];
     foreach (['brand','name','quantity','category','packaging','uxb','uxc'] as $field) {
@@ -93,6 +96,7 @@ function report_detail(PDO $db, int $id, string $owner, bool $moderator): array 
     $report['proposed'] = json_decode($report['proposed_data'], true);
     $report['original'] = json_decode($report['original_data'], true);
     unset($report['proposed_data'], $report['original_data']);
+    $report['automated_import']=report_is_automated_import($report);
     $report['current'] = catalog_product($db, $report['ean']);
     $report['reference_image']='';$report['reference_image_source']='';
     if(catalog_approved_photo($db,$report['ean'])){$report['reference_image']='api/productos.php?ean='.rawurlencode($report['ean']).'&photo=product';$report['reference_image_source']='repotools';}
@@ -187,7 +191,7 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
             if ($revision === false) throw new CatalogException('Revisa la versión actual del producto.', 422);
             $photo=$db->prepare("SELECT object_key FROM report_photos WHERE report_id=? AND kind='product'");$photo->execute([$id]);
             $reviewedProduct=edit_catalog_product($db, $report['ean'], report_fields($input), $revision, (int) $user['id'], $id, $photo->fetchColumn()?:null);
-            if ($report['user_id'] !== null) $db->prepare('INSERT INTO report_rewards (report_id, user_id) VALUES (?, ?) ON CONFLICT(report_id) DO NOTHING')->execute([$id, $report['user_id']]);
+            if ($report['user_id'] !== null && !report_is_automated_import($report)) $db->prepare('INSERT INTO report_rewards (report_id, user_id) VALUES (?, ?) ON CONFLICT(report_id) DO NOTHING')->execute([$id, $report['user_id']]);
         }
         $db->prepare('UPDATE product_reports SET status = ?, reviewed_by = ?, review_note = ?, reviewed_at = CURRENT_TIMESTAMP WHERE id = ? AND status = ?')->execute([$decision, $user['id'], trim($note), $id, 'pending']);
         if ($report['user_id'] !== null) {
@@ -195,7 +199,7 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
             $body = 'EAN ' . $report['ean'] . ($decision === 'approved' ? ' · Actualizamos el producto.' : ' · ' . trim($note));
             $db->prepare('INSERT INTO notifications (user_id, event_key, type, title, body, report_id) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(event_key) DO NOTHING')->execute([$report['user_id'], 'report:' . $id . ':' . $decision, 'report_review', $title, $body, $id]);
         }
-        audit_event($db,(int)$user['id'],$decision,'report:'.$id,['category'=>'roles','ean'=>$report['ean'],'target_user'=>$report['user_id']],['status'=>$report['status'],'product'=>$report['current']??[]],['status'=>$decision,'product'=>$reviewedProduct??$report['current']??[],'proposal'=>$report['proposed']??[],'note'=>trim($note)],'confirmed',null,1);
+        audit_event($db,(int)$user['id'],$decision,'report:'.$id,['category'=>'roles','ean'=>$report['ean'],'target_user'=>$report['user_id'],'automated_import'=>report_is_automated_import($report)],['status'=>$report['status'],'product'=>$report['current']??[]],['status'=>$decision,'product'=>$reviewedProduct??$report['current']??[],'proposal'=>$report['proposed']??[],'note'=>trim($note)],'confirmed',null,1);
         $db->commit(); return report_detail($db, $id, 'user:' . $user['id'], true);
     } catch (Throwable $error) { if ($db->inTransaction()) $db->rollBack(); throw $error; }
 }

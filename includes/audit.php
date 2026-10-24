@@ -35,7 +35,7 @@ function audit_event(PDO $db,int $actor,string $action,string $operation,array $
         if($newUnits>$oldUnits&&!empty($context['new_load']))achievement_record($db,$actor,'productos_agregados',$operation);
         if(empty($before['activated'])&&!empty($after['products'])&&(int)($after['owner_id']??0)===$actor)achievement_record($db,$actor,'pallets',(string)$after['id']);
     }
-    if($action==='approved'&&!empty($context['target_user'])&&(int)$context['target_user']!==$actor&&array_intersect_key($before['product']??[],array_flip(['name','brand','quantity','category','packaging','image']))!==array_intersect_key($after['product']??[],array_flip(['name','brand','quantity','category','packaging','image'])))achievement_record($db,(int)$context['target_user'],'ediciones',$operation);
+    if($action==='approved'&&empty($context['automated_import'])&&!empty($context['target_user'])&&(int)$context['target_user']!==$actor&&array_intersect_key($before['product']??[],array_flip(['name','brand','quantity','category','packaging','image']))!==array_intersect_key($after['product']??[],array_flip(['name','brand','quantity','category','packaging','image'])))achievement_record($db,(int)$context['target_user'],'ediciones',$operation);
     $day=(new DateTimeImmutable($at,new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('America/Argentina/Buenos_Aires'))->format('Y-m-d');
     foreach([['activity',$actor,$activity],['branches',(int)($context['branch_id']??0),$units]] as [$kind,$subject,$value])if($subject>0&&$value>0)audit_q($db,'INSERT INTO ranking_daily(kind,subject_id,day,value) VALUES(?,?,?,?) ON CONFLICT(kind,subject_id,day) DO UPDATE SET value=ranking_daily.value+excluded.value',[$kind,$subject,$day,$value]);
 }

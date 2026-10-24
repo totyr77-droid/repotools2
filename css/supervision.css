@@ -21,3 +21,5 @@
 #supervisionMemberLocations .supervision-export-field-options label{display:flex;flex-direction:row;align-items:center;gap:10px;min-height:44px;padding:4px 0}#supervisionMemberLocations .supervision-export-field-options input{width:22px;height:22px;min-height:22px;flex:none;margin:0;accent-color:#27187e}#supervisionMemberLocations .supervision-export-field-options span{flex:1;min-width:0;text-align:start}body[data-hand=left] #supervisionMemberLocations .supervision-export-field-options label{flex-direction:row-reverse}
 
 #supervisionCatalogSamples small{display:block;color:#696577;padding-block:3px;overflow-wrap:anywhere}
+
+#supervisionCatalogDialog .supervision-import-exclude{display:flex;flex-direction:row;align-items:center;gap:10px;min-height:44px}#supervisionCatalogDialog input[type=checkbox]{width:22px;height:22px;min-height:22px;flex:none;margin:0;accent-color:#27187e}#supervisionCatalogDialog #supervisionCatalogSamples small{display:block;padding-block:3px;overflow-wrap:anywhere}body[data-hand=left] #supervisionCatalogDialog .supervision-import-exclude{flex-direction:row-reverse}#supervisionColumnExamples{overflow-wrap:anywhere}

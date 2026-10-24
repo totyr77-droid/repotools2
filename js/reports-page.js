@@ -154,6 +154,7 @@
           });
         } else if (sender.blocked) { const state = text('span', 'Reportes bloqueados', section); state.className = 'report-blocked-state'; }
       }
+      if(active.automated_import)text('p','Importación de Excel · No otorga puntos ni logros.',details).className='product-edit-note';
       const resolved=active.status!=='pending', baseline=resolved?active.original:active.current;
       const changed = Object.keys(fields).filter(key => (!['uxb','uxc'].includes(key)||Object.hasOwn(active.proposed||{},key)) && (baseline?.[key] || '').trim() !== (active.proposed?.[key] || '').trim());
       const shownFields = Object.keys(fields).filter(key => baseline?.[key] || active.proposed?.[key]);

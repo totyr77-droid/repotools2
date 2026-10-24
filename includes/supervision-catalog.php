@@ -35,6 +35,6 @@ function supervisor_catalog_propose(PDO $db,int $user,array $items,string $listN
         if(($proposal['name']??'')===''||!report_proposed_changes($current,$proposal))continue;
         if(stock_query($db,"SELECT 1 FROM product_reports WHERE user_id=? AND ean=? AND status='pending'",[$user,$ean])->fetchColumn())continue;
         $key=bin2hex(random_bytes(16));$uuid=substr($key,0,8).'-'.substr($key,8,4).'-'.substr($key,12,4).'-'.substr($key,16,4).'-'.substr($key,20);
-        stock_query($db,'INSERT INTO product_reports(submission_key,owner_key,user_id,ean,description,proposed_data,original_data,submitted_at) VALUES(?,?,?,?,?,?,?,?)',[$uuid,'user:'.$user,$user,$ean,'Importado de Excel · '.catalog_text($listName,100),json_encode($proposal,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),json_encode($current,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),time()]);$count++;
+        stock_query($db,'INSERT INTO product_reports(submission_key,owner_key,user_id,ean,description,proposed_data,original_data,submitted_at) VALUES(?,?,?,?,?,?,?,?)',[$uuid,'user:'.$user,$user,$ean,'Importado de Excel · '.catalog_text($listName,100),json_encode([...$proposal,'_origin'=>'supervision_excel'],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),json_encode($current,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),time()]);$count++;
     }return $count;
 }
