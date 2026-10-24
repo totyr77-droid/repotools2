@@ -1,6 +1,12 @@
 {
-  "version": 184,
+  "version": 185,
   "changes": [
+    {
+      "version": 185,
+      "label": "2.80",
+      "date": "2026-10-24",
+      "summary": "Muestra Mi equipo y empresa con descarga pequeña debajo"
+    },
     {
       "version": 184,
       "label": "2.79",
@@ -294,15 +300,9 @@
       "label": "2.31",
       "date": "2026-10-22",
       "summary": "Excel de listas: detectar hojas y encabezados, revisar códigos y corregir o excluir filas"
-    },
-    {
-      "version": 135,
-      "label": "2.30",
-      "date": "2026-10-22",
-      "summary": "Empresas con supervisores, consentimiento de integrantes y comparativa de stock en Excel"
     }
   ],
   "major": 2,
-  "minor": 79,
-  "label": "2.79"
+  "minor": 80,
+  "label": "2.80"
 }
