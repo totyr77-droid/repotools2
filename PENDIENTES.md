@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.73 / interna178**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 24/10/2026. Entrega de código actual: **v2.74 / interna179**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -297,3 +297,14 @@ Aportes Excel y revisión muestran una sola entrada visible UXB; UXC queda como 
 Nuevo helper de lectura de catálogo prioriza UXB y usa UXC antiguo solo si UXB no está informado. Referencias reales ya cargadas por presentación conservan prioridad; referencias de catálogo y cálculo de cajas sin composición propia usan ese total canónico. Exportación acepta cabeceras antiguas como alias sin reescribir el Excel original. Sin migración, borrado ni fusión masiva de datos.
 
 Validación: stock-inner-packs-ui Chromium/WebKit360 unidades, edición y retiro de30; stock-pack-references-offline-ui Chromium con cajas/paquetes/bultos independientes, referencias y sincronización exacta. supervision-ui Chromium con UXC oculto, UXB ambiguo sin preselección, elección explícita y propuesta sin UXC nuevo. supervision-export/unlisted/catalog y catalog-reference/catalog/reports aprobados, incluida prioridad UXB y respaldo UXC. Sintaxis PHP/JS/diff sin errores. Reversión: revertir entrega y publicar caché superior; no borrar datos ni colas offline.
+
+
+## Entrega v2.74 — Listas, búsqueda y orden del equipo
+
+Agregar lista pasa a botón principal con formulario en modal. Cada lista incorpora configuración con icono SVG existente para editar nombre y descripción opcional. Descripción guardada en metadatos versionados existentes, sin migración; conserva archivo original, EAN, encabezado y permisos de empresa. Validación de servidor y CSRF para actualizar, sin puntos ni aportes automáticos al catálogo.
+
+Supervisor: buscador por referencia/descripción de catálogo, marca, EAN y número de palet en Palets y Mercadería, con espera breve al escribir y coincidencias literales (no comodines). Respeta integrantes y locales autorizados, totales y paginación. Ordenar por agrega mayor/menor cantidad y vencimiento cercano/lejano, sin fechas al final y desempate estable. Conserva búsqueda/orden al actualizar o recargar. No hereda búsqueda al Excel: exportación mantiene su alcance independiente. Sin resultados ofrece Limpiar filtros.
+
+Revisión de terminología: carga online/offline y retiro conservaban Cajas cerradas, Paquetes por caja y un título duplicado Unidades por bulto/bulto; corregidos a Bultos cerrados, Paquetes por bulto y Unidades por bulto. Se oculta la opción antigua packs sin eliminar su valor para editar lotes/borradores anteriores; datos, equivalencias por presentación, paquetes internos y colas se conservan. Mensajes de composición/cantidad y pendientes también corregidos. Alias de importación Unidades por caja se conserva para leer Excel antiguos.
+
+Validación: supervision PHP con edición propia/denegación ajena, EAN intactos, búsqueda por nombre/EAN/palet y comodines literales, orden en ambas vistas con stock real de fixture; supervision-export aprobado. UI Chromium/WebKit: crear/configurar lista, descripción persistida, modales320/390/1366 ambas manos, comparación/descarga y permisos. Bultos internos Chromium/WebKit360 unidades, edición y retiro30; referencias online/offline Chromium independientes y sincronización exacta. Sintaxis y diff aprobados. Sin modificación de datos reales. Reversión: revertir entrega y publicar caché superior; metadatos de descripción pueden permanecer sin afectar clientes anteriores, no borrar lotes ni colas.

@@ -141,7 +141,7 @@ function stock_product_input(array $input): array {
     if (!is_string($expires) || ($expires!=='' && (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D',$expires,$date)||!checkdate((int)$date[2],(int)$date[3],(int)$date[1])||(int)$date[1]<2000||(int)$date[1]>2099))) throw new CatalogException('Revisa el vencimiento. Usa día, mes y año.',422);
     $amount=filter_var($input['amount']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>1000000]]);
     $kind=$input['kind']??'units'; $pack= $kind==='units' ? 1 : filter_var($input['pack_size']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>1000000]]);
-    if (!$amount||!$pack||!in_array($kind,['units','boxes','packs'],true)||$amount*$pack>1000000000) throw new CatalogException('Revisa la cantidad y las unidades por caja o bulto.',422);
+    if (!$amount||!$pack||!in_array($kind,['units','boxes','packs'],true)||$amount*$pack>1000000000) throw new CatalogException('Revisa la cantidad y las unidades por bulto.',422);
     $inner=filter_var($input['inner_pack_size']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>1000000]]);
     if($inner===false||($inner>0&&($kind!=='boxes'||$inner>$pack||$pack%$inner!==0)))throw new CatalogException('Revisá los paquetes internos y las unidades por paquete.',422);
     return ['ean'=>$ean,'name'=>catalog_text($input['name']??'',120),'expires'=>$expires,'units'=>$amount*$pack,'kind'=>$kind,'pack_size'=>$pack,'inner_pack_size'=>$inner];
