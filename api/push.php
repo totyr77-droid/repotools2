@@ -12,7 +12,7 @@ try{
  if($method==='GET'&&$action==='health'){
   if(stock_query($db,'SELECT role FROM users WHERE id=?',[$uid])->fetchColumn()!=='manager')throw new CatalogException('Solo managers pueden consultar el envío automático.',403);
   require_once __DIR__.'/../includes/push-health.php';$state=push_health_read();
-  $state['enabled']=(getenv('REPOTOOLS_PUSH_WORKER')?:'1')==='1';
+  $workerFlag=getenv('REPOTOOLS_PUSH_WORKER');$state['enabled']=($workerFlag===false||$workerFlag===''||$workerFlag==='1');
   $state['last_checked']=(int)stock_query($db,'SELECT COALESCE(MAX(checked_at),0) FROM push_subscriptions')->fetchColumn();
   $state['pending']=(int)stock_query($db,"SELECT COUNT(*) FROM push_jobs WHERE status='pending'")->fetchColumn();
   push_response(200,$state);

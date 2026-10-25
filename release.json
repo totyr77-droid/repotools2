@@ -1,6 +1,12 @@
 {
-  "version": 78,
+  "version": 79,
   "changes": [
+    {
+      "version": 79,
+      "label": "1.74",
+      "date": "2026-10-25",
+      "summary": "Aclara envíos desactivados en beta y documenta propuesta de planes"
+    },
     {
       "version": 78,
       "label": "1.73",
@@ -294,15 +300,9 @@
       "label": "1.25",
       "date": "2026-10-19",
       "summary": "Actualizar caché desde BETA conservando sesión y datos locales"
-    },
-    {
-      "version": 29,
-      "label": "1.24",
-      "date": "2026-10-19",
-      "summary": "Alta desplegable de sucursales con ubicación en mapa"
     }
   ],
   "major": 1,
-  "minor": 73,
-  "label": "1.73"
+  "minor": 74,
+  "label": "1.74"
 }
