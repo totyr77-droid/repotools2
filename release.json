@@ -1,6 +1,12 @@
 {
-  "version": 207,
+  "version": 208,
   "changes": [
+    {
+      "version": 208,
+      "label": "3.03",
+      "date": "2026-10-25",
+      "summary": "Limpia reglas repetidas de Biblioteca y recorte de fotos"
+    },
     {
       "version": 207,
       "label": "3.02",
@@ -294,15 +300,9 @@
       "label": "2.54",
       "date": "2026-10-24",
       "summary": "Comparativa Excel alineada y columnas separadas de Unidades y Cajas"
-    },
-    {
-      "version": 158,
-      "label": "2.53",
-      "date": "2026-10-24",
-      "summary": "Importación guiada con ejemplos, aportes en modal y sin puntos automáticos"
     }
   ],
   "major": 3,
-  "minor": 2,
-  "label": "3.02"
+  "minor": 3,
+  "label": "3.03"
 }

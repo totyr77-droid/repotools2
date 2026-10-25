@@ -561,3 +561,12 @@ Retira declaraciones anuladas de tres hojas: Ajustes (encabezados repetidos y an
 Validación: comparación local de geometría y propiedades calculadas antes/después en fixture de los tres componentes, Chromium/WebKit,12 combinaciones por motor (320/390/1366, ambas manos, puntero táctil/no táctil), sin diferencias. Animaciones desactivadas para comparar estados estables. settings-ui Chromium/WebKit, notification-presentation-ui y stock-overview PHP aprobados; captura de Ajustes revisada y diff limpio. Sin datos reales ni cambios de lógica/permisos. No representa auditoría completa de todas las pantallas ni medición de velocidad.
 
 Reversión: restaurar css/settings.css, css/notifications.css y css/stock-overview.css de la revisión anterior y publicar contador de caché superior. Sin datos que revertir. Próxima limpieza, si se continúa, siempre por componente con evidencia; no borrar reglas solo por parecer repetidas.
+
+
+## Entrega v3.03 — Biblioteca y recorte sin reglas anuladas
+
+Biblioteca define el tamaño de los SVG de acciones una sola vez, conservando18px y flex-shrink0; el código de producto conserva20px y16px en móvil estrecho. Recorte de fotos retira las antiguas esquinas desplazadas -22px, anuladas por la posición0 vigente. Revisados product-info.css y campos de formularios: sin repetición equivalente que justifique cambios; se conservan. Sin rediseño ni cambios de datos, permisos o flujo.
+
+Validación: library-dialog-polish-ui aprobado (código único, copia, acciones320–1366, edición y duplicados); product-editor-photo aprobado (carga, recorte, JPEG, reintento/reset); product-pack-fields-ui Chromium/WebKit aprobado en tres formularios, ambas manos320/390/1366. Comparación de medidas y propiedades calculadas antes/después en fixture de Biblioteca/editor/recorte, Chromium/WebKit,12 combinaciones por motor (tres anchos, dos manos, táctil/no táctil), sin diferencias. Diff limpio. Solo fixtures locales; no prueba de cámara física ni auditoría global.
+
+Reversión: restaurar css/library.css y css/product-crop.css de la revisión anterior y publicar caché superior; sin datos que revertir.

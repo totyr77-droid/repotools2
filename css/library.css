@@ -70,10 +70,10 @@ summary:focus-visible { outline: 2px solid var(--color1); outline-offset: 3px; }
 .library-product p { color: #626b7a; margin: 8px 0 12px; user-select: text; }
 .library-product-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .library-product-code { display: flex; align-items: center; gap: 6px; }
-.library-product-code svg, .library-product-actions svg { width: 20px; height: 20px; flex-shrink: 0; }
+.library-product-code svg { width: 20px; height: 20px; flex-shrink: 0; }
 .library-product p.library-product-code { margin-bottom: 0; letter-spacing: .02em; font-size: .85rem; }
 .library-view-code { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 10px 8px; }
-.library-product-actions svg { width: 18px; height: 18px; }
+.library-product-actions svg { width: 18px; height: 18px; flex-shrink: 0; }
 .library-remove-product { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 10px; background: #c92a38; color: white; }
 .library-remove-product:hover { background: #a8212d; }
 @media (max-width: 380px) { .library-product { gap: 8px; } .library-product h3 { font-size: .9rem; } .library-product p.library-product-code { font-size: .78rem; letter-spacing: 0; gap: 4px; } .library-product-code svg { width: 16px; height: 16px; } }
