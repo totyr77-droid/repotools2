@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v3.03. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v3.04. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -80,3 +80,5 @@ Preparación offline con prioridad de uso aplicada en v3.01: pausa entre lotes d
 Limpieza gradual v3.02: retiradas declaraciones anuladas de Ajustes, notificaciones y resumen de Stock, con comparación de estilos/medidas Chromium/WebKit. El resto se revisa por componente; no declarar limpieza global terminada.
 
 Limpieza v3.03: iconos de Biblioteca y reglas antiguas del recorte de fotos revisados y depurados. Formularios y UXB conservados; validación funcional y estilos equivalentes. No quedan cambios comprometidos de esta tanda.
+
+Tanda de limpieza cerrada en v3.04 con Stock/mercadería y comparación de Moderación. Verificación funcional y de equivalencia CSS aprobada; no quedan desarrollos comprometidos de esta revisión. Continuar mantenimiento solo ante evidencia o nuevas prioridades, sin prometer app libre de errores.

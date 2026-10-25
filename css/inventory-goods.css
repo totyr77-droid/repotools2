@@ -2,7 +2,7 @@
 .team-goods-row>summary{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}
 .team-goods-row strong{display:block;font-size:.95rem}
 .team-goods-row small{display:block;font-size:.78rem;font-weight:400;color:#77718a}
-.team-goods-total{text-align:right;flex:none;max-width:50%}
+.team-goods-total{text-align:right;flex:none}
 .team-goods-lot{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;font:inherit;font-size:.8rem;background:none;border:0;border-top:1px solid #eeebf7;padding:10px 4px;min-height:44px;color:#27197F}
 .team-goods-lot strong{font-size:.85rem}
 .team-goods-info{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -23,7 +23,7 @@
 body[data-hand=left] .team-goods-lot{flex-direction:row-reverse}
 .team-goods-row>summary{list-style:none}
 .team-goods-row>summary::-webkit-details-marker{display:none}
-.team-goods-row>summary>.team-goods-chevron{width:18px;height:18px;flex:none;color:#7a718f;align-self:center;transition:transform .15s}
+.team-goods-row>summary>.team-goods-chevron{width:18px;height:18px;flex:none;color:#7a718f;align-self:center}
 .team-goods-row[open]>summary>.team-goods-chevron{transform:rotate(180deg);color:#27197f}
 .team-goods-row[open]{border-inline-start:2px solid #b9dce5;padding-inline-start:8px}
 .team-goods-row[open] .team-goods-lots{margin-top:5px}

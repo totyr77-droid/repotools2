@@ -1,6 +1,12 @@
 {
-  "version": 208,
+  "version": 209,
   "changes": [
+    {
+      "version": 209,
+      "label": "3.04",
+      "date": "2026-10-25",
+      "summary": "Depura estilos de Stock y Moderación conservando su diseño"
+    },
     {
       "version": 208,
       "label": "3.03",
@@ -294,15 +300,9 @@
       "label": "2.55",
       "date": "2026-10-24",
       "summary": "Selección de comparación más cómoda, aviso de descarga y detalle limpio de UXB y fechas"
-    },
-    {
-      "version": 159,
-      "label": "2.54",
-      "date": "2026-10-24",
-      "summary": "Comparativa Excel alineada y columnas separadas de Unidades y Cajas"
     }
   ],
   "major": 3,
-  "minor": 3,
-  "label": "3.03"
+  "minor": 4,
+  "label": "3.04"
 }

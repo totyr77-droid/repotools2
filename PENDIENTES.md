@@ -570,3 +570,12 @@ Biblioteca define el tamaño de los SVG de acciones una sola vez, conservando18p
 Validación: library-dialog-polish-ui aprobado (código único, copia, acciones320–1366, edición y duplicados); product-editor-photo aprobado (carga, recorte, JPEG, reintento/reset); product-pack-fields-ui Chromium/WebKit aprobado en tres formularios, ambas manos320/390/1366. Comparación de medidas y propiedades calculadas antes/después en fixture de Biblioteca/editor/recorte, Chromium/WebKit,12 combinaciones por motor (tres anchos, dos manos, táctil/no táctil), sin diferencias. Diff limpio. Solo fixtures locales; no prueba de cámara física ni auditoría global.
 
 Reversión: restaurar css/library.css y css/product-crop.css de la revisión anterior y publicar caché superior; sin datos que revertir.
+
+
+## Entrega v3.04 — Cierre de limpieza en Stock y Moderación
+
+Retira declaraciones comprobablemente anuladas: posición relativa antigua de la barra del palet (sigue sticky), ancho anterior del total de mercadería y transición ya desactivada de su chevron; márgenes/tamaños anteriores de comparación, figuras y campos de reportes. Conserva flex de escritorio, grilla móvil, reglas finales, colores, tipografía, acciones y mano elegida. No altera filtros, cantidades, API, permisos ni datos. No se retiran reglas por simple coincidencia de selector ni funciones por supuesto desuso.
+
+Validación: stock-product-layout-ui Chromium/WebKit aprobado (unidades/cajas/bultos, móvil/PC y ambas manos); audit-records-ui aprobado (secciones/transacciones, detalles solo modal, permisos, scroll y geometría); moderation-stats-ui aprobado (resumen compacto, períodos, navegación y rechazo por rango). Comparación antes/después de geometría y propiedades CSS calculadas en fixture de barra/mercadería/comparación de reportes: Chromium/WebKit,12 combinaciones por motor,320/390/1366, ambas manos y puntero táctil/no táctil, sin diferencias. Diff limpio. Datos ficticios; no auditoría exhaustiva ni garantía de ausencia de errores en toda la app.
+
+Reversión: restaurar css/stock.css, css/inventory-goods.css y css/reports.css de la revisión anterior, publicar caché superior. Sin datos ni migraciones que revertir. Tanda de limpieza solicitada cerrada; no inventar nuevas etapas o fallos sin evidencia. Respaldo offline pospuesto, zoom descartado, acceso flotante aceptado y Listas/Integrantes separados se conservan.

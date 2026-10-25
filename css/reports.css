@@ -8,11 +8,11 @@
 .report-card h2 { font-size: 1rem; margin-bottom: 8px; }
 .report-card p, #reviewReportDetails p { overflow-wrap: anywhere; line-height: 1.5; margin: 8px 0; }
 .report-card button { margin-top: 8px; }
-.report-comparison { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin: 16px 0; }
+.report-comparison { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
 .report-comparison section { background: #f4f3f9; border-radius: 10px; padding: 12px; min-width: 0; }
-.report-comparison h3 { font-size: 1rem; color: #27187e; }
+.report-comparison h3 { color: #27187e; }
 .report-evidence { display: block; width: 100%; max-height: 420px; object-fit: contain; margin: 8px 0 16px; }
-#reviewReportDetails figure { margin: 16px 0; }
+
 .product-report-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; margin: 4px 0 4px 8px; border-radius: 10px; color: #62577e; background: #f1eef8; cursor: pointer; }
 .product-report-button:focus-visible { outline: 3px solid #8372d8; outline-offset: 3px; }
 .product-edit-dialog textarea { width: 100%; box-sizing: border-box; border: 1px solid #d8dce6; border-radius: 10px; padding: 12px; font: inherit; resize: vertical; }
@@ -49,7 +49,7 @@
 .report-current h3 { color: #526075; }
 .report-field { padding: 8px; margin-top: 6px; border-radius: 8px; }
 .report-field small { color: #626b7a; font-size: .75rem; }
-#reviewReportDetails .report-field p { margin: 3px 0 0; }
+
 .report-current .report-field-changed { background: #fff1df; border-left: 3px solid #c58932; }
 .report-proposed .report-field-changed { background: #e7f5ed; border-left: 3px solid #278450; }
 .report-proposed .report-field-changed small { color: #216b43; font-weight: 600; }
@@ -90,7 +90,7 @@
 .report-block-status:empty { display: none; }
 .report-comparison { gap: 8px; margin: 10px 0; }
 .report-comparison section { padding: 8px; }
-.report-comparison h3 { margin: 0 0 4px; font-size: .9rem; }
+.report-comparison h3 { margin: 0 0 4px; }
 .report-comparison > section > small { font-size: .72rem; }
 .report-field { padding: 5px 7px; margin-top: 3px; }
 #reviewReportDetails .report-field p { margin: 1px 0 0; font-size: .85rem; line-height: 1.3; }
@@ -101,7 +101,7 @@
 .report-ean-guide-numbers { position: absolute; left: 0; right: 0; bottom: -32px; color: #fff; text-shadow: 0 1px 3px #000; text-align: center; font-size: .75rem; }
 #reportCameraDialog[data-photo-kind="ean"] .report-camera-flash { top: 12px; transform: none; }
 #reviewReportDialog .library-heading h2 { font-size: 1.25rem; }
-.report-comparison h3 { font-size: 1rem; }
+
 #reviewReportDetails .report-field p { font-size: .95rem; }
 #reviewReportForm label { font-size: .95rem; }
 .report-card p { font-size: .9rem; }
