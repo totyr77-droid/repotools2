@@ -579,3 +579,14 @@ Retira declaraciones comprobablemente anuladas: posición relativa antigua de la
 Validación: stock-product-layout-ui Chromium/WebKit aprobado (unidades/cajas/bultos, móvil/PC y ambas manos); audit-records-ui aprobado (secciones/transacciones, detalles solo modal, permisos, scroll y geometría); moderation-stats-ui aprobado (resumen compacto, períodos, navegación y rechazo por rango). Comparación antes/después de geometría y propiedades CSS calculadas en fixture de barra/mercadería/comparación de reportes: Chromium/WebKit,12 combinaciones por motor,320/390/1366, ambas manos y puntero táctil/no táctil, sin diferencias. Diff limpio. Datos ficticios; no auditoría exhaustiva ni garantía de ausencia de errores en toda la app.
 
 Reversión: restaurar css/stock.css, css/inventory-goods.css y css/reports.css de la revisión anterior, publicar caché superior. Sin datos ni migraciones que revertir. Tanda de limpieza solicitada cerrada; no inventar nuevas etapas o fallos sin evidencia. Respaldo offline pospuesto, zoom descartado, acceso flotante aceptado y Listas/Integrantes separados se conservan.
+
+
+## Entrega v3.05 — URL de Inicio y scroll de edición en modales
+
+Inicio intentaba descomprimir cualquier query como lista compartida, incluyendo parámetros normales; ahora el lector legado exige payload Base64 completo con padding final válido. Parámetros con nombre (from/utm/view/check) se ignoran sin tocar la lista local. Conserva listas comprimidas anteriores, códigos entregados por servidor y error ante payload legado inválido. No cambia from del navegador/proveedor ni permisos de enlaces.
+
+Ajuste de viewport del modal movía el scroll hacia el campo enfocado también al recibir scroll del viewport o mutaciones de contenido. Ahora actualiza posición/altura sin forzar scroll en esos eventos; revela el campo solo al enfocarlo o cambiar tamaño/teclado. Acumula la intención de revelar si coinciden eventos en un frame, conserva cierre/confirmación de borradores/bloqueo de fondo y limpieza de navegación.
+
+Validación: shared-list-query comprueba parámetros normales, listas legadas/códigos de servidor y payload corrupto. dialog-edit-scroll-ui Chromium/WebKit simula viewport reducido por teclado: foco visible, scroll manual estable ante viewport.scroll y contenido asíncrono, resize revela campo y edición conserva valor. dialog-dirty-ui aprobado online/offline (X/fondo/Escape, mantener/salir, busy, restauración y valores). Sintaxis/diff aprobados. No se reprodujo teclado físico de iPhone; solicitar confirmación de ese dispositivo sin afirmar cobertura completa.
+
+Reversión: restaurar js/script.js y js/dialog-scroll.js de revisión anterior y publicar caché superior. Sin datos, permisos ni migraciones que revertir.

@@ -141,6 +141,9 @@ function limpiarLista(valores) {
 function cargarListaCompartida() {
   if(Array.isArray(window.repotoolsSharedCodes)){lista=limpiarLista(window.repotoolsSharedCodes);delete window.repotoolsSharedCodes;if(lista.length){esListaCompartida=true;guardarLista();abrirResultados();}return;}
   if (!urlActual.search || !window.LZString) return;
+  // Legacy links contain only a padded Base64 payload, not named URL parameters.
+  const payload=urlActual.search.substring(1);
+  if(payload.length<8||payload.length%4!==0||!/^[A-Za-z0-9+/]+={0,3}$/.test(payload))return;
 
   try {
     const comprimido = urlActual.search.substring(1);

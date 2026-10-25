@@ -1,6 +1,12 @@
 {
-  "version": 209,
+  "version": 210,
   "changes": [
+    {
+      "version": 210,
+      "label": "3.05",
+      "date": "2026-10-25",
+      "summary": "Corrige falsa alerta de enlace y saltos de scroll al editar modales"
+    },
     {
       "version": 209,
       "label": "3.04",
@@ -294,15 +300,9 @@
       "label": "2.56",
       "date": "2026-10-24",
       "summary": "Cajas junto a Unidades, resumen compacto y columnas ajustadas al contenido"
-    },
-    {
-      "version": 160,
-      "label": "2.55",
-      "date": "2026-10-24",
-      "summary": "Selección de comparación más cómoda, aviso de descarga y detalle limpio de UXB y fechas"
     }
   ],
   "major": 3,
-  "minor": 4,
-  "label": "3.04"
+  "minor": 5,
+  "label": "3.05"
 }
