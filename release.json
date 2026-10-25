@@ -1,6 +1,12 @@
 {
-  "version": 210,
+  "version": 211,
   "changes": [
+    {
+      "version": 211,
+      "label": "3.06",
+      "date": "2026-10-25",
+      "summary": "Refuerza el inicio y la recuperación del pitido QR y EAN"
+    },
     {
       "version": 210,
       "label": "3.05",
@@ -294,15 +300,9 @@
       "label": "2.57",
       "date": "2026-10-24",
       "summary": "Corrige campos superpuestos al ajustar mercadería en PC"
-    },
-    {
-      "version": 161,
-      "label": "2.56",
-      "date": "2026-10-24",
-      "summary": "Cajas junto a Unidades, resumen compacto y columnas ajustadas al contenido"
     }
   ],
   "major": 3,
-  "minor": 5,
-  "label": "3.05"
+  "minor": 6,
+  "label": "3.06"
 }

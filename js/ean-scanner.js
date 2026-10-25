@@ -90,13 +90,14 @@
   if (page) page.listen('pagehide', clearScanPhoto);
   else window.addEventListener?.('pagehide', clearScanPhoto);
 
-  let audioContext = null, audioPrimed = false;
+  let audioContext = window.RepoScannerAudioContext || null, audioPrimed = false;
   function prepareSound() {
     try {
-      if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient';
+      try { if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient'; } catch {}
       const Context = window.AudioContext || window.webkitAudioContext;
       if (!Context) return;
-      audioContext ??= new Context();
+      if (!audioContext || audioContext.state === 'closed') { audioContext = new Context(); window.RepoScannerAudioContext = audioContext; audioPrimed = false; }
+      if (audioContext.state !== 'running') audioPrimed = false;
       if (audioContext.state !== 'running') audioContext.resume().catch(() => {});
       if (!audioPrimed && audioContext.createBufferSource) {
         const source = audioContext.createBufferSource(); source.buffer = audioContext.createBuffer(1, 1, 22050);
@@ -113,6 +114,7 @@
       // the confirmed tone, then restore the previous mixing policy.
       const session = window.navigator?.audioSession;
       if (session) {
+        try {
         const previous = session.type;
         let restored = false;
         session.type = 'playback';
@@ -120,8 +122,13 @@
           if (restored) return; restored = true;
           try { if (session.type === 'playback') session.type = previous; } catch {}
         };
+        } catch {}
       }
-      if (audioContext.state !== 'running') await audioContext.resume();
+      if (audioContext.state !== 'running') {
+        let timer;
+        try { await Promise.race([audioContext.resume(),new Promise(resolve=>{timer=setTimeout(resolve,200);})]); }
+        finally { clearTimeout(timer); }
+      }
       if (audioContext.state !== 'running') return;
       const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
       oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1600, now);
@@ -753,7 +760,7 @@ function palletNumberRegion(image){
           }
           enqueue(async () => {
             if(token!==revision)return;
-            metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR&&validEAN(code))rememberScanPhoto(code,element); await release(current);
+            metric(current,'feedback-request');await beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR&&validEAN(code))rememberScanPhoto(code,element); await release(current);
             if (token === revision) Promise.resolve().then(() => { if (token === revision) {metric(current,'action');return onCode(code);} }).then(()=>{if(current.actionStarted)metric(current,'action-complete');}).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };

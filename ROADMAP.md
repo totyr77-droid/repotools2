@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v3.05. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v3.06. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -84,3 +84,5 @@ Limpieza v3.03: iconos de Biblioteca y reglas antiguas del recorte de fotos revi
 Tanda de limpieza cerrada en v3.04 con Stock/mercadería y comparación de Moderación. Verificación funcional y de equivalencia CSS aprobada; no quedan desarrollos comprometidos de esta revisión. Continuar mantenimiento solo ante evidencia o nuevas prioridades, sin prometer app libre de errores.
 
 Incidencias de capturas corregidas en v3.05: parámetros normales de Inicio no se leen como lista y modal no fuerza scroll por viewport.scroll/mutaciones durante edición. Regresiones locales aprobadas; comportamiento de teclado físico iPhone pendiente de confirmación del usuario.
+
+Pitido QR/EAN reforzado en v3.06: contexto compartido/recreación, errores de audioSession aislados y programación previa al cierre con espera limitada. Regresiones simuladas aprobadas; audición en iPhone pendiente de confirmación.

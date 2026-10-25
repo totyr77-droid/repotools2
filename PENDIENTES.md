@@ -590,3 +590,14 @@ Ajuste de viewport del modal movía el scroll hacia el campo enfocado también a
 Validación: shared-list-query comprueba parámetros normales, listas legadas/códigos de servidor y payload corrupto. dialog-edit-scroll-ui Chromium/WebKit simula viewport reducido por teclado: foco visible, scroll manual estable ante viewport.scroll y contenido asíncrono, resize revela campo y edición conserva valor. dialog-dirty-ui aprobado online/offline (X/fondo/Escape, mantener/salir, busy, restauración y valores). Sintaxis/diff aprobados. No se reprodujo teclado físico de iPhone; solicitar confirmación de ese dispositivo sin afirmar cobertura completa.
 
 Reversión: restaurar js/script.js y js/dialog-scroll.js de revisión anterior y publicar caché superior. Sin datos, permisos ni migraciones que revertir.
+
+
+## Entrega v3.06 — Preparación y recuperación del pitido QR/EAN
+
+AudioContext del lector se reutiliza entre navegaciones internas, evitando acumular contextos. Al abrir con sonido activo recrea contexto cerrado y vuelve a preparar buffer silencioso si estaba suspendido/interrumpido, siempre desde el arranque existente en el gesto. Fallar al configurar audioSession ambient/playback ya no cancela la preparación o el pitido. Conserva política de playback solo durante tono confirmado y restauración, volumen/timbre y preferencias independientes.
+
+En lectura que cierra cámara espera a que beep termine de programar, con reanudación limitada200ms, antes de liberar cámara/entregar código. Reanudación rechazada o colgada no bloquea lectura; timeout no reproduce tono tardío. Modo continuo conserva entrega sin espera. No cambia detección, QR/EAN, controles ni permisos. Referencia de interrupciones de Safari: https://bugs.webkit.org/show_bug.cgi?id=273511 ; no atribuir todos los fallos reales a esa incidencia histórica.
+
+Validación: ean-scanner amplía regresiones para contexto cerrado/recreado, política de sesión que lanza error, reanudación demorada conservando cámara hasta tono, audio colgado200ms con código entregado y sin tono tardío. Conserva QR/EAN, normal/continuo y sonido/vibración activados/desactivados. scanner-lazy-ui Chromium/WebKit y scanner-frame aprobados; main-rapid-scanner aprobado. Audio simulado, no audición ni hardware iPhone; confirmar en dispositivo del usuario. Sintaxis/diff aprobados, sin datos reales.
+
+Reversión: restaurar js/ean-scanner.js anterior y publicar caché superior; pruebas/documentación pueden conservarse. No datos ni migraciones que revertir.
