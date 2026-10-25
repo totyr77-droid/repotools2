@@ -1,5 +1,5 @@
-const assert=require('node:assert/strict'),{chromium}=require('../tmp/ui-check/node_modules/playwright');
-(async()=>{const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});try{
+const assert=require('node:assert/strict'),{chromium,webkit}=require('../tmp/ui-check/node_modules/playwright');
+(async()=>{const browser=await (process.env.RT_BROWSER==='webkit'?webkit.launch({headless:true}):chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'}));try{
  const page=await browser.newPage();let calls=0,failBatch=2,revision=1;
  await page.route('http://localhost/**',async route=>{const url=new URL(route.request().url());if(!url.searchParams.has('offline_codes'))return route.fulfill({contentType:'text/html',body:'<main><div id="stockOverview"></div></main>'});calls++;if(calls===failBatch)return route.fulfill({status:503,body:'{}'});const pallets=url.searchParams.get('offline_codes').split(',').map(code=>({id:Number(code)-10000000+1,code,revision,available:false,products:[{id:1,pallet_id:Number(code)-10000000+1,ean:'96385074',units:84,revision:1}]}));return route.fulfill({contentType:'application/json',body:JSON.stringify({user_id:1,pallets})});});
  await page.goto('http://localhost/');await page.evaluate(()=>{window.repotoolsOfflineUser=1;window.RepoOfflinePreparation=Promise.resolve(true);});
@@ -7,7 +7,14 @@ const assert=require('node:assert/strict'),{chromium}=require('../tmp/ui-check/n
  for(const file of ['stock-offline','offline-cache','stock-preparation'])await page.addScriptTag({path:'js/'+file+'.js'});
  assert.equal(await page.evaluate(async()=> (await RepoStockOffline(2).list()).length),1,'Upgrade preserves existing queue');
  const manifest=Array.from({length:12},(_,i)=>({id:i+1,code:String(10000000+i),revision:1}));
- await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest,warning_days:30});
+ // An open form and a pending write each prevent new background requests.
+ await page.evaluate(data=>{const dialog=document.createElement('dialog');dialog.id='foreground';document.body.append(dialog);dialog.showModal();window.preparing=RepoStockPreparation.prepare(data);},{pallets:manifest,warning_days:30});
+ await page.waitForTimeout(650);assert.equal(calls,0,'No background request while editing');
+ await page.evaluate(()=>{window.syncBusy=true;window.RepoOfflineSync={busy:()=>syncBusy};document.getElementById('foreground').close();});
+ await page.waitForTimeout(650);assert.equal(calls,0,'Queued writes have priority');
+ await page.evaluate(()=>{window.syncBusy=false;window.dispatchEvent(new Event('input'));});
+ await page.waitForTimeout(200);assert.equal(calls,0,'Recent interaction yields foreground time');
+ await page.evaluate(()=>window.preparing);
  assert.equal(calls,2);assert.equal(await page.evaluate(async()=> (await RepoOfflineStorage.getView(1,'stock')).data.offline_preparation.complete),false);
  failBatch=0;await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest,warning_days:30});assert.equal(calls,4,'Resume only missing seven pallets');
  assert.equal(await page.evaluate(async()=> (await RepoOfflineStorage.getView(1,'stock')).data.offline_preparation.ready),12);
@@ -17,5 +24,9 @@ const assert=require('node:assert/strict'),{chromium}=require('../tmp/ui-check/n
  await page.evaluate(data=>RepoStockPreparation.prepare(data),{pallets:manifest.slice(0,11),warning_days:30});
  assert.equal(await page.evaluate(async()=>!!await RepoStockOffline(1).cached('10000011')),false);assert.equal(await page.evaluate(async()=> (await RepoStockOffline(1).list()).length),1);
  await page.evaluate(()=>RepoOfflineStorage.clearPrivate(1));assert.equal(await page.evaluate(async()=> (await RepoStockOffline(1).list()).length),1);assert.equal(await page.evaluate(async()=>!!await RepoOfflineStorage.getView(1,'stock')),false);
- console.log('OK: whole authorized manifest, five-pallet batches, interrupted preparation/resume, revisions, revoked read cache and pending preservation.');
+ const beforeLeave=calls;
+ await page.evaluate(data=>{document.getElementById('foreground').showModal();window.preparing=RepoStockPreparation.prepare(data);},{pallets:manifest,warning_days:30});
+ await page.waitForTimeout(250);await page.evaluate(()=>window.dispatchEvent(new Event('pagehide')));
+ await page.evaluate(()=>window.preparing);assert.equal(calls,beforeLeave,'Leaving cancels a paused preparation without a late request');
+ console.log('OK: foreground/modal/sync priority, cancellation, whole authorized manifest, five-pallet batches, interrupted preparation/resume, revisions, revoked read cache and pending preservation.');
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

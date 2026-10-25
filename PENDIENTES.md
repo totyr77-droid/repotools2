@@ -541,3 +541,14 @@ Validación: stock-progressive-ui Chromium/WebKit (32/64, filtro de último pale
 Ajustes de fixtures: formatos de lector explícitos en mock de cámara; elección sin sucursal cercana para probar asignación manual; introducción marcada vista/loader finalizado y espaciador sin contracción para medir scroll; importScripts simulado y validado en prueba SW centrada en offline. No cambian funciones de negocio.
 
 Reversión: revertir JS/listado/lectores y plantillas de esta entrega y publicar caché superior. Sin migraciones ni datos que revertir; para restaurar arranque eager reponer ambos script tags. No borrar copia offline ni operaciones pendientes. Acceso flotante aceptado, mano del usuario, zoom descartado y listas/integrantes separados se conservan.
+
+
+## Entrega v3.01 — Preparación offline con prioridad de uso
+
+La copia de lectura de Stock cede entre lotes mientras hay modal abierto (detalle/formulario/cámara), sincronización Stock/Biblioteca, pestaña oculta o interacción reciente. Verifica cada200ms, con400ms de margen tras interacción; no interrumpe el lote de lectura ya iniciado. Revisa caché por tramos32 para ceder el hilo y conserva lotes de red5. Cancelar/navegar aborta también las esperas, sin peticiones tardías. El trabajo retoma al quedar libre la pantalla. Sin nuevos controles, mensajes ni cambios visuales.
+
+Reduce guardados del manifiesto de progreso a un máximo aproximado cada2s, forzando inicio, final y error. Los detalles de cada palet siguen guardándose al recibirlos; solo se agrupa la escritura del contador. Conserva fuente completa, comprobaciones de identidad/revisión/permisos y reconciliación de lecturas revocadas; nunca borra cargas pendientes. No es el respaldo/exportación pospuesto.
+
+Validación: stock-preparation Chromium/WebKit con prioridad de modal/sincronización/interacción, reanudación, lotes/revisiones, revocación sin perder cola; Chromium incluye cancelación por salida. offline-start aprobado (entrada offline desde cero, búsqueda/vencimientos/Biblioteca, sincronización8x5 y privacidad). service-worker-offline y sintaxis/diff aprobados. Datos ficticios; sin medición nueva de velocidad ni prueba física.
+
+Reversión: revertir js/stock-preparation.js y publicar contador de caché superior; tests/documentación pueden conservarse. Sin migraciones ni datos que revertir.

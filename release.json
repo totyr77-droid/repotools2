@@ -1,6 +1,12 @@
 {
-  "version": 205,
+  "version": 206,
   "changes": [
+    {
+      "version": 206,
+      "label": "3.01",
+      "date": "2026-10-25",
+      "summary": "Prepara la copia offline sin competir con formularios y sincronización"
+    },
     {
       "version": 205,
       "label": "3.00",
@@ -294,15 +300,9 @@
       "label": "2.52",
       "date": "2026-10-23",
       "summary": "Locales por integrante y propuestas de catálogo desde Excel"
-    },
-    {
-      "version": 156,
-      "label": "2.51",
-      "date": "2026-10-23",
-      "summary": "Corregir carpeta personal del worker y clasificar errores de conexión"
     }
   ],
   "major": 3,
-  "minor": 0,
-  "label": "3.00"
+  "minor": 1,
+  "label": "3.01"
 }
