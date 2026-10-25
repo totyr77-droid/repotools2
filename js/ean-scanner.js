@@ -1,3 +1,68 @@
+// Application audio lifetime is independent from camera readers, modals and page modules.
+(() => {
+  'use strict';
+  if (window.RepoScanFeedback) return;
+  let audioContext = window.RepoScannerAudioContext || null, audioPrimed = false;
+  let playbackUsers=0, playbackPrevious, playbackSession;
+  function prepareSound() {
+    try {
+      try { if (!playbackUsers && window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient'; } catch {}
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      if (!audioContext || audioContext.state === 'closed') { audioContext = new Context(); window.RepoScannerAudioContext = audioContext; audioPrimed = false; }
+      if (audioContext.state !== 'running') audioPrimed = false;
+      if (audioContext.state !== 'running') audioContext.resume().catch(() => {});
+      if (!audioPrimed && audioContext.createBufferSource) {
+        const source = audioContext.createBufferSource(); source.buffer = audioContext.createBuffer(1, 1, 22050);
+        source.connect(audioContext.destination); source.onended = () => source.disconnect(); source.start(0); audioPrimed = true;
+      }
+    } catch {}
+  }
+  async function beep(preferences = {}, onScheduled = () => {}) {
+    if (preferences.vibration !== false) { try { window.navigator?.vibrate?.(60); } catch {} }
+    if (preferences.sound === false || !audioContext) return;
+    let restoreSession = () => {}, scheduled = false;
+    try {
+      // Ambient obeys the iPhone Silent switch. Request playback only for
+      // the confirmed tone, then restore the previous mixing policy.
+      const session = window.navigator?.audioSession;
+      if (session) {
+        try {
+          if (!playbackUsers) {
+            playbackPrevious = session.type; session.type = 'playback'; playbackSession = session;
+          }
+          playbackUsers++;
+          let restored = false;
+          restoreSession = () => {
+            if (restored) return; restored = true;
+            if (--playbackUsers === 0) {
+              try { if (playbackSession?.type === 'playback') playbackSession.type = playbackPrevious; } catch {}
+              playbackSession = null;
+            }
+          };
+        } catch {}
+      }
+      if (audioContext.state !== 'running') {
+        let timer;
+        try { await Promise.race([audioContext.resume(),new Promise(resolve=>{timer=setTimeout(resolve,200);})]); }
+        finally { clearTimeout(timer); }
+      }
+      if (audioContext.state !== 'running') return;
+      const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
+      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1600, now);
+      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.72, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
+      oscillator.connect(gain); gain.connect(audioContext.destination);
+      const restore = restoreSession;
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
+      oscillator.start(now); onScheduled(); oscillator.stop(now + .15);
+      scheduled = true;
+      // Release the exclusive policy even if iOS interrupts before onended.
+      setTimeout(restore, 500);
+    } catch {} finally { if (!scheduled) restoreSession(); }
+  }
+  window.RepoScanFeedback = { prepare: prepareSound, confirm: beep };
+})();
+
 (() => {
   'use strict';
   const page = window.RepoNavigation?.page;
@@ -90,58 +155,8 @@
   if (page) page.listen('pagehide', clearScanPhoto);
   else window.addEventListener?.('pagehide', clearScanPhoto);
 
-  let audioContext = window.RepoScannerAudioContext || null, audioPrimed = false;
-  function prepareSound() {
-    try {
-      try { if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient'; } catch {}
-      const Context = window.AudioContext || window.webkitAudioContext;
-      if (!Context) return;
-      if (!audioContext || audioContext.state === 'closed') { audioContext = new Context(); window.RepoScannerAudioContext = audioContext; audioPrimed = false; }
-      if (audioContext.state !== 'running') audioPrimed = false;
-      if (audioContext.state !== 'running') audioContext.resume().catch(() => {});
-      if (!audioPrimed && audioContext.createBufferSource) {
-        const source = audioContext.createBufferSource(); source.buffer = audioContext.createBuffer(1, 1, 22050);
-        source.connect(audioContext.destination); source.onended = () => source.disconnect(); source.start(0); audioPrimed = true;
-      }
-    } catch {}
-  }
-  async function beep(preferences = {}, onScheduled = () => {}) {
-    if (preferences.vibration !== false) { try { window.navigator?.vibrate?.(60); } catch {} }
-    if (preferences.sound === false || !audioContext) return;
-    let restoreSession = () => {}, scheduled = false;
-    try {
-      // Ambient obeys the iPhone Silent switch. Request playback only for
-      // the confirmed tone, then restore the previous mixing policy.
-      const session = window.navigator?.audioSession;
-      if (session) {
-        try {
-        const previous = session.type;
-        let restored = false;
-        session.type = 'playback';
-        restoreSession = () => {
-          if (restored) return; restored = true;
-          try { if (session.type === 'playback') session.type = previous; } catch {}
-        };
-        } catch {}
-      }
-      if (audioContext.state !== 'running') {
-        let timer;
-        try { await Promise.race([audioContext.resume(),new Promise(resolve=>{timer=setTimeout(resolve,200);})]); }
-        finally { clearTimeout(timer); }
-      }
-      if (audioContext.state !== 'running') return;
-      const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
-      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1600, now);
-      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.72, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
-      oscillator.connect(gain); gain.connect(audioContext.destination);
-      const restore = restoreSession;
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
-      oscillator.start(now); onScheduled(); oscillator.stop(now + .15);
-      scheduled = true;
-      // Release the exclusive policy even if iOS interrupts before onended.
-      setTimeout(restore, 500);
-    } catch {} finally { if (!scheduled) restoreSession(); }
-  }
+  const prepareSound = window.RepoScanFeedback.prepare;
+  const beep = window.RepoScanFeedback.confirm;
   function visibleFrame(video) {
     const width = video.videoWidth, height = video.videoHeight;
     const ratio = video.clientWidth && video.clientHeight ? video.clientWidth / video.clientHeight : width / height;

@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v3.06. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v3.07. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -86,3 +86,5 @@ Tanda de limpieza cerrada en v3.04 con Stock/mercadería y comparación de Moder
 Incidencias de capturas corregidas en v3.05: parámetros normales de Inicio no se leen como lista y modal no fuerza scroll por viewport.scroll/mutaciones durante edición. Regresiones locales aprobadas; comportamiento de teclado físico iPhone pendiente de confirmación del usuario.
 
 Pitido QR/EAN reforzado en v3.06: contexto compartido/recreación, errores de audioSession aislados y programación previa al cierre con espera limitada. Regresiones simuladas aprobadas; audición en iPhone pendiente de confirmación.
+
+Sonido global independiente de cámara/modal implementado en v3.07 y probado por regresiones. Publicación pública sin confirmar por502 del servidor, iniciado en comprobación v3.06; requiere revisar logs del servicio si persiste. No afirmar versión pública disponible.

@@ -601,3 +601,16 @@ En lectura que cierra cámara espera a que beep termine de programar, con reanud
 Validación: ean-scanner amplía regresiones para contexto cerrado/recreado, política de sesión que lanza error, reanudación demorada conservando cámara hasta tono, audio colgado200ms con código entregado y sin tono tardío. Conserva QR/EAN, normal/continuo y sonido/vibración activados/desactivados. scanner-lazy-ui Chromium/WebKit y scanner-frame aprobados; main-rapid-scanner aprobado. Audio simulado, no audición ni hardware iPhone; confirmar en dispositivo del usuario. Sintaxis/diff aprobados, sin datos reales.
 
 Reversión: restaurar js/ean-scanner.js anterior y publicar caché superior; pruebas/documentación pueden conservarse. No datos ni migraciones que revertir.
+
+
+## Entrega v3.07 — Pitido con ciclo de vida global
+
+Extrae preparación y confirmación a un servicio singleton RepoScanFeedback de aplicación, definido fuera del módulo/página del lector y sin referencia a DOM, cámara o modal. Reejecutar el adaptador por navegación conserva servicio, contexto, fuentes activas y temporizadores; cerrar/detener cámara no los destruye. El lector invoca prepare/confirm; mantiene la espera limitada anterior para programar el tono, no su duración. No se agrega elemento de audio a ningún div ni dependencia.
+
+Contabiliza tonos activos para que preparar otro lector no fuerce ambient mientras suena un pitido ni finalice playback al terminar el primero si queda otro. Restaura política anterior al terminar el último, con fallback existente500ms. Conserva tono, preferencias y recuperación de v3.06. El sistema operativo/volumen/interrupciones externas todavía pueden impedir audio: no prometer nunca se cancela ni audición garantizada.
+
+Validación: scan-feedback comprueba servicio sin documento/cámara, tono activo conservado al reejecutar módulo, contexto único, reapertura que no cambia playback, tonos superpuestos y restauración final, preferencias. ean-scanner, main-rapid-scanner y scanner-lazy-ui Chromium/WebKit aprobados. Sintaxis/diff limpios. Audio simulado, sin prueba física iPhone.
+
+Publicación: envío a main; el endpoint público continúa respondiendo502 desde la verificación de v3.06. No confirmar despliegue hasta obtener versión correspondiente; falta acceso a logs del servicio para diagnosticar el502. Sin evidencia de que el cambio JS cause fallo del servidor.
+
+Reversión: restaurar js/ean-scanner.js anterior y publicar caché superior; no datos ni migraciones.

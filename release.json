@@ -1,6 +1,12 @@
 {
-  "version": 211,
+  "version": 212,
   "changes": [
+    {
+      "version": 212,
+      "label": "3.07",
+      "date": "2026-10-25",
+      "summary": "Separa el pitido del ciclo de cámara y modales"
+    },
     {
       "version": 211,
       "label": "3.06",
@@ -294,15 +300,9 @@
       "label": "2.58",
       "date": "2026-10-24",
       "summary": "Comparación con selectores en modales, sucursales automáticas y encabezados Excel destacados"
-    },
-    {
-      "version": 162,
-      "label": "2.57",
-      "date": "2026-10-24",
-      "summary": "Corrige campos superpuestos al ajustar mercadería en PC"
     }
   ],
   "major": 3,
-  "minor": 6,
-  "label": "3.06"
+  "minor": 7,
+  "label": "3.07"
 }
