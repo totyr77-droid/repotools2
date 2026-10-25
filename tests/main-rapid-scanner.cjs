@@ -7,6 +7,7 @@ browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Ap
 await context.route('https://**/*',r=>r.fulfill({body:''}));await context.addInitScript(()=>{localStorage.setItem('lista','[]');localStorage.setItem('repotools_onboarding_seen_guest','true');localStorage.setItem('repotools_onboarding_version_guest','1');});
 await context.route('**/api/productos.php?**',async r=>{const code=new URL(r.request().url()).searchParams.get('ean');if(code===ean(1))await new Promise(resolve=>setTimeout(resolve,1400));await r.fulfill({json:{product:code===ean(5)?null:{brand:'Demo',name:'Producto '+code.slice(-4),quantity:'1 L'},can_edit:false}})});
 const p=await context.newPage();await p.goto(base+'/index.php');await p.waitForFunction(()=>window.RepoEANScanner&&!document.documentElement.classList.contains('is-loading'));await p.evaluate(()=>{
+window.Html5QrcodeSupportedFormats={EAN_13:9,EAN_8:10,QR_CODE:0};
 window.camera={starts:0,stops:0,clears:0};window.readers=[];
 window.Html5Qrcode=class{constructor(id){this.id=id;this.isScanning=false;readers.push(this)}async start(_,__,success){this.success=success;this.isScanning=true;camera.starts++;document.getElementById(this.id).innerHTML='<video style="width:100%;height:240px;background:#17132c"></video>';}async stop(){camera.stops++;this.isScanning=false}clear(){camera.clears++;document.getElementById(this.id).replaceChildren()}};
 });

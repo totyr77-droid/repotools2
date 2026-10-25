@@ -24,7 +24,7 @@
 <?php include __DIR__ . '/product-editor.vista.php'; ?>
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
-<!-- SCRIPTS -->
+<!-- SCRIPTS: los motores de cámara se cargan al abrir el lector (ean-scanner.js). -->
 
 <script src="js/navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/navigation.js'),0,12) ?>"></script>
 <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?>
@@ -48,10 +48,8 @@
 <script src="js/action-notices.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php $referralNotice=$_SESSION['referral_registration_notice']??null;if($referralNotice&&current_user()&&(int)$referralNotice['user_id']===(int)current_user()['id']){unset($_SESSION['referral_registration_notice']);if((int)$referralNotice['at']>time()-900): ?><script>window.RepoToast?.(<?= json_encode($referralNotice['message'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>,{kind:'info'});</script><?php endif;} ?>
 <?php if (!empty($paginaBiblioteca)): ?>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -59,35 +57,28 @@
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-management.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/audit-records.js?v=<?= substr(sha1_file(__DIR__.'/../js/audit-records.js'),0,12) ?>"></script>
 <script src="js/reports-page.js?v=<?= substr(sha1_file(__DIR__.'/../js/reports-page.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaSupervision)): ?>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaGestionEmpresas)): ?>
 <!-- Gestión administrativa: sin lector ni formularios de mercadería. -->
 <?php elseif (!empty($paginaEquipo)): ?>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/qrcode.min.js"></script>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <?php include __DIR__.'/stock-scripts.vista.php'; ?>
 <?php elseif (empty($paginaCuenta)): ?>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/vendor/lz-string-1.4.4.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/script.js?v=<?= substr(sha1_file(__DIR__.'/../js/script.js'),0,12) ?>"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php endif; ?>

@@ -54,9 +54,9 @@ SQL compatible en estructura con ambos controladores; pruebas funcionales ejecut
 
 Ninguna de las tres pantallas desbordó horizontalmente a 390 px; sin errores JavaScript. Los tiempos de pantalla incluyen descarga de recursos, scripts y contenido; no deben confundirse con tiempo SQL o de API. Variaciones entre corridas son esperables.
 
-## Próxima oportunidad, sin cambio aplicado
+## Oportunidad detectada en v2.99 (implementada en v3.00 más abajo)
 
-La primera carga de Stock sigue creando aproximadamente 9.180 nodos con 1.000 palets y descarga muchos recursos compartidos en caché vacía. Estudiar renderizado progresivo y recursos por pantalla preservando búsqueda, filtros, copia offline, enlaces a palets y desplazamiento. Mi equipo y registros ya paginan 30/50 elementos. No introducir paginación de Stock ni cambiar el contrato offline sin cubrir esos recorridos.
+La primera carga de Stock sigue creando aproximadamente 9.180 nodos con 1.000 palets y descarga muchos recursos compartidos en caché vacía. Estudiar renderizado progresivo y recursos por pantalla preservando búsqueda, filtros, copia offline, enlaces a palets y desplazamiento. Mi equipo y registros ya paginan 30/50 elementos. En v3.00 se cubren esos recorridos y se recorta solo la representación, manteniendo el contrato completo de datos/offline.
 
 ## Limpieza de estilos y validación
 
@@ -69,3 +69,28 @@ Pruebas: stock-notifications (incluye cero UPDATE repetidos, lectura, transacci�
 ## Reversión
 
 Revertir los archivos de esta entrega y publicar una versión de caché superior. No requiere revertir datos ni migraciones. Los archivos de benchmark son independientes de la aplicación; pueden conservarse aunque se revierta una optimización.
+
+## v3.00 — Carga inicial por tramos y motores de cámara al usarlos
+
+Se aplica la oportunidad detectada en v2.99. No modifica consultas SQL ni contratos de autorización/datos. La respuesta de Stock y el manifiesto offline siguen completos; solo la representación visual es incremental.
+
+- Palets propios/compartidos: primer tramo de32, siguientes por proximidad al final o Ver más palets. Sucursal, etiqueta y orden se resuelven contra la fuente completa. Conserva el tramo cargado al recargar con iguales filtros; los enlaces a productos abren su modal sin montar tarjetas intermedias. Los observadores/fuentes se liberan al navegar. Etiquetas para imprimir conservan el flujo anterior.
+- Mapas por código/ID para sucursales y etiquetas; evita búsqueda lineal por cada tarjeta y no reconstruye la lista al tipear si su criterio/datos no cambiaron.
+- Motores de cámara de375.364 y156.608 bytes dejan de ejecutarse/descargarse como script de cada pantalla antes de usar un lector. Primario bajo demanda, auxiliar solo EAN; fallo permite reintento y cerrar responde sin esperar al motor. No arranca una cámara después de cerrar. Validación de EAN y flujo manual siguen disponibles desde el inicio.
+- Ambos motores y el helper nuevo permanecen preparados por el SW para offline. Su primera instalación puede descargar recursos en segundo plano y no está incluida en estas cifras. No se promete eliminar todo uso de red antes del primer escaneo.
+
+Corrida de referencia final, misma metodología/fixture que v2.99, una carga por pantalla/red (no mediana de renderizado):
+
+| Pantalla | v2.99 local | v3.00 local | v2.99 red lenta | v3.00 red lenta |
+|---|---:|---:|---:|---:|
+| Stock | 3,64 s | 1,43 s | 15,00 s | 9,71 s |
+| Mi equipo | 1,12 s | 1,01 s | 9,30 s | 6,63 s |
+| Registros | 3,36 s | 2,99 s | 11,03 s | 8,24 s |
+
+Stock propio de1.000 palets: nodos DOM9.180→1.866 (1.876 en la muestra lenta por estado de fondo), aproximadamente80% menos nodos iniciales; no es una medición de memoria. La API de Stock continúa entregando255.325 bytes de esta fixture: la ganancia es de representación/recursos, no de quitar inventario. Red lenta:150ms RTT,200.000 bytes/s de descarga, caché vacía. Sin desborde ni errores JS en el benchmark. Fuentes externas bloqueadas; cámara física, CPU móvil, SW inicial y PostgreSQL real no medidos.
+
+Nuevas pruebas reproducibles: `node tests/stock-progressive-ui.cjs` y `node tests/scanner-lazy-ui.cjs`; para WebKit usar RT_BROWSER=webkit y el directorio Playwright configurado. Comparten las restricciones de runtime local del benchmark. La primera comprueba manifiesto offline íntegro, palets fuera del primer tramo, orden/etiqueta/sucursal, compartidos, recarga, navegación y limpieza de actualizaciones tardías. La segunda usa cámara simulada y errores de descarga controlados; no acredita hardware.
+
+También aprobados: stock-tags/branches/export/offline, offline-start (arranque offline real, búsqueda y carga sincronizada), supervision, main-rapid-scanner, pruebas de EAN/planificación/encuadre, SW y navegación/scroll. Fixtures actualizadas para no depender de motores cargados eager, no autoasignar sucursal cercana durante una prueba manual y no contraer el espaciador de scroll de Inicio.
+
+Reversión: revertir los JS y las plantillas de la entrega, con caché superior. Mantener operaciones offline, datos y permisos; no hay migraciones. Estos resultados mejoran el escenario observado, no garantizan un tiempo fijo en producción ni una carga instantánea con conexión lenta.

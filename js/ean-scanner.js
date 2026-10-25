@@ -2,6 +2,21 @@
   'use strict';
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
+  // Camera engines are only needed after a user opens a reader; SW keeps them available offline.
+  const libraryLoads=window.RepoScannerLibraryLoads??=new Map();
+  function cameraLibrary(src,ready){
+    if(ready())return Promise.resolve();
+    if(libraryLoads.has(src))return libraryLoads.get(src);
+    const promise=new Promise((resolve,reject)=>{
+      const script=globalThis.document.createElement('script');script.src=new URL(src,globalThis.document.baseURI).href;
+      const finish=error=>{clearTimeout(timer);script.onload=script.onerror=null;if(error){script.remove();libraryLoads.delete(src);reject(error);}else resolve();};
+      const timer=setTimeout(()=>finish(Error('No pudimos cargar el lector. Volvé a intentar.')),15000);
+      script.onload=()=>finish(ready()?null:Error('No pudimos cargar el lector. Volvé a intentar.'));
+      script.onerror=()=>finish(Error('No pudimos cargar el lector. Revisá la conexión y volvé a intentar.'));
+      globalThis.document.head.append(script);
+    });
+    libraryLoads.set(src,promise);return promise;
+  }
   // One camera lease and viewport implementation for every recognition mode.
   let cameraQueue = Promise.resolve(), cameraOwner = null;const metricListeners=new Set();
   function cameraTask(task) { const next = cameraQueue.then(task); cameraQueue = next.catch(() => {}); return next; }
@@ -676,16 +691,18 @@ function palletNumberRegion(image){
       if (feedbackPreferences().sound !== false) prepareSound();
       const token = ++revision;
       if (session) session.accepting = false;
-      return enqueue(async () => {
+      const isQR = format === 'qr';
+      const ready=window.Html5Qrcode&&window.Html5QrcodeSupportedFormats?Promise.resolve():(onStatus('Preparando cámara…'),cameraLibrary('js/vendor/html5-qrcode-2.3.8.min.js',()=>Boolean(window.Html5Qrcode&&window.Html5QrcodeSupportedFormats)));
+      // Loading a shared engine must not keep Stop (or closing a modal) waiting for the network.
+      return ready.then(()=>enqueue(async () => {
         await cameraOwner?.release();
         await release(session);
         if (token !== revision) return false;
         if(statusArea&&statusArea.parentElement===element)element.before(statusArea);
         element.classList.remove('ean-confirmed');
         element.classList.remove('ean-detecting');
-        if (!window.Html5Qrcode || !window.Html5QrcodeSupportedFormats) throw new Error('No se pudo cargar el lector. Intenta nuevamente.');
+        if(!isQR)cameraLibrary('js/vendor/quagga-1.12.1.min.js',()=>Boolean(window.Quagga?.decodeSingle)).catch(()=>{});
         const formats = window.Html5QrcodeSupportedFormats;
-        const isQR = format === 'qr';
         const kind = typeof identification === 'function' ? identification() : identification;
         const normalize = isQR && kind === 'pallet' ? palletIdentifier : value => value;
         const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : code => validEAN(code)||Boolean(window.RepoTeamInvitation?.token(code));
@@ -775,7 +792,7 @@ function palletNumberRegion(image){
           if(statusArea)element.append(statusArea);
           throw error;
         }
-      });
+      })).catch(error=>{if(token!==revision)return false;throw error;});
     }
     page?.onLeave(stop);
     const originalCode=onCode;const normalCode=code=>window.RepoTeamInvitation?.token(code)?window.RepoTeamInvitation.open(code):originalCode(code);if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;

@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v2.99. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v3.00. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -17,7 +17,7 @@ Estas confirmaciones cubren lo probado por el usuario; no acreditan todos los mo
 
 1. Prueba expiry-alerts-ui.cjs corregida y aprobada en v2.99: las fechas estaban en la fixture; la expectativa visual no contemplaba urgent (hoy/<=7 días). No era un fallo del aviso.
 2. Mantener documentación de continuidad y prioridades al día, sin reabrir funciones implementadas.
-3. Medición grande completada en v2.99, correcciones de avisos/registros aplicadas. Ver docs/RENDIMIENTO-INVENTARIOS.md. Próxima oportunidad: primera carga de recursos y renderizado progresivo de Stock, preservando offline/filtros/enlaces; no ejecutado aún.
+3. Medición grande completada en v2.99, correcciones de avisos/registros aplicadas. Ver docs/RENDIMIENTO-INVENTARIOS.md. Implementado en v3.00: renderizado por tramos sobre fuente completa y motores de cámara bajo demanda; offline/filtros/enlaces verificados. Las cifras son locales y no incluyen la instalación inicial del SW.
 
 ## Mejora de rapidez push consultada
 
@@ -72,3 +72,5 @@ Nombres v2.97: Mi equipo = empresa supervisada; Mi sucursal = equipo de sucursal
 Moderación General v2.98: cuatro cifras y tres desgloses en modal; todas las métricas y accesos a registros conservados, sin repetir movimientos de stock.
 
 Estilos v2.99: consolidados buscador/toolbar, comparación, textarea y controles repetidos de Mi equipo, sin cambio visual comprobado en Chromium/WebKit. Limpieza restante gradual por componente, no tarea para reescribir todo el CSS.
+
+Carga inicial v3.00: Stock por tramos, filtros/orden sobre inventario completo y motores de cámara al usarlos; no queda como desarrollo pendiente. Mejora local comprobada con inventario grande/red lenta. No declarar instantaneidad ni rendimiento garantizado en dispositivos/producción no medidos.

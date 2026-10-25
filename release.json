@@ -1,6 +1,12 @@
 {
-  "version": 204,
+  "version": 205,
   "changes": [
+    {
+      "version": 205,
+      "label": "3.00",
+      "date": "2026-10-25",
+      "summary": "Carga Stock por tramos y prepara la cámara solo al abrirla"
+    },
     {
       "version": 204,
       "label": "2.99",
@@ -294,15 +300,9 @@
       "label": "2.51",
       "date": "2026-10-23",
       "summary": "Corregir carpeta personal del worker y clasificar errores de conexión"
-    },
-    {
-      "version": 155,
-      "label": "2.50",
-      "date": "2026-10-23",
-      "summary": "Conservar configuración del proceso de avisos y precisar fallos de conexión"
     }
   ],
-  "major": 2,
-  "minor": 99,
-  "label": "2.99"
+  "major": 3,
+  "minor": 0,
+  "label": "3.00"
 }
