@@ -552,3 +552,12 @@ Reduce guardados del manifiesto de progreso a un máximo aproximado cada2s, forz
 Validación: stock-preparation Chromium/WebKit con prioridad de modal/sincronización/interacción, reanudación, lotes/revisiones, revocación sin perder cola; Chromium incluye cancelación por salida. offline-start aprobado (entrada offline desde cero, búsqueda/vencimientos/Biblioteca, sincronización8x5 y privacidad). service-worker-offline y sintaxis/diff aprobados. Datos ficticios; sin medición nueva de velocidad ni prueba física.
 
 Reversión: revertir js/stock-preparation.js y publicar contador de caché superior; tests/documentación pueden conservarse. Sin migraciones ni datos que revertir.
+
+
+## Entrega v3.02 — Limpieza gradual de estilos
+
+Retira declaraciones anuladas de tres hojas: Ajustes (encabezados repetidos y antigua grilla de dos columnas reemplazada por tres), notificaciones (display anterior y reglas repetidas del encabezado) y resumen de Stock (tamaños, espaciados y grilla móvil antiguos anulados por la fila compacta actual). Conserva reglas finales, especificidad necesaria, controles, colores, tipografía, mano elegida y estructura. No retira funciones ni hace una reescritura global del CSS.
+
+Validación: comparación local de geometría y propiedades calculadas antes/después en fixture de los tres componentes, Chromium/WebKit,12 combinaciones por motor (320/390/1366, ambas manos, puntero táctil/no táctil), sin diferencias. Animaciones desactivadas para comparar estados estables. settings-ui Chromium/WebKit, notification-presentation-ui y stock-overview PHP aprobados; captura de Ajustes revisada y diff limpio. Sin datos reales ni cambios de lógica/permisos. No representa auditoría completa de todas las pantallas ni medición de velocidad.
+
+Reversión: restaurar css/settings.css, css/notifications.css y css/stock-overview.css de la revisión anterior y publicar contador de caché superior. Sin datos que revertir. Próxima limpieza, si se continúa, siempre por componente con evidencia; no borrar reglas solo por parecer repetidas.

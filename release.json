@@ -1,6 +1,12 @@
 {
-  "version": 206,
+  "version": 207,
   "changes": [
+    {
+      "version": 207,
+      "label": "3.02",
+      "date": "2026-10-25",
+      "summary": "Limpia estilos repetidos de Ajustes, notificaciones y resumen de Stock"
+    },
     {
       "version": 206,
       "label": "3.01",
@@ -294,15 +300,9 @@
       "label": "2.53",
       "date": "2026-10-24",
       "summary": "Importación guiada con ejemplos, aportes en modal y sin puntos automáticos"
-    },
-    {
-      "version": 157,
-      "label": "2.52",
-      "date": "2026-10-23",
-      "summary": "Locales por integrante y propuestas de catálogo desde Excel"
     }
   ],
   "major": 3,
-  "minor": 1,
-  "label": "3.01"
+  "minor": 2,
+  "label": "3.02"
 }

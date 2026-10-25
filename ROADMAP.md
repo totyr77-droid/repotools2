@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v3.01. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 24/10/2026 contra v3.02. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
 
 ## Confirmado por el usuario
 
@@ -76,3 +76,5 @@ Estilos v2.99: consolidados buscador/toolbar, comparación, textarea y controles
 Carga inicial v3.00: Stock por tramos, filtros/orden sobre inventario completo y motores de cámara al usarlos; no queda como desarrollo pendiente. Mejora local comprobada con inventario grande/red lenta. No declarar instantaneidad ni rendimiento garantizado en dispositivos/producción no medidos.
 
 Preparación offline con prioridad de uso aplicada en v3.01: pausa entre lotes durante modales/sincronización/interacción/pestaña oculta y agrupa escrituras de progreso. Mantiene validaciones y cargas pendientes; no implementar respaldo pospuesto por esta mejora.
+
+Limpieza gradual v3.02: retiradas declaraciones anuladas de Ajustes, notificaciones y resumen de Stock, con comparación de estilos/medidas Chromium/WebKit. El resto se revisa por componente; no declarar limpieza global terminada.
