@@ -676,3 +676,11 @@ Editor manager-only en Moderación → Sistema → Planes y límites. Migración
 Diagnóstico push corrige lectura de REPOTOOLS_PUSH_WORKER=0: PHP trataba el texto0 como vacío y mostraba enabled=true aunque el entrypoint ya respetaba desactivación. Solo cambia indicador, no envíos; push-health comprueba0 desactivado con worker manual sobre fixture sin envíos. Dependencias Composer bloqueadas copiadas localmente para pruebas, ignoradas por Git. No modificar configuración de producción.
 
 Usuario pide acordar beneficios/motivo de pago. Propuesta en docs/PLANES-COMERCIALES-PROPUESTA.md: consulta gratuita, Personal(usuario), Equipo(sucursal), Gestión(empresa), paquete mensual sin cobrar por escaneo y sin duplicar licencia individual dentro del equipo cubierto. Beneficios y transición de usuarios actuales aún por acordar; no es activación de planes ni autorización para bloquear funciones/cobrar.
+
+## Beta1.76 — Pro y preparación de suscripción de prueba
+
+Usuario acota primero Free/Pro, sucursal/empresa después. Pro orientado a transferir/compartir palets, gestionar accesos y compartir stock; cupos finales en discusión. Se actualiza propuesta. Solicita etiquetas PRO junto a acciones existentes sin romperlas: configuración del palet y compartir stock, mismas acciones/permisos.
+
+Migración47 aditiva, adaptador/API/entrada Mi suscripción solo manager, renovación mediante cuotas verificadas y cancelación confirmada conservando período pagado. Exclusivamente prueba, deshabilitada: sin aplicación/secretos del proveedor ni importe acordado. Producción intacta, sin cobros reales ni restricciones. La prueba integrada con Mercado Pago requiere que el usuario cree la aplicación/cuentas de prueba. No afirmar renovación real probada. Guía, validación, límites y reversión en docs/MERCADO-PAGO-BETA.md.
+
+Validación: pro-subscriptions PHP y UI Chromium/WebKit aprobadas; commercial-plans-ui aprobado en ambos motores con esquema47, guardas beta aprobadas y sintaxis/diff sin errores. Corregida carga del escáner de Inicio en la nueva página Pro: su script requiere controles que esta página no contiene. Captura revisada de menú con PRO; botones conservan apertura de accesos. Pruebas con datos ficticios y transporte simulado, no acreditan integración con el proveedor.

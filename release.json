@@ -1,6 +1,18 @@
 {
-  "version": 79,
+  "version": 81,
   "changes": [
+    {
+      "version": 81,
+      "label": "1.76",
+      "date": "2026-10-25",
+      "summary": "Prepara Pro y pagos de prueba con diseño integrado"
+    },
+    {
+      "version": 80,
+      "label": "1.75",
+      "date": "2026-10-25",
+      "summary": "Prepara suscripción Pro de prueba y distintivos en palets"
+    },
     {
       "version": 79,
       "label": "1.74",
@@ -288,21 +300,9 @@
       "label": "1.27",
       "date": "2026-10-19",
       "summary": "Compactar sucursal y escaneo con acceso personal independiente"
-    },
-    {
-      "version": 31,
-      "label": "1.26",
-      "date": "2026-10-19",
-      "summary": "Ordenar encabezado y aviso del escáner de sucursal"
-    },
-    {
-      "version": 30,
-      "label": "1.25",
-      "date": "2026-10-19",
-      "summary": "Actualizar caché desde BETA conservando sesión y datos locales"
     }
   ],
   "major": 1,
-  "minor": 74,
-  "label": "1.74"
+  "minor": 76,
+  "label": "1.76"
 }

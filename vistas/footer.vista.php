@@ -72,7 +72,7 @@
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <?php include __DIR__.'/stock-scripts.vista.php'; ?>
-<?php elseif (empty($paginaCuenta)): ?>
+<?php elseif (empty($paginaCuenta) && empty($paginaPro)): ?>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/vendor/lz-string-1.4.4.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -124,5 +124,6 @@
 <?php include __DIR__.'/team-shortcut.vista.php'; ?>
 <?php if(current_user()&&empty($paginaCuenta)&&!support_active()): include __DIR__.'/push-notice.vista.php'; endif; ?>
 <?php if(!support_active()): ?><script src="js/push-settings.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(!empty($paginaPro)): ?><script src="js/pro-subscriptions.js?v=<?= substr(sha1_file(__DIR__.'/../js/pro-subscriptions.js'),0,12) ?>"></script><?php endif; ?>
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
 </html>

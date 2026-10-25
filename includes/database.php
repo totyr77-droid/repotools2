@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=46;
+const REPOTOOLS_SCHEMA_VERSION=47;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -374,6 +374,12 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE commercial_plans(scope TEXT PRIMARY KEY CHECK(scope IN ('user','branch','company')),name TEXT NOT NULL,max_users INTEGER CHECK(max_users>0),max_branches INTEGER CHECK(max_branches>0),max_pallets INTEGER CHECK(max_pallets>0),max_products INTEGER CHECK(max_products>0),revision INTEGER NOT NULL DEFAULT 1,updated_by {$ref} REFERENCES users(id),updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
             $db->exec("INSERT INTO commercial_plans(scope,name) VALUES('user','Usuario'),('branch','Sucursal'),('company','Empresa')");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(46)');
+        }
+        if(!isset($applied[47])){
+            $db->exec("CREATE TABLE pro_subscriptions(reference TEXT PRIMARY KEY,user_id {$ref} NOT NULL UNIQUE REFERENCES users(id),provider_id TEXT UNIQUE,status TEXT NOT NULL DEFAULT 'new',checkout_url TEXT NOT NULL DEFAULT '',amount_cents INTEGER NOT NULL CHECK(amount_cents>0),paid_until BIGINT NOT NULL DEFAULT 0,updated_at BIGINT NOT NULL DEFAULT 0)");
+            $db->exec("CREATE TABLE pro_payments(provider_id TEXT PRIMARY KEY,reference TEXT NOT NULL REFERENCES pro_subscriptions(reference),status TEXT NOT NULL,period_end BIGINT NOT NULL,updated_at BIGINT NOT NULL)");
+            $db->exec('CREATE INDEX pro_payments_reference ON pro_payments(reference,status,period_end)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(47)');
         }
         $db->commit();
     } catch (Throwable $error) {

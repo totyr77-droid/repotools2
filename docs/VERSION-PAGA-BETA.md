@@ -19,7 +19,7 @@ Los precios, cuotas concretas, cálculo de consumo, asignación de planes, activ
 
 ## Editor preparado en beta1.73
 
-Moderación → Sistema → Planes y límites, visible y permitido solo a managers. Tres configuraciones iniciales (Usuario/Sucursal/Empresa), nombre y límites opcionales de usuarios/sucursales según alcance, palets activos y productos distintos. Campo vacío significa sin límite definido. Todos los límites son borradores: guardarlos no cobra, asigna planes ni bloquea cargas o accesos. No hay integración de pasarela ni suscripciones.
+Moderación → Sistema → Planes y límites, visible y permitido solo a managers. Tres configuraciones iniciales (Usuario/Sucursal/Empresa), nombre y límites opcionales de usuarios/sucursales según alcance, palets activos y productos distintos. Campo vacío significa sin límite definido. Todos los límites son borradores: guardarlos no cobra, asigna planes ni bloquea cargas o accesos. En esa entrega todavía no había integración de pasarela ni suscripciones. La preparación privada posterior está en MERCADO-PAGO-BETA.md; continúa sin cobros reales ni aplicación de restricciones.
 
 Migración46 aditiva con commercial_plans y configuraciones sin cuotas predeterminadas. API valida rol actual en servidor, CSRF, rangos/alcance y revisión optimista; registra antes/después en auditoría dentro de la transacción. UI conserva valores ante error y pide confirmación para cambiar de alcance con cambios sin guardar. Sin caché API ni nuevas dependencias. Reutiliza modal, SVG, alertas y campos existentes.
 

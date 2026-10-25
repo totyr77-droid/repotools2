@@ -1,26 +1,19 @@
-# Beneficios y motivo de pago — propuesta para acordar
+# Free y Pro — acuerdo en preparación
 
-Conversación del25/10/2026. Se prepara en beta; no activa precios, cobros, asignaciones ni bloqueos. Usuario pidió definir qué tendría cada opción y por qué pagarían. Los alcances Usuario/Sucursal/Empresa están confirmados; esta distribución concreta de beneficios todavía es una propuesta.
+Actualizado25/10/2026. Alcance actual: cuenta registrada Free y Pro. Sucursal y Empresa se definirán después; no confundir Pro con permisos de supervisión, sucursal o moderación.
 
-| Opción | Para quién | Qué ofrecería | Motivo de pago |
-| --- | --- | --- | --- |
-| Consulta gratuita | Quien necesita identificar un producto | Escanear/consultar catálogo, lista personal y aportar correcciones | Permite conocer RepoTools y aportar al catálogo; no requiere suscripción de gestión |
-| Personal — usuario | Repositor que administra su propio stock | Palets, lotes/unidades/cajas/bultos, vencimientos, movimientos propios, exportación y offline ya disponible | Mantener inventario ordenado y reducir trabajo manual de seguimiento |
-| Equipo — sucursal | Responsable y equipo de un local | Gestión de stock del local con integrantes, roles, acceso autorizado y movimientos registrados; funciones personales necesarias para trabajar allí | Coordinar personas, conocer movimientos y evitar registros dispersos |
-| Gestión — empresa | Organización con varios locales/equipos | Visión de sus sucursales/equipos autorizados, supervisores, filtros/alcances y comparación/exportación consolidada; capacidades de sucursal incluidas | Supervisar varios locales sin consolidar información manualmente |
+## Pro
 
-## Reglas propuestas
+Beneficios conversados: transferir la propiedad de palets, compartir palets, gestionar sus accesos y compartir stock. El propietario contrataría Pro; el invitado podría participar con Free respetando permisos y consentimiento actuales. Historial del trabajo compartido propuesto como acompañamiento. Selecciones avanzadas y accesos temporales siguen pendientes, no anunciarlos como disponibles.
 
-- Abono mensual por paquete con límites claros de usuarios/locales/palets/productos, sin cobrar cada escaneo ni consulta.
-- Sucursal cubre a sus integrantes dentro del local contratado; empresa cubre a sus usuarios dentro de los equipos contratados. No cobrar además un plan individual por ese mismo trabajo. Uso personal fuera del alcance requiere definir cobertura.
-- Permisos existentes y consentimiento se mantienen. Contratar no otorga rangos internos de moderación/manager ni acceso a cuentas o stock ajenos.
-- Seguridad de cuentas, privacidad e integridad de datos no son extras premium. Definir acceso de consulta/exportación y conservación tras finalizar un plan antes de aplicar restricciones; no borrar stock por vencimiento de suscripción.
-- Las funciones implementadas se enumeran como base; empaquetarlas comercialmente requiere reglas de cobertura y pruebas nuevas. Ubicaciones internas, filtros guardados y otras mejoras anotadas siguen pendientes; no ofrecerlas como disponibles.
+El usuario pidió etiquetas PRO discretas en los botones correspondientes, por ejemplo al configurar un palet. Se agregan a transferir/compartir/gestionar accesos y al acceso de compartir stock. No alteran eventos, permisos ni bloquean funciones en esta preparación. Antes de aplicar privilegios distinguir transferencia de propiedad de un palet de movimiento de mercadería entre palets, y compartir QR de la etiqueta de conceder acceso: hoy son recorridos relacionados pero no equivalentes.
 
-## Por definir
+## Capacidad
 
-Aceptar/ajustar beneficios; cuotas concretas; precio/moneda/período; cobertura entre stock personal y empresa; definición de empresa y sus equipos; cambios/bajas/prueba gratuita; descuentos por cantidad. No modificar usuarios actuales ni condiciones de producción sin decidir transición y comunicarla.
+Se conversaron50 palets,200 EAN distintos,2 listas y5 productos por lista para Free, y capacidad ilimitada en Pro. Luego el usuario planteó limitar acciones en lugar de capacidad. Queda por cerrar esa combinación; no aplicar las cifras ni ilimitados como condiciones definitivas. Comparación/exportación conservan permisos del contexto de supervisión/sucursal, no se conceden por Pro.
 
-## Relación con lo ya preparado
+## Suscripción
 
-Moderación → Sistema → Planes y límites guarda tres configuraciones por alcance. No es todavía un catálogo público de niveles Gratis/Personal/Equipo/Gestión ni calcula consumo, asigna cobertura o aplica restricciones. La consulta gratuita propuesta sería la entrada al producto, no un cuarto alcance de facturación. Definir estos acuerdos antes de extender el modelo de suscripción.
+Usuario autorizó preparar Mercado Pago y renovación mensual automática en beta. Todavía no creó la aplicación del proveedor. La integración de esta entrega es privada para managers y solo admite pruebas; cobro desactivado por defecto. No hay precio comercial acordado ni plazo de gracia. Ver MERCADO-PAGO-BETA.md.
+
+Antes de comercializar: confirmar beneficios/cupos, precio, condiciones y transición de usuarios actuales. No eliminar stock por baja; seguridad, privacidad y permisos siguen vigentes para todas las cuentas. Las funciones pendientes no se anuncian como implementadas.
