@@ -1,6 +1,6 @@
 # Continuidad de RepoTools
 
-Actualizado: 24/10/2026. Entrega de código actual: **v2.98 / interna203**. Ver últimas entregas al final y estado vigente en ROADMAP.md; las notas históricas conservan sus comprobaciones de cada momento.
+Actualizado: 25/10/2026. Ver entrega de código en release.json y últimas entregas al final; estado vigente en ROADMAP.md. Las notas históricas conservan sus comprobaciones de cada momento.
 
 ## Trabajo actual
 
@@ -10,7 +10,7 @@ Pruebas indicadas de Excel/API, escáner e impresión confirmadas por el usuario
 
 - Pendientes reales y opcionales: [ROADMAP.md](ROADMAP.md).
 - Arquitectura: [ARCHITECTURE.md](ARCHITECTURE.md).
-- Próximo trabajo interno: revisar fixture antiguo de notificaciones de vencimiento y mantener documentación; medir rendimiento antes de optimizar.
+- Fixture antiguo de notificaciones y medición de inventarios grandes: resueltos en v2.99/v3.00. Mantener documentación y medir antes de optimizar.
 - Push: espera entre revisiones reducida de60 a15 segundos en v2.72. Resumen diario de vencimientos conservado; medir entrega y carga en producción.
 - Empresas, comparaciones/exportación XLSX, selección por integrante/sucursal, cajas internas, etiquetas y moderación están implementadas. Ver entregas recientes para validación y reversión.
 
@@ -633,3 +633,13 @@ Con teclado abierto el modal desplaza todo su contenido, sin comprimir la lista 
 Detección de teclado conserva su estado al pasar del campo a un botón mientras el viewport sigue reducido; evita que Cancelar cambie la geometría entre pulsar y soltar en WebKit. Se libera al recuperar altura o cerrar modales. Conserva revelado de campos por foco/resize, scroll manual, controles, metadatos y preferencia de mano.
 
 Validación: pallet-keyboard-layout-ui en Chromium y WebKit,320/390/1366 y ambas manos, viewport reducido con offset, producto sin recorte, acciones accesibles, búsqueda/cancelación, sin desborde horizontal y retorno al scroll normal. dialog-edit-scroll-ui y dialog-dirty-ui aprobados en ambos motores; último con servidor local y datos ficticios. Captura revisada. Teclado simulado, no prueba física de Safari/iPhone. Sin cambios de datos ni permisos. Reversión: restaurar css/ux-polish.css y js/dialog-scroll.js anteriores y publicar caché superior.
+
+## Entrega v3.09 — Salud operativa después de la migración
+
+Revisión puntual de producción y desarrollo: ambos live, consultas agregadas sin bloqueos y errores de nivel error ausentes en la ventana observada de15 minutos. Push con comprobación reciente y sin pendientes atrasados. Muestra CPU/RAM/disco sin evidencia de saturación; no se cambia plan ni amplía recursos. Latencia histórica p95 no disponible en workspace Hobby; mediciones HTTP puntuales desde esta computadora no representan p95 de usuarios. Datos completos de diagnóstico permanecen privados. No enviar notificaciones de prueba a personas sin solicitud explícita.
+
+Nuevo health.php comprueba conexión PostgreSQL y las versiones de esquema esperadas, con TLS, conexión limitada2s, statement_timeout1500ms y sesión SQL de solo lectura. GET/HEAD200 si listo,503 genérico si no;405 otros métodos. Sin cookies, auth, datos privados, inicialización de DB ni fallback SQLite. Evita que app-version.php se interprete como prueba de base disponible. Activar ruta de salud en producción solo después de confirmar200 público; desarrollo/beta independiente conserva su configuración.
+
+Validación: health-endpoint contra PostgreSQL18 aislado con TLS: éxito/esquema vacío/conexión ausente/inválida/rechazada, HEAD, POST405, cuerpo fijo y sin sesiones; base vacía permanece sin tablas, servidor temporal detenido. XAMPP local requiere habilitar pdo_pgsql solo para el proceso de prueba; su libpq antiguo no tiene SNI para el endpoint externo Render, no es un fallo del contenedor de producción. Regresiones scan-feedback, ean-scanner, scanner-lazy-ui Chromium/WebKit, push/startup/worker/health/stock-notifications, Stock API, sesiones HTTP y supervisión/exportación aprobadas. pallet-keyboard-layout-ui espera condición real en lugar de pausa80ms; pasó en ambos motores. No implica cámara/sonido/teclado físicos ni auditoría total de todas las pantallas.
+
+Reversión: devolver ruta de salud de Render a app-version.php antes de retirar health.php, y publicar caché superior si se revierte código. Sin migraciones ni datos que revertir. Conservar Render, Neon gratuito y respaldos; pendientes físicos de iPhone no se dan por comprobados mediante simulaciones.

@@ -1,6 +1,12 @@
 {
-  "version": 213,
+  "version": 214,
   "changes": [
+    {
+      "version": 214,
+      "label": "3.09",
+      "date": "2026-10-25",
+      "summary": "Comprueba conexión y esquema en salud sin crear sesiones ni modificar datos"
+    },
     {
       "version": 213,
       "label": "3.08",
@@ -294,15 +300,9 @@
       "label": "2.60",
       "date": "2026-10-24",
       "summary": "Una sola descripción por producto en el Excel aunque tenga varias fechas"
-    },
-    {
-      "version": 164,
-      "label": "2.59",
-      "date": "2026-10-24",
-      "summary": "Excel con códigos de palet y nombres de sucursales e integrantes sin cantidades"
     }
   ],
   "major": 3,
-  "minor": 8,
-  "label": "3.08"
+  "minor": 9,
+  "label": "3.09"
 }

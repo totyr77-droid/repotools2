@@ -1,6 +1,6 @@
 # Pendientes vigentes de RepoTools
 
-Actualizado el 24/10/2026 contra v3.07. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md.
+Actualizado el 25/10/2026. Lo implementado se documenta en ARCHITECTURE.md y PENDIENTES.md; versión actual en release.json.
 
 ## Confirmado por el usuario
 
@@ -87,4 +87,8 @@ Incidencias de capturas corregidas en v3.05: parámetros normales de Inicio no s
 
 Pitido QR/EAN reforzado en v3.06: contexto compartido/recreación, errores de audioSession aislados y programación previa al cierre con espera limitada. Regresiones simuladas aprobadas; audición en iPhone pendiente de confirmación.
 
-Sonido global independiente de cámara/modal implementado en v3.07 y probado por regresiones. Publicación pública sin confirmar por502 del servidor, iniciado en comprobación v3.06; requiere revisar logs del servicio si persiste. No afirmar versión pública disponible.
+Sonido global independiente de cámara/modal implementado en v3.07 y probado por regresiones. El502 de la base Neon sin cuota quedó resuelto con la migración a Render; publicación v3.08/interna213 confirmada y usuario confirmó funcionamiento después de migrar. Neon quedó gratuito por confirmación del usuario. No reabrir aquella caída como pendiente actual.
+
+Modal de palet con teclado corregido en v3.08, con pruebas Chromium/WebKit y ambas manos. Audición del pitido y teclado físicos de iPhone siguen por confirmar; las simulaciones no los sustituyen.
+
+Revisión operativa del25/10: producción/desarrollo live, sin bloqueos ni errores recientes en la ventana observada, proceso push revisando y sin pendientes atrasados. Recursos sin saturación observada; no requiere aumentar plan con esta muestra. v3.09 incorpora health.php sin sesiones ni escrituras, con comprobación de conexión/esquema para mejorar la señal de salud de Render. La latencia histórica de la API de métricas no está incluida en el workspace Hobby; no inventar p95 ni inferir capacidad máxima de usuarios de esta revisión puntual.
