@@ -1,6 +1,12 @@
 {
-  "version": 212,
+  "version": 213,
   "changes": [
+    {
+      "version": 213,
+      "label": "3.08",
+      "date": "2026-10-25",
+      "summary": "Corrige el modal del palet con teclado abierto y el foco del buscador"
+    },
     {
       "version": 212,
       "label": "3.07",
@@ -294,15 +300,9 @@
       "label": "2.59",
       "date": "2026-10-24",
       "summary": "Excel con códigos de palet y nombres de sucursales e integrantes sin cantidades"
-    },
-    {
-      "version": 163,
-      "label": "2.58",
-      "date": "2026-10-24",
-      "summary": "Comparación con selectores en modales, sucursales automáticas y encabezados Excel destacados"
     }
   ],
   "major": 3,
-  "minor": 7,
-  "label": "3.07"
+  "minor": 8,
+  "label": "3.08"
 }

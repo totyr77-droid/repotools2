@@ -614,3 +614,22 @@ Validación: scan-feedback comprueba servicio sin documento/cámara, tono activo
 Publicación: envío a main; el endpoint público continúa respondiendo502 desde la verificación de v3.06. No confirmar despliegue hasta obtener versión correspondiente; falta acceso a logs del servicio para diagnosticar el502. Sin evidencia de que el cambio JS cause fallo del servidor.
 
 Reversión: restaurar js/ean-scanner.js anterior y publicar caché superior; no datos ni migraciones.
+
+
+## Migración a Render — recuperación inicial25/10/2026
+
+Usuario confirma acceso a Neon y base Render creada: PostgreSQL18, Ohio,256MB RAM y1GB de almacenamiento (USD6+0,30/mes según captura), sin ampliación automática. Consulta mínima del origen ya funciona. Exportación inicial completa en formato custom con cliente oficial PostgreSQL18.6, sin propietarios/ACL, solo lectura. Respaldo privado fuera de Git y raíz web, índice legible y hashSHA256. Restauración de prueba completa en PostgreSQL18 local aislado,79 tablas/297.978 filas, sin errores; servidor temporal detenido. No guardar filas ni credenciales en documentación.
+
+Actualización: acceso Render confirmado por CLI oficial y autorización del usuario. Destino vacío18.6/Ohio restaurado en transacción; copia final79 tablas/297.981 filas, hashes de contenido, columnas, índices, restricciones y secuencias coincidentes. Respaldo final actualizado23,7MB también restaurado en PostgreSQL18 local aislado y detenido. Dos valores checked_at de suscripciones push reconciliados con origen antes de verificar; detalles y datos permanecen privados.
+
+DATABASE_URL de producción y desarrollo cambiado a Render interno con TLS, conservando todas las demás variables. Ambos servicios live; desarrollo necesitó redeploy del mismo build para aplicar entorno nuevo. Confirmado mediante sesiones anónimas nuevas presentes en Render y ausentes en Neon. Inicio/conectividad200; Stock/Biblioteca/Supervisión/Reportes401 sin autenticar. Sin cambios de código ni versión:212/v3.07. Comprobación posterior del origen: únicamente app_sessions cambió durante reapertura de desarrollo, sin nuevas operaciones de negocio. Falta confirmación de recorridos autenticados en celular y recepción push física; no se tomaron sesiones de usuarios. Neon y respaldos conservados, facturación intacta. Si se revierte después de nuevas escrituras, conciliar primero datos de Render. Guía vigente docs/MIGRACION-RENDER-POSTGRES.md.
+
+Usuario confirmó funcionamiento en celular después del corte y luego confirmó bajar Neon al plan gratuito desde su panel. No se modificó facturación mediante herramientas.
+
+## Entrega v3.08 — Palet legible con teclado abierto
+
+Con teclado abierto el modal desplaza todo su contenido, sin comprimir la lista de productos entre el buscador y las acciones. Buscador y productos conservan su altura; botones quedan después del producto y se alcanzan desplazando. Al cerrar teclado vuelve el desplazamiento habitual de productos. Foco del buscador se indica en el contenedor completo, evitando borde interno sobre el texto.
+
+Detección de teclado conserva su estado al pasar del campo a un botón mientras el viewport sigue reducido; evita que Cancelar cambie la geometría entre pulsar y soltar en WebKit. Se libera al recuperar altura o cerrar modales. Conserva revelado de campos por foco/resize, scroll manual, controles, metadatos y preferencia de mano.
+
+Validación: pallet-keyboard-layout-ui en Chromium y WebKit,320/390/1366 y ambas manos, viewport reducido con offset, producto sin recorte, acciones accesibles, búsqueda/cancelación, sin desborde horizontal y retorno al scroll normal. dialog-edit-scroll-ui y dialog-dirty-ui aprobados en ambos motores; último con servidor local y datos ficticios. Captura revisada. Teclado simulado, no prueba física de Safari/iPhone. Sin cambios de datos ni permisos. Reversión: restaurar css/ux-polish.css y js/dialog-scroll.js anteriores y publicar caché superior.

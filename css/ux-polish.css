@@ -745,6 +745,12 @@ body[data-hand] #palletDialog .stock-product-actions>.stock-delete,.demo-merchan
 #publicShareDescription:not(:empty)::before{content:'•';margin-right:6px}
 .public-stock-tools .public-stock-search>.public-search-action{flex-basis:30px;min-width:30px;width:30px;padding:5px;color:#27197f;cursor:pointer}
 .public-stock-search input::-webkit-search-cancel-button{display:none}
+.pallet-view-tools .public-stock-search:focus-within{border-color:#7464bb;box-shadow:0 0 0 2px #7464bb33}
+.pallet-view-tools .public-stock-search>input:focus{outline:none}
+/* With the keyboard open, scroll the palet as one surface instead of squeezing its products. */
+html.dialog-keyboard-open #palletDialog[open]{overflow-y:auto;scroll-padding-block:12px}
+html.dialog-keyboard-open #palletDialog[open]>.pallet-view-tools{flex:none}
+html.dialog-keyboard-open #palletDialog[open]>#palletProducts{flex:none;overflow:visible}
 .public-filter-clear{grid-column:1/-1;justify-self:end;margin:0;min-height:36px;padding:4px 0;background:transparent;border:0;color:#a52c45;text-decoration:underline;cursor:pointer;font:inherit;font-size:.82rem}
 .public-filter-clear[hidden]{display:none!important}
 .stock-filter-popover #publicStockFilterFields{gap:8px}
