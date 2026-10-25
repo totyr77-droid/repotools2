@@ -7,7 +7,7 @@ require_once __DIR__.'/includes/referrals.php';
 require_once __DIR__.'/includes/email-verification.php';
 $referralsEnabled=referrals_enabled();
 $register = ($_GET['mode'] ?? '') === 'registro';
-$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion', 'palet', 'stock-compartido', 'sucursales', 'gestion-empresas'], true) ? $_GET['next'] : '';
+$next = in_array($_GET['next'] ?? '', ['stock', 'tops', 'biblioteca', 'reportes', 'moderacion', 'palet', 'stock-compartido', 'sucursales', 'gestion-empresas', 'supervision'], true) ? $_GET['next'] : '';
 $error = $_SESSION['logout_error'] ?? '';
 unset($_SESSION['logout_error']);
 $invitation=$_SESSION['referral_invitation']??null;
@@ -16,7 +16,7 @@ $name = '';
 $email = '';
 $company = '';
 $deviceConflict=false;
-function finish_account_login(array $user,string $token,string $kind,string $next): void { session_regenerate_id(true);unset($_SESSION['pending_device_login']);$_SESSION['user']=$user;$_SESSION['device_token']=$token;$_SESSION['device_kind']=$kind;$_SESSION['csrf']=bin2hex(random_bytes(32));header('Location: '.account_destination($next));exit; }
+function finish_account_login(array $user,string $token,string $kind,string $next): void { require_once __DIR__.'/includes/audit.php';audit_session(database(),(int)$user['id'],'session_started',$kind);session_regenerate_id(true);unset($_SESSION['pending_device_login']);$_SESSION['user']=$user;$_SESSION['device_token']=$token;$_SESSION['device_kind']=$kind;$_SESSION['csrf']=bin2hex(random_bytes(32));header('Location: '.account_destination($next));exit; }
 if($_SERVER['REQUEST_METHOD']==='POST'&&isset($_POST['device_decision'])&&!current_user()){
     $pending=$_SESSION['pending_device_login']??null;
     if(!valid_csrf()||!$pending||(int)$pending['expires']<time()){$error='La confirmación venció. Ingresa nuevamente.';unset($_SESSION['pending_device_login']);}
@@ -29,6 +29,9 @@ function account_icon(string $name): string {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$paths[$name].'</svg>';
 }
 function account_destination(string $next): string {
+    if(in_array($next,['','biblioteca'],true)&&is_string($_SESSION['library_share']??null)&&preg_match('/^[a-f0-9]{64}$/D',$_SESSION['library_share'])){
+        $token=$_SESSION['library_share'];unset($_SESSION['library_share']);return 'biblioteca.php?share='.rawurlencode($token);
+    }
     if($next==='stock-compartido'){ $token=$_SESSION['pending_stock_report_token']??'';unset($_SESSION['pending_stock_report_token']);return is_string($token)&&preg_match('/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{64})$/D',$token)?'stock-compartido.php?token='.rawurlencode($token):'index.php'; }
     if($next==='palet'){ $code=$_SESSION['pending_report_code']??'';unset($_SESSION['pending_report_code']);return is_string($code)&&preg_match('/^[0-9]{8}$/D',$code)?'palet.php?codigo='.rawurlencode($code):'index.php'; }
     if($next==='stock'&&is_string($_SESSION['pending_label_codes']??null)){ $codes=$_SESSION['pending_label_codes'];unset($_SESSION['pending_label_codes']);if(preg_match('/^[0-9]{8}(?:,[0-9]{8}){0,99}$/D',$codes))return 'etiqueta.php?codigos='.rawurlencode($codes); }
@@ -108,36 +111,38 @@ include __DIR__ . '/vistas/header.vista.php';
   <section class="account-panel<?= current_user() ? ' account-panel-profile' : ' account-panel-auth' ?>">
     <?php if (current_user() && $error): ?><p class="account-error" role="alert"><?= escape($error) ?></p><?php endif; ?>
     <?php if (current_user()): ?>
-    <div class="account-profile-heading sr-only"><h1 class="account-title"><?= stock_icon('user') ?>Mi perfil</h1></div>
-    <?php require_once __DIR__.'/includes/profile-card.php';profile_card(database(),(int)current_user()['id'],true); ?>
+    <div class="account-profile-heading sr-only"><h1 class="account-title"><?= stock_icon('settings') ?>Ajustes</h1></div>
+    <?php require_once __DIR__.'/includes/profile-card.php';profile_card(database(),(int)current_user()['id'],true,true); ?>
     <div class="account-profile-contact"><p id="accountCompany" class="account-company"<?= empty(current_user()['company']) ? ' hidden' : '' ?>><?= account_icon('company') ?><span><?= escape(current_user()['company'] ?? '') ?></span></p></div>
     <dialog id="accountEditDialog" class="account-edit-dialog"><div class="account-edit-heading"><h2>Información de la cuenta</h2><button type="button" class="app-close" aria-label="Cerrar" title="Cerrar"><?= stock_icon('close') ?></button></div><form id="accountEditForm"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><label><span class="account-field-title"><?= account_icon('user') ?>Nombre</span><input name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Tu nombre" required value="<?= escape(current_user()['name']) ?>"></label><label><span class="account-field-title"><?= account_icon('company') ?>Empresa o agencia <small>(opcional)</small></span><input name="company" autocomplete="organization" maxlength="100" placeholder="Marca, empresa o agencia" value="<?= escape(current_user()['company'] ?? '') ?>"></label><p id="accountEditStatus" role="status"></p><button type="submit">Guardar cambios</button></form></dialog><p id="accountSavedStatus" class="account-saved-status" role="status" hidden><?= stock_icon('check') ?><span>Información actualizada.</span></p>
-    <div class="settings-layout"><section class="settings-group settings-profile" aria-labelledby="settingsProfileTitle"><h2 id="settingsProfileTitle">Perfil</h2>
+    <div id="accountPreferences" class="settings-layout" data-csrf="<?= escape(csrf_token()) ?>">
+    <section class="settings-group settings-preferences" aria-labelledby="settingsPreferencesTitle"><h2 id="settingsPreferencesTitle">Preferencias</h2>
+    <?php include __DIR__ . '/includes/hand-preference-view.php'; ?><label class="settings-toggle"><span class="settings-toggle-name"><?= stock_icon('settings') ?>Modo de una mano</span><span class="settings-toggle-control"><input id="oneHandMode" type="checkbox" role="switch" aria-label="Modo de una mano"><span class="settings-toggle-track" aria-hidden="true"></span></span></label><p class="settings-hint">Guardado para tu cuenta en este navegador.</p>
+
+    </section>
+    <section class="settings-group settings-profile" aria-labelledby="settingsProfileTitle"><h2 id="settingsProfileTitle">Perfil</h2>
     <details id="myProfileQR" class="profile-qr"><summary><?= stock_icon('qr') ?>Mi QR de perfil<span class="profile-chevron"><?= stock_icon('chevron') ?></span></summary><div class="profile-qr-image"></div><p role="status"></p></details>
 
 <details id="emailVerification" class="account-public-name account-email-disclosure"><summary><?= account_icon('mail') ?>Correo electrónico<?= stock_icon('chevron') ?></summary><?php $verification=database()->prepare('SELECT email_verified_at,pending_email FROM users WHERE id=?');$verification->execute([current_user()['id']]);$emailState=$verification->fetch(); ?><div class="settings-email-status"><p class="settings-current-email"><?= escape(current_user()['email']) ?></p><div class="email-verification-row" data-verified="<?= $emailState['email_verified_at']?'true':'false' ?>"><p><?= stock_icon($emailState['email_verified_at']?'check':'clock') ?><?= $emailState['email_verified_at']?'Correo verificado':'Correo pendiente' ?></p><button id="resendVerification" class="library-secondary" type="button"<?= $emailState['email_verified_at']&&!$emailState['pending_email']?' hidden':'' ?>>Reenviar</button></div></div><?php if($emailState['pending_email']): ?><p class="settings-hint">Nueva dirección pendiente de confirmar. La anterior sigue vigente.</p><?php endif; ?><div class="security-email-change"><h3 class="settings-email-change-title"><?= account_icon('mail') ?>Cambiar correo</h3><form id="changeEmailForm"><label>Contraseña actual<input type="password" name="current_password" autocomplete="current-password" maxlength="72" required></label><label>Nuevo correo<input type="email" name="email" maxlength="254" autocomplete="email" required></label><button type="submit" class="library-primary">Verificar nuevo correo</button></form></div></details>
     <?php include __DIR__.'/vistas/public-name.vista.php'; ?>
-
-    </section>
-    <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2>
-    <?php require_once __DIR__.'/includes/branch-team.php';$accountTeamLocations=team_locations(database(),(int)current_user()['id']);$accountTeamInvites=team_incoming(database(),(int)current_user()['id']); ?>
-    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><?php if($accountTeamLocations||$accountTeamInvites): ?><a href="sucursales.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Mi equipo</a><?php if($accountTeamLocations&&team_can_assign(database(),(int)current_user()['id'])): ?><a href="gestion-empresas.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Empresas y sucursales</a><?php endif;endif; ?>
-    <a href="tops.php"><?= stock_icon('chart') ?>Estadísticas y TOPs</a>
-    <a href="biblioteca.php"><?= stock_icon('book') ?>Biblioteca</a>
-    <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
-    <a href="stock.php"><?= stock_icon('qr') ?>Palets</a>
-    <a href="index.php"><?= stock_icon('barcode') ?>Escáner</a><a id="shareApp" href="referidos.php"><?= stock_icon('share') ?>Compartir app</a></nav>
-    <button id="replayOnboarding" type="button" class="onboarding-replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/></svg>Ver introducción</button>
-    </section>
-    <section id="accountPreferences" class="settings-group settings-preferences" aria-labelledby="settingsPreferencesTitle" data-csrf="<?= escape(csrf_token()) ?>"><h2 id="settingsPreferencesTitle">Preferencias</h2>
-    <section class="stock-preferences"><h3><?= stock_icon('clock') ?>Avisos de vencimiento</h3><form id="stockPreferences"><label for="stockExpiryDays">Días de anticipación</label><input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="<?= (int)($accountPreferences['expiry_days']??30) ?>" required aria-describedby="expiryPreferenceHint"></form><p id="expiryPreferenceHint" class="settings-hint">Para tus palets y los compartidos.</p><p id="stockPreferenceStatus" role="status" hidden></p></section>
+    <details id="accountAlerts" class="account-public-name settings-alerts"><summary><?= stock_icon('clock') ?>Avisos y respuesta<?= stock_icon('chevron') ?></summary>    <section class="stock-preferences"><h3><?= stock_icon('clock') ?>Avisos de vencimiento</h3><form id="stockPreferences"><label for="stockExpiryDays">Días de anticipación</label><input id="stockExpiryDays" type="number" inputmode="numeric" min="0" max="365" placeholder="30" value="<?= (int)($accountPreferences['expiry_days']??30) ?>" required aria-describedby="expiryPreferenceHint"></form><p id="expiryPreferenceHint" class="settings-hint">Para tus palets y los compartidos.</p><div id="expiryColorPreview" class="expiry-color-preview" aria-label="Ejemplo de colores de vencimiento"><span class="stock-expiry-safe">Buena fecha</span><span id="expiryPreviewNear" class="stock-expiry-near">Por vencer · 8–30 días</span><span class="stock-expiry-urgent">Urgente · hasta 7 días</span><span class="stock-expiry-past">Vencido</span></div><p id="stockPreferenceStatus" role="status" hidden></p></section>
+    <?php include __DIR__.'/vistas/push-settings.vista.php'; ?>
     <fieldset class="settings-feedback"><legend>Sonido y vibración</legend>
     <?php foreach(['sound'=>['Sonido','fa-volume-high'],'vibration'=>['Vibración','fa-mobile-screen-button']] as $key=>$setting): ?>
     <label class="settings-toggle"><span class="settings-toggle-name"><i class="fa-solid <?= $setting[1] ?>" aria-hidden="true"></i><?= $setting[0] ?></span><span class="settings-toggle-control"><small data-preference-state="<?= $key ?>"><?= ($accountPreferences[$key]??true)?'Activado':'Desactivado' ?></small><input id="preference-<?= $key ?>" type="checkbox" role="switch" name="<?= $key ?>" aria-label="<?= $setting[0] ?>"<?= ($accountPreferences[$key]??true)?' checked':'' ?>><span class="settings-toggle-track" aria-hidden="true"></span></span></label>
     <?php endforeach; ?>
     </fieldset>
-    <?php include __DIR__ . '/includes/hand-preference-view.php'; ?><label class="settings-toggle"><span class="settings-toggle-name"><?= stock_icon('settings') ?>Modo de una mano</span><span class="settings-toggle-control"><input id="oneHandMode" type="checkbox" role="switch" aria-label="Modo de una mano"><span class="settings-toggle-track" aria-hidden="true"></span></span></label><p class="settings-hint">Guardado para tu cuenta en este navegador.</p>
+</details>
+
     </section>
+    <section class="settings-group settings-access" aria-labelledby="settingsAccessTitle"><h2 id="settingsAccessTitle">Accesos</h2>
+    <?php require_once __DIR__.'/includes/branch-team.php';$accountTeamLocations=team_locations(database(),(int)current_user()['id']);$accountTeamInvites=team_incoming(database(),(int)current_user()['id']); ?>
+    <nav class="account-shortcuts" aria-label="Accesos de mi cuenta"><?php require_once __DIR__.'/includes/supervision.php';$accountSupervisor=supervisor_team(database(),(int)current_user()['id']);$accountSupervisorLinks=supervisor_links(database(),(int)current_user()['id']);if($accountSupervisor||$accountSupervisorLinks): ?><a href="supervision.php" class="account-team-shortcut"><?= stock_icon('users') ?><?= $accountSupervisor?'Mi equipo':'Mis supervisores' ?></a><?php endif; ?><?php if($accountTeamLocations||$accountTeamInvites): ?><a href="sucursales.php?ambito=sucursales" class="account-team-shortcut"><?= stock_icon('branch') ?>Mi sucursal</a><?php if($accountTeamLocations&&team_can_assign(database(),(int)current_user()['id'])): ?><a href="gestion-empresas.php" class="account-team-shortcut"><?= stock_icon('branch') ?>Empresas y sucursales</a><?php endif;endif; ?>
+    <a href="reportes.php"><?= stock_icon('report') ?>Mis reportes</a>
+    <a id="shareApp" href="referidos.php"><?= stock_icon('share') ?>Compartir app</a></nav>
+    <button id="replayOnboarding" type="button" class="onboarding-replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/></svg>Ver introducción</button>
+    </section>
+
 <?php include __DIR__.'/includes/account-security-view.php'; ?></div>
 
     <?php else: ?>

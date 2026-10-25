@@ -9,7 +9,7 @@ const server=spawn(php,['-S','127.0.0.1:18829','-t',process.cwd()],{env,stdio:'i
  await context.route('https://**/*',r=>r.fulfill({contentType:'text/javascript',body:''}));
  await page.goto(base+'/cuenta.php');await page.locator('[name=email]').fill('alerts@example.invalid');await page.locator('[name=password]').fill('test-password-123');await page.locator('form[method=post] button[type=submit]').click();await page.waitForURL('**/index.php');
  await page.locator('#openNotifications').click();await page.locator('.notification-item[data-state=expired]').waitFor();
- for(const [state,label] of [['expired','Vencido hace 3 días'],['today','Vence hoy'],['warning','Vence en 1 día']])assert.equal(await page.locator(`.notification-item[data-state=${state}] .notification-expiry-label`).innerText(),label);
+ for(const [state,label] of [['expired','Vencido hace 3 días'],['urgent','Vence hoy'],['urgent','Vence en 1 día']])assert.equal(await page.locator(`.notification-item[data-state=${state}] `).getByText(label,{exact:true}).innerText(),label);
  for(const width of [320,390,1366]){await page.setViewportSize({width,height:850});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert(await page.locator('#notificationPanel').evaluate(el=>el.getBoundingClientRect().right<=innerWidth+1));}
  await page.setViewportSize({width:390,height:850});await page.screenshot({path:'tmp/expiry-notifications-390.png'});
  const link=page.locator('.notification-item[data-state=expired]'),href=await link.getAttribute('href'),id=new URL(href,base).searchParams.get('producto');

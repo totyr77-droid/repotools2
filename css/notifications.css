@@ -18,7 +18,7 @@
 #readAllNotifications { width: 100%; min-height: 44px; padding: 8px; background: #f0eef8; color: #27187e; border-radius: 8px; margin: 8px 0; cursor: pointer; }
 #notificationStatus { font-size: .9rem; color: #626b7a; line-height: 1.5; }
 #notificationStatus:empty { display: none; }
-.notification-item { display: block; padding: 14px 10px; border-bottom: 1px solid #e1e5ed; color: #172033; text-decoration: none; line-height: 1.4; overflow-wrap: anywhere; }
+.notification-item { padding: 14px 10px; border-bottom: 1px solid #e1e5ed; color: #172033; text-decoration: none; line-height: 1.4; overflow-wrap: anywhere; }
 .notification-item strong, .notification-item span, .notification-item time { display: block; }
 .notification-item span { font-size: .85rem; margin-top: 4px; color: #536174; }
 .notification-item time { margin-top: 6px; color: #626b7a; font-size: .75rem; }
@@ -44,3 +44,19 @@
 #openNotifications{margin:0;padding:0;border:0;line-height:1}
 #openNotifications svg{display:block}
 .notification-item .notification-badge{width:44px;height:50px;object-fit:contain;flex:none}.notification-item .notification-achievement-detail{font-size:.76rem;color:#747086;margin-top:5px}
+
+/* Shared hierarchy: title/state, branch context, short message and date. */
+.notification-item-heading{display:flex;align-items:flex-start;gap:6px;min-width:0}
+.notification-item-heading strong{flex:1;min-width:0;font-size:.94rem;line-height:1.3}
+.notification-unread-dot{width:6px;height:6px;flex:none;border-radius:50%;background:#27187e}
+.notification-item .notification-branch-label{display:inline-flex;align-items:center;gap:4px;max-width:100%;box-sizing:border-box;margin:5px 0 2px;padding:2px 7px;border-radius:6px;background:#e5f4f8;color:#246579;font-size:.78rem;line-height:1.35}
+.notification-branch-label svg{width:14px;height:14px;flex:none}
+.notification-item:focus-visible{outline:2px solid #6552b5;outline-offset:-2px;border-radius:6px}
+@media(hover:hover){a.notification-item:hover{background:#f5f4fa}}
+
+.notification-item .notification-item-heading time{margin:2px 0 0;font-size:.67rem;line-height:1.4;white-space:nowrap;flex:none}.notification-item-heading .notification-unread-dot{margin-top:6px}
+
+.push-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.push-controls button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;margin:0}.push-controls svg{width:18px;height:18px}#pushPreferences h3{display:flex;align-items:center;gap:6px}#pushPreferences h3 svg{width:18px;height:18px;flex:none}body[data-hand=left] .push-controls{flex-direction:row-reverse;justify-content:flex-end}
+.push-controls [hidden]{display:none!important}
+
+#pushPreferences .push-controls button{width:auto;padding:10px 12px;font-size:.85rem}#pushPreferences .library-secondary{background:#eeebf7;color:#27187e}

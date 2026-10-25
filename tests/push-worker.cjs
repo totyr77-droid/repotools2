@@ -1,0 +1,10 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+(async()=>{const handlers={},shown=[],opened=[],calls=[];let response={ok:true,status:200,json:async()=>({allowed:true,user:1})},offline=false;
+const context={URL,AbortSignal,fetch:async url=>{calls.push(String(url));if(offline)throw Error('offline');return response;},self:{addEventListener:(name,fn)=>handlers[name]=fn,registration:{scope:'https://example.invalid/app/',showNotification:async(title,options)=>shown.push({title,...options})},clients:{matchAll:async()=>[],openWindow:async url=>opened.push(url)}}};vm.runInNewContext(fs.readFileSync('js/push-worker.js','utf8'),context);
+const payload={user:1,receipt:'a'.repeat(32),title:'Invitación',body:'Nombre privado de prueba',url:'stock.php?invitacion=12345678',tag:'notice-1'};
+async function push(value){let task;handlers.push({data:{json:()=>value},waitUntil:p=>task=p});await task;}
+await push(payload);assert.equal(shown.length,1);assert.equal(shown[0].body,payload.body);assert(calls.every(url=>url.includes('action=verify')));assert(!calls.some(url=>url.includes('action=read')));
+response={ok:false,status:403};await push(payload);assert.equal(shown.length,1,'wrong account suppressed');
+response={ok:true,status:200,json:async()=>({allowed:true,user:2})};await push(payload);assert.equal(shown.length,1,'account mismatch suppressed');
+offline=true;await push(payload);assert.equal(shown.length,2);assert(!shown[1].body.includes('privado'));assert(shown[1].data.url.endsWith('/app/cuenta.php'));offline=false;response={ok:true,status:200,json:async()=>({allowed:true,user:1})};await push({...payload,url:'https://evil.invalid/'});assert.equal(shown.length,2);
+let task,closed=false;handlers.notificationclick({notification:{data:shown[0].data,close:()=>closed=true},waitUntil:p=>task=p});await task;assert(closed);assert.equal(opened[0],'https://example.invalid/app/stock.php?invitacion=12345678');assert(!calls.some(url=>url.includes('read')));console.log('OK: push verification, no read action, wrong-account privacy, offline generic fallback, safe URLs and click target.');})().catch(e=>{console.error(e);process.exitCode=1});

@@ -71,7 +71,7 @@
 
 .repo-camera-guide[hidden]{display:none!important}
 
-.repo-pallet-qr-guide{border:0;border-radius:0;color:white;opacity:.5}.repo-pallet-qr-guide>svg{width:100%;height:100%;display:block;filter:none}.repo-pallet-number-guide{position:absolute;left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;text-align:center;color:white;box-sizing:border-box;border:1px solid #ffffff80;border-radius:6px;padding:0 8px 4px;background:transparent;opacity:.6}.repo-pallet-number-guide>span{display:block;font:32px/1 monospace;letter-spacing:5px}.repo-pallet-number-guide>small{display:block;font-size:10px;line-height:1.2;text-shadow:0 1px 2px #000}.repo-camera-viewport.ean-detecting .repo-pallet-qr-guide{color:#facc15}.repo-camera-viewport.ean-confirmed .repo-pallet-qr-guide{color:#23c55e}
+.repo-pallet-qr-guide{border:0;border-radius:0;color:white;opacity:.5}.repo-camera-viewport .repo-camera-guide.repo-pallet-qr-guide>svg{width:100%;height:100%;max-width:none;max-height:none;display:block;filter:none}.repo-pallet-number-guide{position:absolute;left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;text-align:center;color:white;box-sizing:border-box;border:1px solid #ffffff80;border-radius:6px;padding:0 8px 4px;background:transparent;opacity:.6}.repo-pallet-number-guide>span{display:block;font:32px/1 monospace;letter-spacing:5px}.repo-pallet-number-guide>small{display:block;font-size:10px;line-height:1.2;text-shadow:0 1px 2px #000}.repo-camera-viewport.ean-detecting .repo-pallet-qr-guide{color:#facc15}.repo-camera-viewport.ean-confirmed .repo-pallet-qr-guide{color:#23c55e}
 
 [aria-pressed=true] .torch-off-mark{display:none}
 
@@ -90,3 +90,11 @@
 
 /* Camera controls remain legible when the label fills the frame with white. */
 .repo-camera-viewport .ean-camera-light,.repo-camera-viewport .ean-camera-manual{background:#17122b99;color:#fff}
+
+/* The middle of the shared target identifies the intended label. */
+.repo-pallet-qr-guide:after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);background:linear-gradient(currentColor,currentColor) center/12px 2px no-repeat,linear-gradient(currentColor,currentColor) center/2px 12px no-repeat;filter:drop-shadow(0 1px 1px #0008)}
+
+/* The eight-digit fallback sits below the QR, without covering its corners. */
+.repo-pallet-number-guide{height:44px;padding:2px 8px;transform:translateX(-50%)}
+.repo-pallet-number-guide>span{line-height:24px;letter-spacing:2px;white-space:nowrap}
+.repo-pallet-number-guide[hidden]{display:none!important}

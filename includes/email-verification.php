@@ -9,7 +9,7 @@ function welcome_email(string $name,string $url): array {
     foreach(['pallets'=>['Organizá tus palets','Creá palets y agrupá tu mercadería.'],'ean'=>['Escaneá productos','Leé códigos EAN con tu cámara.'],'stock'=>['Consultá tu stock','Revisá cantidades y vencimientos.'],'qr'=>['Accedé con QR','Consultá el palet o compartí su información.']] as $asset=>[$title,$description]){
         $content.='<tr><td width="88" style="padding:10px 12px 10px 0"><img width="80" height="64" src="'.email_escape(email_origin().'/img/email/'.$asset.'.png').'" alt="'.email_escape($title).'" style="display:block;border:0"></td><td style="padding:10px 0;font-size:14px;line-height:1.5"><strong style="color:#27197F">'.email_escape($title).'</strong><br>'.email_escape($description).'</td></tr>';$text.=$title.': '.$description."\n";
     }
-    $content.='</table><p style="font-size:12px;color:#626b7a">Si no creaste esta cuenta ni pediste verificar una dirección, ignorá el mensaje.</p><p style="font-size:12px;word-break:break-all">Si el botón no funciona: <a href="'.email_escape($url).'">'.email_escape($url).'</a></p>';
+    $content.='</table><p style="font-size:12px;color:#626b7a">Si no creaste esta cuenta ni pediste verificar una dirección, ignorá el mensaje.</p><p style="font-size:12px;word-break:break-all">Si tu correo bloquea el botón, marcá este mensaje como «No es spam» o copiá y pegá este enlace en tu navegador:<br><a href="'.email_escape($url).'">'.email_escape($url).'</a></p>';
     return ['html'=>email_layout('Hola, '.$name,$content),'text'=>$text.'Si no solicitaste el registro, ignorá este correo.'];
 }
 function email_request(PDO $db,int $user,?string $newEmail=null): array {
@@ -27,7 +27,7 @@ function email_request(PDO $db,int $user,?string $newEmail=null): array {
         audit_q($db,'UPDATE email_verifications SET expires=? WHERE user_id=? AND used_at IS NULL',[$now-1,$user]);
         $token=bin2hex(random_bytes(32));audit_q($db,'INSERT INTO email_verifications(token_hash,user_id,address,expires,created) VALUES(?,?,?,?,?)',[hash('sha256',$token),$user,$address,$now+86400,$now]);$db->commit();
     }catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}
-    $url=rtrim(getenv('APP_URL')?:'https://repotools.online','/').'/verificar-correo.php#verificar='.$token;$mail=welcome_email($u['name'],$url);$key=getenv('RESEND_API_KEY')?:'';$from=getenv('MAIL_FROM')?:'';
+    $url=email_origin().'/verificar-correo.php#verificar='.$token;$mail=email_embed_logo(welcome_email($u['name'],$url));$key=getenv('RESEND_API_KEY')?:'';$from=getenv('MAIL_FROM')?:'';
     if(!$key||!$from||!function_exists('curl_init'))return ['needed'=>true,'sent'=>false];
     $c=curl_init('https://api.resend.com/emails');curl_setopt_array($c,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>4,CURLOPT_TIMEOUT=>10,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key,'Content-Type: application/json','Idempotency-Key: welcome/'.hash('sha256',$token)],CURLOPT_POSTFIELDS=>json_encode(['from'=>$from,'to'=>[$address],'subject'=>'Bienvenido a RepoTools · Verificá tu correo',...$mail])]);curl_exec($c);$status=curl_getinfo($c,CURLINFO_HTTP_CODE);curl_close($c);return ['needed'=>true,'sent'=>$status>=200&&$status<300];
 }

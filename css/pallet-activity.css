@@ -8,3 +8,5 @@
 .pallet-activity small,.pallet-activity time{display:block;color:#626b7a;font-size:.8rem;margin-top:4px}
 .pallet-activity button{width:auto;min-height:44px;padding:8px 12px;margin-top:8px;border:0;border-radius:8px;background:#f2f0fa;color:#27187e}
 @media(max-width:768px) and (pointer:coarse){body[data-hand=left] .pallet-activity li,body[data-hand=left] .pallet-activity summary{flex-direction:row-reverse;text-align:right}body[data-hand=left] .pallet-activity summary .fa-chevron-down{margin-left:0;margin-right:auto}}
+
+.stock-activity-team{margin-inline-start:.4em;color:#27197F}

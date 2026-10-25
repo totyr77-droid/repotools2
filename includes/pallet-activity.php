@@ -8,9 +8,15 @@ function pallet_activity_snapshot(PDO $db,int $id): ?array {
     $p['accesses']=stock_query($db,'SELECT user_id,status FROM pallet_access WHERE pallet_id=?',[$id])->fetchAll(PDO::FETCH_KEY_PAIR);
     return $p;
 }
-function pallet_activity_record(PDO $db,int $user,int $id,?array $before,?array $after): void {
+function pallet_activity_team_metadata(PDO $db,int $user,int $id,bool $teamContext=false): array {
+    $p=stock_query($db,'SELECT owner_id,branch_id FROM pallets WHERE id=?',[$id])->fetch();
+    if(!$p||!team_role($db,$user,(int)($p['branch_id']??0))||(!$teamContext&&(int)$p['owner_id']===$user))return [];
+    return ['source'=>'team'];
+}
+function pallet_activity_record(PDO $db,int $user,int $id,?array $before,?array $after,bool $teamContext=false): void {
     if(!$after)return;
-    $emit=static function(string $action,array $metadata=[],?int $product=null)use($db,$user,$id):void{stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$user,$id,$product,$action,json_encode($metadata,JSON_UNESCAPED_UNICODE)]);};
+    $source=pallet_activity_team_metadata($db,$user,$id,$teamContext);
+    $emit=static function(string $action,array $metadata=[],?int $product=null)use($db,$user,$id,$source):void{stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$user,$id,$product,$action,json_encode([...$metadata,...$source],JSON_UNESCAPED_UNICODE)]);};
     if(!$before)$emit('pallet_created');
     if($before&&$before['released']!=$after['released'])$emit('pallet_deleted');
     if(($before['description']??'')!==$after['description'])$emit('description_updated',['old'=>$before['description']??'','new'=>$after['description']]);
@@ -43,8 +49,10 @@ function pallet_activity_initial_joins(PDO $db): string {
 function pallet_activity_list(PDO $db,int $user,int $id,int $cursor=0,int $limit=25,int $event=0): array {
     $p=stock_query($db,'SELECT owner_id,code,branch_id FROM pallets WHERE id=?',[$id])->fetch();
     if(!$p)throw new CatalogException('No encontramos este palet.',404);
-    if((int)$p['owner_id']!==$user&&!stock_is_admin($db,$user)&&!team_role($db,$user,(int)($p['branch_id']??0))&&stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()!=='accepted')throw new CatalogException('No tenés acceso a la actividad de este palet.',403);
+    $allowed=(int)$p['owner_id']===$user||stock_is_admin($db,$user)||team_role($db,$user,(int)($p['branch_id']??0))||stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$id,$user])->fetchColumn()==='accepted';
+    $pendingBranch=0;if(!$allowed){$pendingBranch=team_active($db,$user);if(!$pendingBranch||!team_pallet_request($db,$id,$pendingBranch))throw new CatalogException('No tenés acceso a la actividad de este palet.',403);}
     $limit=max(1,min(30,$limit));$args=[$id];$filter='';if($event){$filter=' AND a.id=?';$args[]=$event;}elseif($cursor>0){$filter=' AND a.id<?';$args[]=$cursor;}
+    if($pendingBranch){$branchMeta=$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql'?"COALESCE(a.metadata::jsonb->>'branch_id','0')":"COALESCE(json_extract(a.metadata,'$.branch_id'),0)";$filter.=" AND a.action='team_pending_edited' AND CAST($branchMeta AS BIGINT)=?";$args[]=$pendingBranch;}
     $join=pallet_activity_initial_joins($db);$rows=stock_query($db,"SELECT a.id,a.action,a.metadata,a.created_at,a.user_id AS actor_id,u.public_name,initial_expiry.metadata AS initial_expiry FROM pallet_activity a LEFT JOIN users u ON u.id=a.user_id {$join} WHERE initial_add.id IS NULL AND a.pallet_id=?{$filter} ORDER BY a.id DESC LIMIT ".($event?1:$limit+1),$args)->fetchAll();
     if($event&&!$rows)throw new CatalogException('Este movimiento no está disponible.',404);
     $more=count($rows)>$limit;$rows=array_slice($rows,0,$limit);$items=pallet_activity_present($db,$rows);foreach($items as &$item){$item['pallet_id']=$id;$item['code']=$p['code'];}unset($item);

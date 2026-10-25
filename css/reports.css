@@ -8,11 +8,11 @@
 .report-card h2 { font-size: 1rem; margin-bottom: 8px; }
 .report-card p, #reviewReportDetails p { overflow-wrap: anywhere; line-height: 1.5; margin: 8px 0; }
 .report-card button { margin-top: 8px; }
-.report-comparison { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin: 16px 0; }
+.report-comparison { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
 .report-comparison section { background: #f4f3f9; border-radius: 10px; padding: 12px; min-width: 0; }
-.report-comparison h3 { font-size: 1rem; color: #27187e; }
+.report-comparison h3 { color: #27187e; }
 .report-evidence { display: block; width: 100%; max-height: 420px; object-fit: contain; margin: 8px 0 16px; }
-#reviewReportDetails figure { margin: 16px 0; }
+
 .product-report-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; margin: 4px 0 4px 8px; border-radius: 10px; color: #62577e; background: #f1eef8; cursor: pointer; }
 .product-report-button:focus-visible { outline: 3px solid #8372d8; outline-offset: 3px; }
 .product-edit-dialog textarea { width: 100%; box-sizing: border-box; border: 1px solid #d8dce6; border-radius: 10px; padding: 12px; font: inherit; resize: vertical; }
@@ -49,7 +49,7 @@
 .report-current h3 { color: #526075; }
 .report-field { padding: 8px; margin-top: 6px; border-radius: 8px; }
 .report-field small { color: #626b7a; font-size: .75rem; }
-#reviewReportDetails .report-field p { margin: 3px 0 0; }
+
 .report-current .report-field-changed { background: #fff1df; border-left: 3px solid #c58932; }
 .report-proposed .report-field-changed { background: #e7f5ed; border-left: 3px solid #278450; }
 .report-proposed .report-field-changed small { color: #216b43; font-weight: 600; }
@@ -90,7 +90,7 @@
 .report-block-status:empty { display: none; }
 .report-comparison { gap: 8px; margin: 10px 0; }
 .report-comparison section { padding: 8px; }
-.report-comparison h3 { margin: 0 0 4px; font-size: .9rem; }
+.report-comparison h3 { margin: 0 0 4px; }
 .report-comparison > section > small { font-size: .72rem; }
 .report-field { padding: 5px 7px; margin-top: 3px; }
 #reviewReportDetails .report-field p { margin: 1px 0 0; font-size: .85rem; line-height: 1.3; }
@@ -101,7 +101,7 @@
 .report-ean-guide-numbers { position: absolute; left: 0; right: 0; bottom: -32px; color: #fff; text-shadow: 0 1px 3px #000; text-align: center; font-size: .75rem; }
 #reportCameraDialog[data-photo-kind="ean"] .report-camera-flash { top: 12px; transform: none; }
 #reviewReportDialog .library-heading h2 { font-size: 1.25rem; }
-.report-comparison h3 { font-size: 1rem; }
+
 #reviewReportDetails .report-field p { font-size: .95rem; }
 #reviewReportForm label { font-size: .95rem; }
 .report-card p { font-size: .9rem; }
@@ -125,15 +125,26 @@
 
 .report-reference-photo{border:1px solid #e1e5ed;border-radius:10px;padding:12px;background:#f8f8fc}.report-reference-photo .product-edit-note{display:flex;align-items:flex-start;gap:6px;font-size:.8rem}.report-reference-photo .product-edit-note svg{width:16px;height:16px;flex-shrink:0}.report-reference-photo .report-evidence{max-height:240px;margin-bottom:0}#reportProductPhotoNote:empty{display:none}
 
-/* Audit cards: action first, one native disclosure for the full summary. */
-.report-audit-card{cursor:pointer;direction:ltr;text-align:left}
-.report-audit-card .audit-event-detail>summary{display:block;position:relative;min-height:44px;padding-right:24px;list-style:none;color:inherit}
-.report-audit-card .audit-event-detail>summary::-webkit-details-marker{display:none}
-.report-audit-card .audit-event-detail>summary::after{content:'';position:absolute;right:2px;top:8px;width:7px;height:7px;border-right:1.5px solid #62577e;border-bottom:1.5px solid #62577e;transform:rotate(45deg);transition:transform .2s}
-.report-audit-card .audit-event-detail[open]>summary::after{transform:rotate(225deg)}
-.report-audit-card .report-log-heading h2{margin:0 0 6px;color:#27197F;font-size:1rem;line-height:1.4}
-.report-audit-card .audit-event-detail>summary p{margin:4px 0;font-size:.85rem}
-.report-audit-card .audit-event-detail>div{cursor:auto;border-top:1px solid #e7e5ef;margin-top:10px;padding-top:10px}
-.report-audit-card .audit-event-detail[open]::before{display:none}
-@media(min-width:1100px){.report-audit-card .audit-event-detail[open]>div{margin-top:0}}
-@media(prefers-reduced-motion:reduce){.report-audit-card .audit-event-detail>summary::after{transition:none}}
+/* Compact audit list; details always live in a dialog. */
+.report-audit-card{direction:ltr;text-align:left}
+.audit-section-tabs{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:10px}.audit-section-tabs button{font-size:.8rem;gap:5px}.audit-section-tabs svg{width:17px;height:17px;flex:none}
+.audit-toolbar{display:flex;gap:8px;align-items:center}.audit-search{display:flex;align-items:center;gap:8px;flex:1;min-width:0;border:1px solid #dddce8;border-radius:10px;padding:0 10px;background:white}.audit-search svg{width:18px;height:18px;flex:none;color:#27197f}.audit-search input{min-width:0;width:100%;border:0!important;min-height:44px;margin:0!important;padding:8px 0!important;background:transparent!important}
+.audit-filter-menu{position:relative;flex:none}.audit-filter-menu>summary{list-style:none;display:flex;align-items:center;gap:6px;min-height:44px;box-sizing:border-box;cursor:pointer}.audit-filter-menu>summary::-webkit-details-marker{display:none}.audit-filter-menu svg{width:18px;height:18px}.audit-filter-fields{position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:min(300px,calc(100vw - 48px));max-height:65dvh;overflow:auto;padding:12px;background:white;border:1px solid #e1dfea;border-radius:12px;box-shadow:0 8px 24px #27197f18;box-sizing:border-box}.audit-filter-fields label{display:grid;gap:4px;font-size:.8rem;margin-bottom:8px}.audit-filter-fields select,.audit-filter-fields input{width:100%;min-width:0;min-height:44px;box-sizing:border-box;font-size:16px}.audit-date-range{border:0;padding:0;margin:0;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.audit-date-range legend{font-size:.8rem;color:#62577e}.audit-record-open{display:block;width:100%;margin:0!important;padding:0 22px 0 0!important;border:0;background:transparent!important;box-shadow:none!important;text-align:left;color:inherit;position:relative;cursor:pointer;min-height:52px}.audit-record-open::after{content:'';position:absolute;right:3px;top:calc(50% - 4px);width:7px;height:7px;border-top:1.5px solid #62577e;border-right:1.5px solid #62577e;transform:rotate(45deg)}.audit-record-open:focus-visible{outline:2px solid #6552b5;outline-offset:5px;border-radius:4px}.audit-record-open .report-log-heading{display:flex;justify-content:space-between;align-items:flex-start}.audit-record-open strong{display:flex;align-items:center;gap:6px;font-size:.95rem;color:#27197f;min-width:0}.audit-record-open svg{width:18px;height:18px;flex:none}.audit-record-date{font-size:.72rem;color:#68677b;white-space:nowrap}.audit-record-actor{display:flex;align-items:center;gap:6px;font-size:.82rem;color:#62577e;margin-top:5px}.audit-record-meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:.78rem;margin-top:5px}.audit-record-meta .stock-branch-label,#auditRecordContent .stock-branch-label{display:inline-flex;align-items:center;gap:4px;color:#246579;background:#e5f4f8;border-radius:6px;padding:2px 7px;font-size:.78rem}.audit-record-meta .stock-branch-label svg,#auditRecordContent .stock-branch-label svg{width:16px;height:16px}.audit-count{color:#62577e}
+#auditRecordDialog{width:min(640px,calc(100% - 24px));box-sizing:border-box}#auditRecordDialog .library-heading h2{font-size:1.1rem;display:flex;align-items:center;gap:6px;min-width:0}#auditRecordDialog .library-heading h2 svg{width:20px;height:20px;flex:none}.audit-record-identity{font-size:.82rem;color:#62577e;margin-top:0}.audit-operation-part+.audit-operation-part{border-top:1px solid #e5e3ec;padding-top:12px;margin-top:12px}.audit-operation-part h3{font-size:.95rem;color:#27197f;margin:0 0 8px}.audit-product-change{padding:10px 0;border-bottom:1px solid #eeedf3}.audit-product-change>strong,.audit-product-change>small{display:block}.audit-product-change>small{color:#68677b;font-size:.78rem;margin:4px 0}.audit-product-change p,.audit-operation-part p{margin:6px 0;font-size:.9rem}.audit-delta{display:inline-flex;max-width:100%;box-sizing:border-box;border-radius:6px;padding:3px 7px;font-size:.8rem;font-weight:600;background:#eeeafa;color:#514086}.audit-delta[data-tone=success]{background:#e3f4e9;color:#176b44}.audit-delta[data-tone=danger]{background:#fbe6ea;color:#ab2436}.audit-transfer-route{font-weight:600;color:#27197f}.audit-technical{margin-top:12px}.audit-technical summary{min-height:44px;cursor:pointer;font-size:.8rem;color:#62577e}.audit-technical pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.72rem;max-width:100%}
+body[data-hand=left] .audit-toolbar{flex-direction:row-reverse}body[data-hand=left] .audit-filter-fields{right:auto;left:0}
+@media(max-width:420px){.audit-section-tabs button{flex-direction:column;font-size:.72rem;padding:7px 2px;gap:3px}.audit-record-open .report-log-heading{gap:4px}.audit-record-date{font-size:.65rem}}
+
+.one-hand-sheet .audit-toolbar{display:block}.one-hand-sheet .audit-search{margin-bottom:10px}.one-hand-sheet .audit-filter-fields{position:static;width:100%;max-height:none;box-shadow:none;padding:0;border:0}.one-hand-sheet .audit-filter-menu>summary{display:none}.one-hand-sheet #clearAuditFilters{display:none}
+
+.audit-scope-note{margin:0 0 10px;color:#68677b;font-size:.8rem}.audit-section-tabs{grid-template-columns:repeat(auto-fit,minmax(65px,1fr))}
+.report-audit-card{--audit-tone:#62577e;--audit-soft:#f0edf8}.report-audit-card[data-tone=success]{--audit-tone:#23704a;--audit-soft:#e8f6ee}.report-audit-card[data-tone=danger]{--audit-tone:#af2940;--audit-soft:#fff0f2}.report-audit-card[data-tone=warning]{--audit-tone:#9a570d;--audit-soft:#fff2dd}.report-audit-card[data-tone=info]{--audit-tone:#286879;--audit-soft:#e9f5f7}
+.audit-record-open .report-log-heading>strong>svg{color:var(--audit-tone);background:var(--audit-soft);padding:6px;border-radius:9px;width:20px;height:20px;box-sizing:content-box}
+.audit-entity{display:inline-flex;align-items:center;gap:4px;color:#62577e}.audit-entity svg{width:15px;height:15px}.audit-record-identity a,.audit-target-user a{color:#27197f;text-underline-offset:3px;font-weight:600}
+.audit-pallet-heading{display:flex;align-items:center;gap:6px}.audit-pallet-heading svg{width:19px;height:19px}.audit-deleted-label{color:#a52e45;background:#fff0f2;padding:3px 6px;border-radius:5px;font-size:.72rem;font-weight:400}
+.audit-comparison{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin:8px 0}.audit-comparison>span{display:grid;gap:3px;min-width:0;border-radius:8px;background:#f4f4f8;padding:8px 10px;overflow-wrap:anywhere}.audit-comparison>span>small{font-size:.72rem;color:#68677b}.audit-comparison>span>strong{font-size:.85rem;line-height:1.35;font-weight:600;color:#454258}.audit-comparison>.audit-comparison-after{background:#eeebf8}.audit-comparison>.audit-comparison-after>strong{color:#27197f}
+.audit-record-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}.audit-record-actions>a{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 12px;box-sizing:border-box;border-radius:10px;font-size:.85rem;text-decoration:none}.audit-record-actions svg{width:18px;height:18px}#auditRecordTitle[data-tone=danger]>svg{color:#af2940}#auditRecordTitle[data-tone=success]>svg{color:#23704a}#auditRecordTitle[data-tone=warning]>svg{color:#9a570d}#auditRecordTitle[data-tone=info]>svg{color:#286879}
+body[data-hand=left] .audit-record-actions{flex-direction:row-reverse}.audit-record-open .report-log-heading>strong{overflow-wrap:anywhere}
+
+.audit-filter-fields{max-height:var(--audit-filter-max,65dvh)}.audit-filter-menu[data-placement=up]>.audit-filter-fields{top:auto;bottom:calc(100% + 6px)}.one-hand-sheet .audit-filter-menu[data-placement]>.audit-filter-fields{position:static;max-height:none}
+
+.audit-delta{align-items:center;gap:5px}.audit-delta>svg{width:15px;height:15px;flex:none}

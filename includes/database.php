@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=40;
+const REPOTOOLS_SCHEMA_VERSION=45;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -16,6 +16,12 @@ function postgres_connection(string $url): array {
     $port = $parts['port'] ?? 5432;
     if (!$host || !$name || !$user || !$password || $port < 1 || $port > 65535 || preg_match('/[;\s]/', $host . $name)) {
         throw new PDOException('DATABASE_URL no es válida.');
+    }
+    // Optional deployment guard: beta must fail closed if its connection is replaced accidentally.
+    $expectedName=trim(getenv('REPOTOOLS_EXPECTED_DATABASE')?:'');
+    $expectedUser=trim(getenv('REPOTOOLS_EXPECTED_DATABASE_USER')?:'');
+    if (($expectedName!=='' && $name!==$expectedName) || ($expectedUser!=='' && $user!==$expectedUser)) {
+        throw new PDOException('La conexión no corresponde al entorno configurado.');
     }
     // TLS es obligatorio. Las credenciales nunca se incluyen en el DSN ni en mensajes.
     return ['dsn' => "pgsql:host={$host};port={$port};dbname={$name};sslmode=require;connect_timeout=15", 'user' => $user, 'password' => $password];
@@ -325,6 +331,44 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE achievement_days(user_id {$ref} NOT NULL REFERENCES users(id),day TEXT NOT NULL,PRIMARY KEY(user_id,day))");
             $db->exec("CREATE TABLE user_achievements(user_id {$ref} NOT NULL REFERENCES users(id),category TEXT NOT NULL,level INTEGER NOT NULL CHECK(level BETWEEN 1 AND 6),unlocked_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP,featured INTEGER NOT NULL DEFAULT 0,seen_at {$timestamp},PRIMARY KEY(user_id,category,level))");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(40)');
+        }
+        if(!isset($applied[41])){
+            $db->exec("CREATE TABLE team_pallet_requests(id {$id},pallet_id {$ref} NOT NULL REFERENCES pallets(id),branch_id {$ref} NOT NULL REFERENCES stock_branches(id),owner_id {$ref} NOT NULL REFERENCES users(id),requested_by {$ref} NOT NULL REFERENCES users(id),base_revision INTEGER NOT NULL,revision INTEGER NOT NULL DEFAULT 1,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','rejected','cancelled')),created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE UNIQUE INDEX team_pallet_pending ON team_pallet_requests(pallet_id,branch_id) WHERE status='pending'");
+            $db->exec('CREATE INDEX team_pallet_owner ON team_pallet_requests(owner_id,status)');
+            $db->exec('CREATE INDEX team_pallet_branch ON team_pallet_requests(branch_id,status,pallet_id)');
+            $db->exec("CREATE TABLE team_pallet_products(id {$id},request_id {$ref} NOT NULL REFERENCES team_pallet_requests(id),pallet_id {$ref} NOT NULL REFERENCES pallets(id),ean TEXT NOT NULL,name TEXT NOT NULL DEFAULT '',expires TEXT NOT NULL DEFAULT '',units INTEGER NOT NULL CHECK(units>0 AND units<=1000000000),kind TEXT NOT NULL,pack_size INTEGER NOT NULL CHECK(pack_size>0),revision INTEGER NOT NULL DEFAULT 1,UNIQUE(request_id,ean,expires))");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(41)');
+        }
+        if(!isset($applied[42])){
+            foreach(['pallet_products','team_pallet_products','stock_product_references'] as $table){
+                $db->exec("ALTER TABLE $table ADD COLUMN inner_pack_size INTEGER NOT NULL DEFAULT 0 CHECK(inner_pack_size>=0 AND inner_pack_size<=1000000)");
+            }
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(42)');
+        }
+        if(!isset($applied[43])){
+            $db->exec("CREATE TABLE supervisor_teams(id {$id},owner_id {$ref} NOT NULL UNIQUE REFERENCES users(id),name TEXT NOT NULL,active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)),revision INTEGER NOT NULL DEFAULT 1,created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("CREATE TABLE supervisor_members(team_id {$ref} NOT NULL REFERENCES supervisor_teams(id),user_id {$ref} NOT NULL REFERENCES users(id),status TEXT NOT NULL CHECK(status IN ('pending','accepted','declined','revoked')),revision INTEGER NOT NULL DEFAULT 1,created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(team_id,user_id))");
+            $db->exec('CREATE INDEX supervisor_members_user ON supervisor_members(user_id,status,team_id)');
+            $db->exec("CREATE TABLE supervisor_lists(id {$id},team_id {$ref} NOT NULL REFERENCES supervisor_teams(id),name TEXT NOT NULL,source_base64 TEXT NOT NULL,sheet_path TEXT NOT NULL,ean_column TEXT NOT NULL,ean_rows TEXT NOT NULL,row_count INTEGER NOT NULL,created_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec('CREATE INDEX supervisor_lists_team ON supervisor_lists(team_id,id)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(43)');
+        }
+        if(!isset($applied[44])){
+            $db->exec("CREATE TABLE push_app_keys(id INTEGER PRIMARY KEY CHECK(id=1),public_key TEXT NOT NULL,private_key TEXT NOT NULL)");
+            $db->exec("CREATE TABLE push_subscriptions(id {$id},endpoint_hash TEXT NOT NULL UNIQUE,user_id {$ref} NOT NULL REFERENCES users(id) ON DELETE CASCADE,device_hash TEXT NOT NULL,endpoint TEXT NOT NULL,p256dh TEXT NOT NULL,auth TEXT NOT NULL,enabled INTEGER NOT NULL DEFAULT 1 CHECK(enabled IN (0,1)),last_notification_id BIGINT NOT NULL DEFAULT 0,expiry_day TEXT NOT NULL DEFAULT '',checked_at BIGINT NOT NULL DEFAULT 0,updated_at BIGINT NOT NULL)");
+            $db->exec('CREATE INDEX push_subscriptions_user ON push_subscriptions(user_id,device_hash,enabled)');
+            $db->exec("CREATE TABLE push_jobs(id TEXT PRIMARY KEY,subscription_id {$ref} NOT NULL REFERENCES push_subscriptions(id) ON DELETE CASCADE,event_key TEXT NOT NULL,notification_id {$ref},kind TEXT NOT NULL,payload TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','sending','sent','cancelled','failed')),attempts INTEGER NOT NULL DEFAULT 0,available_at BIGINT NOT NULL,lease_until BIGINT NOT NULL DEFAULT 0,expires_at BIGINT NOT NULL,sent_at BIGINT,error_code TEXT,UNIQUE(subscription_id,event_key))");
+            $db->exec('CREATE INDEX push_jobs_ready ON push_jobs(status,available_at,lease_until)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(44)');
+        }
+        if(!isset($applied[45])){
+            $db->exec("ALTER TABLE products ADD COLUMN uxb TEXT NOT NULL DEFAULT ''");
+            $db->exec("ALTER TABLE products ADD COLUMN uxc TEXT NOT NULL DEFAULT ''");
+            $db->exec("ALTER TABLE supervisor_members ADD COLUMN branch_scope TEXT NOT NULL DEFAULT 'all'");
+            $db->exec('ALTER TABLE supervisor_members ADD COLUMN scope_revision INTEGER NOT NULL DEFAULT 1');
+            $db->exec("CREATE TABLE supervisor_member_branches(team_id {$ref} NOT NULL,user_id {$ref} NOT NULL,branch_id {$ref} NOT NULL,PRIMARY KEY(team_id,user_id,branch_id),FOREIGN KEY(team_id,user_id) REFERENCES supervisor_members(team_id,user_id) ON DELETE CASCADE)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(45)');
         }
         $db->commit();
     } catch (Throwable $error) {

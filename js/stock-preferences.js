@@ -10,12 +10,14 @@
     const response=await window.fetch('api/preferencias.php',{method:'POST',credentials:'same-origin',keepalive:true,body:new URLSearchParams({...body,csrf})});
     const data=await response.json();if(!response.ok)throw Error(data.error||'No pudimos guardar la preferencia.');csrf=data.csrf;return data;
   }
+  function preview(){const badge=doc.getElementById('expiryPreviewNear');if(!badge)return;const n=validDays()?Number(days.value):Number(savedDays);badge.hidden=n<=7;badge.textContent='Por vencer · '+(n===8?'8 días':'8–'+n+' días');}
+  days.addEventListener('input',preview);days.addEventListener('blur',()=>setTimeout(preview,0));preview();
   function validDays(){return days.value!==''&&Number.isInteger(Number(days.value))&&Number(days.value)>=0&&Number(days.value)<=365;}
   async function saveDays(){
     clearTimeout(expiryTimer);if(expiryBusy||!validDays()||days.value===savedDays)return;
     const rawValue=days.value,value=String(Number(rawValue));expiryBusy=true;days.setAttribute('aria-busy','true');
-    try{const data=await save({expiry_days:value});savedDays=String(data.expiry_days);if(days.value===rawValue)days.value=savedDays;notify('Días de anticipación actualizados.');}
-    catch(error){if(days.value===rawValue)days.value=savedDays;notify(error.message,'error');}
+    try{const data=await save({expiry_days:value});savedDays=String(data.expiry_days);if(days.value===rawValue)days.value=savedDays;preview();notify('Días de anticipación actualizados.');}
+    catch(error){if(days.value===rawValue)days.value=savedDays;preview();notify(error.message,'error');}
     finally{expiryBusy=false;days.removeAttribute('aria-busy');if(validDays()&&days.value!==savedDays)expiryTimer=setTimeout(saveDays,600);}
   }
   days.addEventListener('input',()=>{clearTimeout(expiryTimer);if(validDays())expiryTimer=setTimeout(saveDays,600);});

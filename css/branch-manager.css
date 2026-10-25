@@ -13,3 +13,10 @@
 
 .company-assignment-dialog #teamSetup>p,.company-assignment-dialog #teamCreateForm>.team-hint{display:none}.company-assignment-dialog .company-form-actions{margin-top:14px}.company-branch-open{display:block;text-align:start;padding:4px 0;font-weight:700;min-height:44px}#companyNewBranchClose svg{transform:rotate(90deg)}#companyNewBranchBody .team-inline{display:flex;gap:10px}#companyNewBranchBody label{display:block;margin-bottom:10px}#companyNewBranchBody input{width:100%;box-sizing:border-box}#companyAssignmentContext:empty{display:none}
 .company-new-branch-panel{border-top:1px solid #eeeaf5;padding-top:12px;margin-top:8px}.company-new-branch-panel h2{font-size:1.05rem}#companyLocation{margin-bottom:12px}#companyLocation summary{min-height:44px;display:flex;align-items:center;gap:6px;cursor:pointer}#companyLocationMap{height:240px}.company-new-branch-panel label{display:block}.company-new-branch-panel .team-section-title{margin-bottom:10px}#companyBranchDialogBody:has(.company-new-branch-panel:not([hidden]))~#teamCreateButton{display:none}
+
+/* Company details use the same centered dialog as their branches. */
+.company-layout:has(dialog.company-detail){display:block}.company-manager dialog.company-detail{width:min(620px,calc(100vw - 24px));margin:auto;padding:20px;border:1px solid #e5e1ef;scroll-margin-top:0}.company-result{align-items:center;gap:10px}.company-result-arrow{margin-inline-start:auto;color:#746998;display:flex;flex:none}.company-result-arrow svg{width:18px;height:18px;transform:rotate(-90deg)}.company-detail .team-row{gap:10px}.company-detail .team-row>div{min-width:0}.company-detail #companyDelete{margin-top:18px}
+
+.company-parent-link{display:block;text-align:start;text-decoration:underline;text-underline-offset:3px;color:#62577e;font-size:.9rem;padding:4px 0;margin-bottom:8px}
+
+.company-detail .company-branches-heading>button{display:inline-flex;width:auto;min-width:44px;gap:6px;padding:10px;white-space:nowrap}.company-detail .company-branches-heading h2{font-size:1rem}.company-detail .company-branches-heading{flex-wrap:wrap}

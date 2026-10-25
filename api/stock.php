@@ -31,10 +31,31 @@ if ($method==='POST' && (!$uid || !valid_csrf())) stock_response($uid?403:401,['
 $csrf=csrf_token();$catalogPermit=$method==='POST'&&$uid?catalog_reference_take($uid,$_POST):null; session_write_close(); $db=null;
 try {
     $db=database(); $db->beginTransaction();
+    $teamBranch=(int)($_POST['team_branch_id']??$_GET['team_branch_id']??0);
+    if($teamBranch){
+        if(!$uid)throw new CatalogException('Ingresá para acceder al equipo.',401);
+        team_require($db,$uid,$teamBranch);
+        if($method==='GET'&&isset($_GET['code'])){$result=['pallet'=>team_request_detail($db,(string)$_GET['code'],$uid,$teamBranch),'csrf'=>$csrf,'user_id'=>$uid];$db->commit();stock_response(200,$result);}
+        if($method==='POST'){
+            if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');
+            $key=$_POST['operation_key']??'';if(!is_string($key)||!preg_match('/^[a-f0-9-]{36}$/D',$key))throw new CatalogException('Recargá el formulario.',422);
+            $payload=$_POST;unset($payload['csrf']);$hash=hash('sha256',json_encode($payload));
+            $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
+            if($cached!==false&&isset(json_decode($cached,true)['_team_payload'])){$previous=json_decode($cached,true);if(!hash_equals($previous['_team_payload'],$hash))throw new CatalogException('La operación ya fue utilizada. Revisá el palet.',409);unset($previous['_team_payload']);$db->commit();stock_response(200,[...$previous,'csrf'=>$csrf,'user_id'=>$uid]);}
+            $pending=team_request_edit($db,$uid,$teamBranch,$_POST);
+            if($pending!==null){stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode([...$pending,'_team_payload'=>$hash],JSON_UNESCAPED_UNICODE)]);$db->commit();stock_response(200,[...$pending,'csrf'=>$csrf,'user_id'=>$uid]);}
+        }
+    }
     $expiryDue=$method==='POST'||stock_query($db,'SELECT 1 FROM pallet_labels WHERE (pallet_id IS NULL AND reserved_until>0 AND reserved_until<=?) OR pallet_id IN (SELECT id FROM pallets WHERE released=1 OR (released=0 AND activated=0 AND prepared_until<=? AND NOT EXISTS(SELECT 1 FROM pallet_products b WHERE b.pallet_id=pallets.id))) LIMIT 1',[time(),time()])->fetchColumn();
     if($expiryDue){if($db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql')$db->query('SELECT pg_advisory_xact_lock(72684623)');else $db->exec('UPDATE stock_mutex SET revision=revision+1 WHERE id=1');stock_expire($db);}
     if ($method==='GET') {
-        if(isset($_GET['offline_codes'])){
+        if(isset($_GET['goods'])){
+            if(!$uid)throw new CatalogException('Ingresá para consultar tu mercadería.',401);
+            require_once __DIR__.'/../includes/team-inventory.php';
+            $view=match($_GET['goods']){'lots'=>'lotes','dates'=>'fechas',default=>'mercaderia'};if(!is_string($_GET['goods'])||!in_array($_GET['goods'],['list','dates','lots'],true))throw new CatalogException('Sección no válida.',422);
+            $input=$_GET;if(($input['sort']??'')==='modified')$input['sort']='';
+            $result=['inventory'=>team_inventory_page($db,$uid,0,$view,$input,true)];
+        }elseif(isset($_GET['offline_codes'])){
             if(!$uid)throw new CatalogException('Inicia sesión para preparar Stock.',401);
             $codes=is_string($_GET['offline_codes'])?explode(',',$_GET['offline_codes']):[];if(!$codes||count($codes)>5||count(array_unique($codes))!==count($codes))throw new CatalogException('El lote no es válido.',422);
             $items=[];foreach($codes as $code){if(!preg_match('/^[0-9]{8}$/D',$code))throw new CatalogException('El código no es válido.',422);$allowed=stock_query($db,"SELECT p.id FROM pallets p WHERE p.code=? AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$code,$uid,$uid])->fetchColumn();if(!$allowed)throw new CatalogException('Este palet no está disponible para preparar en tu cuenta.',403);$items[]=stock_detail($db,$code,$uid);}$result=['pallets'=>$items];
@@ -43,15 +64,16 @@ try {
             $search=is_string($_GET['search']??null)?trim($_GET['search']):'';
             if(mb_strlen($search)>100)throw new CatalogException('La búsqueda admite hasta 100 caracteres.',422);
             $digits=preg_replace('/[\s-]+/u','',$search);$searchEAN=preg_match('/^(?:[0-9]{8}|[0-9]{13})$/D',$digits)?$digits:null;if($searchEAN!==null)$search=$searchEAN;
-            $sql="SELECT b.id,b.name,b.ean,b.expires,b.units,p.code,p.description AS pallet_description,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN products c ON c.ean=b.ean WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))";
+            $sql="SELECT b.id,b.name,b.ean,b.expires,b.units,p.code,p.description AS pallet_description,p.branch_id,(SELECT sb.name FROM stock_branches sb WHERE sb.id=p.branch_id AND ".branch_visibility_sql($db,$uid,'sb.id').") AS branch_name,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id LEFT JOIN products c ON c.ean=b.ean WHERE p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))";
             $params=[$uid,$uid];
             $branchFilter=$_GET['branch']??'all';if(!is_string($branchFilter)||($branchFilter!=='all'&&$branchFilter!=='none'&&!preg_match('/^[1-9][0-9]{0,17}$/D',$branchFilter)))throw new CatalogException('La sucursal no es válida.',422);if($branchFilter==='none')$sql.=' AND p.branch_id IS NULL';elseif($branchFilter!=='all'){$sql.=' AND p.branch_id=?';$params[]=$branchFilter;}
             $tag=$_GET['tag']??'';if(!is_string($tag)||mb_strlen($tag)>40)throw new CatalogException('La etiqueta no es válida.',422);
-            if($tag!==''&&!stock_is_admin($db,$uid))throw new CatalogException('Las etiquetas requieren rango administrador o manager.',403);
             if($tag!==''){$sql.=' AND EXISTS(SELECT 1 FROM pallet_user_tags t WHERE t.pallet_id=p.id AND t.user_id=? AND t.name=?)';$params[]=$uid;$params[]=$tag;}
-            if($searchEAN!==null){$sql.=' AND (b.ean=? OR p.code=?)';array_push($params,$searchEAN,$searchEAN);}elseif($search!==''){$sql.=' AND (LOWER(b.name) LIKE ? OR p.code LIKE ? OR b.ean LIKE ? OR LOWER(c.name) LIKE ? OR LOWER(c.brand) LIKE ? OR LOWER(p.description) LIKE ? OR EXISTS(SELECT 1 FROM pallet_user_tags st WHERE st.pallet_id=p.id AND st.user_id=? AND CAST(? AS INTEGER)=1 AND LOWER(st.name) LIKE ?))';$term='%'.mb_strtolower($search).'%';$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$uid;$params[]=stock_is_admin($db,$uid)?1:0;$params[]=$term;}
+            if($searchEAN!==null){$sql.=' AND (b.ean=? OR p.code=?)';array_push($params,$searchEAN,$searchEAN);}elseif($search!==''){$sql.=' AND (LOWER(b.name) LIKE ? OR p.code LIKE ? OR b.ean LIKE ? OR LOWER(c.name) LIKE ? OR LOWER(c.brand) LIKE ? OR LOWER(p.description) LIKE ? OR EXISTS(SELECT 1 FROM pallet_user_tags st WHERE st.pallet_id=p.id AND st.user_id=? AND LOWER(st.name) LIKE ?))';$term='%'.mb_strtolower($search).'%';$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$term;$params[]=$uid;$params[]=$term;}
             if(isset($_GET['expiries'])){$sql.=" AND b.expires<>'' AND b.expires<=?";$params[]=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$uid).' days')->format('Y-m-d');}
-            $result=['items'=>stock_query($db,$sql." ORDER BY CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires,p.code,b.id LIMIT 201",$params)->fetchAll(),'warning_days'=>stock_warning_days($db,$uid)];
+            $sort=$_GET['sort']??'modified';if(!is_string($sort)||!in_array($sort,['modified','expiry_asc','expiry_desc'],true))throw new CatalogException('El orden no es válido.',422);
+            $order=$sort==='modified'?'p.updated_at DESC,p.id DESC,b.id':"CASE WHEN b.expires='' THEN 1 ELSE 0 END,b.expires ".($sort==='expiry_desc'?'DESC':'ASC').",p.updated_at DESC,p.id DESC,b.id";
+            $result=['items'=>stock_query($db,$sql." ORDER BY ".$order." LIMIT 201",$params)->fetchAll(),'warning_days'=>stock_warning_days($db,$uid)];
             if($searchEAN!==null){$scope=substr($sql,strpos($sql,' FROM pallet_products b '));$totals=stock_query($db,'SELECT COUNT(DISTINCT p.id) AS pallet_count,COALESCE(SUM(b.units),0) AS units'.$scope.' AND b.ean=?',[...$params,$searchEAN])->fetch();$result['ean_summary']=['ean'=>$searchEAN,'pallet_count'=>(int)$totals['pallet_count'],'units'=>(int)$totals['units']];}
             $result['items']=array_map('stock_product_names',$result['items']);
             $result['has_more']=count($result['items'])>200;$result['items']=array_slice($result['items'],0,200);
@@ -66,7 +88,8 @@ try {
             if (!$uid) throw new CatalogException('Inicia sesión para agregar productos.',401);
             $ean=$_GET['ean'];
             if (!is_string($ean)||!valid_product_ean($ean)) throw new CatalogException('Ingresa un EAN válido.',422);
-            $result=['references'=>stock_query($db,'SELECT kind,pack_size FROM stock_product_references WHERE ean=?',[$ean])->fetchAll(),'reference_name'=>stock_saved_reference($db,$ean,$uid)];
+            $result=['references'=>stock_query($db,'SELECT kind,pack_size,inner_pack_size FROM stock_product_references WHERE ean=?',[$ean])->fetchAll(),'reference_name'=>stock_saved_reference($db,$ean,$uid)];
+            $catalog=catalog_product($db,$ean);foreach(['boxes','packs']as$kind)if(!in_array($kind,array_column($result['references'],'kind'),true)&&catalog_outer_units($catalog))$result['references'][]=['kind'=>$kind,'pack_size'=>catalog_outer_units($catalog),'inner_pack_size'=>0];
         } else {
             if (!$uid) throw new CatalogException('Inicia sesión para ver tus palets.',401);
             $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$uid])->fetchColumn();
@@ -85,7 +108,7 @@ try {
         $cached=stock_query($db,'SELECT result FROM stock_operations WHERE user_id=? AND operation_key=?',[$uid,$key])->fetchColumn();
         $transferPayload=($_POST['action']??'')==='transfer_commit'?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','mode','target_code','email','source_revision','target_revision','target_id','target_user']))):null;
         $deductPayload=($_POST['action']??'')==='deduct_product'?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','product_id','revision','amount','kind','pack_size']))):null;
-        $offlinePayload=isset($_POST['offline_owner'])?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','code','product_id','ean','name','amount','kind','pack_size','expires']))):null;
+        $offlinePayload=isset($_POST['offline_owner'])?hash('sha256',json_encode(array_map(fn($field)=>$_POST[$field]??null,['pallet_id','code','product_id','ean','name','amount','kind','pack_size','expires',...((int)($_POST['inner_pack_size']??0)>0?['inner_pack_size']:[])]))):null;
         if ($cached!==false) { $previous=json_decode($cached,true);if($transferPayload!==null&&(!isset($previous['_transfer_payload'])||!hash_equals($previous['_transfer_payload'],$transferPayload)))throw new CatalogException('Esta confirmación corresponde a otra transferencia. Revisá el destino.',409);if($deductPayload!==null&&isset($previous['_deduct_payload'])&&!hash_equals($previous['_deduct_payload'],$deductPayload))throw new CatalogException('Esta operación ya está confirmada. Revisá la cantidad actual antes de otra resta.',409);unset($previous['_deduct_payload'],$previous['_transfer_payload']);if($offlinePayload!==null&&isset($previous['_offline_payload'])&&!hash_equals($previous['_offline_payload'],$offlinePayload))throw new CatalogException('Esta operación ya fue enviada con otros datos. Conservamos la carga para revisar.',409);unset($previous['_offline_payload']);if($offlinePayload!==null){if(!isset(json_decode($cached,true)['_offline_payload']))throw new CatalogException('No pudimos verificar la confirmación antigua. Conservamos la carga para revisar.',409);$previous=stock_offline_confirmation($db,$previous,$key,$uid);}$previous['user_id']=$uid;$previous['csrf']=$csrf;$db->commit();if(isset($previous['confirmation']))$previous['confirmation']['committed']=true;if($offlinePayload!==null)$previous['catalog_reference_saved']=catalog_reference_sync($db,$uid,$previous)||!empty($previous['catalog_reference_saved']);stock_response(200,$previous); }
         $action=$_POST['action']??''; $id=(int)($_POST['pallet_id']??0); $result=[];
         $tracks=in_array($action,['claim','import','save_product','delete_product','description','delete','invite','accept','decline','revoke','leave'],true);
@@ -100,7 +123,12 @@ try {
                 $count=filter_var($_POST['count']??1,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>100]]);
                 if (!$count) throw new CatalogException('Elige entre 1 y 100 etiquetas.',422);
                 $result['labels']=[]; for($i=0;$i<$count;$i++) $result['labels'][]=stock_generate($db,$uid); break;
-            case 'claim': $result=stock_claim($db,(string)($_POST['code']??''),$uid); break;
+            case 'claim':
+                $suggested=$_POST['branch_id']??'';if(!is_string($suggested)||($suggested!==''&&!preg_match('/^[1-9][0-9]{0,14}$/D',$suggested)))throw new CatalogException('La sucursal no es válida.',422);
+                if($suggested!==''){require_once __DIR__.'/../includes/stock-branches.php';branch_owned($db,(int)$suggested,$uid);if(stock_label($db,(string)($_POST['code']??''))['pallet_id'])throw new CatalogException('El palet ya está en uso. Volvé a abrirlo antes de asignar sucursal.',409);}
+                $result=stock_claim($db,(string)($_POST['code']??''),$uid);
+                if($suggested!=='')branch_assign($db,$uid,['pallet_id'=>$result['id'],'revision'=>1,'branch_id'=>$suggested,'share_pallet'=>'0']);
+                break;
             case 'save_product':
                 if (isset($_POST['offline_revision'])) {
                     $current=stock_editable($db,$id,$uid);
@@ -115,7 +143,7 @@ try {
                 if(isset($_POST['offline_owner'])){$current=stock_editable($db,$id,$uid);if($current['code']!==($_POST['code']??'')||(int)$_POST['offline_revision']>(int)$current['revision'])throw new CatalogException('El palet no coincide con la copia local.',409);}
                 $result=stock_deduct_product($db,$uid,$_POST);
                 $result['deduction']=['product_id'=>(int)$_POST['product_id'],'ean'=>$result['_movement']['ean'],'units_before'=>$result['_movement']['old'],'units_after'=>$result['_movement']['new'],'units_removed'=>$result['removed']];
-                stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$uid,$id,$result['remaining']?(int)$_POST['product_id']:null,'quantity_deducted',json_encode($result['_movement'],JSON_UNESCAPED_UNICODE)]);
+                stock_query($db,'INSERT INTO pallet_activity(user_id,pallet_id,product_id,action,metadata) VALUES(?,?,?,?,?)',[$uid,$id,$result['remaining']?(int)$_POST['product_id']:null,'quantity_deducted',json_encode([...$result['_movement'],...pallet_activity_team_metadata($db,$uid,$id,($_POST['activity_source']??'')==='team')],JSON_UNESCAPED_UNICODE)]);
                 unset($result['_movement']);break;
             case 'import':
                 $products=json_decode(is_string($_POST['products']??null)?$_POST['products']:'',true);
@@ -158,7 +186,7 @@ try {
                 $ids=array_unique($ids);
                 // Authorize the entire batch before changing anything. The existing transaction is atomic.
                 foreach($ids as $target)stock_editable($db,$target,$uid,true);
-                foreach($ids as $target){$before=pallet_activity_snapshot($db,$target);stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$target]);stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$target]);$after=$before;$after['released']=1;pallet_activity_record($db,$uid,$target,$before,$after);audit_stock($db,$uid,'delete',$key.':'.$target,audit_from_activity($before),audit_from_activity($after),[]);}
+                foreach($ids as $target){$before=pallet_activity_snapshot($db,$target);stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$target]);stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$target]);$after=$before;$after['released']=1;pallet_activity_record($db,$uid,$target,$before,$after);audit_stock($db,$uid,'delete',$key.':'.$target,audit_from_activity($before),[...audit_from_activity($after),'transaction_id'=>$key],[]);}
                 break;
             case 'delete':
                 stock_editable($db,$id,$uid,true); stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$id]);
@@ -192,13 +220,16 @@ try {
                 stock_query($db,'INSERT INTO stock_preferences(user_id,expiry_days) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET expiry_days=excluded.expiry_days',[$uid,$days]); break;
             default: throw new CatalogException('Acción no válida.',422);
         }
-        if($tracks){$historyId=(int)($result['id']??$historyId);if($historyId){$historyAfter=pallet_activity_snapshot($db,$historyId);pallet_activity_record($db,$uid,$historyId,($historyBefore&& (int)$historyBefore['id']===$historyId)?$historyBefore:null,$historyAfter);}}
+        if($tracks){$historyId=(int)($result['id']??$historyId);if($historyId){$historyAfter=pallet_activity_snapshot($db,$historyId);pallet_activity_record($db,$uid,$historyId,($historyBefore&& (int)$historyBefore['id']===$historyId)?$historyBefore:null,$historyAfter,($_POST['activity_source']??'')==='team');}}
         if ($action!=='tag'&&stock_is_admin($db,$uid)&&($id||isset($_POST['code']))) {
             $target=$id?stock_query($db,'SELECT code FROM pallets WHERE id=?',[$id])->fetchColumn():(string)$_POST['code'];
             $details=$_POST;unset($details['csrf'],$details['operation_key']);
             stock_query($db,'INSERT INTO pallet_admin_events(user_id,pallet_id,code,action,details) VALUES(?,?,?,?,?)',[$uid,$id?:null,$target?:'',(string)$action,json_encode($details,JSON_UNESCAPED_UNICODE)]);
         }
-        if(!in_array($action,['preferences','delete_many','tag'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id))),$_POST);
+        $auditAfter=$action==='generate'?['labels'=>array_column($result['labels'],'code')]:($historyAfter?audit_from_activity($historyAfter):audit_pallet($db,(int)($result['id']??$id)));
+        if($action==='delete_labels')$auditAfter=['labels'=>$codes];
+        if($action==='transfer_commit')$auditAfter['transfer']=['mode'=>$result['mode'],'source_code'=>$result['code'],'target_code'=>$result['target_code']??'', 'target_name'=>$result['target_name']??'','units'=>$result['units']??array_sum(array_column($auditBefore['products']??[],'units'))];
+        if(!in_array($action,['preferences','delete_many','tag','transfer_preview'],true))audit_stock($db,$uid,$action,$key,$auditBefore,$auditAfter,$_POST);
         $result['ok']=true;if($transferPayload!==null)$result['_transfer_payload']=$transferPayload;if($deductPayload!==null)$result['_deduct_payload']=$deductPayload;if($offlinePayload!==null)$result['_offline_payload']=$offlinePayload; stock_query($db,'INSERT INTO stock_operations(user_id,operation_key,result) VALUES(?,?,?)',[$uid,$key,json_encode($result,JSON_UNESCAPED_UNICODE)]);
     }
     if($method==='POST' && $offlinePayload!==null)$result=stock_offline_confirmation($db,$result,$key,$uid);

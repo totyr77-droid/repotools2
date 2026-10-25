@@ -21,7 +21,7 @@ $db->beginTransaction();team_manager_rename($db,1,$workspace,'Empresa 23','Empre
 $input=['branch_id'=>$branch['id'],'revision'=>1,'name'=>'Sucursal corregida','address'=>'Calle 2','locality'=>'Mendoza','province'=>'Mendoza','description'=>'Entrada lateral'];
 management_denied(fn()=>team_manager_save_branch($db,1,23,$input),409);$db->beginTransaction();team_manager_save_branch($db,1,$workspace,$input);$db->commit();management_denied(fn()=>team_manager_save_branch($db,1,$workspace,$input),409);
 $saved=team_manager_company($db,1,$workspace)['branches'][0];management_check($saved['name']==='Sucursal corregida'&&(int)$saved['revision']===2,'branch saved with revision');
-management_check(team_role($db,3,(int)$branch['id'])==='admin','responsible unchanged');management_check(team_role($db,1,(int)$branch['id'])==='','platform manager does not acquire business access');
+management_check(team_role($db,3,(int)$branch['id'])==='admin','responsible unchanged');management_check(team_role($db,1,(int)$branch['id'])==='admin','platform manager has administrative business access');
 for($i=0;$i<31;$i++){$id=(int)stock_query($db,'INSERT INTO stock_branches(owner_id,name,address,locality,province) VALUES(1,?,?,?,?) RETURNING id',['Page '.$i,'Address '.$i,'City','Province'])->fetchColumn();stock_query($db,'INSERT INTO branch_workspace_locations(branch_id,workspace_id) VALUES(?,22)',[$id]);}
 $page=team_manager_company($db,1,22);management_check(count($page['branches'])===30&&$page['next_cursor']!==null,'branch pagination');$tail=team_manager_company($db,1,22,$page['next_cursor']);management_check(count($tail['branches'])===1&&!$tail['next_cursor'],'branch pagination end');
 

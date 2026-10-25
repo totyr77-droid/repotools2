@@ -11,14 +11,23 @@ function audit_time(?int $millis=null): string {
 }
 function audit_event(PDO $db,int $actor,string $action,string $operation,array $context=[],array $before=[],array $after=[],string $result='confirmed',?string $original=null,int $activity=0,int $units=0): void {
     if(!$db->inTransaction())throw new LogicException('Audit requires the business transaction.');
+    $businessActor=$actor;
+    $supportActor=$GLOBALS['repo_support_actor']??null;$supportTarget=$GLOBALS['repo_support_target']??null;
+    if($supportActor&&$supportTarget){$actor=(int)$supportActor['id'];$after['support_account']=['id'=>(int)$supportTarget['id'],'name'=>get_public_user_name($supportTarget)];}
     $u=audit_q($db,'SELECT id,name,role,public_name FROM users WHERE id=?',[$actor])->fetch();
+    if($supportActor&&$supportTarget)$u['public_name']=get_public_user_name($u).' · como '.get_public_user_name($supportTarget);
     $id=hash('sha256',$actor.'|'.$action.'|'.$operation.'|'.$result);
     $at=$original??gmdate('Y-m-d H:i:s');
     $insert=audit_q($db,'INSERT INTO audit_events(event_id,actor_id,actor_name,actor_role,actor_rank,action,category,result,occurred_at,synced_at,operation_id,branch_id,pallet_id,pallet_code,ean,target_user,before_data,after_data) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(event_id) DO NOTHING',[$id,$actor,$u?get_public_user_name($u):'Usuario eliminado',$u['role']??'usuario',audit_rank($u['role']??'usuario'),$action,$context['category']??'movements',$result,$at,gmdate('Y-m-d H:i:s'),$operation,$context['branch_id']??null,$context['pallet_id']??null,$context['code']??'',$context['ean']??'',$context['target_user']??null,json_encode(audit_clean($before),JSON_UNESCAPED_UNICODE),json_encode(audit_clean($after),JSON_UNESCAPED_UNICODE)])->rowCount();
     if(!$insert||$result!=='confirmed')return;
+    $actor=$businessActor;
     require_once __DIR__.'/achievements.php';
     if(in_array($action,['save_product','deduct_product','transfer_commit','edited'],true))achievement_day($db,$actor);
-    if($action==='referral_credited')achievement_record($db,$actor,'referidos',(string)($context['target_user']??$operation));
+    if($action==='referral_credited'){
+        achievement_record($db,$actor,'referidos',(string)($context['target_user']??$operation));
+        $joined=audit_q($db,"SELECT r.id AS referral_id,u.id,u.public_name FROM referrals r JOIN users u ON u.id=r.invitee_id WHERE r.referrer_id=? AND r.invitee_id=? AND r.state='validated' AND r.email_verified_at IS NOT NULL",[$actor,(int)($context['target_user']??0)])->fetch();
+        if($joined)audit_q($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO NOTHING",[$actor,'referral-joined:'.$joined['referral_id'],'referral_joined','¡Se sumó tu referido!',get_public_user_name($joined).' se unió a RepoTools con tu invitación. ¡Gracias por ayudarnos a crecer!']);
+    }
     if($action==='transfer_commit')achievement_record($db,$actor,'transferencias',$operation);
     if($action==='deduct_product')achievement_record($db,$actor,'retiros',$operation);
     if($action==='save_product'){
@@ -26,7 +35,7 @@ function audit_event(PDO $db,int $actor,string $action,string $operation,array $
         if($newUnits>$oldUnits&&!empty($context['new_load']))achievement_record($db,$actor,'productos_agregados',$operation);
         if(empty($before['activated'])&&!empty($after['products'])&&(int)($after['owner_id']??0)===$actor)achievement_record($db,$actor,'pallets',(string)$after['id']);
     }
-    if($action==='approved'&&!empty($context['target_user'])&&(int)$context['target_user']!==$actor&&array_intersect_key($before['product']??[],array_flip(['name','brand','quantity','category','packaging','image']))!==array_intersect_key($after['product']??[],array_flip(['name','brand','quantity','category','packaging','image'])))achievement_record($db,(int)$context['target_user'],'ediciones',$operation);
+    if($action==='approved'&&empty($context['automated_import'])&&!empty($context['target_user'])&&(int)$context['target_user']!==$actor&&array_intersect_key($before['product']??[],array_flip(['name','brand','quantity','category','packaging','image']))!==array_intersect_key($after['product']??[],array_flip(['name','brand','quantity','category','packaging','image'])))achievement_record($db,(int)$context['target_user'],'ediciones',$operation);
     $day=(new DateTimeImmutable($at,new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('America/Argentina/Buenos_Aires'))->format('Y-m-d');
     foreach([['activity',$actor,$activity],['branches',(int)($context['branch_id']??0),$units]] as [$kind,$subject,$value])if($subject>0&&$value>0)audit_q($db,'INSERT INTO ranking_daily(kind,subject_id,day,value) VALUES(?,?,?,?) ON CONFLICT(kind,subject_id,day) DO UPDATE SET value=ranking_daily.value+excluded.value',[$kind,$subject,$day,$value]);
 }
@@ -50,4 +59,9 @@ function audit_denied(PDO $db,int $actor,string $action,string $key,int $status,
 
 function audit_from_activity(?array $snapshot): array {
     if(!$snapshot)return [];$p=array_intersect_key($snapshot,array_flip(['id','code','branch_id','description','released','activated','owner_id']));$p['products']=[];$products=$snapshot['products']??[];ksort($products);foreach($products as $id=>$row)$p['products'][]=['id'=>(int)$id,...$row];$p['accesses']=[];$accesses=$snapshot['accesses']??[];ksort($accesses);foreach($accesses as $id=>$status)$p['accesses'][]=['user_id'=>(int)$id,'status'=>$status];return $p;
+}
+
+function audit_session(PDO $db,int $user,string $action,string $kind): void {
+    // No cookies, session identifiers, credentials, IPs or device tokens are stored.
+    $own=!$db->inTransaction();try{if($own)$db->beginTransaction();audit_event($db,$user,$action,bin2hex(random_bytes(16)),['category'=>'users'],[],['device_kind'=>$kind==='mobile'?'mobile':'desktop']);if($own)$db->commit();}catch(Throwable $e){if($own&&$db->inTransaction())$db->rollBack();error_log('Repotools session audit unavailable');}
 }

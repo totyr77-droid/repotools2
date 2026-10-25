@@ -12,7 +12,7 @@ Docker usa PHP 8.3 y Apache, PDO PostgreSQL/SQLite, mbstring, curl y GD. `.htacc
 
 `includes/auth.php` y `includes/sessions.php` mantienen sesiones persistentes en DB, duración30días, renovación del identificador al ingresar y cookies HttpOnly/SameSite. `includes/account-devices.php` valida una sesión desktop y una mobile por cuenta. Cambios de contraseña invalidan las sesiones correspondientes mediante versión de autenticación. Recuperación está implementada con Resend, tokens de un uso y vencimiento; configuración en [docs/RECUPERACION.md](docs/RECUPERACION.md).
 
-Rangos actuales: usuario, moderador, supervisor, administrador y manager. APIs validan permisos en el servidor; ocultar botones no concede ni revoca acceso. Manager tiene capacidades superiores; supervisión por vínculos y Empresa como permiso siguen pendientes. El usuario invitado puede escanear y consultar contenido público, pero no administrar colecciones/palets privados.
+Rangos generales: usuario, moderador, administrador y manager. Supervisor de empresa es un permiso adicional por vínculo, no un rango general. APIs validan permisos en el servidor; ocultar botones no concede ni revoca acceso. Manager tiene capacidades superiores; Empresas y supervisión por vínculos están implementadas con consentimiento y revocación. El usuario invitado puede escanear y consultar contenido público, pero no administrar colecciones/palets privados.
 
 ## Escaneo y celular-PC
 
@@ -36,9 +36,9 @@ El selector abre primero el mapa. Alta/edición muestra el mapa arriba y tres su
 
 ## Offline y PWA
 
-Un único service worker: `sw.js`, registrado por `js/offline-cache.js`. Shell actualv10 con `offline.html`; no se cachean APIs privadas. Navegaciones cubiertas muestran shell offline al fallar la red. Requiere preparar recursos con conexión en el mismo origen antes de usarlos offline.
+Un único service worker: `sw.js`, registrado por `js/offline-cache.js`. Caché de shell versionada por release, con `offline.html`; no se cachean APIs privadas. Navegaciones cubiertas muestran shell offline al fallar la red. Requiere preparar recursos con conexión en el mismo origen antes de usarlos offline.
 
-`js/stock-offline.js` utiliza IndexedDBv2 para cargas Stock/Biblioteca, catálogo y envíos recientes, separados por cuenta. `js/library-offline.js` y Stock verifican conectividad autenticada, identidad e idempotencia antes de sincronizar. Inicio offline conserva lista local, sin enviar lecturas a TOPs. No borrar IndexedDB al revertir una entrega.
+`js/stock-offline.js` utiliza IndexedDBv4 para cargas Stock/Biblioteca, catálogo y envíos recientes, separados por cuenta. `js/library-offline.js` y Stock verifican conectividad autenticada, identidad e idempotencia antes de sincronizar. Inicio offline conserva lista local, sin enviar lecturas a TOPs. No borrar IndexedDB al revertir una entrega.
 
 `manifest.webmanifest` define la misma aplicación PHP con rutas relativas a su directorio, modo standalone y colores existentes. Iconos reales del pack en `img/Repotools_Logo_Pack_Blanco/`: normales/maskable192/512, Apple180 y logo horizontal blanco. El encabezado general enlaza manifest una vez. No existe un segundo service worker ni se cambió la estrategia de caché para instalar la PWA.
 
@@ -46,7 +46,7 @@ Un único service worker: `sw.js`, registrado por `js/offline-cache.js`. Shell a
 
 Leer `PENDIENTES.md` y ROADMAP antes de continuar. Historial de decisiones y entregas en CHANGELOG; las notas antiguas no prevalecen sobre código actual. Mantener diseño minimalista, SVG y preferencia de mano móvil; escritorio conserva disposición diestra. Pruebas en `tests/` usan mayormente DB temporal/Chrome simulado, no equivalen a pruebas de campo.
 
-La raíz de trabajo no contiene Git; publicación mediante checkout `tmp/upstream` en desarrollo (main requiere autorización explícita) y despliegue automático Render. Versionar solo archivos de la entrega, conservar cambios del usuario y documentar validación/reversión. Publicar un commit no demuestra que Render haya terminado.
+La raíz de trabajo no contiene Git; publicación mediante checkout `tmp/upstream` en main para las entregas actualmente autorizadas; beta independiente y despliegue automático Render. Versionar solo archivos de la entrega, conservar cambios del usuario y documentar validación/reversión. Publicar un commit no demuestra que Render haya terminado.
 
 ## Entrega4–8 (desarrollo)
 
@@ -55,4 +55,20 @@ Indicador Stock/Biblioteca lee loads/libraryLoads existentes; eventos de escritu
 initialize_database consulta todas las versiones una vez dentro de la transacción/bloqueo existentes; no usa MAX ni caché entre requests. Auditoría y límites de pruebas reales: docs/AUDITORIA-2026-10-13.md.
 
 ## Offline inteligente
-Service Worker shell-v16 y modelos OCR en caché independiente. Conectividad real mediante API mínima, colas compartidas e IndexedDB v3. Consultar docs/OFFLINE-INTELIGENTE.md para alcance, aislamiento de cuenta y reversión; no se cachean respuestas API ni HTML privado.
+Service worker único con caché versionada y modelos OCR en caché independiente. Conectividad real mediante API mínima, colas compartidas e IndexedDB v4. Consultar docs/OFFLINE-INTELIGENTE.md para alcance, aislamiento de cuenta y reversión; no se cachean respuestas API ni HTML privado.
+
+
+## Estado añadido en main hasta v2.37
+
+- Empresas/supervisores: permiso independiente habilitado por Manager, integrantes aceptan invitación, varios supervisores y desvinculación. Consulta/descarga sin edición del stock del integrante. Listas XLSX con elección de hoja/columna/títulos, corrección de incidencias y exportación filtrada con campos opcionales. docs/SUPERVISION-EMPRESAS.md.
+- Equipos de sucursal y solicitudes de edición están en main; proyección pendiente y decisión del propietario no sustituyen permisos de inventario. docs/REGISTROS-MODERACION.md describe su auditoría, no cambia el flujo de consentimiento.
+- Stock admite unidades/cajas/bultos y paquetes internos. Transferencias a palet o cuenta y etiquetas personales privadas para propietario/acceso aceptado están implementadas. Supervisión no concede estas ediciones.
+- Registros de Moderación: cuatro secciones, operación agrupada por identidad real antes de paginar y detalle en modal. Inicio/cierre explícito de sesión se audita desde v2.37, no cada recarga.
+- Notificaciones actuales: campana autenticada con consulta periódica. Hasta v2.37 no hay PushManager, suscripciones ni envío push con app cerrada. Esa integración es el trabajo actual; no confundir la campana con notificaciones del sistema.
+
+Las secciones antiguas que describen entregas en desarrollo son contexto técnico. El estado vigente y lo que falta probar se mantienen en PENDIENTES.md y ROADMAP.md; versiones y cachés antiguas no son instrucciones para reducir el esquema o IndexedDB.
+
+
+## Notificaciones del dispositivo — v2.38
+
+Push Web estándar sobre el service worker existente, activación voluntaria y API autenticada api/push.php. Claves VAPID persistentes en DB y suscripciones por dispositivo/sesión; jobs con dedupe/lease/reintentos. Worker CLI en el mismo contenedor cada60s, desactivable con REPOTOOLS_PUSH_WORKER=0. Migración44; Composer minishlink/web-push9.0.4 y vendor instalado en Docker, no versionado ni accesible por HTTP. Avisos seleccionados y vencimientos agrupados diarios, sin lectura automática de campana. Hasta v2.37 solo había consulta interna; desde v2.38 el envío cerrado está implementado, pendiente de recepción física real. Detalles, pruebas y reversión: docs/NOTIFICACIONES-PUSH.md.

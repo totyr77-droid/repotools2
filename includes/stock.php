@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/catalog.php';
 require_once __DIR__ . '/public-names.php';
+require_once __DIR__.'/branch-visibility.php';
 require_once __DIR__.'/branch-team.php';
 
 function stock_public_identity(array $row): array {
@@ -88,14 +89,15 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     $access=$user ? stock_query($db,'SELECT status FROM pallet_access WHERE pallet_id=? AND user_id=?',[$p['id'],$user])->fetchColumn() : false;
     $teamRole=$user?team_role($db,$user,(int)($p['branch_id']??0)):'';
     $p['can_remove_branch']=$owner||in_array($teamRole,['admin','manager'],true);
-    $p['can_tag']=$admin&&($owner||$access==='accepted'); $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted' || ($teamRole!==''); $p['pending_invitation']=$access==='pending';
-    $p['team_access']=!$owner&&$teamRole!=='';$p['can_edit_description']=$p['can_edit']&&!$p['team_access'];$p['can_transfer_stock']=$owner||$p['team_access'];
+    $p['can_tag']=($owner||$access==='accepted'); $p['available']=false; $p['is_owner']=$owner; $p['is_admin']=$admin; $p['can_manage']=$owner||$admin; $p['can_delete']=$owner||$admin; $p['can_edit']=$owner || $admin || $access==='accepted' || ($teamRole!==''); $p['pending_invitation']=$access==='pending';
+    $p['team_access']=!$owner&&$teamRole!=='';$p['can_edit_description']=$p['can_edit']&&!$p['team_access'];$p['can_transfer_stock']=$owner;
     $p['team_tag']=in_array($teamRole,['admin','manager'],true)?(stock_query($db,'SELECT name FROM pallet_user_tags WHERE pallet_id=? AND user_id=?',[$p['id'],$p['owner_id']])->fetchColumn()?:''):'';
     $p['products']=stock_query($db,'SELECT b.*,c.name AS catalog_product,c.brand AS catalog_brand,c.quantity AS catalog_quantity FROM pallet_products b LEFT JOIN products c ON c.ean=b.ean WHERE b.pallet_id=? ORDER BY CASE WHEN b.expires=\'\' THEN 1 ELSE 0 END,b.expires,b.name,b.id',[$p['id']])->fetchAll();
     foreach ($p['products'] as &$product) $product=stock_product_names($product);
     unset($product);
     if ($owner||$admin) $p['members']=stock_query($db,'SELECT a.user_id,a.status,u.name,u.public_name,u.email FROM pallet_access a JOIN users u ON u.id=a.user_id WHERE a.pallet_id=? ORDER BY u.name',[$p['id']])->fetchAll();
     if(isset($p['members']))foreach($p['members'] as &$member){$member['name']=get_public_user_name($member);unset($member['public_name']);}unset($member);
+    if(!branch_visible($db,(int)($p['branch_id']??0),$user))$p['branch_id']=null;
     if ($p['branch_id']) $p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch() ?: null;
     if (!$p['can_edit']) unset($p['description'],$p['branch_id'],$p['owner_company'],$p['created_at']);
     // Read-only visitors receive merchandise, not internal account metadata.
@@ -103,7 +105,7 @@ function stock_detail(PDO $db, string $code, ?int $user, bool $public=false): ar
     if($public||$user===null){
         if(!isset($p['branch'])&&!empty($p['branch_id']))$p['branch']=stock_query($db,'SELECT name,address,locality,province,description FROM stock_branches WHERE id=?',[$p['branch_id']])->fetch()?:null;
         $p=array_intersect_key($p,array_flip(['code','available','products','branch','owner_name','updated_at','updated_name']));
-        $p['products']=array_map(static fn($product)=>array_intersect_key($product,array_flip(['ean','name','display_name','reference_name','catalog_name','units','expires','kind','pack_size'])),$p['products']);
+        $p['products']=array_map(static fn($product)=>array_intersect_key($product,array_flip(['ean','name','display_name','reference_name','catalog_name','units','expires','kind','pack_size','inner_pack_size'])),$p['products']);
     }
     return $p;
 }
@@ -139,8 +141,23 @@ function stock_product_input(array $input): array {
     if (!is_string($expires) || ($expires!=='' && (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D',$expires,$date)||!checkdate((int)$date[2],(int)$date[3],(int)$date[1])||(int)$date[1]<2000||(int)$date[1]>2099))) throw new CatalogException('Revisa el vencimiento. Usa día, mes y año.',422);
     $amount=filter_var($input['amount']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>1000000]]);
     $kind=$input['kind']??'units'; $pack= $kind==='units' ? 1 : filter_var($input['pack_size']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>1000000]]);
-    if (!$amount||!$pack||!in_array($kind,['units','boxes','packs'],true)||$amount*$pack>1000000000) throw new CatalogException('Revisa la cantidad y las unidades por caja o bulto.',422);
-    return ['ean'=>$ean,'name'=>catalog_text($input['name']??'',120),'expires'=>$expires,'units'=>$amount*$pack,'kind'=>$kind,'pack_size'=>$pack];
+    if (!$amount||!$pack||!in_array($kind,['units','boxes','packs'],true)||$amount*$pack>1000000000) throw new CatalogException('Revisa la cantidad y las unidades por bulto.',422);
+    $inner=filter_var($input['inner_pack_size']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>1000000]]);
+    if($inner===false||($inner>0&&($kind!=='boxes'||$inner>$pack||$pack%$inner!==0)))throw new CatalogException('Revisá los paquetes internos y las unidades por paquete.',422);
+    return ['ean'=>$ean,'name'=>catalog_text($input['name']??'',120),'expires'=>$expires,'units'=>$amount*$pack,'kind'=>$kind,'pack_size'=>$pack,'inner_pack_size'=>$inner];
+}
+function stock_combined_packing(PDO $db,array $old,array $input,int $units): array {
+    $plain=['kind'=>'units','pack_size'=>1,'inner_pack_size'=>0];
+    $a=in_array($old['kind']??'', ['boxes','packs'],true)?$old:null;
+    $b=in_array($input['kind']??'', ['boxes','packs'],true)?$input:null;
+    if($a&&$b&&($a['kind']!==$b['kind']||(int)$a['pack_size']!==(int)$b['pack_size']||(int)($a['inner_pack_size']??0)!==(int)($b['inner_pack_size']??0)))return $plain;
+    $packing=$a??$b;
+    if(!$packing){
+        $reference=stock_query($db,"SELECT pack_size,inner_pack_size FROM stock_product_references WHERE ean=? AND kind='boxes'",[$input['ean']])->fetch();
+        if(!$reference||(int)$reference['pack_size']<=1||$units%(int)$reference['pack_size']!==0)return $plain;
+        $packing=['kind'=>'boxes',...$reference];
+    }
+    return ['kind'=>$packing['kind'],'pack_size'=>(int)$packing['pack_size'],'inner_pack_size'=>(int)($packing['inner_pack_size']??0)];
 }
 function stock_save_product(PDO $db,int $user,array $input): array {
     $v=stock_product_input($input); $id=(int)($input['pallet_id']??0); $relocated=false;
@@ -169,15 +186,19 @@ function stock_save_product(PDO $db,int $user,array $input): array {
         if ($existing && (int)$existing['id']!==$productId) {
             $units=(int)$existing['units']+$v['units'];
             if ($units>1000000000) throw new CatalogException('La cantidad es demasiado grande.',422);
-            stock_query($db,'UPDATE pallet_products SET units=?,name=?,kind=\'units\',pack_size=1,revision=revision+1 WHERE id=?',[$units,$v['name'],$existing['id']]);
+            stock_query($db,'UPDATE pallet_products SET units=?,name=?,kind=\'units\',pack_size=1,inner_pack_size=0,revision=revision+1 WHERE id=?',[$units,$v['name'],$existing['id']]);
             stock_query($db,'DELETE FROM pallet_products WHERE id=?',[$productId]);
-        } else stock_query($db,'UPDATE pallet_products SET name=?,expires=?,units=?,kind=?,pack_size=?,revision=revision+1 WHERE id=?',[$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$productId]);
+        } else {
+            $packing=$v['kind']==='units'?stock_combined_packing($db,$old,$v,$v['units']):$v;
+            stock_query($db,'UPDATE pallet_products SET name=?,expires=?,units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=?',[$v['name'],$v['expires'],$v['units'],$packing['kind'],$packing['pack_size'],$packing['inner_pack_size'],$productId]);
+        }
     } elseif ($existing) {
         $units=(int)$existing['units']+$v['units'];
         if ($units>1000000000) throw new CatalogException('La cantidad es demasiado grande.',422);
-        stock_query($db,'UPDATE pallet_products SET units=?,kind=\'units\',pack_size=1,revision=revision+1 WHERE id=?',[$units,$existing['id']]);
-    } else stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size) VALUES(?,?,?,?,?,?,?)',[$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size']]);
-    if ($v['kind']!=='units') stock_query($db,'INSERT INTO stock_product_references(ean,kind,pack_size,updated_by) VALUES(?,?,?,?) ON CONFLICT(ean,kind) DO UPDATE SET pack_size=excluded.pack_size,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP',[$v['ean'],$v['kind'],$v['pack_size'],$user]);
+        $packing=stock_combined_packing($db,$existing,$v,$units);
+        stock_query($db,'UPDATE pallet_products SET units=?,kind=?,pack_size=?,inner_pack_size=?,revision=revision+1 WHERE id=?',[$units,$packing['kind'],$packing['pack_size'],$packing['inner_pack_size'],$existing['id']]);
+    } else stock_query($db,'INSERT INTO pallet_products(pallet_id,ean,name,expires,units,kind,pack_size,inner_pack_size) VALUES(?,?,?,?,?,?,?,?)',[$id,$v['ean'],$v['name'],$v['expires'],$v['units'],$v['kind'],$v['pack_size'],$v['inner_pack_size']]);
+    if ($v['kind']!=='units') stock_query($db,'INSERT INTO stock_product_references(ean,kind,pack_size,inner_pack_size,updated_by) VALUES(?,?,?,?,?) ON CONFLICT(ean,kind) DO UPDATE SET pack_size=excluded.pack_size,inner_pack_size=excluded.inner_pack_size,updated_by=excluded.updated_by,updated_at=CURRENT_TIMESTAMP',[$v['ean'],$v['kind'],$v['pack_size'],$v['inner_pack_size'],$user]);
     stock_query($db,'UPDATE pallets SET activated=1 WHERE id=?',[$id]); stock_touch($db,$id,$user);
     $result=['code'=>$p['code'],'id'=>$id,'relocated'=>$relocated];
     if (!$productId) {
@@ -189,12 +210,12 @@ function stock_save_product(PDO $db,int $user,array $input): array {
 }
 function stock_warning_days(PDO $db,int $user): int {
     $days=stock_query($db,'SELECT expiry_days FROM stock_preferences WHERE user_id=?',[$user])->fetchColumn();
-    return $days===false?30:min(30,max(0,(int)$days));
+    return $days===false?30:min(365,max(0,(int)$days));
 }
 function stock_list(PDO $db,int $user,bool $all=false): array {
     $all=$all&&stock_is_admin($db,$user);
     $limit=(new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires')))->modify('+'.stock_warning_days($db,$user).' days')->format('Y-m-d');
-    return array_map('stock_public_identity',stock_query($db,"SELECT p.id,p.code,p.revision,p.description,p.owner_id,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,p.updated_at,p.activated,p.prepared_until,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY COALESCE((SELECT MIN(NULLIF(exp.expires,'')) FROM pallet_products exp WHERE exp.pallet_id=p.id),'9999-12-31'),p.updated_at DESC,p.id DESC",[$limit,(int)$all,$user,$user])->fetchAll());
+    return array_map('stock_public_identity',stock_query($db,"SELECT p.id,p.code,p.revision,p.description,p.owner_id,u.name AS owner_name,u.public_name AS owner_public_name,u.id AS owner_user_id,u.company AS owner_company,p.updated_at,p.activated,p.prepared_until,(SELECT MIN(NULLIF(e.expires,'')) FROM pallet_products e WHERE e.pallet_id=p.id) AS next_expiry,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id AND b.expires<>'' AND b.expires<=?) AS expiry_count,(SELECT COUNT(*) FROM pallet_products b WHERE b.pallet_id=p.id) AS product_count FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.released=0 AND (?='1' OR p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted')) ORDER BY p.updated_at DESC,p.id DESC",[$limit,(int)$all,$user,$user])->fetchAll());
 }
 function stock_expiry_state(string $date,int $warningDays,?DateTimeImmutable $today=null): array {
     $today=$today??new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
@@ -207,20 +228,29 @@ function stock_notify(PDO $db,int $user): array {
     $today=new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
     $limit=$today->modify("+{$days} days")->format('Y-m-d');
     $items=stock_query($db,"SELECT b.id,b.name,b.ean,b.expires,p.code FROM pallet_products b JOIN pallets p ON p.id=b.pallet_id WHERE p.released=0 AND b.expires<>'' AND b.expires<=? AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$limit,$user,$user])->fetchAll();
-    $current=[];
-    foreach($items as $item) {
-        $expiry=stock_expiry_state($item['expires'],$days,$today);$remaining=$expiry['days'];$state=$expiry['state'];
-        $title=$remaining<0?'Mercadería vencida':($remaining===0?'Mercadería que vence hoy':'Mercadería próxima a vencer');
-        $label=$remaining<0?'Vencido hace '.(-$remaining).' día'.($remaining===-1?'':'s'):($remaining===0?'Vence hoy':'Vence en '.$remaining.' día'.($remaining===1?'':'s'));
-        $key='expiry:'.$user.':'.$item['id'].':'.$item['expires'];
-        $body='Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']);
-        stock_query($db,"INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO UPDATE SET title=excluded.title,body=excluded.body,read_at=CASE WHEN notifications.title<>excluded.title THEN NULL ELSE notifications.read_at END",[$user,$key,'stock_expiry',$title,$body]);
-        $current[$key]=['pallet_code'=>$item['code'],'product_id'=>(int)$item['id'],'expiry_state'=>$state,'expiry_label'=>$label];
+    $ownTransaction=!$db->inTransaction();
+    if($ownTransaction)$db->beginTransaction();
+    try {
+        $upsert=$db->prepare("INSERT INTO notifications(user_id,event_key,type,title,body) VALUES(?,?,?,?,?) ON CONFLICT(event_key) DO UPDATE SET title=excluded.title,body=excluded.body,read_at=CASE WHEN notifications.title<>excluded.title THEN NULL ELSE notifications.read_at END WHERE notifications.title<>excluded.title OR notifications.body<>excluded.body");
+        $current=[];
+        foreach($items as $item) {
+            $expiry=stock_expiry_state($item['expires'],$days,$today);$remaining=$expiry['days'];$state=$expiry['state'];
+            $title=$remaining<0?'Mercadería vencida':($remaining===0?'Mercadería que vence hoy':'Mercadería próxima a vencer');
+            $label=$remaining<0?'Vencido hace '.(-$remaining).' día'.($remaining===-1?'':'s'):($remaining===0?'Vence hoy':'Vence en '.$remaining.' día'.($remaining===1?'':'s'));
+            $key='expiry:'.$user.':'.$item['id'].':'.$item['expires'];
+            $body='Palet '.$item['code'].' · '.($item['name']?:'EAN '.$item['ean']);
+            $upsert->execute([$user,$key,'stock_expiry',$title,$body]);
+            $current[$key]=['pallet_code'=>$item['code'],'product_id'=>(int)$item['id'],'expiry_state'=>$state,'expiry_urgent'=>$remaining>=0&&$remaining<=7,'expiry_label'=>$label];
+        }
+        foreach(stock_query($db,"SELECT id,event_key FROM notifications WHERE user_id=? AND type='stock_expiry'",[$user])->fetchAll() as $old) {
+            if(!isset($current[$old['event_key']]))stock_query($db,'DELETE FROM notifications WHERE user_id=? AND id=?',[$user,$old['id']]);
+        }
+        if($ownTransaction)$db->commit();
+        return $current;
+    } catch(Throwable $error) {
+        if($ownTransaction&&$db->inTransaction())$db->rollBack();
+        throw $error;
     }
-    foreach(stock_query($db,"SELECT id,event_key FROM notifications WHERE user_id=? AND type='stock_expiry'",[$user])->fetchAll() as $old) {
-        if(!isset($current[$old['event_key']]))stock_query($db,'DELETE FROM notifications WHERE user_id=? AND id=?',[$user,$old['id']]);
-    }
-    return $current;
 }
 
 function stock_deduct_product(PDO $db,int $user,array $input): array {
@@ -236,11 +266,9 @@ function stock_deduct_product(PDO $db,int $user,array $input): array {
 }
 
 function stock_user_tags(PDO $db,int $user): array {
-    if(!stock_is_admin($db,$user))return [];
     return stock_query($db,"SELECT t.pallet_id,t.name,p.code FROM pallet_user_tags t JOIN pallets p ON p.id=t.pallet_id WHERE t.user_id=? AND p.released=0 AND (p.owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$user,$user,$user])->fetchAll();
 }
 function stock_save_tag(PDO $db,int $user,int $id,mixed $name): void {
-    if(!stock_is_admin($db,$user))throw new CatalogException('Las etiquetas requieren rango administrador o manager.',403);
     // Personal labels require current ownership or an accepted invitation, including for admins.
     if(!stock_query($db,"SELECT id FROM pallets p WHERE id=? AND released=0 AND (owner_id=? OR EXISTS(SELECT 1 FROM pallet_access a WHERE a.pallet_id=p.id AND a.user_id=? AND a.status='accepted'))",[$id,$user,$user])->fetchColumn())throw new CatalogException('No tenés acceso a las etiquetas de este palet.',403);
     if(!is_string($name)||mb_strlen(trim($name))>40||preg_match('/[\x00-\x1F\x7F]/u',$name))throw new CatalogException('La etiqueta admite hasta 40 caracteres.',422);

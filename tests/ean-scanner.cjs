@@ -28,9 +28,9 @@ window.AudioContext = class {
   createBuffer() { return {}; }
   createBufferSource() { return { connect() {}, disconnect() {}, start() { unlocked++; this.onended?.(); } }; }
 };
-const frame = new Set();
+const frame = new Set(), audioWaitTimers=[];
 const document = { getElementById: () => ({ classList: { add: value => frame.add(value), remove: value => frame.delete(value) } }) };
-vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/ean-scanner.js'), 'utf8'), { window, document, setTimeout: (callback, delay) => { if (delay <= 180) callback(); return 1; }, clearTimeout: () => {}, performance: { now: () => now } });
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/ean-scanner.js'), 'utf8'), { window, document, setTimeout: (callback, delay) => { if (delay <= 180) callback(); else if(delay===200)audioWaitTimers.push(callback); return 1; }, clearTimeout: () => {}, performance: { now: () => now } });
 const service = window.RepoEANScanner;
 const a = '7791234567898', b = '96385074';
 const flush = async () => { for (let i = 0; i < 20; i++) await Promise.resolve(); };
@@ -137,6 +137,21 @@ function read(reader, code) { now += 100; reader.success(code, { decodedText: co
   assert.equal(beeps, tonesBeforeFailure);
   assert.equal(window.navigator.audioSession.type, 'ambient', 'Una falla al reanudar también libera playback');
   lastAudio.resume = originalResume;
+  // Closed contexts are recreated in the opening gesture; unsupported session policies cannot mute the tone.
+  const beforeRecreate=audioCreated;lastAudio.state='closed';
+  const audioRecovered=service.create('recovered-audio',{onCode:()=>{}});await audioRecovered.start('qr');
+  assert.equal(audioCreated,beforeRecreate+1);const recoveredReader=readers.at(-1),beforeRecovered=beeps;
+  const originalSession=window.navigator.audioSession;window.navigator.audioSession={get type(){return 'ambient';},set type(value){throw Error('Unsupported audio policy');}};
+  read(recoveredReader,'PALET-RECOVERED');await flush();assert.equal(beeps,beforeRecovered+1,'Session setter failure does not suppress confirmed QR tone');window.navigator.audioSession=originalSession;
+  // Single scans retain the live camera until resume schedules the tone, without dropping the code.
+  const delayedCodes=[],delayed=service.create('delayed-audio',{onCode:code=>delayedCodes.push(code)});await delayed.start('qr');const delayedReader=readers.at(-1),ctx=lastAudio,resume=ctx.resume;let resumeAudio;
+  ctx.state='interrupted';ctx.resume=()=>new Promise(resolve=>{resumeAudio=()=>{ctx.state='running';resolve();};});
+  read(delayedReader,'PALET-DELAYED');await flush();assert.equal(delayedReader.isScanning,true);assert.equal(delayedCodes.length,0);
+  resumeAudio();await flush();assert.deepEqual(delayedCodes,['PALET-DELAYED']);ctx.resume=resume;
+  const stalledCodes=[],stalled=service.create('stalled-audio',{onCode:code=>stalledCodes.push(code)});await stalled.start('qr');const stalledReader=readers.at(-1),stalledContext=lastAudio,stalledResume=lastAudio.resume;let finishStalled;
+  stalledContext.state='interrupted';stalledContext.resume=()=>new Promise(resolve=>{finishStalled=()=>{stalledContext.state='running';resolve();};});const stalledTones=beeps;
+  read(stalledReader,'PALET-STALLED');await flush();audioWaitTimers.at(-1)();await flush();assert.deepEqual(stalledCodes,['PALET-STALLED'],'Hung audio cannot block QR delivery');assert.equal(beeps,stalledTones);
+  finishStalled();await flush();assert.equal(beeps,stalledTones,'No delayed tone after timeout');stalledContext.resume=stalledResume;
   // The existing feedback remains unchanged, with independent preferences.
   for (const continuous of [false,true]) for (const sound of [false,true]) for (const vibrate of [false,true]) {
     const delivered=[],beforeTone=beeps,beforeVibration=vibration.length;

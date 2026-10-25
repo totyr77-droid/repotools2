@@ -70,11 +70,11 @@ summary:focus-visible { outline: 2px solid var(--color1); outline-offset: 3px; }
 .library-product p { color: #626b7a; margin: 8px 0 12px; user-select: text; }
 .library-product-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .library-product-code { display: flex; align-items: center; gap: 6px; }
-.library-product-code svg, .library-product-actions svg { width: 20px; height: 20px; flex-shrink: 0; }
+.library-product-code svg { width: 20px; height: 20px; flex-shrink: 0; }
 .library-product p.library-product-code { margin-bottom: 0; letter-spacing: .02em; font-size: .85rem; }
 .library-view-code { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 10px 8px; }
-.library-product-actions svg { width: 18px; height: 18px; }
-.library-product-actions .library-remove-product { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 10px; background: #c92a38; color: white; }
+.library-product-actions svg { width: 18px; height: 18px; flex-shrink: 0; }
+.library-remove-product { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 10px; background: #c92a38; color: white; }
 .library-remove-product:hover { background: #a8212d; }
 @media (max-width: 380px) { .library-product { gap: 8px; } .library-product h3 { font-size: .9rem; } .library-product p.library-product-code { font-size: .78rem; letter-spacing: 0; gap: 4px; } .library-product-code svg { width: 16px; height: 16px; } }
 .library-product-actions .library-primary { flex: 1; }
@@ -134,3 +134,11 @@ body:has(.library-dialog[open]) { overflow: hidden; }
 
 #shareLibrary[hidden]{display:none}
 .library-product p.library-catalog-name{font-size:.82rem;line-height:1.35;margin:3px 0 0;color:#626b7a;overflow-wrap:anywhere}.library-ean-swipe-area .library-catalog-name{font-size:.88rem;color:#626b7a;margin:4px 0 10px;overflow-wrap:anywhere}
+
+#libraryImportDialog,#libraryShareDialog{width:min(520px,calc(100vw - 24px));max-height:calc(100dvh - 32px);box-sizing:border-box;overflow:auto}#libraryImportDialog .library-heading,#libraryShareDialog .library-heading{gap:10px;margin-bottom:12px}#libraryImportDialog h2,#libraryShareDialog h2{display:flex;align-items:center;gap:8px;font-size:1.15rem;color:#27197F;min-width:0}#libraryImportDialog h2 svg,#libraryShareDialog h2 svg{width:22px;height:22px;flex:none}.library-import-summary{font-weight:600;color:#27197F;margin:8px 0}.library-share-hint{font-size:.85rem;color:#626b7a;margin:8px 0 12px}#libraryImportDialog .library-import-products{list-style:none;padding:0;margin:12px 0;max-height:36dvh;border-top:1px solid #e1e5ed;overscroll-behavior:contain}#libraryImportDialog .library-import-products li{display:flex;gap:10px;align-items:flex-start;padding:10px 0}#libraryImportDialog .library-import-products li>svg{width:20px;height:20px;color:#626b7a;flex:none;margin-top:2px}#libraryImportDialog .library-import-products li>span{min-width:0}#libraryImportDialog .library-import-products small{font-size:.8rem}#libraryImportDialog .library-dialog-actions{margin-top:12px}.library-share-tabs{display:flex;gap:4px;background:#eeeaf7;padding:4px;border-radius:10px;margin:12px 0}.library-share-tabs button{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:8px;background:transparent;color:#27197F;cursor:pointer}.library-share-tabs button[aria-selected=true]{background:#27197F;color:white}.library-share-tabs svg,#libraryShareLinkPanel button svg{width:20px;height:20px;flex:none}#libraryShareLinkPanel button{display:inline-flex;gap:6px;align-items:center;justify-content:center}#libraryShareUserPanel>button{width:100%;margin-top:8px}#libraryShareEmail{box-sizing:border-box;width:100%}#libraryShareStatus:empty{display:none}body[data-hand=left] #libraryShareLinkPanel .library-dialog-actions{flex-direction:row-reverse}
+
+.library-ean-product-heading{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;margin-top:12px}
+#libraryEanDialog .library-ean-product-heading #eanProductName{grid-column:2;grid-row:1;margin:0}
+.library-ean-product-heading .library-remove-product{grid-column:1;grid-row:1;margin:0}
+.library-ean-product-heading .library-remove-product svg{width:18px;height:18px}
+body[data-hand=left] .library-ean-product-heading .library-remove-product{grid-column:3}

@@ -37,7 +37,7 @@
 .stock-pallet-dialog { width: min(720px,calc(100% - 24px)); }
 .stock-pallet-dialog [hidden],.stock-workspace [hidden] { display: none !important; }
 #palletTools .library-settings-menu { left: auto; right: 0; }
-#palletTools { position: relative; display: flex; align-items: center; }
+#palletTools { display: flex; align-items: center; }
 #palletTools .library-settings { position: relative; }
 #palletTools .library-settings summary { width: 48px; min-height: 48px; background: #f0eef8; color: #27187e; }
 #palletTools .library-settings-menu { position: absolute; width: min(260px,calc(100vw - 24px)); margin: 0; top: calc(100% + 6px); box-sizing: border-box; overflow-y: auto; }
@@ -262,3 +262,11 @@ body[data-hand] .stock-product-save-actions:has(#saveAndScanStockProduct[hidden]
 .stock-transfer-dialog{max-width:min(480px,calc(100vw - 24px))}.stock-transfer-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stock-transfer-choices button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;font-size:.9rem}.stock-transfer-choices svg,.stock-transfer-code svg{width:22px;height:22px;flex:none}.stock-transfer-code{display:flex;align-items:center;gap:6px}.stock-transfer-code input{min-width:0;flex:1}.stock-transfer-code button{width:44px;height:44px;padding:10px}.stock-transfer-dialog .stock-muted{font-size:.85rem;line-height:1.4}.stock-transfer-dialog form>button{margin-top:10px}.stock-transfer-dialog .library-dialog-actions{gap:8px;display:flex;justify-content:flex-end}body[data-hand=left] .stock-transfer-dialog .library-dialog-actions{flex-direction:row-reverse}
 
 #leavePallet{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:10px 14px;border:1px solid #e8b8bf;border-radius:10px;background:#fff2f3;color:#b3263a}#leavePallet[hidden]{display:none!important}
+
+#stockProductForm .stock-inner-toggle{display:flex;align-items:center;gap:9px;min-height:44px;margin:0 0 8px;cursor:pointer;color:#62577e;font-size:.88rem}
+#stockProductForm .stock-inner-toggle input{display:block;flex:none;width:20px;height:20px;min-height:20px;margin:0;padding:0;accent-color:#27187e}
+#stockProductForm .stock-inner-toggle span{line-height:1.35}
+#stockInnerFields input{width:100%;min-width:0}
+@media(min-width:1024px) and (hover:hover) and (pointer:fine){#stockProductForm{grid-template-areas:'ean ean' 'lookup lookup' 'expiry name' 'presentation amount' 'inner-toggle inner-toggle' 'inner-fields inner-fields' 'total total' 'status status' 'actions actions'}#stockProductForm>#stockInnerToggle{grid-area:inner-toggle}#stockProductForm>#stockInnerFields{grid-area:inner-fields}}
+#stockProductForm .stock-form-row:has(#stockProductKind):has(#stockPackLabel[hidden]){grid-template-columns:1fr}
+@media(max-width:768px) and (pointer:coarse){body[data-hand=left] #stockProductForm .stock-inner-toggle{flex-direction:row-reverse}}

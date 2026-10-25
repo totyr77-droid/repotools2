@@ -24,11 +24,13 @@
 <?php include __DIR__ . '/product-editor.vista.php'; ?>
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
-<!-- SCRIPTS -->
+<!-- SCRIPTS: los motores de cámara se cargan al abrir el lector (ean-scanner.js). -->
 
 <script src="js/navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/navigation.js'),0,12) ?>"></script>
+<?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?>
 <link rel="stylesheet" href="css/product-crop.css?v=<?= (int)app_release()['version'] ?>">
 <script src="js/product-crop.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php endif; ?>
 <script src="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/mobile-navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/mobile-navigation.js'),0,12) ?>"></script>
 <script src="js/account-sharing.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -46,10 +48,8 @@
 <script src="js/action-notices.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php $referralNotice=$_SESSION['referral_registration_notice']??null;if($referralNotice&&current_user()&&(int)$referralNotice['user_id']===(int)current_user()['id']){unset($_SESSION['referral_registration_notice']);if((int)$referralNotice['at']>time()-900): ?><script>window.RepoToast?.(<?= json_encode($referralNotice['message'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>,{kind:'info'});</script><?php endif;} ?>
 <?php if (!empty($paginaBiblioteca)): ?>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
@@ -57,30 +57,28 @@
 <?php elseif (!empty($paginaReportes)): ?>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/branch-management.js?v=<?= (int)app_release()['version'] ?>"></script>
+<script src="js/audit-records.js?v=<?= substr(sha1_file(__DIR__.'/../js/audit-records.js'),0,12) ?>"></script>
 <script src="js/reports-page.js?v=<?= substr(sha1_file(__DIR__.'/../js/reports-page.js'),0,12) ?>"></script>
+<?php elseif (!empty($paginaSupervision)): ?>
+<script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaGestionEmpresas)): ?>
 <!-- Gestión administrativa: sin lector ni formularios de mercadería. -->
 <?php elseif (!empty($paginaEquipo)): ?>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/vendor/qrcode.min.js"></script>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaStock)): ?>
 <?php include __DIR__.'/stock-scripts.vista.php'; ?>
 <?php elseif (empty($paginaCuenta)): ?>
-<script src="js/vendor/html5-qrcode-2.3.8.min.js"></script>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/vendor/lz-string-1.4.4.min.js"></script>
 <script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>
-<script src="js/vendor/quagga-1.12.1.min.js"></script>
 <script src="js/script.js?v=<?= substr(sha1_file(__DIR__.'/../js/script.js'),0,12) ?>"></script>
 <?php if (current_user()): ?><script src="js/scan-library.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php endif; ?>
@@ -98,6 +96,7 @@
 <?php include __DIR__ . '/onboarding.vista.php'; ?>
 <script src="js/onboarding.js?v=<?= (int)app_release()['version'] ?>"></script>
 <?php endif; ?>
+<?php if(!empty($paginaInicio)&&current_user()): ?><script src="js/home-location.js?v=<?= substr(sha1_file(__DIR__.'/../js/home-location.js'),0,12) ?>"></script><?php endif; ?>
 <?php if (!empty($paginaTops)): ?><script src="js/tops.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if (!empty($paginaStock)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-export.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-export.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-overview.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-overview.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()): ?><script src="js/scanner-performance.js?v=<?= substr(sha1_file(__DIR__.'/../js/scanner-performance.js'),0,12) ?>"></script><?php endif; ?>
@@ -107,15 +106,23 @@
 
 <?php if(!empty($stockEmbedded)): ?><script>window.repotoolsStock=<?= json_encode(['csrf'=>csrf_token(),'user_id'=>(int)current_user()['id'],'embedded'=>true,'teamContext'=>!empty($paginaEquipo)],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script>
 <?php include __DIR__.'/stock-scripts.vista.php'; ?>
-<script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/stock-overview.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-overview.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaEquipo)&&empty($stockEmbedded)): ?><script src="js/pallet-activity.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaEquipo)&&empty($stockEmbedded)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()&&(!empty($paginaInicio)||!empty($paginaEquipo))): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-team.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
-<?php if(!empty($paginaEquipo)): ?><script src="js/team-inventory.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(!empty($paginaEquipo)): ?><script src="js/inventory-goods.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/team-inventory.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaGestionEmpresas)): ?><script src="js/branch-maps.js?v=<?= (int)app_release()['version'] ?>"></script><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><link rel="stylesheet" href="css/branch-manager.css?v=<?= (int)app_release()['version'] ?>"><script src="js/branch-manager.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()): ?><link rel="stylesheet" href="css/user-qr.css?v=<?= (int)app_release()['version'] ?>"><script src="js/user-qr.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(!empty($paginaCuenta)): ?><script src="js/profile-showcase.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <?php if(current_user()): ?><script src="js/achievement-events.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php if(!empty($paginaEquipo)): ?><link rel="stylesheet" href="css/supervision.css?v=<?= (int)app_release()['version'] ?>"><?php endif; ?>
+<?php if(!empty($paginaSupervision)||!empty($paginaGestionEmpresas)): ?>
+<link rel="stylesheet" href="css/supervision.css?v=<?= (int)app_release()['version'] ?>">
+<?php if(!empty($paginaSupervision)): ?><link rel="stylesheet" href="css/branch-team.css?v=<?= (int)app_release()['version'] ?>"><script src="js/stock-utils.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/stock-summary.js?v=<?= (int)app_release()['version'] ?>"></script>
+<?php foreach(['branch','chevron','trash','settings']as$supervisionIcon): ?><span hidden data-supervision-icon="<?= $supervisionIcon ?>"><?= stock_icon($supervisionIcon) ?></span><?php endforeach;endif; ?><script src="js/supervision.js?v=<?= (int)app_release()['version'] ?>"></script><?php if(!empty($paginaSupervision)): ?><script src="js/supervision-scanner.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
+<?php endif; ?>
 <?php include __DIR__.'/team-shortcut.vista.php'; ?>
+<?php if(current_user()&&empty($paginaCuenta)&&!support_active()): include __DIR__.'/push-notice.vista.php'; endif; ?>
+<?php if(!support_active()): ?><script src="js/push-settings.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/app-updates.js?v=<?= (int)app_release()['version'] ?>"></script></body>
 </html>

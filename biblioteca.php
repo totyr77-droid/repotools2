@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
-if (is_string($_GET['share'] ?? null) && preg_match('/^[a-f0-9]{64}$/D', $_GET['share'])) $_SESSION['library_share'] = $_GET['share'];
+require_once __DIR__.'/includes/stock-icons.php';
+$sharedCollection = is_string($_GET['share'] ?? null) && preg_match('/^[a-f0-9]{64}$/D', $_GET['share']);
+if ($sharedCollection) $_SESSION['library_share'] = $_GET['share'];
+// A shared collection needs an account, not the unrelated guest demo.
+if($sharedCollection&&!current_user()) require_account('biblioteca');
 if(!current_user()){
     require_once __DIR__.'/includes/stock-icons.php';
     $demoSection='biblioteca';$paginaDemo=true;$paginaBiblioteca=true;
@@ -56,7 +60,7 @@ include __DIR__ . '/vistas/header.vista.php';
 <dialog id="libraryEanDialog" class="library-dialog library-ean-dialog">
   <div class="library-heading"><h2>Código EAN</h2><button type="button" data-close="libraryEanDialog" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
   <label>Colección<select id="eanCollection"></select></label>
-  <div id="libraryEanSwipeArea" class="library-ean-swipe-area"><h3 id="eanProductName"></h3><p id="eanCatalogName" class="library-catalog-name" hidden></p><svg id="libraryBarcode" role="img" aria-label="Código de barras del producto"></svg><p id="eanValue"></p>
+  <div class="library-ean-product-heading"><h3 id="eanProductName"></h3><button id="removeLibraryEan" type="button" class="library-danger library-remove-product" aria-label="Quitar producto" title="Quitar producto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg></button></div><div id="libraryEanSwipeArea" class="library-ean-swipe-area"><p id="eanCatalogName" class="library-catalog-name" hidden></p><svg id="libraryBarcode" role="img" aria-label="Código de barras del producto"></svg><p id="eanValue"></p>
   <p id="eanPosition" role="status"></p><p id="librarySwipeHint" class="library-swipe-hint" hidden>Desliza para cambiar de producto</p></div>
   <div class="library-preview-actions"><button id="openLibraryProductInfo" type="button" class="library-secondary library-info-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v2"/></svg> Información</button><button id="copyLibraryEan" type="button" class="library-secondary library-info-button" aria-label="Copiar código EAN"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 8h12v13H8zM16 8V3H3v13h5"/></svg><span>Copiar código</span></button><button id="reportLibraryProduct" type="button" class="library-secondary library-info-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 21V3m0 1h14l-3 5 3 5H5"/></svg> Reportar</button></div>
   <div class="library-dialog-actions ean-navigation"><button id="previousLibraryEan" class="library-secondary" type="button">← Anterior</button><button id="nextLibraryEan" class="library-primary" type="button">Siguiente →</button></div>
@@ -66,14 +70,18 @@ include __DIR__ . '/vistas/header.vista.php';
   <p id="libraryInfoEan" class="library-scanned-ean"></p><section id="libraryProductDetails" class="product-details" aria-label="Características del producto"></section>
 </dialog>
 <dialog id="libraryImportDialog" class="library-dialog" aria-labelledby="libraryImportTitle">
-  <h2 id="libraryImportTitle">Colección compartida</h2><p id="libraryImportQuestion"></p>
+  <div class="library-heading"><h2 id="libraryImportTitle"><?= stock_icon('book') ?>Colección compartida</h2><button type="button" data-close="libraryImportDialog" class="library-secondary app-close" aria-label="Cerrar colección compartida"><?= stock_icon('close') ?></button></div><p id="libraryImportQuestion" class="library-import-summary"></p><p id="libraryImportHint" class="library-share-hint">Se guardará una copia en tu biblioteca.</p>
   <ul id="libraryImportProducts" class="library-import-products"></ul>
   <p id="libraryImportStatus" role="status"></p>
   <div class="library-dialog-actions"><button type="button" data-close="libraryImportDialog" class="library-secondary">Cancelar</button><button id="confirmLibraryImport" type="button" class="library-primary">Agregar a mi biblioteca</button></div>
 </dialog>
 <dialog id="libraryShareDialog" class="library-dialog" aria-labelledby="libraryShareTitle">
-  <h2 id="libraryShareTitle">Compartir colección</h2><label>Enlace<input id="libraryShareUrl" readonly></label>
-  <div class="library-dialog-actions"><button type="button" data-close="libraryShareDialog" class="library-secondary app-close" aria-label="Cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><button id="copyLibraryShare" type="button" class="library-primary">Copiar enlace</button></div>
+  <div class="library-heading"><h2 id="libraryShareTitle"><?= stock_icon('share') ?>Compartir colección</h2><button type="button" data-close="libraryShareDialog" class="library-secondary app-close" aria-label="Cerrar compartir colección"><?= stock_icon('close') ?></button></div>
+  <p id="libraryShareName" class="library-import-summary"></p>
+
+  <form id="libraryShareUserPanel"><label for="libraryShareEmail">Correo del usuario</label><input id="libraryShareEmail" name="email" type="email" maxlength="254" autocomplete="off" required><p class="library-share-hint">La persona podrá revisar y agregar la colección.</p><button type="submit" class="library-primary">Enviar colección</button></form>
+  <section id="libraryShareLinkPanel" class="library-share-link-section"><label>Enlace de la colección<input id="libraryShareUrl" readonly></label><div class="library-dialog-actions"><button id="copyLibraryShare" type="button" class="library-secondary"><?= stock_icon('copy') ?>Copiar enlace</button><button id="sendLibraryShareLink" type="button" class="library-secondary"><?= stock_icon('share') ?>Compartir</button></div></section>
+  <p id="libraryShareStatus" class="library-share-status" role="status"></p>
 </dialog>
 <script>window.repotoolsLibrary = <?= json_encode(['userId' => current_user() ? (int) current_user()['id'] : null, 'csrf' => csrf_token(), 'share' => $pendingShare], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
 <?php include __DIR__ . '/vistas/footer.vista.php'; ?>

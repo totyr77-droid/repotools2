@@ -1,0 +1,4 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const source=fs.readFileSync('js/stock.js','utf8'),start=source.indexOf('  async function api('),end=source.indexOf('  async function run(',start),original=new DOMException('Aborted','AbortError');Object.freeze(original);
+const context=vm.createContext({navigator:{onLine:true},window:{RepoConnectivity:{report(){}}},fetch:async()=>{throw original},AbortController,setTimeout,clearTimeout,readRequests:new Set()});vm.runInContext(source.slice(start,end),context);
+(async()=>{try{await vm.runInContext("api('?code=12345678')",context);assert.fail('Must reject')}catch(error){assert.match(error.message,/No pudimos conectar con Stock/);assert.equal(error.cause,original);assert.equal(original.message,'Aborted');}console.log('OK: readonly DOMException preserved, readable Stock connection error.');})().catch(e=>{console.error(e);process.exitCode=1});

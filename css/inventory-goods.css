@@ -1,0 +1,33 @@
+.team-goods-row{padding:10px 0;border-bottom:1px solid #e5e1eb}
+.team-goods-row>summary{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}
+.team-goods-row strong{display:block;font-size:.95rem}
+.team-goods-row small{display:block;font-size:.78rem;font-weight:400;color:#77718a}
+.team-goods-total{text-align:right;flex:none}
+.team-goods-lot{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;font:inherit;font-size:.8rem;background:none;border:0;border-top:1px solid #eeebf7;padding:10px 4px;min-height:44px;color:#27197F}
+.team-goods-lot strong{font-size:.85rem}
+.team-goods-info{flex:1;min-width:0;overflow-wrap:anywhere}
+.team-goods-row .team-goods-ean,.team-goods-row .team-goods-count{display:flex;align-items:center;gap:5px;margin-top:3px}
+.team-goods-row .team-goods-total>strong{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:.85rem}
+.team-goods-row .team-goods-ean svg,.team-goods-row .team-goods-count svg,.team-goods-total svg{width:16px;height:16px}
+.team-goods-row .team-goods-expiry{display:inline-flex;align-items:center;gap:5px;max-width:100%;box-sizing:border-box;padding:3px 7px;border-radius:6px;margin:5px 0 2px;font-size:.76rem;font-weight:600}
+.team-goods-expiry.stock-expiry-safe{background:#e7f4ec;color:#23704a}
+.team-goods-expiry.stock-expiry-near,.team-goods-expiry.stock-expiry-today{background:#fff4d6;color:#85610d}
+.team-goods-expiry.stock-expiry-past{background:#fce8eb;color:#a52e45}
+.team-goods-expiry.team-expiry-none{background:#efedf5;color:#686277}
+.team-goods-total{max-width:48%;min-width:0}
+.team-goods-lot-info{display:grid;gap:3px;flex:1;min-width:0;text-align:left;border:0;background:none;box-shadow:none;color:inherit;font:inherit;padding:5px 0;margin:0;min-height:44px}
+.team-goods-lot-info strong{display:flex;align-items:center;gap:5px}
+.team-goods-lot-info svg{width:17px;height:17px}
+.team-goods-lot-info>span{font-size:.78rem;color:#6b6878;overflow-wrap:anywhere}
+.team-goods-go svg{width:16px;height:16px;transform:rotate(-90deg)}
+body[data-hand=left] .team-goods-lot{flex-direction:row-reverse}
+.team-goods-row>summary{list-style:none}
+.team-goods-row>summary::-webkit-details-marker{display:none}
+.team-goods-row>summary>.team-goods-chevron{width:18px;height:18px;flex:none;color:#7a718f;align-self:center}
+.team-goods-row[open]>summary>.team-goods-chevron{transform:rotate(180deg);color:#27197f}
+.team-goods-row[open]{border-inline-start:2px solid #b9dce5;padding-inline-start:8px}
+.team-goods-row[open] .team-goods-lots{margin-top:5px}
+.team-goods-row>summary>.team-goods-chevron{transition:none}
+.stock-goods-product{display:block;padding:12px 14px;margin:10px 0;color:#27197F}.stock-goods-product>summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none}.stock-goods-product>summary::-webkit-details-marker{display:none}.stock-goods-info{flex:1;min-width:0;overflow-wrap:anywhere}.stock-goods-info>strong{display:block;font-size:1rem}.stock-goods-info small{display:flex;align-items:center;gap:5px;color:#626b7a;font-size:.8rem;margin-top:4px}.stock-goods-info svg{width:16px;height:16px;flex:none}.stock-goods-total{font-size:.85rem;flex:none}.stock-goods-product>summary>svg{width:17px;height:17px;flex:none;transition:transform .15s}.stock-goods-product[open]>summary>svg{transform:rotate(180deg)}.stock-goods-dates{margin-top:10px;border-top:1px solid #e1e5ed}.stock-goods-dates .team-goods-row{margin:0;padding:10px 0}.stock-goods-dates .team-goods-row[open]{border-inline-start:2px solid #d4ccef;padding-inline-start:8px}.stock-goods-dates [hidden],#stockGoodsExpiryFilter[hidden]{display:none!important}.stock-goods-panel .team-goods-lots .library-secondary{margin-top:6px}.stock-goods-panel .team-goods-row strong{font-size:.88rem}#stockGoodsMore{margin:10px 0}#goodsTab{display:inline-flex;align-items:center;justify-content:center;gap:5px}#goodsTab svg{width:18px;height:18px;flex:none}.stock-goods-panel .team-goods-lot-info small{font-size:.78rem;color:#626b7a}.stock-goods-panel .team-goods-total{margin-inline-start:auto}@media(max-width:360px){.stock-goods-product{padding:10px}.stock-goods-total{font-size:.78rem}.team-goods-go{font-size:.72rem;padding:3px}}@media(prefers-reduced-motion:reduce){.stock-goods-product>summary>svg{transition:none}}
+
+#goodsTab[hidden]{display:none!important}

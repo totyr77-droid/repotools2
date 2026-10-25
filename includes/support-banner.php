@@ -1,0 +1,3 @@
+<?php if(support_active()): $supportTarget=$GLOBALS['repo_support_target']; ?>
+<aside class="support-session-bar" role="status"><span><?= stock_icon('user') ?><span>Usando la cuenta de <strong><?= escape(get_public_user_name($supportTarget)) ?></strong></span></span><form method="post" action="ingresar-usuario.php?support=<?= escape(support_context()) ?>"><input type="hidden" name="action" value="exit"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" class="library-secondary"><?= stock_icon('close') ?><span>Volver a mi cuenta</span></button></form></aside>
+<?php endif; ?>

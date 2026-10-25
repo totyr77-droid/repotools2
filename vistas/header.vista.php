@@ -24,6 +24,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <meta charset="utf-8">
     <?php include __DIR__ . '/page-loader-head.vista.php'; ?>
     <?php if(isset($publicShareBase)): ?><base href="<?= escape($publicShareBase) ?>"><?php endif; ?>
+    <?php if(support_active()): ?><script>window.RepoSupport=<?= json_encode(['context'=>support_context()],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;</script><script src="js/support-session.js?v=<?= substr(sha1_file(__DIR__.'/../js/support-session.js'),0,12) ?>"></script><?php endif; ?>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
     <title><?= escape($previewTitle) ?></title>
@@ -61,6 +62,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link rel="stylesheet" href="https://use.typekit.net/sxf4kmm.css">
     <link href="css/loading.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <?php if (!empty($paginaInicio) || (!empty($paginaCuenta) && empty($paginaTops) && current_user())): ?><link href="css/onboarding.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if(!empty($paginaInicio)&&current_user()): ?><link rel="stylesheet" href="css/home-location.css?v=<?= substr(sha1_file(__DIR__.'/../css/home-location.css'),0,12) ?>"><?php endif; ?>
     <link href="css/normalize.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <link href="css/contador.css" rel="stylesheet" type="text/css">
@@ -70,7 +72,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaReportes)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/product-info.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($stockEmbedded)): ?><link href="css/product-info.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
-    <?php if(!empty($paginaGestionEmpresas)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if(!empty($paginaGestionEmpresas)||!empty($paginaSupervision)): ?><?php if(!empty($paginaGestionEmpresas)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio) || !empty($paginaEquipo)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
 
@@ -78,7 +80,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <link href="css/notifications.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
     <link href="css/account-bar.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
-    <?php if (!empty($paginaStock) || !empty($stockEmbedded) || !empty($paginaCuenta) || !empty($paginaEquipo)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/stock.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if (!empty($paginaStock) || !empty($stockEmbedded) || !empty($paginaCuenta) || !empty($paginaEquipo) || !empty($paginaSupervision)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/stock.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <link href="css/action-notices.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <link href="css/close-buttons.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <link href="css/navigation.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
@@ -102,7 +104,8 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/ux-polish.css?v=<?= substr(sha1_file(__DIR__.'/../css/ux-polish.css'),0,12) ?>" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>" as="script"><link rel="preload" href="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>" as="script">    <?php if(!empty($paginaDemo)): ?><link href="css/guest-demo.css?v=<?= substr(sha1_file(__DIR__.'/../css/guest-demo.css'),0,12) ?>" rel="stylesheet"><?php endif; ?>
 <link href="css/development.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
 </head>
-  <?php require_once __DIR__.'/../includes/app-release.php'; ?><body data-app-updates="<?= current_user() && isset($roleLabels[$navRole]) ? '1' : '0' ?>" data-app-version="<?= (int)app_release()['version'] ?>" data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-hand-preference="<?= in_array($userHand,['left','right'],true)?$userHand:'' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : ((!empty($paginaBiblioteca)||!empty($paginaEquipo)||!empty($paginaGestionEmpresas)) ? ' class="library-page"' : '') ?>>
+  <?php require_once __DIR__.'/../includes/app-release.php'; ?><body data-app-updates="<?= current_user() && isset($roleLabels[$navRole]) ? '1' : '0' ?>" data-app-version="<?= (int)app_release()['version'] ?>" data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-hand-preference="<?= in_array($userHand,['left','right'],true)?$userHand:'' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : ((!empty($paginaBiblioteca)||!empty($paginaEquipo)||!empty($paginaGestionEmpresas)||!empty($paginaSupervision)) ? ' class="library-page"' : '') ?>>
+    <?php include __DIR__.'/../includes/support-banner.php'; ?>
     <script>window.repotoolsOfflineUser=<?= (int)(current_user()['id']??0) ?>;try{document.body.dataset.oneHand=localStorage.getItem('repotools_one_hand_v1_user_<?= (int)(current_user()['id']??0) ?>')==='1'?'1':'0';}catch{document.body.dataset.oneHand='0';}</script>
     <header>
       <div class="header-contenedor">
@@ -144,7 +147,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
       </div>
     <?php if(current_user()): ?><details id="quickUserQR" class="quick-user-qr"><summary aria-label="Mostrar mi QR de usuario" title="Mi QR"><?= stock_icon('chevron') ?></summary><div class="quick-user-qr-panel"><strong>Mi QR de usuario</strong><div id="quickUserQRImage" aria-label="QR de mi cuenta"></div><p id="quickUserQRStatus" role="status"></p><small>Abre tu perfil y comparte tu invitación. En la app también permite seleccionarte.</small></div></details><?php endif; ?>
     </header>
-    <?php if (current_user() && empty($paginaStock) && empty($paginaBiblioteca) && empty($paginaReportes) && empty($paginaEquipo)): ?>
+    <?php if (current_user() && empty($paginaStock) && empty($paginaBiblioteca) && empty($paginaReportes) && empty($paginaEquipo) && empty($paginaGestionEmpresas) && empty($paginaSupervision)): ?>
     <div class="account-bar"><span class="account-greeting" title="Hola, <?= escape(current_user()['name']) ?>">Hola, <strong><?= escape(current_user()['name']) ?></strong><?php if (isset($roleLabels[$navRole])): $badge = $roleLabels[$navRole]; ?><span class="account-role account-role-<?= escape($navRole) ?>" title="<?= escape($badge[1]) ?>" aria-label="<?= escape($badge[1]) ?>"><i class="fa-solid <?= escape($badge[2]) ?>" aria-hidden="true"></i><?= escape($badge[0]) ?></span><?php endif; ?></span><form action="salir.php" method="post"><input type="hidden" name="csrf" value="<?= escape(csrf_token()) ?>"><button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/></svg><span>Salir</span></button></form></div>
     <?php endif; ?>
 

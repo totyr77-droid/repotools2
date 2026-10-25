@@ -2,6 +2,7 @@
 require_once __DIR__.'/../includes/auth.php';
 require_once __DIR__.'/../includes/branch-address.php';
 require_once __DIR__.'/../includes/branch-places.php';
+require_once __DIR__.'/../includes/stock.php';
 header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');
 try{
     if($_SERVER['REQUEST_METHOD']!=='POST')throw new CatalogException('Solicitud no válida.',405);
@@ -10,7 +11,7 @@ try{
     $point=branch_coordinates($_POST);session_write_close();
     if(($_POST['mode']??'')==='places'){
         $db=database();$nearby=[];
-        $query=$db->prepare('SELECT id,name,address,locality,province,description,latitude,longitude,revision FROM stock_branches WHERE latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?');
+        $query=$db->prepare('SELECT id,name,address,locality,province,description,latitude,longitude,revision FROM stock_branches WHERE '.branch_visibility_sql($db,(int)current_user()['id'],'id').' AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?');
         $span=min(360,0.003/max(0.01,cos(deg2rad($point['latitude']))));
         $query->execute([$point['latitude']-0.002,$point['latitude']+0.002,$point['longitude']-$span,$point['longitude']+$span]);
         foreach($query->fetchAll(PDO::FETCH_ASSOC) as $branch){$distance=branch_point_distance($point,$branch);if($distance<=200){$branch['distance']=(int)round($distance);$nearby[]=$branch;}}

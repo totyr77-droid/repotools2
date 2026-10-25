@@ -1,5 +1,6 @@
 <section id="systemWorkspace" class="system-workspace" hidden aria-labelledby="systemTitle">
   <h2 id="systemTitle"><?= stock_icon('clock') ?>Sistema</h2>
+  <p id="systemPushHealth" class="system-push-health system-hint" role="status"><?= stock_icon('bell') ?><span>Consultando envío de avisos…</span></p>
   <p>Rendimiento del escáner</p>
   <form id="systemFilters" class="system-filters">
     <label>Período<select name="days"><option value="1">Últimas 24 horas</option><option value="7" selected>Últimos 7 días</option><option value="30">Últimos 30 días</option></select></label>

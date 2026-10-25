@@ -1,11 +1,17 @@
 <?php
 function stock_icon(string $name): string {
     $paths = [
+        'bell'=>'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+        'shield'=>'<path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/>',
+        'install'=>'<path d="M8 3H5v18h14V3h-3M12 3v11m-4-4 4 4 4-4"/>',
         'verified'=>'<path d="m12 2 3 2 3.5.5.5 3.5 2 4-2 3-.5 3.5-3.5.5-3 2-3-2-3.5-.5L4 15l-2-3 2-4 .5-3.5L8 4z"/><path d="m8 12 3 3 5-6"/>',
         'lock'=>'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/>',
         'crown'=>'<path d="m3 6 4 4 5-7 5 7 4-4-2 13H5zM5 22h14"/>',
         'home'=>'<path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/>',
         'pallet'=>'<path d="M3 21h18M4 17h16V4H4zM4 10h16M12 4v13"/>',
+        'logout'=>'<path d="M9 4H4v16h5m5-12 4 4-4 4m-6-4h13"/>',
+        'map-pin'=>'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+        'locate'=>'<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>',
         'camera'=>'<path d="M3 7h4l2-3h6l2 3h4v14H3z"/><circle cx="12" cy="13" r="4"/>',
         'calendar'=>'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 4h2m4 0h2m-8 3h2"/>',
         'package'=>'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5 9-5V8m-9 5v10M7.5 5.5l9 5"/>',
@@ -23,6 +29,7 @@ function stock_icon(string $name): string {
         'print'=>'<path d="M6 9V3h12v6M6 17H3V9h18v8h-3M6 14h12v7H6zM17 12h.01"/>',
         'copy'=>'<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/>',
         'transfer'=>'<path d="M3 7h16m-4-4 4 4-4 4M21 17H5m4-4-4 4 4 4"/>',
+        'link'=>'<path d="m10 13 4-4M8 16l-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 0 2-2a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/>',
         'share'=>'<path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/>',
         'settings'=>'<path d="M9.7 2h4.6l.6 2.8 2.1 1.2 2.7-.8 2.3 4-2.1 2v2.4l2.1 2-2.3 4-2.7-.8-2.1 1.2-.6 2.8H9.7l-.6-2.8L7 18.8l-2.7.8-2.3-4 2.1-2v-2.4L2 9.2l2.3-4 2.7.8 2.1-1.2z"/><circle cx="12" cy="12" r="3"/>',
         'trash'=>'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',

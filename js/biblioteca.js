@@ -62,7 +62,7 @@
     return result.libraries;
   }
   async function mutate(data) {
-    if(!navigator.onLine){if(data.action!=='add_product')throw Error('Esta acción necesita conexión.');await RepoLibraryQueue.add(data,libraries.find(l=>Number(l.id)===Number(data.library_id))?.name||'Biblioteca');const local=libraries.find(l=>Number(l.id)===Number(data.library_id));if(local&&!local.products.some(p=>p.ean===data.ean))local.products.push({ean:data.ean,name:data.name,pending:true});render();return;}
+    if(!navigator.onLine){if(window.RepoSupport)throw Error('Este acceso requiere conexión.');if(data.action!=='add_product')throw Error('Esta acción necesita conexión.');await RepoLibraryQueue.add(data,libraries.find(l=>Number(l.id)===Number(data.library_id))?.name||'Biblioteca');const local=libraries.find(l=>Number(l.id)===Number(data.library_id));if(local&&!local.products.some(p=>p.ean===data.ean))local.products.push({ean:data.ean,name:data.name,pending:true});render();return;}
     if (busy) throw new Error('Espera a que termine el cambio anterior.');
     busy = true;
     document.querySelectorAll('.library-app button, #newCollection, #scanLibraryProduct, #shareLibrary, #collectionSettings button, .library-dialog button[type="submit"]').forEach(b => b.disabled = true);
@@ -115,17 +115,37 @@
       });
       view.setAttribute('aria-label', 'Ver EAN'); view.title = 'Ver EAN';
       view.append(icon('<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'), barcodeIcon());
-      const remove = button('', 'library-danger library-remove-product', async () => {
-        if (!await window.RepoConfirm({ title: 'Quitar producto', message: `¿Quitar «${product.name || product.ean}» de esta colección?`, confirmLabel: 'Quitar' })) return;
-        try { await mutate({ action: 'delete_product', library_id: library.id, ean: product.ean }); message('Producto eliminado.'); }
-        catch (error) { message(error.message); }
-      });
+      const remove = button('', 'library-danger library-remove-product', () => removeProduct(library.id, product));
       remove.setAttribute('aria-label', 'Quitar producto'); remove.title = 'Quitar producto';
       remove.append(icon('<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>'));
       actions.append(view, remove);
       card.append(description, actions); get('libraryProducts').append(card);
     });
   }
+  let removingProduct = false;
+  async function removeProduct(libraryId, product) {
+    if (busy || removingProduct) return;
+    removingProduct = true;
+    const control = get('removeLibraryEan');
+    control.disabled = true;
+    try {
+      if (!await window.RepoConfirm({ title: 'Quitar producto', message: `¿Quitar «${product.name || product.ean}» de esta colección?`, confirmLabel: 'Quitar' })) return;
+      await mutate({ action: 'delete_product', library_id: libraryId, ean: product.ean });
+      if (get('libraryEanDialog').open && viewerId === Number(libraryId)) {
+        const remaining = libraries.find(l => Number(l.id) === viewerId);
+        if (remaining?.products.length) renderViewer();
+        else get('libraryEanDialog').close();
+      }
+      window.RepoToast?.('Producto eliminado.');
+      message('Producto eliminado.');
+    } catch (error) { message(error.message); }
+    finally { removingProduct = false; control.disabled = false; }
+  }
+  get('removeLibraryEan').addEventListener('click', () => {
+    const library = libraries.find(l => Number(l.id) === viewerId);
+    const product = library?.products[viewerIndex];
+    if (product) removeProduct(library.id, product);
+  });
   function renderViewer() {
     if (get('libraryInfoDialog').open) get('libraryInfoDialog').close();
     window.RepoProductInfo.clear(get('libraryProductDetails'));
@@ -237,7 +257,7 @@
   });
   function moveViewer(direction) {
     const library = libraries.find(l => Number(l.id) === viewerId);
-    if (!library?.products.length) return;
+    if (removingProduct || !library?.products.length) return;
     viewerIndex = (viewerIndex + direction + library.products.length) % library.products.length; renderViewer();
   }
   get('previousLibraryEan').addEventListener('click', () => moveViewer(-1));
@@ -317,22 +337,11 @@
     if (!response.ok) throw new Error(result.error || 'No pudimos compartir la colección.');
     return result;
   }
-  get('shareLibrary').addEventListener('click', async () => {
-    const library = activeLibrary();
-    if (!library || library.products.length < 1 || busy) return;
-    const control = get('shareLibrary'); control.disabled = true;
-    try {
-      const result = await shareRequest({ action: 'share', library_id: library.id });
-      let url = new URL('biblioteca.php', location.href); url.searchParams.set('share', result.token);
-      url=new URL(await window.RepoShareLinks.url('b',result.token,config.csrf,url.href));
-      const showLink = () => { get('libraryShareUrl').value = url.href; openDialog('libraryShareDialog'); };
-      if (navigator.share) {
-        try { await navigator.share({ title: library.name, text: `${library.name}: ${library.products.length} productos`, url: url.href }); }
-        catch (error) { if (error.name !== 'AbortError') showLink(); }
-      } else showLink();
-    } catch (error) { message(error.message); }
-    finally { control.hidden = !activeLibrary() || activeLibrary().products.length < 1; control.disabled = control.hidden; }
-  });
+  let sharingLibrary=null;
+  get('shareLibrary').addEventListener('click',async()=>{const library=activeLibrary();if(!library||!library.products.length||busy)return;const control=get('shareLibrary');control.disabled=true;try{const result=await shareRequest({action:'share',library_id:library.id});let url=new URL('biblioteca.php',location.href);url.searchParams.set('share',result.token);url=new URL(await window.RepoShareLinks.url('b',result.token,config.csrf,url.href));sharingLibrary={id:library.id,name:library.name,count:library.products.length};get('libraryShareUrl').value=url.href;get('libraryShareName').textContent=library.name+' · '+library.products.length+' productos';get('libraryShareEmail').value='';get('libraryShareStatus').textContent='';openDialog('libraryShareDialog');}catch(error){message(error.message);}finally{control.hidden=!activeLibrary()||!activeLibrary().products.length;control.disabled=control.hidden;}});
+  get('sendLibraryShareLink').addEventListener('click',async()=>{if(!sharingLibrary)return;if(!navigator.share){get('copyLibraryShare').click();return;}try{await navigator.share({title:sharingLibrary.name,text:sharingLibrary.name+': '+sharingLibrary.count+' productos',url:get('libraryShareUrl').value});}catch(error){if(error.name!=='AbortError')get('libraryShareStatus').textContent='No pudimos compartir. Podés copiar el enlace.';}});
+  let sendingLibrary=false;
+  get('libraryShareUserPanel').addEventListener('submit',async event=>{event.preventDefault();if(sendingLibrary||!sharingLibrary)return;sendingLibrary=true;const controls=[...get('libraryShareUserPanel').querySelectorAll('button,input')];controls.forEach(n=>n.disabled=true);get('libraryShareStatus').textContent='Enviando…';try{await shareRequest({action:'share_user',library_id:sharingLibrary.id,email:get('libraryShareEmail').value.trim()});get('libraryShareDialog').close();window.RepoToast?.('Colección enviada.');}catch(error){get('libraryShareStatus').textContent=error.message;}finally{sendingLibrary=false;controls.forEach(n=>n.disabled=false);}});
   get('copyLibraryShare').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(get('libraryShareUrl').value); get('libraryShareDialog').close(); message('Enlace copiado.'); }
     catch { get('libraryShareUrl').select(); message('Copia este enlace para compartir.'); }
@@ -346,13 +355,14 @@
       const response = await fetch(`api/biblioteca.php?share=${encodeURIComponent(config.share)}`);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'No pudimos cargar la colección.');
-      get('libraryImportQuestion').textContent = `¿Agregar «${result.collection.name}» a tu biblioteca con ${result.collection.products.length} ${result.collection.products.length===1?'producto':'productos'}?`;
+      get('libraryImportQuestion').textContent = `«${result.collection.name}» · ${result.collection.products.length} ${result.collection.products.length===1?'producto':'productos'}`;
       get('libraryImportProducts').replaceChildren();
       result.collection.products.forEach(product => {
-        const item = document.createElement('li'); item.textContent = product.name || 'Producto sin nombre';
-        const code = document.createElement('small'); code.textContent = `EAN ${product.ean}`; item.append(code); get('libraryImportProducts').append(item);
+        const item=document.createElement('li'),info=document.createElement('span'),name=document.createElement('strong');name.textContent=product.name||'Producto sin nombre';info.append(name);item.append(barcodeIcon(),info);
+        const code=document.createElement('small');code.textContent=product.ean;info.append(code); get('libraryImportProducts').append(item);
       });
       get('libraryImportStatus').textContent = result.alreadyAdded ? 'Esta colección ya está en tu biblioteca.' : '';
+      get('libraryImportHint').hidden=result.alreadyAdded;
       importedLibraryId = result.alreadyAdded ? Number(result.libraryId) : null;
       get('confirmLibraryImport').textContent = importedLibraryId ? 'Ver en mi biblioteca' : 'Agregar a mi biblioteca';
       get('confirmLibraryImport').disabled = false;

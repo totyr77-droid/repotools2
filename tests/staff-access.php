@@ -1,0 +1,21 @@
+<?php
+require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../includes/user-profiles.php';require_once __DIR__.'/../includes/stock.php';require_once __DIR__.'/../includes/audit-read.php';
+$db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($db);
+function staff_check($ok,$why){if(!$ok)throw new RuntimeException($why);}
+function staff_denied($fn){try{$fn();throw new RuntimeException('Unauthorized operation succeeded');}catch(CatalogException $e){staff_check($e->status===403,'HTTP403');}}
+foreach(['usuario','moderador','moderador','administrador','administrador','manager']as$i=>$role)audit_q($db,'INSERT INTO users(name,public_name,email,password_hash,role) VALUES(?,?,?,?,?)',['Persona '.($i+1),'Persona '.($i+1),$i.'@example.invalid','x',$role]);
+$db->beginTransaction();for($i=1;$i<=6;$i++){audit_event($db,$i,'edited','edit-'.$i,['category'=>'movements','ean'=>'96385074'],['name'=>'Antes'],['name'=>'Después']);audit_event($db,$i,'session_started','session-'.$i,['category'=>'users'],[],['device_kind'=>'mobile']);}$db->commit();
+foreach(['0','1']as$grouped){$mod=audit_read($db,2,['grouped'=>$grouped]);staff_check(count($mod['items'])===1&&(int)$mod['items'][0]['actor_id']===2,'moderator only own actions');$admin=audit_read($db,4,['grouped'=>$grouped]);$ids=array_map('intval',array_column($admin['items'],'actor_id'));sort($ids);staff_check($ids===[2,3,4],'administrator own and moderators only');staff_check(count(audit_read($db,6,['grouped'=>$grouped])['items'])===12,'manager all');$forbidden=audit_read($db,6,['grouped'=>$grouped,'actor'=>'6','section'=>'moderation'])['items'][0]['event_id'];staff_check(audit_read($db,4,['grouped'=>$grouped,'event'=>$forbidden])['items']===[],'direct event cannot bypass hierarchy');staff_check(audit_read($db,2,['grouped'=>$grouped,'actor'=>'3'])['items']===[],'forged actor filter');staff_denied(fn()=>audit_read($db,4,['grouped'=>$grouped,'section'=>'users']));staff_denied(fn()=>audit_read($db,2,['grouped'=>$grouped,'section'=>'users']));}
+foreach([2,3,4,5]as$actor)staff_denied(fn()=>profile_change_role($db,$actor,1,'moderador'));
+staff_denied(fn()=>profile_detail($db,profile_user($db,4),profile_user($db,6)));staff_denied(fn()=>profile_detail($db,profile_user($db,4),profile_user($db,5)));
+staff_check(profile_roles(profile_user($db,4),profile_user($db,1))===[],'no role editor for administrator');
+staff_check(!report_can_manage_sender('moderador',2,profile_user($db,1),true),'moderator cannot block accounts');staff_check(!report_can_manage_sender('administrador',4,profile_user($db,6),true),'administrator cannot block manager');
+profile_change_role($db,6,3,'manager');$ids=array_map('intval',array_column(audit_read($db,4,['grouped'=>'1'])['items'],'actor_id'));staff_check(!in_array(3,$ids,true),'promotion closes historical record access');staff_check(count(profile_detail($db,profile_user($db,4),profile_user($db,2))['roles'])===0,'profiles have no role write path');
+echo "OK: staff hierarchy, direct/grouped/filter/detail enforcement, manager-only sessions and role changes, protected profiles, blocking and live promotions.\n";
+
+$db->exec("INSERT INTO pallets(id,code,owner_id,updated_by,prepared_until,activated) VALUES(1,'12345678',1,1,9999999999,1)");$db->exec("INSERT INTO pallet_labels(code,pallet_id) VALUES('12345678',1)");
+$event=['actor_id'=>2,'target_user'=>6,'pallet_id'=>1,'pallet_code'=>'12345678'];$links=audit_navigation($db,$event,2,1);staff_check(!isset($links['pallet'])&&!isset($links['target']),'no navigation escalates moderator scope');
+$db->exec("INSERT INTO pallet_access(pallet_id,user_id,status) VALUES(1,2,'accepted')");$links=audit_navigation($db,$event,2,1);staff_check($links['pallet']['href']==='stock.php?codigo=12345678','accepted access gets pallet link');
+$links=audit_navigation($db,$event,4,2);staff_check(!isset($links['target']),'manager profile not linked for administrator');
+$db->exec('UPDATE pallets SET released=1 WHERE id=1');staff_check(!isset(audit_navigation($db,$event,6,3)['pallet']),'deleted pallet has no stale action');
+echo "OK: navigation respects account hierarchy, pallet access and deleted destinations.\n";

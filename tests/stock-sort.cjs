@@ -1,0 +1,6 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('js/stock-tags.js','utf8');const sort=source.slice(source.indexOf('function sortCards(){'),source.indexOf('\nfunction apply(){'));
+const row=(id,expiry,modified)=>({dataset:{palletId:String(id),expiry,modified}});
+const nodes={stockSort:{value:'modified'},ownedPallets:{children:[row(1,'2020-01-01','2026-01-01'),row(2,'2030-01-01','2026-01-02'),row(3,'','2026-01-03')],append(...rows){this.children=rows}},sharedPallets:{children:[],append(...rows){this.children=rows}}};
+const context=vm.createContext({$:id=>nodes[id]});vm.runInContext(sort,context);const codes=()=>nodes.ownedPallets.children.map(r=>r.dataset.palletId);
+vm.runInContext('sortCards()',context);assert.deepEqual(codes(),['3','2','1']);nodes.stockSort.value='expiry_asc';vm.runInContext('sortCards()',context);assert.deepEqual(codes(),['1','2','3']);nodes.stockSort.value='expiry_desc';vm.runInContext('sortCards()',context);assert.deepEqual(codes(),['2','1','3']);nodes.stockSort.value='modified';vm.runInContext('sortCards()',context);assert.deepEqual(codes(),['3','2','1']);console.log('OK: recent edits, nearest/farthest expiry, undated last and restore default.');

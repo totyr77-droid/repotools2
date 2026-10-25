@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/stock.php';
 require_once __DIR__.'/../includes/achievements.php';
+require_once __DIR__.'/../includes/notification-context.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
@@ -23,9 +24,13 @@ try {
         $comparison = $_POST['action'] === 'read_all' ? '<=' : '=';
         $db->prepare("UPDATE notifications SET read_at = CURRENT_TIMESTAMP WHERE user_id = ? AND id {$comparison} ? AND read_at IS NULL")->execute([$userId, $id]);
     }
-    $stmt = $db->prepare('SELECT n.event_key, n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? ORDER BY n.id DESC LIMIT 40');
-    $stmt->execute([$userId]); $items = $stmt->fetchAll();
+    $stmt = $db->prepare('SELECT n.event_key, n.id, n.type, n.title, n.body, n.report_id, n.created_at, n.read_at, r.status AS report_status FROM notifications n LEFT JOIN product_reports r ON r.id = n.report_id WHERE n.user_id = ? AND '.notification_visibility_sql($db,$userId).' ORDER BY n.id DESC LIMIT 40');
+    $stmt->execute([$userId]); $items = notification_branch_context($db,$stmt->fetchAll(),$userId);
     foreach ($items as &$item) {
+        if($item['type']==='team_pallet_request'&&preg_match('/^team-pallet-request:([0-9]+)$/',$item['event_key'],$match))$item['team_request_id']=(int)$match[1];
+        if($item['type']==='library_invitation'&&preg_match('/^library-share:([0-9]+):/',$item['event_key'],$match)){
+            $q=$db->prepare('SELECT token FROM library_shares WHERE source_library_id=?');$q->execute([(int)$match[1]]);$item['library_token']=$q->fetchColumn()?:null;
+        }
         if($item['type']==='stock_invitation'){
             if(preg_match('/^pallet-invite:(\d+):/',$item['event_key'],$match)){
                 $p=stock_query($db,'SELECT p.code,u.id,u.name,u.public_name FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.id=?',[(int)$match[1]])->fetch();
@@ -39,7 +44,7 @@ try {
         $item['created_at']=(new DateTimeImmutable($item['created_at'],new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
     }
     unset($item);
-    $stmt = $db->prepare('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read_at IS NULL');
+    $stmt = $db->prepare('SELECT COUNT(*) FROM notifications n WHERE n.user_id = ? AND n.read_at IS NULL AND '.notification_visibility_sql($db,$userId));
     $stmt->execute([$userId]);
     $unread = (int) $stmt->fetchColumn();
     $limit = (new DateTimeImmutable('today', new DateTimeZone('America/Buenos_Aires')))->modify('+' . stock_warning_days($db, $userId) . ' days')->format('Y-m-d');

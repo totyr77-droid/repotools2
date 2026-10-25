@@ -1,7 +1,87 @@
+// Application audio lifetime is independent from camera readers, modals and page modules.
+(() => {
+  'use strict';
+  if (window.RepoScanFeedback) return;
+  let audioContext = window.RepoScannerAudioContext || null, audioPrimed = false;
+  let playbackUsers=0, playbackPrevious, playbackSession;
+  function prepareSound() {
+    try {
+      try { if (!playbackUsers && window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient'; } catch {}
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      if (!audioContext || audioContext.state === 'closed') { audioContext = new Context(); window.RepoScannerAudioContext = audioContext; audioPrimed = false; }
+      if (audioContext.state !== 'running') audioPrimed = false;
+      if (audioContext.state !== 'running') audioContext.resume().catch(() => {});
+      if (!audioPrimed && audioContext.createBufferSource) {
+        const source = audioContext.createBufferSource(); source.buffer = audioContext.createBuffer(1, 1, 22050);
+        source.connect(audioContext.destination); source.onended = () => source.disconnect(); source.start(0); audioPrimed = true;
+      }
+    } catch {}
+  }
+  async function beep(preferences = {}, onScheduled = () => {}) {
+    if (preferences.vibration !== false) { try { window.navigator?.vibrate?.(60); } catch {} }
+    if (preferences.sound === false || !audioContext) return;
+    let restoreSession = () => {}, scheduled = false;
+    try {
+      // Ambient obeys the iPhone Silent switch. Request playback only for
+      // the confirmed tone, then restore the previous mixing policy.
+      const session = window.navigator?.audioSession;
+      if (session) {
+        try {
+          if (!playbackUsers) {
+            playbackPrevious = session.type; session.type = 'playback'; playbackSession = session;
+          }
+          playbackUsers++;
+          let restored = false;
+          restoreSession = () => {
+            if (restored) return; restored = true;
+            if (--playbackUsers === 0) {
+              try { if (playbackSession?.type === 'playback') playbackSession.type = playbackPrevious; } catch {}
+              playbackSession = null;
+            }
+          };
+        } catch {}
+      }
+      if (audioContext.state !== 'running') {
+        let timer;
+        try { await Promise.race([audioContext.resume(),new Promise(resolve=>{timer=setTimeout(resolve,200);})]); }
+        finally { clearTimeout(timer); }
+      }
+      if (audioContext.state !== 'running') return;
+      const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
+      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1600, now);
+      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.72, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
+      oscillator.connect(gain); gain.connect(audioContext.destination);
+      const restore = restoreSession;
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
+      oscillator.start(now); onScheduled(); oscillator.stop(now + .15);
+      scheduled = true;
+      // Release the exclusive policy even if iOS interrupts before onended.
+      setTimeout(restore, 500);
+    } catch {} finally { if (!scheduled) restoreSession(); }
+  }
+  window.RepoScanFeedback = { prepare: prepareSound, confirm: beep };
+})();
+
 (() => {
   'use strict';
   const page = window.RepoNavigation?.page;
   const document = page?.document || globalThis.document;
+  // Camera engines are only needed after a user opens a reader; SW keeps them available offline.
+  const libraryLoads=window.RepoScannerLibraryLoads??=new Map();
+  function cameraLibrary(src,ready){
+    if(ready())return Promise.resolve();
+    if(libraryLoads.has(src))return libraryLoads.get(src);
+    const promise=new Promise((resolve,reject)=>{
+      const script=globalThis.document.createElement('script');script.src=new URL(src,globalThis.document.baseURI).href;
+      const finish=error=>{clearTimeout(timer);script.onload=script.onerror=null;if(error){script.remove();libraryLoads.delete(src);reject(error);}else resolve();};
+      const timer=setTimeout(()=>finish(Error('No pudimos cargar el lector. Volvé a intentar.')),15000);
+      script.onload=()=>finish(ready()?null:Error('No pudimos cargar el lector. Volvé a intentar.'));
+      script.onerror=()=>finish(Error('No pudimos cargar el lector. Revisá la conexión y volvé a intentar.'));
+      globalThis.document.head.append(script);
+    });
+    libraryLoads.set(src,promise);return promise;
+  }
   // One camera lease and viewport implementation for every recognition mode.
   let cameraQueue = Promise.resolve(), cameraOwner = null;const metricListeners=new Set();
   function cameraTask(task) { const next = cameraQueue.then(task); cameraQueue = next.catch(() => {}); return next; }
@@ -13,7 +93,20 @@
     let numberGuide;
     if(isQR&&pallet){guide.classList.add('repo-pallet-qr-guide');guide.innerHTML='<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 24V3h21M76 3h21v21M3 76v21h21M76 97h21V76"/><path d="M12 12h14v14H12ZM74 12h14v14H74ZM12 74h14v14H12Z"/></svg>';numberGuide=document.createElement('div');numberGuide.className='repo-pallet-number-guide';numberGuide.setAttribute('aria-hidden','true');numberGuide.innerHTML='<span>········</span><small>Número de palet</small>';element.append(numberGuide);}
     element.append(guide,marker); let timer;
-    function layout() { const width=element.clientWidth,height=element.clientHeight;const side=pallet&&isQR?Math.min(width*.62,height*.58):Math.min(width,height)*.85;if(numberGuide){guide.style.top=height*.40+'px';numberGuide.style.width=Math.min(width*.72,300)+'px';numberGuide.style.top=(height*.40+side/2+12)+'px';}guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px'; }
+    function layout() {
+      const width=element.clientWidth,height=element.clientHeight;
+      let side=Math.min(width,height)*.85;
+      if(numberGuide){
+        // Keep the QR square and the optional number strip in separate rows.
+        const showNumber=height>=280&&width>=220,topPadding=Math.min(48,height*.22),bottomPadding=Math.min(68,height*.3),available=height-topPadding-bottomPadding-(showNumber?52:0);
+        side=Math.max(1,Math.min(width*.62,height*.58,available));
+        const top=topPadding+Math.max(0,(available-side)/2);
+        guide.style.top=top+side/2+'px';numberGuide.hidden=!showNumber;
+        numberGuide.style.width=side+'px';numberGuide.style.top=top+side+8+'px';
+        numberGuide.querySelector('span').style.fontSize=Math.min(24,side/8)+'px';
+      }
+      guide.style.width=(isQR?side:width*.86)+'px';guide.style.height=(isQR?side:Math.min(height*.65,width*.86/2.5))+'px';
+    }
     layout(); const observer=typeof ResizeObserver==='function'?new ResizeObserver(layout):null;observer?.observe(element);
     function reset() { clearTimeout(timer); marker.hidden = true; guide.hidden = false; }
     return {
@@ -62,56 +155,37 @@
   if (page) page.listen('pagehide', clearScanPhoto);
   else window.addEventListener?.('pagehide', clearScanPhoto);
 
-  let audioContext = null, audioPrimed = false;
-  function prepareSound() {
-    try {
-      if (window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient';
-      const Context = window.AudioContext || window.webkitAudioContext;
-      if (!Context) return;
-      audioContext ??= new Context();
-      if (audioContext.state !== 'running') audioContext.resume().catch(() => {});
-      if (!audioPrimed && audioContext.createBufferSource) {
-        const source = audioContext.createBufferSource(); source.buffer = audioContext.createBuffer(1, 1, 22050);
-        source.connect(audioContext.destination); source.onended = () => source.disconnect(); source.start(0); audioPrimed = true;
-      }
-    } catch {}
-  }
-  async function beep(preferences = {}, onScheduled = () => {}) {
-    if (preferences.vibration !== false) { try { window.navigator?.vibrate?.(60); } catch {} }
-    if (preferences.sound === false || !audioContext) return;
-    let restoreSession = () => {}, scheduled = false;
-    try {
-      // Ambient obeys the iPhone Silent switch. Request playback only for
-      // the confirmed tone, then restore the previous mixing policy.
-      const session = window.navigator?.audioSession;
-      if (session) {
-        const previous = session.type;
-        let restored = false;
-        session.type = 'playback';
-        restoreSession = () => {
-          if (restored) return; restored = true;
-          try { if (session.type === 'playback') session.type = previous; } catch {}
-        };
-      }
-      if (audioContext.state !== 'running') await audioContext.resume();
-      if (audioContext.state !== 'running') return;
-      const oscillator = audioContext.createOscillator(), gain = audioContext.createGain(), now = audioContext.currentTime;
-      oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1600, now);
-      gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.72, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
-      oscillator.connect(gain); gain.connect(audioContext.destination);
-      const restore = restoreSession;
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); restore(); };
-      oscillator.start(now); onScheduled(); oscillator.stop(now + .15);
-      scheduled = true;
-      // Release the exclusive policy even if iOS interrupts before onended.
-      setTimeout(restore, 500);
-    } catch {} finally { if (!scheduled) restoreSession(); }
-  }
+  const prepareSound = window.RepoScanFeedback.prepare;
+  const beep = window.RepoScanFeedback.confirm;
   function visibleFrame(video) {
     const width = video.videoWidth, height = video.videoHeight;
     const ratio = video.clientWidth && video.clientHeight ? video.clientWidth / video.clientHeight : width / height;
     const frameWidth = Math.min(width, Math.round(height * ratio)), frameHeight = Math.min(height, Math.round(width / ratio));
     return { x: Math.round((width - frameWidth) / 2), y: Math.round((height - frameHeight) / 2), width: frameWidth, height: frameHeight };
+  }
+  function palletFrame(video,element){
+    const frame=visibleFrame(video),v=video.getBoundingClientRect?.(),g=element.querySelector?.('.repo-pallet-qr-guide')?.getBoundingClientRect?.();
+    if(!v?.width||!v.height||!g?.width||!g.height)return null;
+    const number=element.querySelector?.('.repo-pallet-number-guide'),n=number&&!number.hidden?number.getBoundingClientRect?.():null;
+    const left=Math.max(v.left,g.left),top=Math.max(v.top,g.top),right=Math.min(v.right,g.right),bottom=Math.min(v.bottom,Math.max(g.bottom,n?.bottom||g.bottom));
+    if(right<=left||bottom<=top)return null;
+    return {x:frame.x+(left-v.left)/v.width*frame.width,y:frame.y+(top-v.top)/v.height*frame.height,width:(right-left)/v.width*frame.width,height:(bottom-top)/v.height*frame.height};
+  }
+  function palletSelection(deliver,ambiguous,now=()=>performance.now()){
+    let pending=null,blockedUntil=0,candidate=null;
+    return {
+      ocr(code){pending={code,at:now()};},
+      qr(codes,capturedAt=now(),positions=null){
+        const time=now(),unique=[...new Set(codes.map(palletIdentifier).filter(Boolean))];
+        if(time-capturedAt>1500)return;
+        if(unique.length>1||(unique.length===1&&pending&&time-pending.at<1500&&pending.code!==unique[0])){pending=null;candidate=null;blockedUntil=time+400;ambiguous();return;}
+        if(time<blockedUntil)return;
+        if(unique.length===1&&positions){const symbol=positions.find(p=>palletIdentifier(p.text)===unique[0]);if(!symbol||Math.abs(symbol.x-.5)>.20||Math.abs(symbol.y-.5)>.30){pending=null;candidate=null;ambiguous();return;}}
+        if(!unique.length)candidate=null;
+        if(unique.length===1){if(candidate?.code===unique[0]&&capturedAt>candidate.frame&&time-candidate.at<=700){pending=null;candidate=null;deliver(unique[0],'scoped-qr');}else candidate={code:unique[0],frame:capturedAt,at:time};}
+        else if(pending&&capturedAt>=pending.at){const value=pending;pending=null;if(time-value.at<1500)deliver(value.code,'scoped-ocr');}
+      },conflict(){pending=null;candidate=null;blockedUntil=now()+400;ambiguous();},reset(){pending=null;candidate=null;blockedUntil=0;}
+    };
   }
   function validEAN(code) {
     if (typeof code !== 'string' || !/^(?:\d{8}|\d{13})$/.test(code) || /^0+$/.test(code)) return false;
@@ -139,7 +213,7 @@
   }
 
   // Shared identification engine. Camera/QR decoder and feedback remain in create().
-  const qrRescueURL=(()=>{try{return new URL('qr-rescue-worker.js',document.currentScript?.src||new URL('js/ean-scanner.js',window.location.href)).href;}catch{return 'js/qr-rescue-worker.js';}})();
+  const qrRescueURL=(()=>{try{return new URL('qr-rescue-worker.js?v=bbcb731b62c9',document.currentScript?.src||new URL('js/ean-scanner.js',window.location.href)).href;}catch{return 'js/qr-rescue-worker.js?v=bbcb731b62c9';}})();
   const ocrBase = (() => { try { return new URL('vendor/ocr/', document.currentScript?.src || new URL('js/ean-scanner.js', window.location.href)).href; } catch { return 'js/vendor/ocr/'; } })();
   let ocrLibrary;
   function loadOCR() {
@@ -161,16 +235,26 @@
       const code = /\/q\/(\d{8})\/?$/.exec(url.pathname)?.[1]||url.searchParams.get('codigo'); return /^\d{8}$/.test(code || '') ? code : null;
     } catch { return null; }
   }
-  function ocrConsensus() {
-    const valid=value=>/^\d{8}$/.test(value||''),confirm=confirmation(valid);
-    // An unreadable frame is a missed detection, just as with EAN. Age is checked on the next valid read.
-    const read=(value,frame,now=performance.now())=>valid(value)?confirm(value,now,frame):false;
-    read.progress=confirm.progress;return read;
+  function ocrConsensus(getZoom=()=>1) {
+    const valid=value=>/^\d{8}$/.test(value||'');
+    const tolerance=()=>{const z=Number(getZoom()),zoom=Number.isFinite(z)&&z>=1?z:1;return Math.min(4000,2000+(zoom-1)*500);};
+    const windowMs=()=>tolerance()*2+1000;
+    let code='',count=0,first=0,last=0,lastFrame=null;
+    // OCR may lose the digits between clear frames while digital zoom magnifies hand movement.
+    const read=(value,frame,now=performance.now())=>{
+      if(!valid(value))return false;
+      if(frame!==null&&frame!==undefined&&frame===lastFrame)return false;
+      lastFrame=frame;
+      if(value!==code||now<last||now-last>tolerance()||now-first>windowMs()){code=value;count=1;first=last=now;return false;}
+      if(now-last<60)return false;
+      last=now;return ++count>=3;
+    };
+    read.progress=(now=performance.now())=>count&&now>=last&&now-last<=tolerance()&&now-first<=windowMs()?Math.min(count,3):0;
+    read.tolerance=tolerance;return read;
   }
+  function ocrReadings(data){const lines=(data.blocks||[]).flatMap(b=>(b.paragraphs||[]).flatMap(p=>p.lines||[])),rows=lines.length?lines:[{text:data.text,confidence:data.confidence}];return {rows,numbers:rows.filter(r=>/^\s*(?:\d\s*){8}$/.test(r.text||'')).map(r=>r.text.replace(/\s/g,''))};}
   function ocrCandidate(data) {
-    const lines = (data.blocks || []).flatMap(b => (b.paragraphs || []).flatMap(p => p.lines || []));
-    const rows = lines.length ? lines : [{ text: data.text, confidence: data.confidence }];
-    const numbers=rows.filter(r=>/^\s*(?:\d\s*){8}$/.test(r.text||'')).map(r=>r.text.replace(/\s/g,''));
+    const {rows,numbers}=ocrReadings(data);
     if(new Set(numbers).size>1)return null;
     const valid = rows.filter(r => Number(r.confidence) >= 80 && /^\s*(?:\d\s*){8}$/.test(r.text || '')).map(r => ({ code: r.text.replace(/\s/g, ''), box: r.bbox }));
     return new Set(valid.map(r => r.code)).size === 1 ? valid[0] : null;
@@ -202,7 +286,8 @@ function palletNumberRegion(image){
 }
 
   function palletOCR(element, active, accept, status, viewport, canAnalyze = () => true,onAnalysis=()=>{}) {
-    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus(),pageMode='11',lockedRegion=null;
+    const getZoom=()=>{try{return element.querySelector('video')?.srcObject?.getVideoTracks?.()[0]?.getSettings?.().zoom||1;}catch{return 1;}};
+    let disposed = false, timer, worker, creating, busy = false, lastFrame = null, confirm = ocrConsensus(getZoom),pageMode='11',lockedRegion=null;
     const canvas = document.createElement('canvas'), context = canvas.getContext('2d'),lineCanvas=document.createElement('canvas'),lineContext=lineCanvas.getContext('2d');
     if (!context) return { dispose() {}, resume() {}, reset() {} };
 
@@ -250,7 +335,7 @@ function palletNumberRegion(image){
           await worker.setParameters({ tessedit_char_whitelist: '0123456789', tessedit_pageseg_mode: '11' });
         }
         if (!active() || disposed) return;
-        const frame = visibleFrame(video), scale = Math.min(1, 1280 / frame.width,1920/Math.max(frame.width,frame.height));
+        const frame = palletFrame(video,element);if(!frame)return;const scale = Math.min(1, 1280 / frame.width,1920/Math.max(frame.width,frame.height));
         const stamp = video.currentTime; if (stamp === lastFrame) return; lastFrame = stamp;
         source.width=Math.round(frame.width*scale);source.height=Math.round(frame.height*scale);sourceContext.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,source.width,source.height);
         normalizeDimFrame();
@@ -263,11 +348,16 @@ function palletNumberRegion(image){
         const analysisStarted=performance.now();
         const result = await worker.recognize(ocrSurface, {rotateAuto:false}, { text: true, blocks: true });
         if (disposed || !active()) return;
-        const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),costMs:performance.now()-analysisStarted});
+        if(new Set(ocrReadings(result.data).numbers).size>1){confirm(null,stamp);onAnalysis({matched:false,ambiguous:true,costMs:performance.now()-analysisStarted});accept(null,'ocr-ambiguous');return;}
+        const candidate = ocrCandidate(result.data);onAnalysis({angle,numberRegion:Boolean(region),matched:Boolean(candidate),zoom:Number(getZoom())||1,toleranceMs:confirm.tolerance(),costMs:performance.now()-analysisStarted});
+        let centeredCandidate=false;
         if(candidate?.box){
           const box=candidate.box,points=[[box.x0,box.y0],[box.x1,box.y0],[box.x1,box.y1],[box.x0,box.y1]].map(([x,y])=>{x-=canvas.width/2;y+=lineOffset-canvas.height/2;return {x:x*cos+y*sin+source.width/2,y:-x*sin+y*cos+source.height/2};});
-          viewport?.track({x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},fullWidth,fullHeight);
+          const localBox={x0:Math.max(0,cropX+Math.min(...points.map(p=>p.x))/cropScale),y0:Math.max(0,cropY+Math.min(...points.map(p=>p.y))/cropScale),x1:Math.min(fullWidth,cropX+Math.max(...points.map(p=>p.x))/cropScale),y1:Math.min(fullHeight,cropY+Math.max(...points.map(p=>p.y))/cropScale)},visible=visibleFrame(video),sx=frame.width/fullWidth,sy=frame.height/fullHeight;
+          centeredCandidate=Math.abs((localBox.x0+localBox.x1)/2/fullWidth-.5)<=.20;
+          viewport?.track({x0:frame.x-visible.x+localBox.x0*sx,y0:frame.y-visible.y+localBox.y0*sy,x1:frame.x-visible.x+localBox.x1*sx,y1:frame.y-visible.y+localBox.y1*sy},visible.width,visible.height);
         }else viewport?.reset();
+        if(candidate&&!centeredCandidate){confirm(null,stamp);lockedRegion=null;lockedAngle=null;nextDelay=350;accept(null,'ocr-off-center');return;}
         if (candidate) { lockedRegion=region?{region,width:fullWidth,height:fullHeight,at:performance.now()}:null;lockedAngle=angle;nextDelay=80;const confirmed=confirm(candidate.code, stamp);status(false,confirm.progress()); if (confirmed) accept(candidate.code, 'ocr'); }
         else {lockedRegion=null;lockedAngle=null;nextDelay=350;confirm(null, stamp);}
       } catch { if (!disposed) { status(true); disposed = true; viewport?.reset(); try { await worker?.terminate(); } catch {} } }
@@ -276,7 +366,8 @@ function palletNumberRegion(image){
     schedule();
     return {
       hasCandidate(){return !disposed&&lockedAngle!==null;},
-      reset() { confirm = ocrConsensus();lockedRegion=null;lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
+      tolerance(){return confirm.tolerance();},
+      reset() { confirm = ocrConsensus(getZoom);lockedRegion=null;lockedAngle=null;angleIndex=0;nextDelay=550; viewport?.reset(); },
       resume() { clearTimeout(timer); if (!busy && !disposed) schedule(); },
       dispose() { disposed = true; clearTimeout(timer); viewport?.reset(); if (!busy) { clearCanvases(); try { worker?.terminate().catch(() => {}); } catch {} } else { creating?.then(w => w.terminate()).catch(() => {}); } }
     };
@@ -421,7 +512,8 @@ function palletNumberRegion(image){
       // Adaptador para html5-qrcode 2.3.8: reutiliza su decodificador sobre el canvas,
       // sin convertir cada fotograma en archivos ni crear URLs de imágenes.
       const decoder = current.reader.qrcode;
-      if (!context || typeof decoder?.decodeRobustlyAsync !== 'function' || !serialDecoder(current)) return;
+      const scopedPallet=current.isQR&&current.kind==='pallet';
+      if (!context || (!scopedPallet&&(typeof decoder?.decodeRobustlyAsync !== 'function' || !serialDecoder(current)))) return;
       const profiles = [{ angle: 0, crop: .7 }, { angle: -45, crop: .7 }, { angle: 45, crop: .7 }, { angle: 90, crop: .7 }, { angle: 0, crop: 1 }, { angle: -30, crop: .7 }, { angle: 30, crop: .7 }, { angle: -60, crop: .7 }, { angle: 60, crop: .7 }, { angle: 90, crop: 1 }, { angle: -18, crop: .7 }, { angle: 18, crop: .7 }];
       const probe = document.createElement('canvas'), probeContext = probe.getContext('2d', { willReadFrequently: true });
       function locate(video, frame) {
@@ -484,8 +576,8 @@ function palletNumberRegion(image){
       }
       let rescueWorker,rescueReady=false,rescueFailed=false,rescuePending=null,rescueInitTimer,rescueSequence=0,rescueLast=-Infinity;
       function stopRescue(){clearTimeout(rescueInitTimer);rescueWorker?.terminate();rescueWorker=null;rescueReady=false;if(rescuePending){clearTimeout(rescuePending.timer);rescuePending.resolve(null);rescuePending=null;}}
-      function startRescue(){if(rescueWorker||rescueFailed||typeof Worker!=='function')return;try{rescueWorker=new Worker(qrRescueURL);rescueInitTimer=setTimeout(()=>{rescueFailed=true;stopRescue();},12000);rescueWorker.onmessage=event=>{const value=event.data;if(value?.type==='ready'){clearTimeout(rescueInitTimer);rescueReady=true;metric(current,'qr-rescue-ready');return;}if(value?.type==='unavailable'){rescueFailed=true;stopRescue();return;}if(value?.type!=='result'||!rescuePending||value.id!==rescuePending.id)return;const pending=rescuePending;rescuePending=null;clearTimeout(pending.timer);const codes=Array.isArray(value.codes)?[...new Set(value.codes.filter(code=>typeof code==='string'&&current.validate(code)))]:[];metric(current,'qr-rescue-analysis',{costMs:performance.now()-pending.started,matched:codes.length===1});pending.resolve(codes.length===1?{text:codes[0]}:null);};rescueWorker.onerror=event=>{event.preventDefault?.();rescueFailed=true;stopRescue();};}catch{rescueFailed=true;stopRescue();}}
-      const rescueWarmup=current.isQR?setTimeout(()=>{if(current.accepting&&session===current&&!document.hidden&&canAccept())startRescue();},450):null;
+      function startRescue(){if(rescueWorker||rescueFailed)return;if(typeof Worker!=='function'){rescueFailed=true;return;}try{rescueWorker=new Worker(qrRescueURL);rescueInitTimer=setTimeout(()=>{rescueFailed=true;stopRescue();},12000);rescueWorker.onmessage=event=>{const value=event.data;if(value?.type==='ready'){clearTimeout(rescueInitTimer);rescueReady=true;metric(current,'qr-rescue-ready');return;}if(value?.type==='unavailable'){rescueFailed=true;stopRescue();return;}if(value?.type!=='result'||!rescuePending||value.id!==rescuePending.id)return;const pending=rescuePending;rescuePending=null;clearTimeout(pending.timer);const codes=Array.isArray(value.codes)?[...new Set(value.codes.filter(code=>typeof code==='string'&&current.validate(code)))]:[];metric(current,'qr-rescue-analysis',{costMs:performance.now()-pending.started,matched:codes.length===1,ambiguous:codes.length>1});if(scopedPallet&&pending.scoped&&current.accepting&&session===current&&!document.hidden&&canAccept()){if(value.verified===true)current.selection.qr(codes,pending.started,Array.isArray(value.symbols)?value.symbols:[]);else onStatus('No pudimos comprobar la etiqueta. Volvé a centrarla.');}pending.resolve(codes.length===1?{text:codes[0]}:null);};rescueWorker.onerror=event=>{event.preventDefault?.();rescueFailed=true;stopRescue();};}catch{rescueFailed=true;stopRescue();}}
+      const rescueWarmup=current.isQR?setTimeout(()=>{if(current.accepting&&session===current&&!document.hidden&&canAccept())startRescue();},scopedPallet?0:450):null;
       async function decodeImage(surface){const original=current.isQR&&rescueReady?surface.getContext('2d').getImageData(0,0,surface.width,surface.height):null;try{return await decoder.decodeRobustlyAsync(surface);}catch(error){if(!current.isQR||!current.accepting||session!==current||document.hidden||!canAccept()||performance.now()-(current.cameraReadyAt??current.requestedAt)<650)throw error;startRescue();if(!rescueReady||rescuePending||performance.now()-rescueLast<350)throw error;rescueLast=performance.now();const image=original||surface.getContext('2d').getImageData(0,0,surface.width,surface.height),id=++rescueSequence;const result=await new Promise(resolve=>{rescuePending={id,resolve,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});if(result&&current.accepting&&session===current&&!document.hidden&&canAccept())return result;throw error;}}
       let lastRectify=-Infinity;
       let variant = 0, probeAttempt = 0, lastProfile = null, running = false, disposed = false, lastFrame=null,lastQuagga=-Infinity,quaggaCandidate=false,attempts=0;
@@ -514,7 +606,18 @@ function palletNumberRegion(image){
         if (video?.videoWidth && video.videoHeight && video.readyState>=2 && video.currentTime!==lastFrame && !current.decodeBusy && (current.exclusive||started - (current.lastPrimaryDetection ?? -Infinity) > 180)) {
           running = true;lastFrame=video.currentTime;
           try {
-            const frame = visibleFrame(video);
+            const frame = scopedPallet?palletFrame(video,element):visibleFrame(video);
+            if(!frame)return;
+            if(scopedPallet){
+              startRescue();
+              if(!rescueReady){if(rescueFailed)onStatus('No pudimos verificar el QR. Ingresá el número con el teclado.');return;}
+              const scale=Math.min(1,(current.requestDetail?1920:1280)/Math.max(frame.width,frame.height));current.requestDetail=false;
+              canvas.width=Math.max(1,Math.round(frame.width*scale));canvas.height=Math.max(1,Math.round(frame.height*scale));
+              context.drawImage(video,frame.x,frame.y,frame.width,frame.height,0,0,canvas.width,canvas.height);
+              const image=context.getImageData(0,0,canvas.width,canvas.height),id=++rescueSequence;current.decodeBusy=true;
+              try{await new Promise(resolve=>{rescuePending={id,resolve,scoped:true,started:performance.now(),timer:setTimeout(()=>{rescueFailed=true;stopRescue();},2000)};try{rescueWorker.postMessage({type:'decode',id,multiple:true,width:image.width,height:image.height,buffer:image.data.buffer},[image.data.buffer]);}catch{rescueFailed=true;stopRescue();}});}finally{current.decodeBusy=false;}
+              return;
+            }
             if(current.isQR&&!current.ocr?.hasCandidate?.()&&started-(current.cameraReadyAt??current.requestedAt)>900&&started-lastRectify>1100){
               lastRectify=started;
               if(rectifyLabel(video,frame)){metric(current,'perspective-attempt',{width:canvas.width,height:canvas.height});const result=await decodeImage(canvas);if(current.validate(result.text))accept(result.text,'background',lastFrame);return;}
@@ -583,7 +686,7 @@ function palletNumberRegion(image){
       if (!current) return;
       if (!current.cleanup) current.cleanup = (async () => {
         metric(current,'closed',{outcome:current.failed?'error':current.cycleConfirmed?'confirmed':'cancelled'});
-        current.accepting = false;current.frameObserver?.disconnect();current.frameAbort?.abort(); current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
+        current.accepting = false;current.selection?.reset();current.frameObserver?.disconnect();current.frameAbort?.abort(); current.ocr?.dispose(); current.disposeBackground?.(); current.disposeControls?.(); clearTimeout(current.progressTimer);
         try { await current.starting; } catch {}
         try { if (current.reader.isScanning) await current.reader.stop(); }
         finally {
@@ -610,16 +713,18 @@ function palletNumberRegion(image){
       if (feedbackPreferences().sound !== false) prepareSound();
       const token = ++revision;
       if (session) session.accepting = false;
-      return enqueue(async () => {
+      const isQR = format === 'qr';
+      const ready=window.Html5Qrcode&&window.Html5QrcodeSupportedFormats?Promise.resolve():(onStatus('Preparando cámara…'),cameraLibrary('js/vendor/html5-qrcode-2.3.8.min.js',()=>Boolean(window.Html5Qrcode&&window.Html5QrcodeSupportedFormats)));
+      // Loading a shared engine must not keep Stop (or closing a modal) waiting for the network.
+      return ready.then(()=>enqueue(async () => {
         await cameraOwner?.release();
         await release(session);
         if (token !== revision) return false;
         if(statusArea&&statusArea.parentElement===element)element.before(statusArea);
         element.classList.remove('ean-confirmed');
         element.classList.remove('ean-detecting');
-        if (!window.Html5Qrcode || !window.Html5QrcodeSupportedFormats) throw new Error('No se pudo cargar el lector. Intenta nuevamente.');
+        if(!isQR)cameraLibrary('js/vendor/quagga-1.12.1.min.js',()=>Boolean(window.Quagga?.decodeSingle)).catch(()=>{});
         const formats = window.Html5QrcodeSupportedFormats;
-        const isQR = format === 'qr';
         const kind = typeof identification === 'function' ? identification() : identification;
         const normalize = isQR && kind === 'pallet' ? palletIdentifier : value => value;
         const validate = isQR ? code => kind === 'pallet' ? Boolean(palletIdentifier(code)) : validateQR ? Boolean(validateQR(code)) : typeof code === 'string' && code.trim().length > 0 && code.length <= 2048 : code => validEAN(code)||Boolean(window.RepoTeamInvitation?.token(code));
@@ -628,6 +733,12 @@ function palletNumberRegion(image){
         const current = { reader, metricId:globalThis.crypto?.randomUUID?.()||String(requestedAt)+':'+token, accepting: true, token, isQR, kind, validate, requestedAt, confirm: confirmation(validate,()=>isQR?650:((current.analysisCost||0)+100)*2) };metric(current,'camera-request');
         serialDecoder(current);session = current; cameraOwner = { current, release: () => release(current) };
         const accept = (code, source = 'camera', recognizedFrame = null) => {
+          const scopedVideo=element.querySelector?.('video');
+          if(source==='ocr-ambiguous'||source==='ocr-off-center'){current.selection.conflict();return;}
+          if(isQR&&kind==='pallet'&&scopedVideo?.videoWidth){
+            if(source==='camera'||source==='background')return;
+            if(source==='ocr'){current.selection.ocr(code);return;}
+          }
           code = normalize(code);
           if (code === null) { if (current.accepting && session === current && token === revision && canAccept()) { current.confirm(null); current.ocr?.reset(); onStatus('Este QR no corresponde a un palet de Repotools.'); } return; }
           if (isQR && kind === 'pallet' && current.lastDelivered === code) return;
@@ -643,16 +754,16 @@ function palletNumberRegion(image){
           if (!validate(code)) { current.confirm(code); return; }
           if (source === 'camera') current.lastPrimaryDetection = performance.now();
           metric(current,'decoded',{source});
-          const confirmed = source === 'ocr' || isQR || current.confirm(code,performance.now(),recognizedFrame??(video?.videoWidth&&video.readyState>=2?video.currentTime:null));
+          const confirmed = source === 'ocr' || source === 'scoped-ocr' || isQR || current.confirm(code,performance.now(),recognizedFrame??(video?.videoWidth&&video.readyState>=2?video.currentTime:null));
           if (!confirmed) {
             element.classList.add('ean-detecting'); onStatus('Detectando código…'); clearTimeout(current.progressTimer);
             current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centra un solo código dentro del recuadro.'); } }, 700);
             return;
           }
-          if(source!=='ocr'&&typeof CustomEvent==='function'&&typeof window.dispatchEvent==='function')window.dispatchEvent(new CustomEvent('repotools:accepted-code',{detail:{code,isQR,reader:elementId}}));
-          metric(current,'confirmed',{source,confirmationMs:source==='ocr'?null:isQR?0:Math.max(0,performance.now()-(current.confirm.startedAt??performance.now()))});
+          if(source!=='ocr'&&source!=='scoped-ocr'&&typeof CustomEvent==='function'&&typeof window.dispatchEvent==='function')window.dispatchEvent(new CustomEvent('repotools:accepted-code',{detail:{code,isQR,reader:elementId}}));
+          metric(current,'confirmed',{source,confirmationMs:source==='ocr'||source==='scoped-ocr'?null:isQR?0:Math.max(0,performance.now()-(current.confirm.startedAt??performance.now()))});
           current.accepting = false; current.ocr?.reset(); clearTimeout(current.progressTimer); current.disposeBackground?.(); element.classList.remove('ean-detecting');
-          element.classList.add('ean-confirmed'); onStatus(source==='ocr'?'Número confirmado · 3/3':'Código confirmado.');
+          element.classList.add('ean-confirmed'); onStatus(source==='ocr'||source==='scoped-ocr'?'Número confirmado · 3/3':'Código confirmado.');
           if(keepOpen()){
             current.lastDelivered=code;current.lastDeliveredSeen=Date.now();
             Promise.resolve().then(()=>{metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR&&validEAN(code))rememberScanPhoto(code,element);metric(current,'action');return onCode(code);}).then(()=>metric(current,'action-complete')).catch(error=>{if(token===revision&&session===current){onError(error);}}).then(()=>new Promise(resolve=>setTimeout(resolve,350))).then(()=>{
@@ -664,10 +775,11 @@ function palletNumberRegion(image){
           }
           enqueue(async () => {
             if(token!==revision)return;
-            metric(current,'feedback-request');beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR&&validEAN(code))rememberScanPhoto(code,element); await release(current);
+            metric(current,'feedback-request');await beep(feedbackPreferences(),()=>metric(current,'tone-scheduled'));if(!isQR&&validEAN(code))rememberScanPhoto(code,element); await release(current);
             if (token === revision) Promise.resolve().then(() => { if (token === revision) {metric(current,'action');return onCode(code);} }).then(()=>{if(current.actionStarted)metric(current,'action-complete');}).catch(error => { if (token === revision) onError(error); });
           }).catch(onError);
         };
+        current.selection=palletSelection(accept,()=>{current.ocr?.reset();element.classList.add('ean-detecting');onStatus('Centrá una sola etiqueta dentro de la guía.');});
         onStatus('Abriendo cámara…');
         try {
           if(typeof MutationObserver==='function'&&element.querySelector){current.frameAbort=new AbortController();const observed=()=>{const video=element.querySelector('video');if(!video||video===current.observedVideo)return;current.observedVideo=video;const first=()=>{if(!current.firstFrame){current.firstFrame=true;metric(current,'first-frame',{width:video.videoWidth,height:video.videoHeight});current.frameObserver?.disconnect();}};if(video.readyState>=2)first();else video.addEventListener('loadeddata',first,{once:true,signal:current.frameAbort.signal});};current.frameObserver=new MutationObserver(observed);current.frameObserver.observe(element,{childList:true,subtree:true});observed();}
@@ -691,7 +803,7 @@ function palletNumberRegion(image){
           if(statusArea)element.append(statusArea);
           try { cameraControls(current); } catch { /* Los controles opcionales no bloquean el escáner. */ }
           try { background(current, accept); } catch { /* La cámara sigue leyendo si el análisis auxiliar no está disponible. */ }
-          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, (unavailable,count) => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Número detectado · '+count+'/3'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, 650); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
+          if (isQR && kind === 'pallet') current.ocr = palletOCR(element, () => !document.hidden && performance.now()-(current.cameraReadyAt??current.requestedAt)>(Number(window.navigator?.hardwareConcurrency||8)<=4?900:650) && current.accepting && session === current && token === revision && canAccept(), accept, (unavailable,count) => { if (unavailable) onStatus('OCR no disponible. Escaneá el QR o ingresá el número.'); else { element.classList.add('ean-detecting'); onStatus('Número detectado · '+count+'/3'); clearTimeout(current.progressTimer); current.progressTimer = setTimeout(() => { if (current.accepting && token === revision) { element.classList.remove('ean-detecting'); onStatus('Centrá el QR o el número de 8 dígitos.'); } }, current.ocr?.tolerance?.()||2000); } }, current.viewport,()=>!current.decodeBusy,detail=>metric(current,'ocr-analysis',detail));
           onStatus(isQR && kind === 'pallet' ? 'Centrá el QR o el número de 8 dígitos.' : 'Centra un solo código dentro del recuadro.');
           return true;
         } catch (error) {
@@ -702,12 +814,11 @@ function palletNumberRegion(image){
           if(statusArea)element.append(statusArea);
           throw error;
         }
-      });
+      })).catch(error=>{if(token!==revision)return false;throw error;});
     }
     page?.onLeave(stop);
     const originalCode=onCode;const normalCode=code=>window.RepoTeamInvitation?.token(code)?window.RepoTeamInvitation.open(code):originalCode(code);if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
-  window.RepoEANScanner = { observe(listener){if(typeof listener!=='function')throw TypeError('Observer required');metricListeners.add(listener);return()=>metricListeners.delete(listener);}, create, rawCreate, validEAN, confirmation, palletIdentifier, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
+  window.RepoEANScanner = { observe(listener){if(typeof listener!=='function')throw TypeError('Observer required');metricListeners.add(listener);return()=>metricListeners.delete(listener);}, create, rawCreate, validEAN, confirmation, palletIdentifier, palletFrame, palletSelection, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
 })();
-

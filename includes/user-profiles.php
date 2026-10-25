@@ -52,7 +52,6 @@ function profile_update_information(PDO $db,int $actorId,int $targetId,array $in
 }
 function profile_roles(array $actor, array $target): array {
     if ($actor['role'] === 'manager') return ['usuario','moderador','administrador','manager'];
-    if ($actor['role'] === 'administrador' && $actor['id'] != $target['id'] && in_array($target['role'], ['usuario','moderador'], true)) return ['usuario','moderador'];
     return [];
 }
 function profile_change_role(PDO $db, int $actorId, int $targetId, string $role): void {
@@ -84,7 +83,11 @@ function profile_block_reports(PDO $db, int $actorId, int $targetId, bool $block
         $db->commit();
     } catch (Throwable $e) {if ($db->inTransaction()) $db->rollBack();throw $e;}
 }
+function profile_can_view(array $actor,array $target): bool {
+    return $actor['role']==='manager'||($actor['role']==='administrador'&&((int)$actor['id']===(int)$target['id']||in_array($target['role'],['usuario','moderador'],true)));
+}
 function profile_detail(PDO $db, array $actor, array $target, int $page = 0, string $activity = ''): array {
+    if(!profile_can_view($actor,$target))throw new CatalogException('Tu rango no permite consultar esta cuenta.',403);
     $id = (int)$target['id']; $stats = [];
     foreach (['scans'=>'SELECT COUNT(*) FROM scan_events WHERE user_id=?','unique_codes'=>'SELECT COUNT(DISTINCT code) FROM scan_events WHERE user_id=?','reports'=>'SELECT COUNT(*) FROM product_reports WHERE user_id=?','approved'=>'SELECT COUNT(*) FROM report_rewards WHERE user_id=?','libraries'=>'SELECT COUNT(*) FROM libraries WHERE user_id=?','pallets'=>'SELECT COUNT(*) FROM pallets WHERE owner_id=? AND released=0'] as $key=>$sql) {
         $s=$db->prepare($sql);$s->execute([$id]);$stats[$key]=(int)$s->fetchColumn();
@@ -94,15 +97,16 @@ function profile_detail(PDO $db, array $actor, array $target, int $page = 0, str
     }
     $directEdit=catalog_direct_edit_condition($db);
     $offset=$page*30;
+    $staffScope=$actor['role']==='manager'?'':' AND e.actor_id='.(int)$actor['id'];
     $eventsSql="
         SELECT 'scan' AS kind, code AS detail, created_at, id AS event_id FROM scan_events WHERE user_id=?
         UNION ALL SELECT 'report', ean, created_at, id FROM product_reports WHERE user_id=?
         UNION ALL SELECT 'review', status, reviewed_at, id FROM product_reports WHERE reviewed_by=? AND reviewed_at IS NOT NULL
         UNION ALL SELECT 'edit',ean,created_at,id FROM product_edits WHERE user_id=? AND {$directEdit}
         UNION ALL SELECT 'pallet',code,created_at,id FROM pallet_admin_events WHERE user_id=?
-        UNION ALL SELECT 'role',a.name || ': ' || u.name || ' · ' || e.old_role || ' → ' || e.new_role,e.created_at,e.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE e.user_id=? OR e.actor_id=?
-        UNION ALL SELECT 'block',a.name || ': ' || u.name || ' · ' || e.action,e.created_at,e.id FROM report_block_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE e.user_id=? OR e.actor_id=?
-        UNION ALL SELECT 'profile',e.after_data,e.created_at,e.id FROM user_profile_events e WHERE e.user_id=? OR e.actor_id=?
+        UNION ALL SELECT 'role',a.name || ': ' || u.name || ' · ' || e.old_role || ' → ' || e.new_role,e.created_at,e.id FROM user_role_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE (e.user_id=? OR e.actor_id=?){$staffScope}
+        UNION ALL SELECT 'block',a.name || ': ' || u.name || ' · ' || e.action,e.created_at,e.id FROM report_block_events e JOIN users a ON a.id=e.actor_id JOIN users u ON u.id=e.user_id WHERE (e.user_id=? OR e.actor_id=?){$staffScope}
+        UNION ALL SELECT 'profile',e.after_data,e.created_at,e.id FROM user_profile_events e WHERE (e.user_id=? OR e.actor_id=?){$staffScope}
     ";
     $s=$db->prepare("SELECT DISTINCT kind FROM ({$eventsSql}) events ORDER BY kind");$s->execute(array_fill(0,11,$id));$available=$s->fetchAll(PDO::FETCH_COLUMN);
     if ($activity!=='' && !in_array($activity,['scan','report','review','edit','pallet','role','block','profile'],true)) throw new CatalogException('Actividad no válida.',422);

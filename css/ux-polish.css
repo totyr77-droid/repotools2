@@ -72,7 +72,7 @@ body[data-hand] :is(#palletMetadata,#palletStatus,#stockHistoryList,#stockMoveme
 
 
 #stockShareDialog[open]{display:flex;flex-direction:column;overflow:hidden}#stockShareDialog>.library-heading{flex:none;margin-bottom:8px}#stockShareForm:not([hidden]){display:flex;flex-direction:column;min-height:0;overflow:hidden;gap:8px}.stock-share-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain}.stock-share-footer{flex:none;padding-top:8px;border-top:1px solid #e9e6ef;padding-bottom:max(4px,env(safe-area-inset-bottom,0px))}.stock-share-footer>label{margin:0!important}#stockShareHint{margin:6px 0!important}#stockShareSearch{min-height:44px}.share-search-label{margin:6px 0!important}#stockShareChoices{max-height:260px;overflow-y:auto}.branch-dialog .share-choice{min-height:48px;padding:6px 4px}.stock-share-footer #createStockShare{margin-top:6px;min-height:44px}#stockShareStatus:empty{display:none}#stockShareResult{overflow:auto;min-height:0}
-.stock-invitation{display:flex;align-items:center;flex-direction:row!important;gap:8px;padding:10px 0;cursor:pointer;direction:ltr;text-align:left}.stock-invitation-info{min-width:0;flex:1;overflow-wrap:anywhere}.stock-invitation-info small{display:block;margin-top:3px;color:#626b7a}.stock-invitation-actions{display:flex;gap:6px;margin-left:auto;flex:none}.stock-invitation-actions button{min-height:44px;min-width:44px;padding:8px;font-size:.8rem}.stock-invitation-actions button:first-child{background:#27187e;color:white}.stock-invitation:focus-visible{outline:2px solid #27187e;outline-offset:3px}
+.stock-invitation{display:flex;align-items:center;flex-direction:row!important;gap:12px;padding:12px;box-sizing:border-box;cursor:pointer;direction:ltr;text-align:left}.stock-invitation-info{min-width:0;flex:1;overflow-wrap:anywhere}.stock-invitation-info small{display:block;margin-top:3px;color:#626b7a}.stock-invitation-actions{display:flex;gap:6px;margin-left:auto;flex:none}.stock-invitation-actions button{min-height:44px;min-width:44px;padding:8px;font-size:.8rem}.stock-invitation-actions button:first-child{background:#27187e;color:white}.stock-invitation:focus-visible{outline:2px solid #27187e;outline-offset:3px}
 @media(max-width:768px){body[data-hand=left] #stockShareList .branch-actions{flex-direction:row-reverse}body[data-hand=left] .branch-dialog .share-choice{flex-direction:row;text-align:left}}
 #publicPallet .stock-product{padding:12px;border-radius:9px}#publicPalletMetadata{padding:10px;margin-block:12px;background:#f6f5fa;border:0}#publicPalletStatus:not(:empty){display:block;padding:10px 12px;background:#f0edf8;border-radius:9px;line-height:1.5}#publicPalletDescription:empty{display:none}#publicPalletStock{min-height:44px;padding:10px 14px;width:auto;font-size:.85rem}.public-stock-summary{margin-block:16px;padding:12px}.public-summary-product{padding:10px}.public-share-metadata{font-size:.8rem;direction:ltr;text-align:left}
 
@@ -481,7 +481,7 @@ body[data-hand=left] .stock-find .stock-toolbar{grid-template-columns:auto auto 
 body[data-hand=left] .stock-find .stock-toolbar:has(#cancelStockFilters[hidden]){grid-template-columns:auto minmax(0,1fr)!important}body[data-hand=left] .stock-find .stock-toolbar:has(#cancelStockFilters[hidden]) .stock-search-label{grid-column:2!important}body[data-hand=left] .stock-find .stock-toolbar:has(#cancelStockFilters[hidden]) #stockFilters{grid-column:1}
 body[data-hand=left] #stockFilterPanel{left:0;right:auto}.stock-filters.has-filters>summary{background:#27187e;color:#fff}
 .pallet-tag,.pallet-card-tag{color:#a21b76!important;background:#fce8f6;border:0;border-radius:7px;display:inline-flex!important;align-items:center;gap:4px;font-size:.75rem;max-width:100%;overflow-wrap:anywhere}
-.pallet-tag{padding:4px 8px;min-height:36px;margin-top:4px;cursor:pointer}.pallet-tag[hidden]{display:none!important}.pallet-tag svg,.pallet-card-tag svg{width:16px;height:16px;flex:none}.pallet-card-tag{padding:2px 6px;justify-self:start;grid-column:1/-1}
+.pallet-tag{padding:4px 8px;min-height:44px;margin-top:4px;cursor:pointer}.pallet-tag[hidden]{display:none!important}.pallet-tag svg,.pallet-card-tag svg{width:16px;height:16px;flex:none}.pallet-card-tag{padding:2px 6px;justify-self:start;grid-column:1/-1}
 .stock-pallet-card-content{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2px 6px;width:100%;min-width:0;text-align:left!important}.stock-pallet-card-content>strong{grid-column:1;grid-row:1}.stock-pallet-card-content>.branch-card-name{grid-column:2;grid-row:1;justify-self:end;margin:0;text-align:right;display:flex;gap:3px;align-items:center;font-size:.72rem;overflow-wrap:anywhere}.stock-pallet-card-content>.branch-card-name svg{width:16px;height:16px}.stock-pallet-card-meta,.stock-pallet-card-description{grid-column:1/-1}.stock-pallet-card-content small{margin-top:0}
 #palletDialog #palletMetadata{padding:4px 0;margin:0 0 6px;gap:6px}#palletDialog>.library-heading{padding-bottom:8px;margin-bottom:6px}#palletDialog #palletMetadata strong{margin-bottom:0}#palletDialog .stock-product{padding:10px 0;align-items:center}
 body[data-hand] #palletDialog .stock-product-actions{display:flex;flex-direction:column!important;gap:4px;align-items:center}#palletDialog .stock-product-actions button{width:40px;min-height:40px;height:40px;padding:9px;margin:0!important}#palletDialog .stock-product-actions button svg{width:18px;height:18px}body[data-hand] #palletDialog .stock-product-actions>.stock-delete{order:0;background:#c92a38;color:white;margin:0}#palletDialog .stock-product-actions>button:not(.stock-delete):not(.stock-deduct-button){order:1}#palletDialog .stock-product-actions>.stock-deduct-button{order:2}
@@ -491,9 +491,9 @@ body[data-hand] #palletDialog .stock-product-actions{display:flex;flex-direction
 .pallet-tag-input{display:block;position:relative}.pallet-tag-input input{margin:0!important;padding-right:48px!important;width:100%;box-sizing:border-box}.pallet-tag-input #clearPalletTag{position:absolute;right:0;top:0;bottom:0;margin:0;width:44px;padding:10px;border:0;background:transparent;color:#62577e;display:flex;align-items:center;justify-content:center}.pallet-tag-input #clearPalletTag[hidden]{display:none}.pallet-tag-input #clearPalletTag svg{width:18px;height:18px}.pallet-tag-form-actions{display:flex;gap:8px;justify-content:flex-end}.pallet-tag-form-actions button{min-height:44px}body[data-hand=left] .pallet-tag-form-actions{flex-direction:row-reverse;justify-content:flex-end}
 
 /* Detalle: ubicación y etiqueta comparten encabezado; acciones junto a la mano. */
-#palletDialog .pallet-heading-info{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin-top:4px}#palletDialog .pallet-heading-location{min-width:0;flex:1}#palletDialog .pallet-heading-info .pallet-tag{flex:0 1 auto;margin:0;max-width:45%;min-height:36px}#palletDialog .pallet-heading-info .pallet-tag span{overflow-wrap:anywhere}#palletDialog .pallet-heading-info .stock-heading-branch,#palletDialog .pallet-heading-info .stock-heading-description{margin:0;line-height:1.3}#palletDialog[open]{gap:6px}#palletDialog>#palletProducts{padding-block:0}#palletDialog #palletMetadata{padding:2px 0;margin:0}#palletDialog .stock-product{padding:8px 0;gap:8px}#palletDialog .stock-product h3{margin:0;line-height:1.3}#palletDialog .stock-product p{margin:3px 0;line-height:1.3}#palletDialog .stock-product-actions{align-self:center}#palletDialog .stock-product-actions button{width:36px;height:36px;min-height:36px;padding:8px}
+#palletDialog .pallet-heading-info{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin-top:4px}#palletDialog .pallet-heading-location{min-width:0;flex:1}#palletDialog .pallet-heading-info .pallet-tag{flex:0 1 auto;margin:0;max-width:45%;min-height:44px}#palletDialog .pallet-heading-info .pallet-tag span{overflow-wrap:anywhere}#palletDialog .pallet-heading-info .stock-heading-branch,#palletDialog .pallet-heading-info .stock-heading-description{margin:0;line-height:1.3}#palletDialog[open]{gap:6px}#palletDialog>#palletProducts{padding-block:0}#palletDialog #palletMetadata{padding:2px 0;margin:0}#palletDialog .stock-product{padding:8px 0;gap:8px}#palletDialog .stock-product h3{margin:0;line-height:1.3}#palletDialog .stock-product p{margin:3px 0;line-height:1.3}#palletDialog .stock-product-actions{align-self:center}#palletDialog .stock-product-actions button{width:36px;height:36px;min-height:36px;padding:8px}
 body[data-hand=right] #palletDialog #palletTools>.stock-primary-actions{order:2;margin:0 0 0 auto;flex-direction:row-reverse}body[data-hand=right] #palletDialog #palletTools>.stock-secondary-actions{order:1;margin:0 auto 0 0;flex-direction:row-reverse}body[data-hand=left] #palletDialog #palletTools>.stock-primary-actions{order:1;margin:0 auto 0 0;flex-direction:row}body[data-hand=left] #palletDialog #palletTools>.stock-secondary-actions{order:2;margin:0 0 0 auto;flex-direction:row}#palletDialog #palletTools :is(#scanStockProduct,#deductStockProduct){width:44px;min-width:44px;min-height:44px}#palletDialog #palletTools :is(#assignPalletBranch,#openPalletHistory),#palletDialog #palletTools .library-settings summary{width:40px;min-height:44px}#palletDialog #palletTools .stock-secondary-actions{gap:4px}
-.pallet-tag-choices{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.pallet-tag-choices[hidden]{display:none}.pallet-tag-choices .pallet-tag{margin:0;min-height:40px;padding:6px 10px}.pallet-tag-choices .pallet-tag[aria-pressed=true]{outline:1px solid #a21b76}
+.pallet-tag-choices{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.pallet-tag-choices[hidden]{display:none}.pallet-tag-choices .pallet-tag{margin:0;min-height:44px;padding:6px 10px}.pallet-tag-choices .pallet-tag[aria-pressed=true]{outline:1px solid #a21b76}
 
 .notification-control:has(#refreshAppCache){display:flex;align-items:center;gap:6px}#refreshAppCache{display:grid;place-items:center;width:44px;height:44px;padding:0;margin:0;border:0;border-radius:10px;color:white;background:#ffffff14;cursor:pointer;flex:none}#refreshAppCache svg{width:21px;height:21px}#refreshAppCache[aria-busy=true] svg{animation:cache-refresh-spin 1s linear infinite}#refreshAppCache:disabled{opacity:.6;cursor:wait}@keyframes cache-refresh-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){#refreshAppCache[aria-busy=true] svg{animation:none}}
 
@@ -745,6 +745,12 @@ body[data-hand] #palletDialog .stock-product-actions>.stock-delete,.demo-merchan
 #publicShareDescription:not(:empty)::before{content:'•';margin-right:6px}
 .public-stock-tools .public-stock-search>.public-search-action{flex-basis:30px;min-width:30px;width:30px;padding:5px;color:#27197f;cursor:pointer}
 .public-stock-search input::-webkit-search-cancel-button{display:none}
+.pallet-view-tools .public-stock-search:focus-within{border-color:#7464bb;box-shadow:0 0 0 2px #7464bb33}
+.pallet-view-tools .public-stock-search>input:focus{outline:none}
+/* With the keyboard open, scroll the palet as one surface instead of squeezing its products. */
+html.dialog-keyboard-open #palletDialog[open]{overflow-y:auto;scroll-padding-block:12px}
+html.dialog-keyboard-open #palletDialog[open]>.pallet-view-tools{flex:none}
+html.dialog-keyboard-open #palletDialog[open]>#palletProducts{flex:none;overflow:visible}
 .public-filter-clear{grid-column:1/-1;justify-self:end;margin:0;min-height:36px;padding:4px 0;background:transparent;border:0;color:#a52c45;text-decoration:underline;cursor:pointer;font:inherit;font-size:.82rem}
 .public-filter-clear[hidden]{display:none!important}
 .stock-filter-popover #publicStockFilterFields{gap:8px}
@@ -778,3 +784,162 @@ body[data-hand=right] #palletDialog #palletTools.stock-toolbar,body[data-hand=le
 body[data-hand=right] #palletDialog #palletTools>.stock-secondary-actions,body[data-hand=left] #palletDialog #palletTools>.stock-primary-actions{margin:0 auto 0 0}
 body[data-hand=right] #palletDialog #palletTools>.stock-primary-actions,body[data-hand=left] #palletDialog #palletTools>.stock-secondary-actions{margin:0 0 0 auto}
 #contenedormax[data-scan-mode=rapid] .main-rapid-feedback{height:76px;min-height:76px;max-height:76px;padding:7px 10px;align-items:center}#contenedormax .main-rapid-info{min-width:0;flex:1}#contenedormax[data-scan-mode=rapid] #mainRapidLast{min-width:0;max-width:100%;max-height:38px;line-height:1.2;display:block;-webkit-line-clamp:unset}#contenedormax .rapid-product-name,#contenedormax .rapid-product-meta{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}#contenedormax .rapid-product-name{font-size:.86rem;font-weight:600}#contenedormax .rapid-product-meta{font-size:.73rem;font-weight:400;margin-top:2px}#contenedormax .main-rapid-ean{font-size:.76rem;line-height:1.2;margin-top:3px;white-space:nowrap}#contenedormax #mainRapidCode{overflow-wrap:normal}
+
+/* Applied filters scroll as a single strip instead of squeezing their labels. */
+#stockApp #stockActiveFilters{flex:1 1 0;min-width:0;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:thin;scrollbar-color:#bdb4d7 transparent;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;padding-block:2px;gap:5px}#stockApp #stockActiveFilters .stock-applied-value{flex:0 0 auto;max-width:none;min-width:44px;overflow:visible;white-space:nowrap}#stockApp #stockActiveFilters .stock-applied-value>span{flex:none;max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap}#stockApp #stockActiveFilters:focus-visible{outline:2px solid #8372d8;outline-offset:2px;border-radius:5px}#stockApp #stockActiveFilters::-webkit-scrollbar{height:3px}#stockApp #stockActiveFilters::-webkit-scrollbar-thumb{background:#bdb4d7;border-radius:4px}
+
+/* Confirmed stock and team proposals remain visually distinct. */
+.team-pending-label{display:inline-flex;align-items:center;gap:4px;color:#815600;font-size:.82rem;font-weight:500;background:#fff4d6;border-radius:5px;padding:2px 5px}
+.team-pending-label svg{width:15px;height:15px;flex:none}
+.team-pending-notice{display:grid;gap:6px;border-inline-start:3px solid #d69a20;padding:8px 10px;background:#fff9eb;border-radius:6px;margin:8px 0}
+.team-pending-notice[hidden]{display:none}.team-pending-notice small{color:#685937}.team-pending-notice button{justify-self:start}
+.team-request-list{display:flex;gap:8px;flex-wrap:wrap;margin-block:8px}.team-request-list[hidden]{display:none}.team-request-list h2{width:100%;font-size:1rem;margin:0}.team-request-list button{display:flex;align-items:center;gap:6px}.team-request-list svg{width:20px;height:20px}
+.team-request-dialog{width:min(620px,calc(100vw - 24px));max-height:85dvh;margin:auto;box-sizing:border-box;overflow:auto}.team-request-dialog .stock-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}.team-request-dialog h2{font-size:1.2rem}.team-request-comparison{display:grid;gap:0}.team-request-product{display:grid;gap:4px;border-bottom:1px solid #e7e5ef;padding:10px 0}.team-request-product small{color:#646777}.team-request-product .team-pending-label{justify-self:start}.team-request-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.team-request-actions button{min-height:44px;flex:1}
+
+.team-request-actions[hidden],.team-request-dismiss[hidden]{display:none!important}
+.team-request-dismiss{display:block;min-height:44px;margin-top:12px;width:100%}
+.team-request-list .team-request-link{display:flex;flex:1 1 240px;align-items:center;gap:10px;text-align:start;border:1px solid #e3dfed;background:#fff;border-radius:10px;padding:10px 12px;min-height:60px}
+.team-request-link>span:not(.team-request-arrow){display:grid;gap:3px;min-width:0}.team-request-link strong{font-size:.95rem}.team-request-link small{font-size:.8rem;color:#676577}.team-request-link>svg{flex:none;color:#87620e}.team-request-arrow{margin-inline-start:auto;font-size:1.5rem;color:#80758f}
+.team-change-label{display:inline-flex;align-items:center;gap:5px;justify-self:start;padding:3px 6px;border-radius:5px;background:#fff4d6;color:#805800;font-size:.84rem;font-weight:600}.team-change-label svg{width:17px;height:17px;flex:none}.team-change-quantity{font-size:.86rem;color:#666375}.team-request-product[data-change=removed] .team-change-label,.team-request-product[data-change=withdrawn] .team-change-label{background:#fff0f1;color:#a92d43}.team-request-product[data-change=added] .team-change-label{background:#eaf6f0;color:#256e50}
+#teamPalletStatus:not(:empty){font-size:.85rem;color:#805800;margin:8px 0}#teamPalletProducts .team-request-product{padding:10px 0}
+
+.library-share-link-section{border-top:1px solid #e5e1ec;margin-top:16px;padding-top:14px}.library-share-link-section input{font-size:.85rem}.pallet-nearby-branch{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:8px 0;border-radius:8px;background:#eaf4f6;color:#246778;font-size:.9rem;min-height:44px;box-sizing:border-box}.pallet-nearby-branch[hidden]{display:none!important}.pallet-nearby-branch input{width:20px;height:20px;accent-color:#27197f;flex:none}.pallet-nearby-branch svg{width:20px;height:20px;flex:none}
+
+
+
+.pallet-nearby-owner{margin:10px 0;padding:12px;border:1px solid #cfe4e9;border-radius:10px;background:#f0f8fa;color:#246778}.pallet-nearby-owner[hidden]{display:none!important}.pallet-nearby-owner h3{font-size:1rem;margin:0 0 5px}.pallet-nearby-owner p{font-size:.85rem;margin:5px 0 10px}.pallet-nearby-owner>div{display:flex;flex-wrap:wrap;gap:6px}.pallet-nearby-owner button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.85rem}.pallet-nearby-owner button svg{width:18px;height:18px;flex:none}.pallet-nearby-owner [role=status]:empty{display:none}.pallet-nearby-owner [role=status]{margin-bottom:0}body[data-hand=right] .pallet-nearby-owner>div{flex-direction:row-reverse;justify-content:flex-start}
+
+.pallet-nearby-owner>div{flex-wrap:nowrap}.pallet-nearby-owner button{flex:1 1 0;min-width:0;white-space:normal;padding:8px;line-height:1.25}
+
+/* Available and reserved labels: compact preparation layout, no product-list stretch. */
+#palletDialog[data-available=true]{height:fit-content;min-height:0;margin-block:auto}
+#palletDialog[data-available=true] #palletMetadata{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:6px 0}
+#palletDialog[data-available=true] #palletMetadata>p:only-child{grid-column:1/-1}
+#palletDialog[data-available=true] #palletProducts{flex:0 1 auto;margin:0;width:100%;max-width:100%;box-sizing:border-box;padding:2px 0;min-height:0;border:0}
+#palletDialog[data-available=true] #palletProducts>.stock-muted{margin:4px 0;font-size:.85rem;line-height:1.4}
+#palletDialog[data-available=true] #palletTools{margin:4px 0;padding:0;min-height:0}
+#palletDialog[data-available=true] #palletTools>.stock-primary-actions{display:none}
+#palletDialog[data-available=true] #palletTools>.stock-secondary-actions{width:100%;margin:0;flex:1}
+#palletDialog[data-available=true] #palletTools .library-settings-menu{gap:6px}
+#palletDialog[data-available=true] #palletTools .library-settings-menu :is(button,a){min-height:44px;padding:8px;font-size:.82rem;justify-content:center}
+#palletDialog[data-available=true] #palletTools .library-settings-menu .stock-delete{background:#fff0f2;color:#ad2438}
+#palletDialog #palletNearbyBranch{display:flex;flex-flow:row nowrap;align-items:center;justify-content:flex-start;gap:10px;width:100%;min-height:48px;flex:0 0 auto;padding:10px 12px;margin:6px 0;box-sizing:border-box;text-align:left}
+#palletDialog #palletNearbyBranch[hidden]{display:none!important}
+#palletDialog #palletNearbyBranch input[type=checkbox]{appearance:auto;width:20px;height:20px;min-width:20px;min-height:20px;max-width:20px;padding:0;margin:0;flex:0 0 20px;box-shadow:none;border:0;accent-color:#27197f}
+#palletDialog #palletNearbyBranchName{flex:1;min-width:0;font-size:.88rem;line-height:1.35}
+
+#palletDialog[data-available=true] #claimPallet{min-height:48px;margin-top:2px}
+
+#palletDialog #palletNearbyBranch{direction:ltr;background:#f5f4fa;color:#62577e;border:1px solid #e5e1ec}
+#palletDialog #palletNearbyBranchCheck{order:2}
+#palletDialog #palletNearbyBranchName{order:1;display:flex;flex-flow:row wrap;align-items:center;gap:4px 6px}
+#palletDialog #palletNearbyBranchName .pallet-nearby-branch-tag{display:inline-flex;align-items:center;gap:4px;max-width:100%;margin:0;padding:3px 7px;border-radius:6px;background:#e5f4f8;color:#246579;font-size:.85rem;line-height:1.3;box-sizing:border-box}
+#palletDialog .pallet-nearby-branch-tag svg{width:16px;height:16px;flex:none}
+#palletDialog .pallet-nearby-branch-tag span{min-width:0;overflow-wrap:anywhere}
+#palletDialog[data-available=true] #palletStatus[data-state=success]{background:#f3f0fb!important;color:#27187e!important}
+
+#palletDialog[data-available=true] #palletTools[hidden]{display:none!important}
+
+/* Owner review: compact branch context, comparison and a clear stale-request state. */
+.team-request-dialog{font-size:.9rem;line-height:1.4;padding:16px;max-width:calc(100vw - 24px)}
+.team-request-dialog .stock-dialog-heading{margin-bottom:10px;gap:8px}
+.team-request-dialog .stock-dialog-heading h2{font-size:1.15rem;line-height:1.25;min-width:0}
+.team-request-dialog .stock-dialog-heading>button{width:44px;height:44px;min-height:44px;padding:10px;flex:none}
+.team-request-context{margin:0 0 12px}.team-request-context[hidden],.team-request-section-title[hidden]{display:none}
+.team-request-branch{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:3px 7px;border-radius:6px;background:#e5f4fa;color:#17617d;font-size:.84rem;overflow-wrap:anywhere;box-sizing:border-box}
+.team-request-branch svg{width:16px;height:16px;flex:none}.team-request-context p{margin:6px 0 0;font-size:.85rem;color:#625f70;line-height:1.4}
+.team-request-section-title{font-size:.8rem;color:#716b80;margin:0 0 4px;font-weight:500}
+.team-request-dialog .team-request-product{padding:9px 0}.team-request-dialog .team-request-product>strong{font-size:.94rem;line-height:1.3}.team-request-dialog .team-request-product p{font-size:.82rem;line-height:1.4;margin:4px 0}
+.team-request-status:empty{display:none}.team-request-status{margin:10px 0;font-size:.85rem;line-height:1.4}.team-request-status[data-state=warning]{padding:10px 12px;border-radius:8px;background:#fff6de;color:#795b08}.team-request-status strong{display:block;font-size:.88rem}.team-request-status p{margin:4px 0 0}
+.team-request-dialog .team-request-actions{display:flex;gap:8px;margin-top:12px}.team-request-actions>button{flex:1;min-width:0;min-height:46px;padding:9px 10px;font-size:.88rem;line-height:1.3}.team-request-actions>button[hidden]{display:none!important}
+.team-request-dialog .team-request-actions .stock-delete{background:#fff0f2;color:#ad2438}
+.team-request-dialog[data-conflict=true] .team-request-actions{flex-direction:row-reverse}
+body[data-hand=left] .team-request-dialog[data-conflict=true] .team-request-actions{flex-direction:row}
+body[data-hand=left] .team-request-dialog:not([data-conflict=true]) .team-request-actions{flex-direction:row-reverse}
+
+/* Deduct review: product first, clear quantities and one action after a conflict. */
+#stockDeductDialog .library-heading{margin-bottom:10px;padding-bottom:8px}#stockDeductDialog .library-heading h2{font-size:1.12rem}
+#stockDeductDialog #deductProductName{font-weight:600;color:#27187e;font-size:.95rem;line-height:1.35;margin:0 0 12px}
+#stockDeductDialog #deductFixedEan{font-size:.8rem;margin:0 0 4px}
+#stockDeductDialog #stockDeductForm label{font-size:.88rem}#stockDeductDialog #deductFields>.stock-form-row{margin-bottom:10px}
+#stockDeductDialog #deductRemaining{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0;color:#62577e;font-size:.75rem}
+#deductRemaining>span{min-width:0;display:grid;gap:2px}#deductRemaining small{font-size:.75rem}#deductRemaining strong{font-size:1.05rem;font-weight:600;color:#27187e;overflow-wrap:anywhere}#deductRemaining>span:last-child{text-align:right}#deductRemaining>span:nth-of-type(2){text-align:center}#deductRemaining[data-invalid=true]>span:last-child strong{color:#ad2438}
+#stockDeductDialog #deductStatus:empty{display:none}#stockDeductDialog #deductStatus{font-size:.84rem;line-height:1.4;margin:10px 0;padding:9px 11px;border-radius:8px;background:#f3f0fb;color:#62577e}#stockDeductDialog #deductStatus[data-state=warning]{background:#fff6de;color:#795b08}
+#stockDeductDialog .library-dialog-actions{margin-top:12px;gap:8px}#stockDeductDialog .library-dialog-actions button{font-size:.9rem;min-height:46px;padding:9px 12px}
+#stockDeductDialog #reloadDeductProduct{background:#27187e;color:#fff}#stockDeductDialog .library-dialog-actions button[hidden]{display:none!important}
+
+#deductRemaining>.deduct-summary-unit{grid-column:1/-1;font-size:.72rem;color:#716b80}#deductRemaining>span:nth-of-type(2){text-align:center}#deductRemaining>span:last-child{text-align:right}
+
+.team-request-dialog .team-request-title,.stock-explicit-heading{display:flex;align-items:center;gap:7px;color:#27187e}
+.team-request-title::before,.stock-explicit-heading::before{display:none!important}
+.team-request-dialog .team-request-title svg,.stock-explicit-heading svg{width:21px;height:21px;flex:none;color:inherit}
+.team-request-dialog .team-request-actions>button{display:inline-flex;align-items:center;justify-content:center;gap:6px}.team-request-actions>button svg{width:18px;height:18px;flex:none}
+
+.team-request-list-dialog{width:min(540px,calc(100vw - 24px));max-height:calc(var(--dialog-visible-height,100dvh) - 24px);box-sizing:border-box;padding:16px;overflow:auto}
+.team-request-list-dialog .stock-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.team-request-list-dialog h2{font-size:1.1rem;min-width:0}.team-request-list-dialog .stock-icon{width:44px;height:44px;min-height:44px;flex:none;padding:10px}
+.team-request-list-dialog .team-request-title{display:flex;align-items:center;gap:7px;color:#27187e}.team-request-list-dialog .team-request-title svg{width:20px;height:20px;flex:none}
+.team-request-modal-items{display:grid;gap:7px}.team-request-modal-items .team-request-link{display:flex;align-items:center;gap:10px;width:100%;min-width:0;min-height:56px;padding:10px 12px;text-align:left;border:1px solid #e3dfed;background:#fff;border-radius:10px;box-sizing:border-box}
+.team-request-modal-items .team-request-link>svg{width:20px;height:20px;flex:none}.team-request-modal-items .team-request-link>span:not(.team-request-arrow){display:grid;gap:3px;min-width:0;overflow-wrap:anywhere}.team-request-modal-items .team-request-link strong{font-size:.95rem}.team-request-modal-items .team-request-link small{font-size:.8rem;color:#676577}.team-request-modal-items .team-request-arrow{margin-left:auto;flex:none;font-size:1.4rem;color:#655d80}
+.team-request-list-dialog>p:empty{display:none}
+
+.team-request-list-dialog[open]{display:flex;flex-direction:column;overflow:hidden}.team-request-list-dialog>.stock-dialog-heading{flex:none}.team-request-list-dialog>.team-request-modal-items{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+
+.stock-goods-expiries{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:4px;margin-top:5px}.stock-goods-expiry{display:inline-flex;padding:3px 6px;border-radius:5px;font-size:.76rem;font-weight:600;line-height:1.25;white-space:nowrap}.stock-goods-expiry.stock-expiry-none{background:#f0edf7;color:#70677e}.stock-goods-expiry.stock-expiry-near{background:#fff1c5}.stock-goods-product .stock-goods-total{min-width:0}.stock-goods-dates>.team-goods-row[open]:only-child>summary{display:none}.stock-goods-dates>.team-goods-row[open]:only-child{border:0;background:transparent}
+
+#stockDeductDialog #deductStatus>strong{display:block;font-size:.84rem;color:#27187e}#stockDeductDialog #deductStatus>span{display:block;margin-top:3px}#stockDeductDialog #deductStatus>.deduct-stock-change{font-size:1rem;font-weight:600;color:#27187e}
+#deductRemaining[data-changed=true]>span:first-of-type{border-radius:6px;background:#f0ebff;padding:5px 7px;animation:deduct-stock-updated .7s ease-out}#deductRemaining[data-changed=true]>span{padding-block:5px}
+@keyframes deduct-stock-updated{from{background:#dcd2ff}to{background:#f0ebff}}@media(prefers-reduced-motion:reduce){#deductRemaining[data-changed=true]>span:first-of-type{animation:none}}
+
+.stock-goods-total>.stock-goods-days{display:block;margin-top:4px;font-size:.75rem;line-height:1.3;color:#62577e;white-space:normal}
+
+.team-grouped-dates{padding:0 8px 8px}.team-grouped-dates>.team-goods-row[open]:only-child>summary{display:none}.team-grouped-dates>.team-goods-row[open]:only-child{background:transparent;border:0}.team-grouped-dates .team-goods-expiry,.stock-goods-dates .team-goods-expiry{white-space:normal;line-height:1.35}.team-goods-group .stock-goods-expiries{justify-content:flex-end}.team-goods-group .stock-goods-days{font-size:.75rem;color:#62577e}.team-goods-group summary{min-width:0}
+
+.team-goods-info>strong[hidden]{display:none!important}
+
+.team-grouped-dates .team-goods-expiry svg,.stock-goods-dates .team-goods-expiry svg{width:14px;height:14px;flex:none}.team-grouped-dates .team-goods-info>.team-goods-expiry,.stock-goods-dates .team-goods-info>.team-goods-expiry{margin-top:0}
+
+.stock-result-branch{display:flex;align-items:center;gap:4px;width:fit-content;max-width:100%;background:#e5f4f8;color:#246b7b;border-radius:6px;padding:3px 7px;margin-top:5px}.stock-result-branch svg{width:15px;height:15px;flex:none}
+
+/* Lot identity stays together; the claim remains the primary action. */
+.inventory-lot-badges{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin:1px 0 2px}.inventory-lot-badges>span{display:inline-flex;align-items:center;gap:4px;max-width:100%;border-radius:6px;padding:3px 6px;font-size:.72rem;line-height:1.3;overflow-wrap:anywhere}.team-goods-lot-info .inventory-lot-badges svg{width:14px;height:14px;flex:none}.inventory-lot-branch{background:#e5f4f8;color:#246b7b}.inventory-lot-tag{background:#fce8f6;color:#9f2675}.pallet-claim-actions{display:flex;align-items:stretch;gap:8px;width:100%;margin-top:2px}.pallet-claim-actions #claimPallet{flex:1;min-width:0;margin:0!important}.pallet-claim-actions #scanNextPallet{flex:0 0 48px;width:48px;min-width:48px;min-height:48px;margin:0;padding:12px}.pallet-claim-actions #scanNextPallet svg{width:22px;height:22px}body[data-hand=left] .pallet-claim-actions{flex-direction:row-reverse}
+
+/* Optional branch hint stays inside the relevant pallet task. */
+#palletDialog .pallet-missing-branch{padding:12px 0;margin:5px 0;border-top:1px solid #e9e5f0;color:#27197f;text-align:start}#palletDialog .pallet-missing-branch-heading{display:flex;align-items:center;gap:6px;font-size:.88rem}#palletDialog .pallet-missing-branch svg{width:17px;height:17px;flex:none}#palletDialog .pallet-missing-branch p{margin:5px 0 7px;font-size:.8rem;line-height:1.4;color:#726b80}#palletDialog .pallet-missing-branch-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}#palletDialog .pallet-missing-branch-actions button{display:flex;align-items:center;justify-content:center;gap:5px;margin:0;padding:8px 10px;font-size:.8rem;min-height:44px;border-radius:9px}#palletDialog #palletMissingBranchDismiss{background:none;color:#726b80}body[data-hand=left] #palletDialog .pallet-missing-branch-actions{flex-direction:row-reverse}
+
+/* Stock: iconos visibles y metadata compacta a la derecha del producto. */
+.stock-filter-popover #stockFilterPanel .branch-stock-filter>label>svg{display:block}
+#stockApp .stock-tabs>button>svg{width:19px;height:19px;flex:none;vertical-align:middle;margin-inline-end:5px}
+.repo-mobile-subnav button[data-target="#ownedTab"]>svg,.repo-mobile-subnav button[data-target="#goodsTab"]>svg,.repo-mobile-subnav button[data-target="#pendingTab"]>svg,.repo-mobile-subnav button[data-target="#sharedTab"]>svg{display:block;width:19px;height:19px;margin:0 auto 3px}
+#stockApp .stock-card.stock-search-result{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);align-items:center;gap:10px;text-align:start}
+.stock-result-content{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;overflow-wrap:anywhere}
+.stock-result-badges{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:6px;max-width:120px;min-width:0}
+.stock-result-badges:empty{display:none}
+#stockApp .stock-result-badges>:is(.stock-result-branch,.stock-result-tag){position:static;display:inline-flex;flex-direction:row-reverse;align-items:center;gap:4px;margin:0;max-width:100%;width:fit-content;white-space:normal;overflow-wrap:anywhere;font-size:.73rem;line-height:1.3;text-align:end}
+#stockApp .stock-result-badges svg{width:15px;height:15px;flex:none}
+.stock-goods-total>.stock-goods-days.stock-expiry-safe{color:#246b45;background:transparent}
+.stock-goods-total>.stock-goods-days.stock-expiry-near{color:#99620c;background:transparent}
+.stock-goods-total>.stock-goods-days.stock-expiry-today{color:#a8440a;background:transparent}
+.stock-goods-total>.stock-goods-days.stock-expiry-past{color:#b42332;background:transparent}
+@media(max-width:360px){.stock-result-badges{max-width:94px}#stockApp .stock-card.stock-search-result{gap:8px}}
+
+#stockApp .stock-card.stock-search-result:not(:has(.stock-result-badges>*)){grid-template-columns:minmax(0,1fr)}
+
+body[data-hand=left] .pallet-tag-input input{padding-left:48px!important;padding-right:12px!important}body[data-hand=left] .pallet-tag-input #clearPalletTag{left:0;right:auto}
+
+/* Urgencia por vencimiento: mismo tono en fechas, cantidades y días. */
+.stock-expiry-urgent,.stock-expiry-today{color:#9a430b!important;background:#ffead6!important;border-radius:6px}
+.stock-product .stock-expiry-urgent{display:table;padding:3px 7px;font-size:.82rem;font-weight:600}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span){width:fit-content;max-width:100%;box-sizing:border-box;padding:3px 7px;border-radius:6px;font-size:.78rem;font-weight:600;line-height:1.35}
+.expiry-quantity{display:table}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span).stock-expiry-safe{color:#246b45!important;background:#e8f7ee!important}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span).stock-expiry-near{color:#85610d!important;background:#fff4d6!important}
+:is(.expiry-quantity,.stock-goods-days,.expiry-color-preview>span).stock-expiry-past{color:#b42332!important;background:#fff0f2!important}
+.stock-goods-total>.stock-goods-days{margin-inline-start:auto}
+body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-urgent{margin-left:auto}
+.expiry-color-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.expiry-color-preview [hidden]{display:none!important}
+.notification-item[data-state=urgent] .notification-icon{color:#9a430b;background:#ffead6}.notification-item[data-state=urgent][data-unread]{background:#fff7ee;border-left-color:#dd761d}.notification-item[data-state=urgent] .notification-expiry-label{background:#ffead6;color:#9a430b}
+
+/* Production logo layout, independent of development markers. */
+.header-contenedor .logo{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+@media(max-width:380px){.header-contenedor .logo{padding-inline:12px;gap:6px}.header-contenedor .logo img{width:120px}}

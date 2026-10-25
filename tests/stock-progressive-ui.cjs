@@ -1,0 +1,40 @@
+const fs=require('fs'),os=require('os'),path=require('path'),assert=require('assert/strict'),{spawn,execFileSync}=require('child_process'),pw=require('../tmp/ui-check/node_modules/playwright');
+const dir=fs.mkdtempSync(path.join(os.tmpdir(),'rt-large-progressive-')),env={...process.env,DATABASE_URL:'',REPOTOOLS_REQUIRE_DATABASE_URL:'0',REPOTOOLS_DB_PATH:path.join(dir,'db.sqlite')},php='C:/xampp/php/php.exe',base='http://127.0.0.1:18968';let server,proxy,browser;
+(async()=>{
+  execFileSync(php,['tests/performance-large-seed.php'],{env});
+  execFileSync(php,['-r',`require 'includes/database.php';$db=database();$db->exec("INSERT INTO stock_branches(id,owner_id,name,address,locality,province) VALUES(1,1,'Sucursal especial','Calle','Ciudad','Provincia')");$db->exec("UPDATE pallets SET branch_id=1 WHERE id=1");$db->exec("INSERT INTO pallet_user_tags(user_id,pallet_id,name) VALUES(1,1,'Especial')");$db->exec("UPDATE pallet_products SET expires='2000-01-01' WHERE pallet_id=1");$db->exec("UPDATE pallet_products SET expires='9999-12-31' WHERE pallet_id=2");$db->exec("INSERT INTO pallet_access(pallet_id,user_id,status) VALUES(1800,1,'accepted')");`],{env});
+  server=spawn(php,['-S','127.0.0.1:18969','-t',process.cwd()],{env,stdio:'ignore'});
+  proxy=await require('./performance-proxy.cjs')(18968,18969);
+  for(let i=0;i<40;i++){try{const r=await fetch(base);await r.arrayBuffer();if(r.ok)break;}catch{await new Promise(r=>setTimeout(r,100));}}
+  const engine=process.env.RT_BROWSER||'chromium';browser=await pw[engine].launch({headless:true,...(engine==='chromium'?{executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'}:{})});
+  const c=await browser.newContext({viewport:{width:390,height:844}});await c.route('https://**/*',r=>r.abort());await c.route('**/js/device-connection.js*',r=>r.fulfill({contentType:'text/javascript',body:''}));
+  await c.addInitScript(()=>{delete Navigator.prototype.serviceWorker;localStorage.setItem('repotools_onboarding_seen_1','true');localStorage.setItem('repotools_onboarding_version_1','1');});
+  const p=await c.newPage(),errors=[],engines=[];p.on('pageerror',e=>errors.push(e.message));p.on('request',r=>{if(/vendor\/(html5-qrcode|quagga)/.test(r.url()))engines.push(r.url());});
+  await p.goto(base+'/cuenta.php');await p.locator('[name=email]').fill('bench1@example.invalid');await p.locator('[name=password]').fill('benchmark-only-password');await p.locator('form[method=post] button[type=submit]').click();await p.waitForURL('**/index.php');
+  await p.goto(base+'/stock.php');await p.locator('#ownedPallets .stock-pallet-card').first().waitFor();await p.locator('#repotoolsPageLoader').waitFor({state:'hidden'});
+  await p.locator('#stockTagFilter option[value="Especial"]').waitFor({state:'attached'});await p.locator('#branchFilter option[value="1"]').waitFor({state:'attached'});
+  await p.screenshot({path:'tmp/stock-progressive-'+engine+'.png'});
+  assert.equal(await p.locator('#ownedPallets .stock-pallet-card').count(),32);assert.equal(await p.locator('#ownedPallets [data-code="10000001"]').count(),0);
+  assert.equal(await p.evaluate(()=>document.getElementById('stockApp').repoPalletLists.owned.total),1000);assert.equal(engines.length,0,'No camera engines during initial page load');
+  await p.waitForFunction(async()=>((await RepoOfflineStorage.getView(1,'stock'))?.data.pallets.length||0)===1001);
+  const set=async(id,value)=>p.evaluate(({id,value})=>{const el=document.getElementById(id);el.value=value;el.dispatchEvent(new Event('change',{bubbles:true}));},{id,value});
+  await set('stockTagFilter','Especial');await p.waitForFunction(()=>document.querySelector('#ownedPallets')?.children.length===1);assert.equal(await p.locator('#ownedPallets .stock-pallet-card').first().getAttribute('data-code'),'10000001');assert.equal(await p.locator('#ownedPallets .pallet-card-tag').innerText(),'Especial');
+  await set('stockTagFilter','');await set('branchFilter','1');await p.waitForFunction(()=>document.querySelector('#ownedPallets')?.children.length===1);assert.equal(await p.locator('#ownedPallets .branch-card-name').innerText(),'Sucursal especial');
+  await set('branchFilter','all');await set('stockSort','expiry_asc');assert.equal(await p.locator('#ownedPallets .stock-pallet-card').first().getAttribute('data-code'),'10000001');
+  await set('stockSort','expiry_desc');assert.equal(await p.locator('#ownedPallets .stock-pallet-card').first().getAttribute('data-code'),'10000002');await set('stockSort','modified');
+  const more=p.locator('#ownedPanel .stock-pallet-more');await more.evaluate(n=>n.click());assert.equal(await p.locator('#ownedPallets .stock-pallet-card').count(),64);
+  const codes=await p.locator('#ownedPallets .stock-pallet-card').evaluateAll(ns=>ns.map(n=>n.dataset.code));assert.equal(new Set(codes).size,64);
+  await p.reload();await p.waitForFunction(()=>document.getElementById('ownedPallets')?.children.length===64);await p.locator('#repotoolsPageLoader').waitFor({state:'hidden'});
+  await p.locator('#sharedTab').click();assert.equal(await p.locator('#sharedPallets .stock-pallet-card').count(),1);await p.locator('#ownedTab').click();
+  for(const width of [320,390,1366])for(const hand of ['left','right']){await p.setViewportSize({width,height:844});await p.evaluate(hand=>document.body.dataset.hand=hand,hand);assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}
+  await p.goto(base+'/stock.php?codigo=10000001&producto=1');await p.locator('#palletDialog[open]').waitFor();await p.locator('[data-product-id="1"].stock-product-highlight').waitFor();
+  assert.equal(await p.locator('#ownedPallets [data-code="10000001"]').count(),0,'Deep link does not need to materialize every card');
+  await p.locator('#palletDialog [data-stock-close]').first().click();
+  await p.evaluate(()=>{window.previousList=document.getElementById('stockApp').repoPalletLists.owned;});
+  await p.evaluate(()=>RepoNavigation.navigate('biblioteca.php'));assert.equal(await p.evaluate(()=>typeof RepoPalletList),'undefined');
+  await p.evaluate(()=>{previousList.set([{id:99999,code:'99999999'}]);});assert.equal(await p.evaluate(()=>previousList.total),0,'Disposed list ignores late updates');
+  await p.evaluate(()=>RepoNavigation.navigate('stock.php'));await p.waitForFunction(()=>document.getElementById('ownedPallets')?.children.length===64);
+  await p.evaluate(()=>{delete window.previousList;});
+  assert.equal(engines.length,0);assert.deepEqual(errors,[]);
+  console.log('OK '+engine+': 32/64 cards, full-scope branch/tag/order, shared stock, restored count, offscreen deep link, full offline manifest, both hands320/390/1366; camera engines absent before use.');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();if(server){const exited=new Promise(r=>server.once('exit',r));server.kill();await exited;}proxy?.closeAllConnections();proxy?.close();if(path.dirname(dir)===os.tmpdir()&&path.basename(dir).startsWith('rt-large-progressive-'))fs.rmSync(dir,{recursive:true,force:true});});

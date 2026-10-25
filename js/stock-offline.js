@@ -37,6 +37,19 @@
     async put(user,row){await transact('sent','readwrite',s=>s.put({...row,user,at:Date.now()}));const rows=(await transact('sent','readonly',s=>s.getAll())).filter(r=>r.user===user).sort((a,b)=>b.at-a.at);for(const old of rows.slice(100))await transact('sent','readwrite',s=>s.delete(old.key));window.dispatchEvent(new CustomEvent('repotools:offline-sent'));}
   };
   window.RepoStockOffline = user => ({
+    async rememberPackReferences(ean,references,at=Date.now()){
+      if(!user||!/^\d{8,14}$/.test(ean))return;
+      const db=await ready;return new Promise((resolve,reject)=>{const tx=db.transaction('views','readwrite'),store=tx.objectStore('views'),key=user+':stock-pack-references',r=store.get(key);r.onsuccess=()=>{const data=r.result?.data||{};for(const [kind,value]of Object.entries(references)){const pack=Number(value.pack_size),inner=Number(value.inner_pack_size||0);if(!['boxes','packs'].includes(kind)||!Number.isInteger(pack)||pack<1||pack>1000000||!Number.isInteger(inner)||inner<0||inner>0&&(kind!=='boxes'||pack%inner!==0))continue;const entry=data[ean]||{};if(!entry[kind]||entry[kind].at<=at)entry[kind]={pack_size:pack,inner_pack_size:inner,at};data[ean]=entry;}const recent=Object.entries(data).filter(([,v])=>Object.values(v).some(p=>p.at>Date.now()-30*86400000)).sort((a,b)=>Math.max(...Object.values(b[1]).map(p=>p.at))-Math.max(...Object.values(a[1]).map(p=>p.at))).slice(0,500);store.put({key,user,kind:'stock-pack-references',at:Date.now(),data:Object.fromEntries(recent)});};tx.oncomplete=resolve;tx.onerror=tx.onabort=()=>reject(Error('No pudimos guardar la presentación.'));});
+    },
+    async packReferences(ean){
+      const references={},pending={},times={};const offer=(product,at,target)=>{const kind=product.kind,pack=Number(product.pack_size),inner=Number(product.inner_pack_size||0);if(!['boxes','packs'].includes(kind)||!Number.isInteger(pack)||pack<1||pack>1000000||!Number.isInteger(inner)||inner<0||inner>0&&(kind!=='boxes'||pack%inner!==0))return;if(target===references&&(times[kind]||0)>at)return;target[kind]={pack_size:pack,inner_pack_size:inner};if(target===references)times[kind]=at;};
+      const [saved,palets,loads]=await Promise.all([window.RepoOfflineStorage.getView(user,'stock-pack-references'),transact('palets','readonly',s=>s.getAll()),this.list()]);
+      for(const row of palets)if(row.user===user&&row.at>Date.now()-7*86400000)for(const p of row.pallet.products||[])if(p.ean===ean)offer(p,row.at,references);
+      // A freshly downloaded older lot must not replace a confirmed reference.
+      for(const [kind,p]of Object.entries(saved?.data?.[ean]||{}))if(p.at>Date.now()-30*86400000){times[kind]=0;offer({...p,kind},p.at,references);}
+      for(const row of loads)if(row.data.action==='save_product'&&row.data.ean===ean&&!['rejected','conflict'].includes(row.state))offer(row.data,row.created,pending);
+      return {references,pending};
+    },
     async project(pallet){const copy=structuredClone(pallet);for(const row of await this.list()){if(row.data.action!=='deduct_product'||Number(row.data.pallet_id)!==Number(copy.id)||row.data.code!==copy.code||['rejected','conflict'].includes(row.state))continue;const product=copy.products?.find(p=>Number(p.id)===Number(row.data.product_id));if(product){const units=Number(row.data.amount)*(row.data.kind==='units'?1:Number(row.data.pack_size));product.units=Math.max(0,Number(product.units)-units);product.pending_withdrawal=true;}}return copy;},
     async list(){return (await transact('loads','readonly',s=>s.getAll())).filter(r=>r.user===user).sort((a,b)=>a.created-b.created);},
     async put(row){
@@ -45,6 +58,7 @@
     },
     async remove(key){return transact('loads','readwrite',s=>s.delete(key));},
     async confirm(row,pallet,receipt){
+      if(row.data.action==='save_product')await this.rememberPackReferences(row.data.ean,{[row.data.kind]:row.data}).catch(()=>{});
       const db=await ready;
       return new Promise((resolve,reject)=>{const tx=db.transaction(['loads','sent','palets'],'readwrite'),loads=tx.objectStore('loads'),r=loads.get(row.key);r.onsuccess=()=>{
         if(!r.result||r.result.user!==user||JSON.stringify(clean(r.result.data))!==JSON.stringify(clean(row.data))){tx.abort();return;}
