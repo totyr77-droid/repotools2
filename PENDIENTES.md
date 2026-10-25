@@ -6,7 +6,7 @@ Actualizado: 25/10/2026. Ver entrega de código en release.json y últimas entre
 
 Rama desarrollo, checkout tmp/beta-sucursal. Usuario autoriza clonar la base actual hacia beta y comenzar preparación de versión paga. Main permanece como producción: no publicar cambios comerciales allí sin solicitud explícita. Conservar distintivo BETA, favicon y excepción de sesiones móviles de manager solo en esta rama, y contador de versión independiente. Historial previo de beta preservado en docs/HISTORIAL-BETA-20261025.md.
 
-La rama se actualiza desde main f6f0100 (v3.09), sin sobrescribir cambios locales de main. Base lógica beta y rol exclusivos creados en la instancia Render actual: estructura79 tablas y45 migraciones, permisos de lectura/escritura de producción denegados para el rol beta. No es una instancia independiente: comparte CPU/RAM/disco. Copia de datos y modalidad comercial pendientes de respuestas a las preguntas enviadas; no afirmar despliegue/corte de beta hasta comprobarlos.
+La rama se actualiza desde main f6f0100 (v3.09), sin sobrescribir cambios locales de main. Base lógica beta y rol exclusivos creados en la instancia Render actual, sin lectura/escritura de tablas de producción. Comparte CPU/RAM/disco. Usuario confirmó copia de cuentas/stock sin sesiones ni envíos y preparar planes para usuario/sucursal/empresa, sin pagos automáticos por ahora. Ver entrega1.73 al final; no reabrir las preguntas ya respondidas.
 
 ## Confirmaciones previas
 
@@ -664,3 +664,9 @@ Consulta sobre preparación comercial: distinguir funciones existentes de valida
 ## Preparación beta1.72 — entorno comercial separado
 
 Integración de main f6f0100/v3.09 en desarrollo, distintivo/favicons BETA y excepción de manager conservados. Contador propio76→77; se corrigió etiqueta raíz rezagada1.68 para continuar desde la última entrega registrada1.71. Protección opcional de conexión por base/rol en servidor, probada sin red; no afecta producción. Base beta creada con estructura79 tablas/45 migraciones y rol exclusivo sin acceso a tablas de producción. No se copió información privada ni se cambió todavía el servicio en ejecución. Alcance de datos y modalidad de pago pendientes de respuesta a preguntas enviadas. Detalles/validación/reversión: docs/VERSION-PAGA-BETA.md. No afirmar separación en runtime hasta cambiar conexión y verificarla.
+
+## Beta1.73 — copia independiente y preparación de planes
+
+Usuario respondió: los tres alcances Usuario/Sucursal/Empresa; solo preparar planes/límites, sin cobro automático; copiar cuentas/stock actuales sin sesiones ni envíos reales. Copia autorizada de48 tablas de negocio/5.267 filas verificada contra snapshot consistente, sin parar producción. Sesiones, dispositivos, tokens, claves/colas push y enlaces compartidos excluidos. Referencias de fotos externas conservadas, sin claves del proveedor. Configuración exclusiva de beta guardada con base/rol propios, guardas y APP_URL; push desactivado, variables ajenas intactas. Producción no recibe esta migración ni código.
+
+Editor manager-only en Moderación → Sistema → Planes y límites. Migración46 aditiva aplicada en beta, tres configuraciones iniciales sin cuotas, campos opcionales según alcance y revisión optimista/auditoría. Son borradores: no hay precios, asignación de suscripciones, facturación ni aplicación de restricciones. Esos pasos requieren decisión posterior del usuario. Validaciones y reversión en docs/VERSION-PAGA-BETA.md; pruebas API/UI Chromium/WebKit aprobadas. Verificar versión, salud y sesiones remotas antes de afirmar beta actualizada y conectada a su base.

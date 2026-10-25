@@ -1,6 +1,12 @@
 {
-  "version": 77,
+  "version": 78,
   "changes": [
+    {
+      "version": 78,
+      "label": "1.73",
+      "date": "2026-10-25",
+      "summary": "Prepara planes por usuario sucursal y empresa en beta con base independiente"
+    },
     {
       "version": 77,
       "label": "1.72",
@@ -294,15 +300,9 @@
       "label": "1.24",
       "date": "2026-10-19",
       "summary": "Alta desplegable de sucursales con ubicación en mapa"
-    },
-    {
-      "version": 28,
-      "label": "1.23",
-      "date": "2026-10-19",
-      "summary": "Modales de alta y configuración de sucursales"
     }
   ],
   "major": 1,
-  "minor": 72,
-  "label": "1.72"
+  "minor": 73,
+  "label": "1.73"
 }

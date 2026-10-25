@@ -1,5 +1,6 @@
 <section id="systemWorkspace" class="system-workspace" hidden aria-labelledby="systemTitle">
   <h2 id="systemTitle"><?= stock_icon('clock') ?>Sistema</h2>
+  <?php include __DIR__.'/commercial-plans.vista.php'; ?>
   <p id="systemPushHealth" class="system-push-health system-hint" role="status"><?= stock_icon('bell') ?><span>Consultando envío de avisos…</span></p>
   <p>Rendimiento del escáner</p>
   <form id="systemFilters" class="system-filters">

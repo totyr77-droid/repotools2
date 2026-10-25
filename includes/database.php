@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=45;
+const REPOTOOLS_SCHEMA_VERSION=46;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -369,6 +369,11 @@ function initialize_database(PDO $db): void {
             $db->exec('ALTER TABLE supervisor_members ADD COLUMN scope_revision INTEGER NOT NULL DEFAULT 1');
             $db->exec("CREATE TABLE supervisor_member_branches(team_id {$ref} NOT NULL,user_id {$ref} NOT NULL,branch_id {$ref} NOT NULL,PRIMARY KEY(team_id,user_id,branch_id),FOREIGN KEY(team_id,user_id) REFERENCES supervisor_members(team_id,user_id) ON DELETE CASCADE)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(45)');
+        }
+        if(!isset($applied[46])){
+            $db->exec("CREATE TABLE commercial_plans(scope TEXT PRIMARY KEY CHECK(scope IN ('user','branch','company')),name TEXT NOT NULL,max_users INTEGER CHECK(max_users>0),max_branches INTEGER CHECK(max_branches>0),max_pallets INTEGER CHECK(max_pallets>0),max_products INTEGER CHECK(max_products>0),revision INTEGER NOT NULL DEFAULT 1,updated_by {$ref} REFERENCES users(id),updated_at {$timestamp} NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            $db->exec("INSERT INTO commercial_plans(scope,name) VALUES('user','Usuario'),('branch','Sucursal'),('company','Empresa')");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(46)');
         }
         $db->commit();
     } catch (Throwable $error) {
