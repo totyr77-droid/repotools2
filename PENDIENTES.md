@@ -796,3 +796,13 @@ Usuario reporta primer error genérico y posteriores intentos en verificación. 
 Nuevo clasificador de errores devuelve HTTP y categoría allowlist (red/token/comprador-vendedor/credenciales/plan/proveedor); logs solo números/categoría, nunca cuerpo del proveedor, tarjeta, token ni correos. Unit tests clasificación y privacidad aprobados, regresión suscripciones completa. Conserva bloqueo de intentos ambiguos: no repetir POST ni resetear por un simple resultado vacío. Sin nuevos intentos de suscripción ni cobros en esta entrega.
 
 Prueba deliberadamente inválida propuesta fue rechazada por revisión automática antes de ejecutar por posible efecto remoto; no se ejecutó ni se buscó alternativa para enviar ese POST. Continuó diagnóstico solo lectura. Para capturar causa concreta hace falta un nuevo intento autorizado y controlado desde formulario tras resolver estado ambiguo; no declarar solucionado el rechazo original. Reversión: revertir commit/publicar caché superior. Sin migración/datos.
+
+## Intento controlado autorizado26/10
+
+Usuario autoriza explícitamente nueva prueba tras diagnóstico v1.91. Antes de preparar: vendedor test_user/coincidencia/modo test confirmados, búsqueda por referencia cero resultados, fila creating sin provider_id ni checkout_url. Recuperación única y condicionada a referencia exacta: estado new/referencia nueva, paid_until manual conservado y verificado. Diario privado fuera de Git con estado anterior y resultado; no registrar claves/correos/IDs en documentación. No se envió POST de suscripción ni cobro. Próximo paso requiere tarjeta de prueba desde formulario por usuario, una sola autorización, y observar categoría/HTTP de rechazo o confirmación/webhook. Evitar repetir recuperación con diario existente.
+
+## Beta1.92 — comprador igual al vendedor
+
+Diagnóstico confirmado por GET users/me: correo buyer configurado coincide exactamente (ignorando mayúsculas) con email del vendedor test_user autenticado. Esta configuración intentaba suscripción a la propia cuenta; no inferir que la clave pública sea incorrecta. Consulta pública al identificador anterior del usuario no devuelve email/tags y no alcanza para configurar comprador. Se solicitó cuenta Comprador distinta/Argentina al usuario. Sin nuevos POST, cobros ni cambios de credenciales.
+
+Guard servidor seller() detecta correo comprador=vendedor antes de crear fila o enviar preapproval, devuelve422 claro. Test unitario confirma soloGET identidad, cero filas y cero creación remota. Próximo paso: configurar correo real de cuenta Comprador de prueba, verificar distinto y recuperar intento rechazado solo después de comprobar búsqueda sin suscripción. No sintetizar email desde ID/usuario. Reversión: revertir commit/publicar caché superior. No migración.

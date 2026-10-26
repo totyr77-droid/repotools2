@@ -66,6 +66,7 @@ final class ProSubscriptions {
     private function seller(): void {
         $seller=$this->request('GET','/users/me');
         if((string)($seller['id']??'')!==$this->config['seller']||!in_array('test_user',$seller['tags']??[],true))throw new CatalogException('Configurá una cuenta vendedora de prueba.',503);
+        if(!empty($seller['email'])&&strcasecmp(trim($seller['email']),trim($this->config['buyer']))===0)throw new CatalogException('El comprador de prueba debe ser una cuenta distinta del vendedor. Revisá el correo configurado.',422);
     }
     private function row(int $user): array|false {
         return stock_query($this->db,'SELECT * FROM pro_subscriptions WHERE user_id=?',[$user])->fetch();

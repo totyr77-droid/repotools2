@@ -1,6 +1,12 @@
 {
-  "version": 96,
+  "version": 97,
   "changes": [
+    {
+      "version": 97,
+      "label": "1.92",
+      "date": "2026-10-26",
+      "summary": "Valida comprador distinto del vendedor en pruebas Pro"
+    },
     {
       "version": 96,
       "label": "1.91",
@@ -294,15 +300,9 @@
       "label": "1.43",
       "date": "2026-10-19",
       "summary": "Restringir toda transferencia al propietario del palet"
-    },
-    {
-      "version": 47,
-      "label": "1.42",
-      "date": "2026-10-19",
-      "summary": "Transferir mercadería entre palets y propiedad a otro usuario"
     }
   ],
   "major": 1,
-  "minor": 91,
-  "label": "1.91"
+  "minor": 92,
+  "label": "1.92"
 }
