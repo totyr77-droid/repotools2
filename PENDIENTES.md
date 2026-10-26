@@ -766,3 +766,7 @@ Validación: help-desk-ui Chromium/WebKit con datos ficticios: invitado/CSRF/ais
 ## Beta1.87 — avisos exactos de vencimiento
 
 Misma corrección solicitada para main/beta: tarjetas separan cantidad vencida, vence hoy y por vencer, usando conteos de servidor y plazo vigente. Stock/equipo reutilizan helper de texto/tono; datos offline previos sin desglose muestran aviso neutral. Sin migración, datos, permisos ni cobro. Pruebas PHP de fechas/equipos y helperJS aprobadas. Guía/reversión docs/PALET-AVISOS-EXACTOS.md. Conserva funciones exclusivas beta.
+
+## Beta1.88 — quitar formulario duplicado al final de sucursal
+
+Usuario aclara alta al final del perfil: solo manager podía verla, mediante can_assign_company. Se retira include/eventos antiguos de Mi sucursal; la plantilla y el alta central de Empresas y sucursales por modal siguen disponibles. branch-manager-ui aprobado en beta; aserción de ausencia añadida. Prueba branch-team-ui actualiza altafixture porAPI, conserva limitación de selector antiguo de seguridad documentada en docs/EMPRESAS-SIN-FORMULARIO-DUPLICADO.md. Sin datos/permisos ni cambios comerciales.

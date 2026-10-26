@@ -1,0 +1,5 @@
+# Retiro del formulario duplicado de asignación
+
+El formulario inferior de Mi sucursal se mostraba cuando can_assign_company era verdadero (manager de RepoTools), no a usuarios comunes. Se retira el include de branch-team-assignment en sucursales.php y su inicialización/eventos exclusivos en branch-team.js. La plantilla se conserva en gestion-empresas.php: Asignar empresa/Añadir sucursal mantienen sus modales y permisos. Sin cambios en API, asignaciones, roles o datos. Main y beta.
+
+Validación: sintaxis PHP/JS y diff; branch-manager-ui conserva alta/asignación/añadir desde modal y manager-only. branch-manager-ui verifica ausencia del formulario al ingresar a la sucursal. branch-team-ui se adapta a preparar empresa por API, pero su recorrido completo queda bloqueado por una comprobación antigua de teamSecurityHelp, elemento ya ausente antes de esta entrega; no se cambia configuración para satisfacer ese selector. Reversión: restaurar el include y líneas retiradas de branch-team.js con caché superior; sin migraciones ni datos.

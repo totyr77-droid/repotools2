@@ -1,6 +1,12 @@
 {
-  "version": 92,
+  "version": 93,
   "changes": [
+    {
+      "version": 93,
+      "label": "1.88",
+      "date": "2026-10-26",
+      "summary": "Retira el formulario duplicado de asignación al final de sucursal"
+    },
     {
       "version": 92,
       "label": "1.87",
@@ -294,15 +300,9 @@
       "label": "1.39",
       "date": "2026-10-19",
       "summary": "Compactar detalle de palet y mantener lectura a izquierda"
-    },
-    {
-      "version": 43,
-      "label": "1.38",
-      "date": "2026-10-19",
-      "summary": "Abrir palets del equipo sin salir de la página"
     }
   ],
   "major": 1,
-  "minor": 87,
-  "label": "1.87"
+  "minor": 88,
+  "label": "1.88"
 }
