@@ -1,0 +1,6 @@
+<?php
+require_once __DIR__.'/../includes/database.php';require_once __DIR__.'/../includes/stock.php';
+$db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($db);
+stock_query($db,"INSERT INTO users(name,email,password_hash) VALUES('Fixture','expiry@example.invalid','test')");$label=stock_generate($db,1);$p=stock_claim($db,$label['code'],1);$today=new DateTimeImmutable('today',new DateTimeZone('America/Buenos_Aires'));
+foreach([-1,0,1,30,31] as $days)stock_save_product($db,1,['pallet_id'=>$p['id'],'ean'=>'96385074','name'=>'Lote','amount'=>1,'expires'=>$today->modify(($days>=0?'+':'').$days.' days')->format('Y-m-d')]);
+$entry=stock_list($db,1)[0];foreach(['expiry_count'=>4,'expired_count'=>1,'today_count'=>1] as $k=>$v)if((int)$entry[$k]!==$v)throw new RuntimeException($k);stock_query($db,'INSERT INTO stock_preferences(user_id,expiry_days) VALUES(1,0)');$entry=stock_list($db,1)[0];if((int)$entry['expiry_count']!==2||(int)$entry['expired_count']!==1||(int)$entry['today_count']!==1)throw new RuntimeException('zero warning');echo "OK: exact expired/today/upcoming counters, warning boundary and zero-day preference.\n";

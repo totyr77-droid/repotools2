@@ -1,6 +1,12 @@
 {
-  "version": 91,
+  "version": 92,
   "changes": [
+    {
+      "version": 92,
+      "label": "1.87",
+      "date": "2026-10-26",
+      "summary": "Distingue vencidos, vencen hoy y por vencer en los palets"
+    },
     {
       "version": 91,
       "label": "1.86",
@@ -294,15 +300,9 @@
       "label": "1.38",
       "date": "2026-10-19",
       "summary": "Abrir palets del equipo sin salir de la página"
-    },
-    {
-      "version": 42,
-      "label": "1.37",
-      "date": "2026-10-19",
-      "summary": "Compactar información de tarjetas de palets del equipo"
     }
   ],
   "major": 1,
-  "minor": 86,
-  "label": "1.86"
+  "minor": 87,
+  "label": "1.87"
 }

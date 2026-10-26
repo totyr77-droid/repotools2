@@ -762,3 +762,7 @@ Validación: service-worker-offline cubre red caída/caché ausente/caché que f
 Usuario elige formulario interno. Nuevo acceso Ajustes→Ayuda y soporte para Free/Pro; consultas por tema/asunto, conversación privada, respuesta manager, resolver/reabrir, bandeja manager de20 por página. Sin adjuntos/envíos externos/tiempo de respuesta prometido ni cargos nuevos. Guarda versión interna, no URLs ni datos técnicos privados automáticos. Migración48 de dos tablas e índices solo beta; servidor valida propiedad/rol/CSRF, escapa texto, limita envíos y deduplica reintentos. Sin conceder roles/Pro ni acceso como usuario.
 
 Validación: help-desk-ui Chromium/WebKit con datos ficticios: invitado/CSRF/aislamiento GET y POST/duplicado sin nueva fila/responder/resolver/reabrir, HTML seguro y UI320/390/1366 ambas manos. Corregido cursor SQLite y excluidos scripts exclusivos de Inicio en página soporte. Captura espera fin del cargador existente. SintaxisPHP/JS/diff. Guía, alcance y reversión conservando consultas: docs/SOPORTE-BETA.md. Sin cambios de producción ni Mercado Pago.
+
+## Beta1.87 — avisos exactos de vencimiento
+
+Misma corrección solicitada para main/beta: tarjetas separan cantidad vencida, vence hoy y por vencer, usando conteos de servidor y plazo vigente. Stock/equipo reutilizan helper de texto/tono; datos offline previos sin desglose muestran aviso neutral. Sin migración, datos, permisos ni cobro. Pruebas PHP de fechas/equipos y helperJS aprobadas. Guía/reversión docs/PALET-AVISOS-EXACTOS.md. Conserva funciones exclusivas beta.
