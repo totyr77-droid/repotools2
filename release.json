@@ -1,6 +1,12 @@
 {
-  "version": 83,
+  "version": 84,
   "changes": [
+    {
+      "version": 84,
+      "label": "1.79",
+      "date": "2026-10-26",
+      "summary": "Unifica estética de beta en pantallas y controles"
+    },
     {
       "version": 83,
       "label": "1.78",
@@ -294,15 +300,9 @@
       "label": "1.30",
       "date": "2026-10-19",
       "summary": "Conservar ancho de búsqueda y corregir selector de sucursal"
-    },
-    {
-      "version": 34,
-      "label": "1.29",
-      "date": "2026-10-19",
-      "summary": "Ordenar búsqueda, filtros y etiquetas de coincidencias"
     }
   ],
   "major": 1,
-  "minor": 78,
-  "label": "1.78"
+  "minor": 79,
+  "label": "1.79"
 }

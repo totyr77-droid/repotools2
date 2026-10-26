@@ -1,0 +1,115 @@
+/* Beta only. Visual tokens and existing components; no layout or permission changes. */
+body[data-ui-skin="beta"]{
+  --color1:#2b1b80;
+  --color10:#5134c5;
+  --beta-ink:#28223c;
+  --beta-muted:#68677b;
+  --beta-line:#e3e1ed;
+  --beta-soft:#eeebf8;
+  --beta-surface:#fff;
+  --beta-primary:linear-gradient(115deg,#281778,#4b2ba6);
+  color:var(--beta-ink);
+  background:#f5f6fb;
+  -webkit-font-smoothing:antialiased;
+}
+body[data-ui-skin="beta"]>header{
+  background:radial-gradient(ellipse at 90% 0%,#6b4dd83b,transparent 65%),linear-gradient(110deg,#22116a,#38228d);
+  box-shadow:0 5px 22px #24155814;
+}
+body[data-ui-skin="beta"] :is(.workspace-account-icon,.workspace-sync-button,.notification-control>button){
+  border:1px solid #ffffff14;
+  background:#ffffff10;
+  border-radius:12px;
+}
+body[data-ui-skin="beta"] .development-badge{
+  background:#fff1c9;
+  color:#76550c;
+  border:1px solid #ffedb0;
+  font-size:11px;
+  letter-spacing:.06em;
+}
+body[data-ui-skin="beta"] :is(main h1,.library-heading h2,.app-resumen h2){letter-spacing:-.02em}
+body[data-ui-skin="beta"] :is(.stock-muted,.settings-hint,.account-intro){color:var(--beta-muted)}
+body[data-ui-skin="beta"] :is(.library-primary,.library-secondary,.library-danger,.stock-card,.home-tops){
+  transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+body[data-ui-skin="beta"] .library-primary:not(.stock-delete):not(.library-confirm-delete):not(:disabled){
+  background:var(--beta-primary);
+  box-shadow:0 3px 10px #2f1b7c14;
+}
+body[data-ui-skin="beta"] .library-secondary:not(.stock-delete){
+  background:var(--beta-soft);
+  color:#3c2c77;
+  box-shadow:inset 0 0 0 1px #3b297008;
+}
+body[data-ui-skin="beta"] :is(.library-primary,.library-secondary,.library-danger){border-radius:12px}
+body[data-ui-skin="beta"] :is(.stock-card,.home-list,.report-card,.account-panel-auth){
+  background:var(--beta-surface);
+  border-color:var(--beta-line);
+  border-radius:18px;
+  box-shadow:0 2px 8px #21125004;
+}
+body[data-ui-skin="beta"] .stock-card strong{letter-spacing:.025em}
+body[data-ui-skin="beta"] .home-tops{background:var(--beta-soft);border-radius:14px}
+body[data-ui-skin="beta"].home-page #boton{
+  background:var(--beta-primary);
+  border-radius:20px;
+  box-shadow:0 5px 16px #2f1b7c16;
+}
+body[data-ui-skin="beta"] :is(.stock-tabs,[role="tablist"]){background:#eeedf6;border-radius:14px}
+body[data-ui-skin="beta"] :is(.stock-tabs,[role="tablist"]) button[aria-selected="true"]{
+  background:var(--beta-primary);
+  color:#fff;
+  box-shadow:0 2px 6px #2b19751a;
+  border-radius:11px;
+}
+body[data-ui-skin="beta"] .stock-overview-metrics>div{
+  background:#fff;
+  border:1px solid var(--beta-line);
+  border-radius:14px;
+}
+body[data-ui-skin="beta"] :is(.library-dialog,.product-edit-dialog):not(.pro-upgrade-dialog){
+  border-radius:20px;
+  box-shadow:0 22px 64px #20154b30;
+}
+body[data-ui-skin="beta"] .library-heading{border-color:var(--beta-line)}
+body[data-ui-skin="beta"] :is(.library-settings-menu,.notification-popup){
+  border-color:var(--beta-line);
+  border-radius:14px;
+  box-shadow:0 10px 32px #22144d18;
+}
+body[data-ui-skin="beta"] :is(form input[type="text"],form input[type="email"],form input[type="password"],form input[type="number"],form input[type="date"],form textarea,form select){
+  border-color:#d6d3e3;
+  border-radius:11px;
+}
+body[data-ui-skin="beta"] :is(form input[type="text"],form input[type="email"],form input[type="password"],form input[type="number"],form input[type="date"],form textarea,form select):focus{
+  border-color:#8b78c8;
+  outline:2px solid #6a49bd25;
+  outline-offset:1px;
+}
+body[data-ui-skin="beta"] .repo-mobile-nav{--nav-selected:#4c32aa}
+body[data-ui-skin="beta"] .repo-mobile-nav #nav-celular{
+  background:linear-gradient(110deg,#24136e,#302080);
+  border-top:1px solid #ffffff1a;
+  box-shadow:0 -4px 20px #22134c10;
+}
+body[data-ui-skin="beta"] .repo-mobile-nav #nav-celular>a[aria-current="page"]{
+  background:linear-gradient(135deg,#6042d4,#4d31b5);
+  box-shadow:inset 0 1px 0 #ffffff24;
+  border-radius:13px;
+}
+body[data-ui-skin="beta"] .site-footer{color:#797486;border-color:var(--beta-line);background:transparent}
+@media(hover:hover){
+  body[data-ui-skin="beta"] .library-primary:not(.stock-delete):not(.library-confirm-delete):not(:disabled):hover{box-shadow:0 5px 14px #2f1b7c28}
+  body[data-ui-skin="beta"] .library-secondary:not(.stock-delete):not(:disabled):hover{background:#e4dff4}
+  body[data-ui-skin="beta"] .stock-card:hover{border-color:#c9c0e0;box-shadow:0 4px 14px #2b197509}
+  body[data-ui-skin="beta"] .nav a:hover{background:#ffffff12}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-ui-skin="beta"] :is(.library-primary,.library-secondary,.library-danger,.stock-card,.home-tops){transition:none}
+}
+
+body[data-ui-skin="beta"] .library-secondary:is([aria-pressed="true"],[aria-selected="true"]):not(.stock-delete){background:var(--beta-primary);color:#fff}
+/* Keep the existing sliding selection indicator visible with gradient buttons. */
+body[data-ui-skin="beta"] .motion-selector::before{background:var(--beta-primary)}
+body[data-ui-skin="beta"] .motion-selector>:is(button,a):is([aria-selected="true"],[aria-pressed="true"],[aria-current="page"]){color:#fff}
