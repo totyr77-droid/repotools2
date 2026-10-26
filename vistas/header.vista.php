@@ -78,7 +78,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
 
 
-    <?php if(!empty($paginaPro)||!empty($paginaCuenta)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
+    <?php if(!empty($paginaAyuda)||!empty($paginaPro)||!empty($paginaCuenta)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
     <link href="css/notifications.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
     <?php if(!empty($paginaCuenta)&&empty($paginaTops)&&current_user()): ?><link href="css/public-name.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
     <link href="css/account-bar.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css">
@@ -106,6 +106,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
 <link href="css/ux-polish.css?v=<?= substr(sha1_file(__DIR__.'/../css/ux-polish.css'),0,12) ?>" rel="stylesheet"><link rel="preload" href="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>" as="script"><link rel="preload" href="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>" as="script">    <?php if(!empty($paginaDemo)): ?><link href="css/guest-demo.css?v=<?= substr(sha1_file(__DIR__.'/../css/guest-demo.css'),0,12) ?>" rel="stylesheet"><?php endif; ?>
 <link href="css/development.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet">
 <link href="css/beta-theme.css?v=<?= substr(sha1_file(__DIR__.'/../css/beta-theme.css'),0,12) ?>" rel="stylesheet">
+<?php if(!empty($paginaAyuda)): ?><link href="css/help-desk.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet"><?php endif; ?>
 <link href="css/pro.css?v=<?= substr(sha1_file(__DIR__.'/../css/pro.css'),0,12) ?>" rel="stylesheet">
 </head>
   <?php require_once __DIR__.'/../includes/app-release.php'; ?><body data-ui-skin="beta" data-app-updates="<?= current_user() && isset($roleLabels[$navRole]) ? '1' : '0' ?>" data-app-version="<?= (int)app_release()['version'] ?>" data-ui-user="<?= (int)(current_user()['id']??0) ?>" data-hand="<?= $userHand === 'left' ? 'left' : 'right' ?>" data-hand-preference="<?= in_array($userHand,['left','right'],true)?$userHand:'' ?>" data-scan-sound="<?= $scanSound?'1':'0' ?>" data-scan-vibration="<?= $scanVibration?'1':'0' ?>"<?= !empty($paginaInicio) ? ' class="home-page"' : ((!empty($paginaBiblioteca)||!empty($paginaEquipo)||!empty($paginaGestionEmpresas)||!empty($paginaSupervision)) ? ' class="library-page"' : '') ?>>

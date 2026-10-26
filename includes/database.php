@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=47;
+const REPOTOOLS_SCHEMA_VERSION=48;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -380,6 +380,14 @@ function initialize_database(PDO $db): void {
             $db->exec("CREATE TABLE pro_payments(provider_id TEXT PRIMARY KEY,reference TEXT NOT NULL REFERENCES pro_subscriptions(reference),status TEXT NOT NULL,period_end BIGINT NOT NULL,updated_at BIGINT NOT NULL)");
             $db->exec('CREATE INDEX pro_payments_reference ON pro_payments(reference,status,period_end)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(47)');
+        }
+        if(!isset($applied[48])){
+            $db->exec("CREATE TABLE support_tickets(id {$id},user_id {$ref} NOT NULL REFERENCES users(id),subject TEXT NOT NULL,category TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','resolved')),app_version INTEGER NOT NULL,created_at BIGINT NOT NULL,updated_at BIGINT NOT NULL)");
+            $db->exec("CREATE TABLE support_messages(id {$id},ticket_id {$ref} NOT NULL REFERENCES support_tickets(id),user_id {$ref} NOT NULL REFERENCES users(id),body TEXT NOT NULL,request_key TEXT NOT NULL,created_at BIGINT NOT NULL,UNIQUE(user_id,request_key))");
+            $db->exec('CREATE INDEX support_tickets_owner ON support_tickets(user_id,updated_at)');
+            $db->exec('CREATE INDEX support_tickets_status ON support_tickets(status,updated_at)');
+            $db->exec('CREATE INDEX support_messages_ticket ON support_messages(ticket_id,id)');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(48)');
         }
         $db->commit();
     } catch (Throwable $error) {
