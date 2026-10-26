@@ -722,3 +722,9 @@ El acceso directo reutiliza inicialización/formulario de transferencia existent
 Validación: pro-subscriptions-ui Chromium/WebKit comprueba insignia dentro del botón, tres acciones agrupadas, menú dentro de320/390/1366 y ambas manos, formulario de propiedad sin mutación al abrir y gestión de accesos. pro-access-ui Chromium/WebKit conserva bloqueos/beneficios/revocación. SintaxisPHP/JS/diff aprobadas y captura del menú revisada. Sin pruebas físicas ni pagos. Reversión: restaurar vistas/stock-dialogs.vista.php, css/pro.css, js/stock.js y js/pro-access.js anteriores en desarrollo y publicar caché superior; conservar datos/permisos/pagos. No se usan servicios pagos adicionales ni generación de imágenes.
 
 Publicación comprobada: beta1.80/interna85, commit78d0f16 live, salud200. Producción conserva interna214. Sin cambios de cobro ni datos.
+
+## Beta1.81 — transferencia única y Pro primero
+
+Corrección solicitada: quitar el acceso duplicado Transferir propiedad y colocar el bloque Pro primero. Compartir palet y Gestionar accesos quedan agrupados arriba; después Transferir, Descripción, Reimprimir y Eliminar. Transferir conserva sus destinos y el guard Pro al elegir usuario; movimiento interno conserva permisos existentes. Sin cambios de datos, cobro ni producción.
+
+Validación: pro-subscriptions-ui Chromium/WebKit,320/390/1366 y ambas manos; comprueba grupo primero, ausencia del duplicado, destinos visibles y apertura de formulario sin cambiar propietario. La prueba espera fin de animación de entrada antes de medir para evitar una lectura transitoria. Sintaxis PHP/JS aprobada. Reversión: restaurar vista, stock.js y pro-access.js anteriores y publicar caché superior en beta.

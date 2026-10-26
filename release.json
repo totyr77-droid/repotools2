@@ -1,6 +1,12 @@
 {
-  "version": 85,
+  "version": 86,
   "changes": [
+    {
+      "version": 86,
+      "label": "1.81",
+      "date": "2026-10-26",
+      "summary": "Unifica Transferir y ordena las acciones Pro primero"
+    },
     {
       "version": 85,
       "label": "1.80",
@@ -294,15 +300,9 @@
       "label": "1.32",
       "date": "2026-10-19",
       "summary": "RT estático y barra de carga global blanca"
-    },
-    {
-      "version": 36,
-      "label": "1.31",
-      "date": "2026-10-19",
-      "summary": "Centrar carga inicial y renovar aviso Consultando palet"
     }
   ],
   "major": 1,
-  "minor": 80,
-  "label": "1.80"
+  "minor": 81,
+  "label": "1.81"
 }
