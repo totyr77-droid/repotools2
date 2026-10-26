@@ -84,6 +84,7 @@ final class ProSubscriptions {
         stock_query($this->db,"INSERT INTO pro_subscriptions(reference,user_id,amount_cents) VALUES(?,?,?) ON CONFLICT(user_id) DO NOTHING",[$ref,$user,$this->config['amount']]);
         $create=$this->transaction(function()use($user){
             $row=$this->lock($this->row($user)['reference']);
+            if($row['status']==='beta_trial'&&$row['provider_id']===null&&$row['checkout_url']===''){stock_query($this->db,"UPDATE pro_subscriptions SET status='new',amount_cents=? WHERE reference=?",[$this->config['amount'],$row['reference']]);$row['status']='new';$row['amount_cents']=$this->config['amount'];}
             if(in_array($row['status'],['cancelled','paused'],true))throw new CatalogException('La suscripción está cancelada o pausada. Revisala antes de contratar nuevamente.',409);
             if($row['status']==='authorized')throw new CatalogException('Ya tenés una suscripción autorizada.',409);
             if($row['checkout_url']!=='')return ['url'=>$row['checkout_url']];

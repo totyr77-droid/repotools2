@@ -770,3 +770,7 @@ Misma corrección solicitada para main/beta: tarjetas separan cantidad vencida, 
 ## Beta1.88 — quitar formulario duplicado al final de sucursal
 
 Usuario aclara alta al final del perfil: solo manager podía verla, mediante can_assign_company. Se retira include/eventos antiguos de Mi sucursal; la plantilla y el alta central de Empresas y sucursales por modal siguen disponibles. branch-manager-ui aprobado en beta; aserción de ausencia añadida. Prueba branch-team-ui actualiza altafixture porAPI, conserva limitación de selector antiguo de seguridad documentada en docs/EMPRESAS-SIN-FORMULARIO-DUPLICADO.md. Sin datos/permisos ni cambios comerciales.
+
+## Beta1.89 — retomar Mercado Pago con comprador disponible
+
+Usuario en PC retoma y confirma inicio como comprador; correo aportado guardado solo en entorno beta. Vendedor API verificado test_user/MLA/coincidencia ID. Variables comprador/importe ficticio100ARS/modo test configuradas, sin suscripción/pago creado. Permite abrir checkout desde concesión manual beta_trial sin perder paid_until y usa importe configurado, conservando guard vendedor de prueba. Interfaz habilita botón para ese estado. Pruebas de suscripción/UI ambos motores con datos ficticios. Producción intacta; próxima acción requiere completar checkout con cuenta/tarjeta de prueba. No guardar correo/IDs/claves en docs/Git.

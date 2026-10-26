@@ -1,6 +1,12 @@
 {
-  "version": 93,
+  "version": 94,
   "changes": [
+    {
+      "version": 94,
+      "label": "1.89",
+      "date": "2026-10-26",
+      "summary": "Permite probar suscripción conservando el acceso Pro de prueba"
+    },
     {
       "version": 93,
       "label": "1.88",
@@ -294,15 +300,9 @@
       "label": "1.40",
       "date": "2026-10-19",
       "summary": "Alinear palet, propietario y sucursal en una línea"
-    },
-    {
-      "version": 44,
-      "label": "1.39",
-      "date": "2026-10-19",
-      "summary": "Compactar detalle de palet y mantener lectura a izquierda"
     }
   ],
   "major": 1,
-  "minor": 88,
-  "label": "1.88"
+  "minor": 89,
+  "label": "1.89"
 }

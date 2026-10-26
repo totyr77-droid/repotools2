@@ -46,3 +46,9 @@ Mantener cobro sin configurar o retirar REPOTOOLS_BILLING_MODE; revocar únicame
 El usuario pospone Mercado Pago. Token verificado como vendedor de prueba argentino, identificador guardado y secreto de Webhooks presente; sin correo de comprador ni importe/modo habilitado. Consulta del comprador existente no devolvió correo. Usuario autorizó crear otro comprador por API, pero el proveedor rechazó con403; no se creó cuenta ni pago. No insistir ni pedir credenciales hasta retomar. No exponer secretos/IDs/filas de cuentas en documentación.
 
 El usuario ahora sí autoriza aplicar privilegios PRO solo en beta y mostrar una comparación Free/Pro al intentar usarlos. Esto reemplaza la indicación anterior de enforced=false para privilegios personales; cuotas de capacidad y configuraciones de sucursal/empresa siguen en borrador.
+
+## Retoma de pruebas26/10
+
+Usuario desde PC confirma acceso al comprador de prueba y aporta su correo, guardado únicamente en entorno beta. Vendedor revalidado por API como test_user argentino y coincide con configurado. Importe ficticio100ARS, modo test y comprador configurados; no pagos ni suscripciones creados por esta preparación. Secretos existentes preservados, producción intacta.
+
+Compatibilidad con concesión beta_trial del manager: checkout puede iniciar si aún no tiene proveedor/enlace, toma el importe configurado y conserva paid_until. Interfaz muestra botón de prueba y estado de acceso manual. Prueba unitaria de transición/persistencia de vigencia y UI Chromium/WebKit; corrige expectativa antigua de esquema47 para usar constante actual48. Falta autorización/primerpago/notificación con proveedor: no considerar integración certificada por estas pruebas simuladas.

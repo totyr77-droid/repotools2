@@ -7,7 +7,7 @@ function denied(callable $fn,int $status): void {try{$fn();}catch(CatalogExcepti
 $db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
 initialize_database($db);initialize_database($db);
 $db->exec("INSERT INTO users(name,email,password_hash,role) VALUES('Test','test@example.invalid','fixture','manager'),('Other','other@example.invalid','fixture','usuario')");
-check((int)$db->query('SELECT MAX(version) FROM app_schema_migrations')->fetchColumn()===47,'Migration idempotence');
+check((int)$db->query('SELECT MAX(version) FROM app_schema_migrations')->fetchColumn()===REPOTOOLS_SCHEMA_VERSION,'Migration idempotence');
 denied(fn()=>pro_require_tester($db,2),403);pro_require_tester($db,1);
 check(pro_config()['enabled']===false,'Billing must default off');
 putenv('REPOTOOLS_BILLING_MODE=live');check(pro_config()['enabled']===false,'Live billing must fail closed');putenv('REPOTOOLS_BILLING_MODE=');
@@ -55,4 +55,6 @@ denied(fn()=>pro_verify_webhook('data.id=forged',$signature,$request,$config['se
 denied(fn()=>pro_verify_webhook('data.id=ABC123&data.id=another',$signature,$request,$config['secret'],time()),401);
 denied(fn()=>pro_verify_webhook('data.id=ABC123',$signature,$request,$config['secret'],time()+400),401);
 check((int)$db->query('SELECT COUNT(*) FROM pallets')->fetchColumn()===0,'No stock mutated');
-echo "OK: schema47, private tests, default/live disabled, test seller, timeout recovery, duplicate create/payment, authorization vs payment, calendar period, rejection/refund, wrong amount/seller/live payment, cancellation preserves paid period, signed webhook/tamper/replay. No provider network calls.\n";
+echo "OK: schema migrations, private tests, default/live disabled, test seller, timeout recovery, duplicate create/payment, authorization vs payment, calendar period, rejection/refund, wrong amount/seller/live payment, cancellation preserves paid period, signed webhook/tamper/replay. No provider network calls.\n";
+
+$trialDb=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($trialDb);$trialDb->exec("INSERT INTO users(name,email,password_hash,role) VALUES('Trial','trial@example.invalid','fixture','manager')");$trialUntil=time()+86400;$trialDb->prepare("INSERT INTO pro_subscriptions(reference,user_id,status,amount_cents,paid_until) VALUES('trial-fixture',1,'beta_trial',1,?)")->execute([$trialUntil]);$trialService=new ProSubscriptions($trialDb,$config,$transport);$trialService->checkout(1);$trial=$trialDb->query('SELECT * FROM pro_subscriptions')->fetch();check((int)$trial['amount_cents']===10000,'Trial checkout uses configured amount');check((int)$trial['paid_until']===$trialUntil,'Opening checkout preserves existing trial');check($trial['status']==='pending','Trial can begin a provider test');
