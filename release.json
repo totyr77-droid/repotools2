@@ -1,6 +1,12 @@
 {
-  "version": 216,
+  "version": 217,
   "changes": [
+    {
+      "version": 217,
+      "label": "3.12",
+      "date": "2026-10-26",
+      "summary": "Prepara el pitido en el toque de volver a escanear palet"
+    },
     {
       "version": 216,
       "label": "3.11",
@@ -294,15 +300,9 @@
       "label": "2.63",
       "date": "2026-10-24",
       "summary": "Actualiza búsquedas y totales filtrados después de eliminar mercadería"
-    },
-    {
-      "version": 167,
-      "label": "2.62",
-      "date": "2026-10-24",
-      "summary": "Resalta el lote elegido al abrir un palet desde Mercadería"
     }
   ],
   "major": 3,
-  "minor": 11,
-  "label": "3.11"
+  "minor": 12,
+  "label": "3.12"
 }

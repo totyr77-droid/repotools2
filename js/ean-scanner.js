@@ -706,11 +706,12 @@ function palletNumberRegion(image){
       if (session) session.accepting = false;
       return enqueue(() => release(session));
     }
+    function prepareFeedback() { if (feedbackPreferences().sound !== false) prepareSound(); }
     function start(format = 'ean') {
       const requestedAt=performance.now();clearScanPhoto();
       // Se habilita el audio en el toque que abre la cámara, antes de esperar
       // permisos o fotogramas, para que el primer escaneo también tenga sonido.
-      if (feedbackPreferences().sound !== false) prepareSound();
+      prepareFeedback();
       const token = ++revision;
       if (session) session.accepting = false;
       const isQR = format === 'qr';
@@ -817,7 +818,7 @@ function palletNumberRegion(image){
       })).catch(error=>{if(token!==revision)return false;throw error;});
     }
     page?.onLeave(stop);
-    const originalCode=onCode;const normalCode=code=>window.RepoTeamInvitation?.token(code)?window.RepoTeamInvitation.open(code):originalCode(code);if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
+    const originalCode=onCode;const normalCode=code=>window.RepoTeamInvitation?.token(code)?window.RepoTeamInvitation.open(code):originalCode(code);if(!relayBypass&&elementId!=='userReader')onCode=code=>window.RepoScanMethods?window.RepoScanMethods.route(code,normalCode,elementId):normalCode(code);const raw={start,stop,prepareFeedback};return !relayBypass&&window.RepoScanMethods?window.RepoScanMethods.wrap(elementId,{onCode,onError,onStatus,onManual,scanContext},raw):raw;
   }
   function rawCreate(elementId,options){return create(elementId,{...options,relayBypass:true});}
   window.RepoEANScanner = { observe(listener){if(typeof listener!=='function')throw TypeError('Observer required');metricListeners.add(listener);return()=>metricListeners.delete(listener);}, create, rawCreate, validEAN, confirmation, palletIdentifier, palletFrame, palletSelection, ocrConsensus, ocrCandidate, takeScanPhoto, clearScanPhoto };
