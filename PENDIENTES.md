@@ -774,3 +774,17 @@ Usuario aclara alta al final del perfil: solo manager podía verla, mediante can
 ## Beta1.89 — retomar Mercado Pago con comprador disponible
 
 Usuario en PC retoma y confirma inicio como comprador; correo aportado guardado solo en entorno beta. Vendedor API verificado test_user/MLA/coincidencia ID. Variables comprador/importe ficticio100ARS/modo test configuradas, sin suscripción/pago creado. Permite abrir checkout desde concesión manual beta_trial sin perder paid_until y usa importe configurado, conservando guard vendedor de prueba. Interfaz habilita botón para ese estado. Pruebas de suscripción/UI ambos motores con datos ficticios. Producción intacta; próxima acción requiere completar checkout con cuenta/tarjeta de prueba. No guardar correo/IDs/claves en docs/Git.
+
+## Continuidad Mercado Pago — plan y tokenización pendientes
+
+Diagnóstico real de beta: API del vendedor de prueba validada; aplicación rechaza crear preapproval sin plan (401). Plan mensual de prueba creado una sola vez, importe100ARS, configurado en entorno beta. Intento único con plan rechazado400 «card_token_id is required», sin suscripción enlazada ni pago confirmado. Estado local conserva concesión manual; no reiterar POST ambiguos ni generar planes duplicados. Respuestas completas e identificadores permanecen privados fuera de Git. Cambios locales opcionales de plan/validación en includes/pro-subscriptions.php y pruebas todavía no publicados: no equivalen a flujo terminado.
+
+26/10: documentación oficial confirma plan asociado requiere card_token_id/authorized. Revisión de entorno beta encontró plan configurado pero sin Public Key. Se pidió configurar la Public Key de prueba de la misma aplicación para tokenización mediante SDK oficial, sin enviar tarjeta/Access Token por chat. Próximo paso: completar formulario oficial y transición idempotente probada; validar pago/webhook, renovación y cancelación antes de dar integración por terminada. Producción intacta. No hubo nuevos intentos de cobro en esta continuación.
+
+## Beta1.90 — formulario de autorización con plan asociado
+
+Public Key configurada por usuario, presencia/formato comprobados; vendedor sigue test_user y despliegue previo live. Plan asociado requiere token de tarjeta: formulario CardForm SDK oficial con iframe para número/vencimiento/CVV; POST propio recibe únicamente token, no datos de tarjeta. Configuración pública de prueba solo al manager autenticado; importe/comprador/plan controlados en servidor. Plan autorizado no otorga Pro hasta pago de prueba validado por webhook. Formulario se desmonta al salir; no token en DB/documentación/Git. Modo sin plan anterior conservado.
+
+Intento anterior rechazado400 sin card_token_id: recuperación única condicionada a diario privado del rechazo, vendedor de prueba válido y búsqueda remota sin suscripciones. Nueva referencia idempotente, estado new, paid_until manual conservado; no se crea suscripción al recuperar. No repetir recuperación ni POST ambiguos.
+
+Validación: tests/pro-subscriptions.php y pro-subscriptions-ui Chromium/WebKit (SDK simulado, iframe, envío token, autorización sin nueva concesión, permisos/CSRF y regresiones). No equivale a tokenización/cobro real del proveedor. Usuario debe completar tarjeta oficial de prueba en beta; falta validar resultado, webhook, renovación y cancelación con proveedor. Reversión código: revertir commit y nueva caché; no restaurar referencia anterior ni borrar suscripciones/pagos. Producción sin cambios.

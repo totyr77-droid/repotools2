@@ -8,7 +8,7 @@ function pro_config(): array {
     $url=rtrim(getenv('APP_URL')?:'','/');
     $config=['token'=>getenv('REPOTOOLS_MP_ACCESS_TOKEN')?:'', 'secret'=>getenv('REPOTOOLS_MP_WEBHOOK_SECRET')?:'',
         'buyer'=>getenv('REPOTOOLS_MP_TEST_BUYER_EMAIL')?:'', 'seller'=>getenv('REPOTOOLS_MP_TEST_SELLER_ID')?:'',
-        'amount'=>ctype_digit($amount)?(int)$amount:0,'url'=>$url];
+        'amount'=>ctype_digit($amount)?(int)$amount:0,'url'=>$url,'plan'=>trim(getenv('REPOTOOLS_MP_TEST_PLAN_ID')?:''),'public_key'=>trim(getenv('REPOTOOLS_MP_PUBLIC_KEY')?:'')];
     $config['enabled']=getenv('REPOTOOLS_BILLING_MODE')==='test'
         &&$url==='https://repotools-desarrollo.onrender.com'
         &&$config['token']!==''&&strlen($config['secret'])>=16&&ctype_digit($config['seller'])
@@ -23,7 +23,7 @@ function pro_state(PDO $db,int $user): array {
     $row=stock_query($db,'SELECT status,paid_until FROM pro_subscriptions WHERE user_id=?',[$user])->fetch();
     $config=pro_config();
     return ['mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
-        'status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
+        'card_required'=>($config['plan']??'')!=='','public_key'=>$config['enabled']?($config['public_key']??''):'','test_buyer'=>$config['enabled']?$config['buyer']:'','status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
         'paid_until'=>(int)($row['paid_until']??0),'enforced'=>true];
 }
 final class ProSubscriptions {
@@ -38,6 +38,7 @@ final class ProSubscriptions {
         if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,json_encode($body,JSON_THROW_ON_ERROR));
         $raw=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);
         $data=is_string($raw)?json_decode($raw,true):null;
+        if($status===401&&is_array($data)&&($data['message']??'')==="This app can't create preapprovals without a plan")throw new CatalogException('Mercado Pago requiere un plan asociado para esta aplicación. La configuración de prueba debe actualizarse.',503);
         if($status<200||$status>=300||!is_array($data))throw new CatalogException('No pudimos comunicarnos con Mercado Pago. Volvé a intentar.',503);
         return $data;
     }
@@ -60,6 +61,7 @@ final class ProSubscriptions {
         catch(Throwable $e){if($this->db->inTransaction())$this->db->rollBack();throw $e;}
     }
     private function validate(array $remote,array $row): void {
+        if(($this->config['plan']??'')!==''&&($remote['preapproval_plan_id']??'')!==$this->config['plan'])throw new CatalogException('El plan de suscripción no coincide.',409);
         $recurring=$remote['auto_recurring']??[];
         if(($remote['external_reference']??'')!==$row['reference']
             ||(string)($remote['collector_id']??'')!==$this->config['seller']
@@ -77,7 +79,8 @@ final class ProSubscriptions {
         if($checkout!==''&&(parse_url($checkout,PHP_URL_SCHEME)!=='https'||parse_url($checkout,PHP_URL_HOST)!=='www.mercadopago.com.ar'))throw new CatalogException('Enlace de pago no válido.',503);
         stock_query($this->db,'UPDATE pro_subscriptions SET provider_id=?,status=?,checkout_url=?,updated_at=? WHERE reference=?',[$remote['id'],$status,$checkout,time(),$row['reference']]);
     }
-    public function checkout(int $user): string {
+    public function checkout(int $user,string $cardToken=''): string {
+        if(($this->config['plan']??'')!==''&&!preg_match('/^[a-zA-Z0-9_-]{16,256}$/D',$cardToken))throw new CatalogException('Completá la tarjeta de prueba para continuar.',422);
         $this->seller();
         // A persistent reference/idempotency key survives network timeouts and repeated clicks.
         $ref=bin2hex(random_bytes(24));
@@ -96,9 +99,10 @@ final class ProSubscriptions {
         $row=$create['row'];
         if($create['first']){
             $remote=$this->request('POST','/preapproval',[
+                ...(($this->config['plan']??'')!==''?['preapproval_plan_id'=>$this->config['plan'],'card_token_id'=>$cardToken]:[]),
                 'reason'=>'RepoTools Pro · prueba','external_reference'=>$row['reference'],'payer_email'=>$this->config['buyer'],
                 'auto_recurring'=>['frequency'=>1,'frequency_type'=>'months','transaction_amount'=>(int)$row['amount_cents']/100,'currency_id'=>'ARS'],
-                'back_url'=>$this->config['url'].'/pro.php','status'=>'pending'
+                'back_url'=>$this->config['url'].'/pro.php','status'=>($this->config['plan']??'')!==''?'authorized':'pending'
             ],$row['reference']);
         }else{
             // Do not repeat POST after an ambiguous timeout: recover by reference instead.
@@ -109,6 +113,7 @@ final class ProSubscriptions {
         }
         return $this->transaction(function()use($row,$remote){$current=$this->lock($row['reference']);
             $remote=$this->request('GET','/preapproval/'.rawurlencode((string)$remote['id']));$this->apply($remote,$current);
+            if(($remote['status']??'')==='authorized')return '';
             if(empty($remote['init_point']))throw new CatalogException('No recibimos el enlace de pago.',503);
             return $remote['init_point'];});
     }
