@@ -696,3 +696,5 @@ Modal Free/Pro reutilizado desde botones y errores API; contratación deshabilit
 Validación: pro-access-ui Chromium/WebKit y pro-subscriptions-ui WebKit aprobados, Stock API y unidad de suscripciones aprobadas. Incluye API directa, permisos/CSRF, vencimiento/cancelación, efectos ausentes en denegaciones, ambas manos/tamaños y cierre/revisión de accesos; captura revisada. No prueba física ni cobro del proveedor.
 
 Regresión adicional: Ajustes Chromium aprobado; estilos de modal cargados antes de ajustes de UX, sin volver a cargar la hoja base al final. Cliente de enlaces comprueba denegación PRO sin usar fallback. Se mantienen tiempos de carga locales del botón al verificar plan.
+
+Publicación verificada: beta1.77/interna82, commit837f81b live; health200 y APIpro-access401 sin sesión. Producción sigue interna214. No se activó facturación ni se asignó Pro a cuentas reales.
