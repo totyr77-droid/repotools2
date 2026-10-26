@@ -17,3 +17,7 @@ Reversión: revertir el commit de esta entrega y publicar una versión de caché
 Reemplaza checkbox aislado por opciones «Conservar actual / Usar propuesta» en cada dato diferente, dentro de comparación. Datos existentes seleccionados por defecto; campos sin dato usan propuesta. Selección actual protegida en servidor, formulario permite ajustar valores propuestos. Radios nativos con tamaño acotado y área44px evitan deformación/desborde de captura. Importaciones Excel no envían notificaciones de aprobación ni rechazo; reportes individuales conservan avisos, historial y auditoría intactos. No se borran avisos anteriores.
 
 Pruebas report-approved-edit-ui Chromium/WebKit: nombre actual/propuesta, cantidad nueva seleccionada y ausencia de desborde; reports-api: selección actual de nombre/cantidad, reemplazo explícito y cero nuevas notificaciones al aprobar/rechazar Excel. Reversión: revertir commit y publicar caché superior. Sin migración.
+
+## v3.17 — editar desde cualquier origen
+
+«Usar actual» y «Usar propuesta» cargan el valor de partida; ambos permiten corregirlo en formulario antes de aprobar. Protocolo field_selection2 conserva edición manual validada por report_fields, permisos y revisión optimista; modo anterior conserva comportamiento para clientes abiertos de v3.16. Prueba API aprueba nombre actual corregido/cantidad y conserva ausencia de notificaciones Excel; UI Chromium/WebKit comprueba campo actual editable. Revertir commit y publicar caché superior; no migración.

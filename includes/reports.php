@@ -192,15 +192,15 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
             if ($revision === false) throw new CatalogException('Revisa la versión actual del producto.', 422);
             $photo=$db->prepare("SELECT object_key FROM report_photos WHERE report_id=? AND kind='product'");$photo->execute([$id]);
             $reviewFields=report_fields($input);
-            if(($input['field_selection']??'')==='1'){
+            if(in_array($input['field_selection']??'',['1','2'],true)){
                 foreach(['brand','name','quantity','category','packaging','uxb','uxc'] as $field){
                     $selection=$input['select_'.$field]??null;
                     if($selection!==null&&!in_array($selection,['current','proposed'],true))throw new CatalogException('Revisa los datos seleccionados.',422);
-                    if($selection==='current'){$reviewFields[$field]=$report['current'][$field]??'';if($field==='uxc')$reviewFields['uxb']=$report['current']['uxb']??$report['current']['uxc']??'';}
+                    if($selection==='current'&&($input['field_selection']??'')==='1'){$reviewFields[$field]=$report['current'][$field]??'';if($field==='uxc')$reviewFields['uxb']=$report['current']['uxb']??$report['current']['uxc']??'';}
                 }
             }
             // Imported names replace existing catalog names only with explicit confirmation.
-            if(report_is_automated_import($report) && trim((string)($report['current']['name']??''))!=='' && ($input['replace_existing_name']??'')!=='1' && !(($input['field_selection']??'')==='1'&&($input['select_name']??'')==='proposed'))$reviewFields['name']=$report['current']['name'];
+            if(($input['field_selection']??'')!=='2' && report_is_automated_import($report) && trim((string)($report['current']['name']??''))!=='' && ($input['replace_existing_name']??'')!=='1' && !(($input['field_selection']??'')==='1'&&($input['select_name']??'')==='proposed'))$reviewFields['name']=$report['current']['name'];
             $reviewedProduct=edit_catalog_product($db, $report['ean'], $reviewFields, $revision, (int) $user['id'], $id, $photo->fetchColumn()?:null);
             if ($report['user_id'] !== null && !report_is_automated_import($report)) $db->prepare('INSERT INTO report_rewards (report_id, user_id) VALUES (?, ?) ON CONFLICT(report_id) DO NOTHING')->execute([$id, $report['user_id']]);
         }

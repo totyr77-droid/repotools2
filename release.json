@@ -1,6 +1,12 @@
 {
-  "version": 221,
+  "version": 222,
   "changes": [
+    {
+      "version": 222,
+      "label": "3.17",
+      "date": "2026-10-26",
+      "summary": "Permite corregir datos actuales al revisar reportes"
+    },
     {
       "version": 221,
       "label": "3.16",
@@ -294,15 +300,9 @@
       "label": "2.68",
       "date": "2026-10-24",
       "summary": "Separa el alcance de comparación de los filtros de consulta"
-    },
-    {
-      "version": 172,
-      "label": "2.67",
-      "date": "2026-10-24",
-      "summary": "Conserva sección y filtros del supervisor al actualizar Mi equipo"
     }
   ],
   "major": 3,
-  "minor": 16,
-  "label": "3.16"
+  "minor": 17,
+  "label": "3.17"
 }

@@ -186,8 +186,8 @@
             const choice=document.createElement('label');choice.className='report-value-choice';
             const radio=document.createElement('input');radio.type='radio';radio.name='select_'+key;radio.value=proposed?'proposed':'current';radio.setAttribute('form','reviewReportForm');
             radio.defaultChecked=radio.checked=proposed?!baseline?.[key]:!!baseline?.[key];
-            choice.append(radio,document.createTextNode(proposed?'Usar propuesta':'Conservar actual'));row.append(choice);
-            radio.addEventListener('change',()=>{const field=form.elements[key];if(field){field.value=product?.[key]||'';field.readOnly=!proposed;}if(key==='uxc'){form.elements.uxb.value=product?.uxc||'';form.elements.uxb.readOnly=!proposed;}});
+            choice.append(radio,document.createTextNode(proposed?'Usar propuesta':'Usar actual'));row.append(choice);
+            radio.addEventListener('change',()=>{const field=form.elements[key];if(field){field.value=product?.[key]||'';field.readOnly=false;}if(key==='uxc'){form.elements.uxb.value=product?.uxc||'';form.elements.uxb.readOnly=false;}});
           }
         }
         if (!keys.length) text('p', 'Sin cambios en los datos.', section);
@@ -213,8 +213,8 @@
       }
       if (queue && result.can_review && active.status === 'pending') {
         form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] ?? active.current?.[key] ?? '';if(!form.elements.uxb.value&&!Object.hasOwn(active.proposed||{},'uxb'))form.elements.uxb.value=active.proposed.uxc??active.current?.uxc??'';
-        for(const key of Object.keys(fields)){const selected=details.querySelector('input[name="select_'+key+'"]:checked');const field=form.elements[key];field.readOnly=selected?.value==='current';if(selected)field.value=(selected.value==='current'?active.current:active.proposed)?.[key]||'';}
-        const legacy=details.querySelector('input[name=select_uxc]:checked');if(legacy){form.elements.uxb.value=(legacy.value==='current'?active.current:active.proposed)?.uxc||'';form.elements.uxb.readOnly=legacy.value==='current';}
+        for(const key of Object.keys(fields)){const selected=details.querySelector('input[name="select_'+key+'"]:checked');const field=form.elements[key];field.readOnly=false;if(selected)field.value=(selected.value==='current'?active.current:active.proposed)?.[key]||'';}
+        const legacy=details.querySelector('input[name=select_uxc]:checked');if(legacy){form.elements.uxb.value=(legacy.value==='current'?active.current:active.proposed)?.uxc||'';form.elements.uxb.readOnly=false;}
         form.hidden = false;
         dialog.dispatchEvent(new CustomEvent('repotools:form-saved',{bubbles:true}));
       }
@@ -226,7 +226,7 @@
     const finishLoading = window.RepotoolsLoader?.start(decision === 'approved' ? approve : reject, {type:'button',label:'Guardando...'});
     busy = true; approve.disabled = reject.disabled = close.disabled = true; message.textContent = 'Guardando…';
     try {
-      const body = new FormData(form); body.set('field_selection', '1'); body.set('action', 'review'); body.set('id', active.id); body.set('decision', decision); body.set('revision', active.current?.revision || 0); body.set('csrf', csrf);
+      const body = new FormData(form); body.set('field_selection', '2'); body.set('action', 'review'); body.set('id', active.id); body.set('decision', decision); body.set('revision', active.current?.revision || 0); body.set('csrf', csrf);
       const result = await RepoReports.request('', body); active = result.report;form.hidden=true;const notice=document.getElementById('reportActionStatus');notice.textContent=decision==='approved'?'Aprobado. Producto actualizado.':'Reporte rechazado.';dialog.close(); window.dispatchEvent(new Event('repotools:reports-changed'));await load();list.querySelector('button')?.focus();
     } catch (error) { message.textContent = error.message + (error.status === 409 ? ' Cierra y abre el reporte para revisar los datos actuales.' : ''); }
     finally { finishLoading?.(); busy = false; approve.disabled = reject.disabled = close.disabled = false; }
