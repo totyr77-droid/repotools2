@@ -712,3 +712,11 @@ Usuario pide aplicar la estética a toda la aplicación solo en beta. Nueva hoja
 Validación: beta-theme-ui seis pantallas/320/390/1366/ambas manos, sin desborde, navegación, modal del palet/Pro y movimiento reducido. Chromium y WebKit aprobados. Ajustes Chromium funcional aprobado. Capturas revisadas, corregido contraste del indicador deslizante sobre botones degradados; captura espera fin de cargas/entrada. Guía y reversión: docs/ESTETICA-GENERAL-BETA.md. No afirmar teléfono físico ni auditoría visual de todas las combinaciones.
 
 Publicación verificada: beta1.79/interna84, commit320b313 live; inicio200 con tema activado, CSS público coincide con archivo local y health200. Producción conserva interna214. Hoja visual aplicada solo en desarrollo; sin cambios de configuración o datos.
+
+## Beta1.80 — menú del palet y bloque Pro
+
+Usuario muestra filas de ajustes con fondos apilados y distintivo Pro flotando sobre compartir stock. Solicita ordenarlos y reunir acciones Pro; solo beta. Menú con filas simples, bloque único Pro con insignia/corona SVG existente para compartir, gestionar accesos y acceso directo a transferir propiedad. Eliminar separado al final, con tratamiento destructivo conservado. Compartir stock integra la insignia dentro del botón.
+
+El acceso directo reutiliza inicialización/formulario de transferencia existente, abre destino usuario y mantiene confirmación/permisos del servidor. Flujo Transferir anterior conservado. Botón nuevo solo visible para propietario y pasa por el mismo guard Pro; revisar/revocar accesos continúa disponible. Grupo se oculta si no contiene acciones visibles, incluidas etiquetas disponibles.
+
+Validación: pro-subscriptions-ui Chromium/WebKit comprueba insignia dentro del botón, tres acciones agrupadas, menú dentro de320/390/1366 y ambas manos, formulario de propiedad sin mutación al abrir y gestión de accesos. pro-access-ui Chromium/WebKit conserva bloqueos/beneficios/revocación. SintaxisPHP/JS/diff aprobadas y captura del menú revisada. Sin pruebas físicas ni pagos. Reversión: restaurar vistas/stock-dialogs.vista.php, css/pro.css, js/stock.js y js/pro-access.js anteriores en desarrollo y publicar caché superior; conservar datos/permisos/pagos. No se usan servicios pagos adicionales ni generación de imágenes.
