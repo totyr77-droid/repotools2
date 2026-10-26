@@ -788,3 +788,11 @@ Public Key configurada por usuario, presencia/formato comprobados; vendedor sigu
 Intento anterior rechazado400 sin card_token_id: recuperación única condicionada a diario privado del rechazo, vendedor de prueba válido y búsqueda remota sin suscripciones. Nueva referencia idempotente, estado new, paid_until manual conservado; no se crea suscripción al recuperar. No repetir recuperación ni POST ambiguos.
 
 Validación: tests/pro-subscriptions.php y pro-subscriptions-ui Chromium/WebKit (SDK simulado, iframe, envío token, autorización sin nueva concesión, permisos/CSRF y regresiones). No equivale a tokenización/cobro real del proveedor. Usuario debe completar tarjeta oficial de prueba en beta; falta validar resultado, webhook, renovación y cancelación con proveedor. Reversión código: revertir commit y nueva caché; no restaurar referencia anterior ni borrar suscripciones/pagos. Producción sin cambios.
+
+## Beta1.91 — diagnóstico de rechazos del proveedor
+
+Usuario reporta primer error genérico y posteriores intentos en verificación. Lectura26/10: vendedor de prueba válido, plan active/vendedor/importe correctos, Public Key presente, búsqueda por referencia devuelve cero suscripciones. No identifica por sí solo causa del POST fallido. Logs históricos sin registros útiles; v1.90 descartaba cuerpo/status. No afirmar token inválido ni credenciales mezcladas sin respuesta comprobada.
+
+Nuevo clasificador de errores devuelve HTTP y categoría allowlist (red/token/comprador-vendedor/credenciales/plan/proveedor); logs solo números/categoría, nunca cuerpo del proveedor, tarjeta, token ni correos. Unit tests clasificación y privacidad aprobados, regresión suscripciones completa. Conserva bloqueo de intentos ambiguos: no repetir POST ni resetear por un simple resultado vacío. Sin nuevos intentos de suscripción ni cobros en esta entrega.
+
+Prueba deliberadamente inválida propuesta fue rechazada por revisión automática antes de ejecutar por posible efecto remoto; no se ejecutó ni se buscó alternativa para enviar ese POST. Continuó diagnóstico solo lectura. Para capturar causa concreta hace falta un nuevo intento autorizado y controlado desde formulario tras resolver estado ambiguo; no declarar solucionado el rechazo original. Reversión: revertir commit/publicar caché superior. Sin migración/datos.

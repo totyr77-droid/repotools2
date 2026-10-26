@@ -1,6 +1,12 @@
 {
-  "version": 95,
+  "version": 96,
   "changes": [
+    {
+      "version": 96,
+      "label": "1.91",
+      "date": "2026-10-26",
+      "summary": "Distingue errores de Mercado Pago sin exponer datos privados"
+    },
     {
       "version": 95,
       "label": "1.90",
@@ -294,15 +300,9 @@
       "label": "1.42",
       "date": "2026-10-19",
       "summary": "Transferir mercadería entre palets y propiedad a otro usuario"
-    },
-    {
-      "version": 46,
-      "label": "1.41",
-      "date": "2026-10-19",
-      "summary": "Compactar movimientos y mostrar cambios antes y después"
     }
   ],
   "major": 1,
-  "minor": 90,
-  "label": "1.90"
+  "minor": 91,
+  "label": "1.91"
 }

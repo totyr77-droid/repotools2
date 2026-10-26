@@ -26,6 +26,27 @@ function pro_state(PDO $db,int $user): array {
         'card_required'=>($config['plan']??'')!=='','public_key'=>$config['enabled']?($config['public_key']??''):'','test_buyer'=>$config['enabled']?$config['buyer']:'','status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
         'paid_until'=>(int)($row['paid_until']??0),'enforced'=>true];
 }
+function pro_provider_failure(int $status,?array $data,int $network=0): array {
+    $message=strtolower((string)($data['message']??''));
+    $kind=match(true){
+        $network!==0||$status===0=>'network',
+        str_contains($message,'card_token')||str_contains($message,'card token')=>'card_token',
+        str_contains($message,'payer')&&str_contains($message,'collector')=>'payer_seller',
+        str_contains($message,'credential')||$status===401||$status===403=>'credentials',
+        str_contains($message,'preapproval_plan')||str_contains($message,'plan')=>'plan',
+        default=>'provider'
+    };
+    // Only allowlisted categories and numeric status: never log provider bodies/card tokens.
+    $notice=match($kind){
+        'network'=>'No pudimos conectar con Mercado Pago.',
+        'card_token'=>'Mercado Pago rechazó el token de tarjeta de prueba.',
+        'payer_seller'=>'Mercado Pago rechazó la combinación de comprador y vendedor de prueba.',
+        'credentials'=>'Mercado Pago rechazó las credenciales de esta prueba.',
+        'plan'=>'Mercado Pago rechazó la configuración del plan.',
+        default=>'Mercado Pago rechazó la solicitud de prueba.'
+    };
+    return ['category'=>$kind,'message'=>$notice.' Código HTTP '.$status.'.'];
+}
 final class ProSubscriptions {
     public function __construct(private PDO $db,private array $config,private $transport=null) {}
     private function request(string $method,string $path,?array $body=null,string $key=''): array {
@@ -36,10 +57,10 @@ final class ProSubscriptions {
         if($key!=='')$headers[]='X-Idempotency-Key: '.$key;
         curl_setopt_array($ch,[CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>3,CURLOPT_TIMEOUT=>12,CURLOPT_FOLLOWLOCATION=>false,CURLOPT_HTTPHEADER=>$headers]);
         if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,json_encode($body,JSON_THROW_ON_ERROR));
-        $raw=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);
+        $raw=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);$network=curl_errno($ch);curl_close($ch);
         $data=is_string($raw)?json_decode($raw,true):null;
         if($status===401&&is_array($data)&&($data['message']??'')==="This app can't create preapprovals without a plan")throw new CatalogException('Mercado Pago requiere un plan asociado para esta aplicación. La configuración de prueba debe actualizarse.',503);
-        if($status<200||$status>=300||!is_array($data))throw new CatalogException('No pudimos comunicarnos con Mercado Pago. Volvé a intentar.',503);
+        if($status<200||$status>=300||!is_array($data)){$failure=pro_provider_failure((int)$status,is_array($data)?$data:null,$network);error_log('RepoTools Pro provider http='.(int)$status.' category='.$failure['category'].' network='.(int)$network);throw new CatalogException($failure['message'],503);}
         return $data;
     }
     private function seller(): void {
