@@ -943,3 +943,12 @@ body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-
 /* Production logo layout, independent of development markers. */
 .header-contenedor .logo{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
 @media(max-width:380px){.header-contenedor .logo{padding-inline:12px;gap:6px}.header-contenedor .logo img{width:120px}}
+
+/* En móvil, palets con varios productos aprovechan la altura disponible. */
+@media(max-width:768px){
+  html:not(.dialog-keyboard-open) #palletDialog[open]:not([data-available=true]):has(#palletProducts>.stock-product:nth-of-type(2)){height:calc(var(--dialog-visible-height,100dvh) - 32px);box-sizing:border-box}
+  html:not(.dialog-keyboard-open) #palletDialog[open]:not([data-available=true]):has(#palletProducts>.stock-product:nth-of-type(2))>#palletProducts{flex:1 1 auto;min-height:0}
+  html:not(.dialog-keyboard-open) #palletDialog[open]>.pallet-view-tools{flex:none}
+  #palletDialog .stock-product h3{font-size:1rem}
+  #palletDialog .stock-product>div:first-child>p{font-size:.9rem}
+}

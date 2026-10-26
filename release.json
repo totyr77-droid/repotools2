@@ -1,6 +1,12 @@
 {
-  "version": 214,
+  "version": 215,
   "changes": [
+    {
+      "version": 215,
+      "label": "3.10",
+      "date": "2026-10-26",
+      "summary": "Amplía el espacio de lectura de productos dentro del palet en móvil"
+    },
     {
       "version": 214,
       "label": "3.09",
@@ -294,15 +300,9 @@
       "label": "2.61",
       "date": "2026-10-24",
       "summary": "Simplifica la opción a Vencimiento en información a descargar"
-    },
-    {
-      "version": 165,
-      "label": "2.60",
-      "date": "2026-10-24",
-      "summary": "Una sola descripción por producto en el Excel aunque tenga varias fechas"
     }
   ],
   "major": 3,
-  "minor": 9,
-  "label": "3.09"
+  "minor": 10,
+  "label": "3.10"
 }
