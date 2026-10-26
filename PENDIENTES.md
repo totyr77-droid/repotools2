@@ -698,3 +698,9 @@ Validación: pro-access-ui Chromium/WebKit y pro-subscriptions-ui WebKit aprobad
 Regresión adicional: Ajustes Chromium aprobado; estilos de modal cargados antes de ajustes de UX, sin volver a cargar la hoja base al final. Cliente de enlaces comprueba denegación PRO sin usar fallback. Se mantienen tiempos de carga locales del botón al verificar plan.
 
 Publicación verificada: beta1.77/interna82, commit837f81b live; health200 y APIpro-access401 sin sesión. Producción sigue interna214. No se activó facturación ni se asignó Pro a cuentas reales.
+
+## Beta1.78 — presentación Pro
+
+Usuario pide una presentación más impactante con animaciones. Modal con cabecera violeta degradada, insignia PRO/corona SVG existente, mensaje Tu stock, en equipo, comparación con columna Pro destacada y checks accesibles. Acción principal a ancho completo y revisión de accesos discreta; conserva contratación deshabilitada y permisos. Entrada breve con opacidad/desplazamiento y emblema; se desactiva con prefers-reduced-motion. Sin imágenes, librerías, bucles de animación, datos ni cambios de cobro.
+
+Validación: pro-access-ui Chromium/WebKit, API de permisos preservada,320/390/1366 y ambas manos, cierre táctil44px con tolerancia decimal de0,1px por transformación animada, movimiento reducido, enlaces sin fallback y accesos actuales. Captura revisada y corregido icono no existente al SVG corona del sistema; suprimido QR automático del título solo en esta cabecera. Sintaxis/diff revisados. Reversión: restaurar vistas/pro-upgrade.vista.php y css/pro.css anteriores en desarrollo y publicar caché superior, sin tocar pagos ni stock.

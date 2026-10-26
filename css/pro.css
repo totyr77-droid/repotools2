@@ -19,3 +19,42 @@
 .pro-comparison caption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 .pro-upgrade-dialog .library-dialog-actions{display:flex;flex-wrap:wrap;gap:8px}
 .pro-upgrade-dialog .library-dialog-actions button{min-height:44px;margin:0}
+/* Pro presentation: scoped to the upgrade dialog. */
+.pro-upgrade-dialog{padding:0;isolation:isolate;border:1px solid #ffffff70;box-shadow:0 24px 80px #170f5140}
+.pro-upgrade-hero{padding:16px 20px 23px;color:#fff;background:radial-gradient(ellipse at 85% 0%,#8171ef80,transparent 65%),linear-gradient(125deg,#201065,#3e2699);overflow:hidden}
+.pro-upgrade-hero .library-heading{margin:0 0 16px;padding:0;border:0;gap:12px}
+.pro-upgrade-brand{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;letter-spacing:.02em}
+.pro-upgrade-brand>svg{width:20px;height:20px;color:#e2d9ff;flex:none}
+.pro-upgrade-brand strong{font-size:.72rem;letter-spacing:.12em;padding:4px 7px;border:1px solid #ffffff55;border-radius:6px;background:#ffffff18;color:#fff}
+.pro-upgrade-hero .app-close{flex:none;background:#ffffff18;color:#fff;border:1px solid #ffffff20;box-shadow:none}
+.pro-upgrade-hero .app-close:hover{background:#ffffff30}
+.pro-upgrade-hero h2{font-size:clamp(1.65rem,5.5vw,2rem);line-height:1.12;letter-spacing:-.025em;margin:0;color:#fff}
+.pro-upgrade-hero>p{margin:9px 0 0;color:#e2dcff;font-size:.94rem}
+.pro-upgrade-content{padding:16px 20px 20px}
+.pro-upgrade-content>#proUpgradeReason{margin:0 0 15px;color:#4a435d}
+.pro-comparison thead th{font-size:.8rem;color:#746e82;font-weight:500;padding-block:10px}
+.pro-comparison thead th:last-child{background:#f0ebff;color:#362182;font-weight:700;border-radius:8px 8px 0 0;letter-spacing:.04em}
+.pro-comparison tbody td:last-child{background:#f7f4ff;color:#362182}
+.pro-comparison tbody tr:last-child td:last-child{border-radius:0 0 8px 8px}
+.pro-comparison tbody th{font-weight:500;color:#362e49}
+.pro-included>svg{width:19px;height:19px;vertical-align:middle;stroke-width:2.3}
+.pro-included-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.pro-upgrade-content>.stock-muted{font-size:.79rem;line-height:1.45;color:#746e82;margin:14px 0}
+.pro-upgrade-content>#proUpgradeAvailability{font-size:.76rem;margin-bottom:14px}
+.pro-upgrade-dialog .library-dialog-actions{flex-direction:column;align-items:stretch;gap:8px;margin:0}
+.pro-upgrade-dialog #proUpgradeJoin{order:0;min-height:48px;font-weight:600;border-radius:12px}
+.pro-upgrade-dialog #proUpgradeJoin:not(:disabled){background:linear-gradient(110deg,#27187e,#5633b9);box-shadow:0 5px 15px #38228c22}
+.pro-upgrade-dialog #proUpgradeReview{order:1;background:transparent;color:#625879;font-size:.82rem;min-height:44px;text-decoration:underline;text-underline-offset:3px}
+@media(prefers-reduced-motion:no-preference){
+.pro-upgrade-dialog[open]{animation:pro-upgrade-enter .28s cubic-bezier(.2,.8,.2,1) both}
+.pro-upgrade-dialog[open]::backdrop{animation:pro-upgrade-backdrop .2s ease-out both}
+.pro-upgrade-dialog[open] .pro-upgrade-brand>svg{animation:pro-upgrade-emblem .45s .08s ease-out both}
+.pro-upgrade-dialog[open] .pro-upgrade-content{animation:pro-upgrade-enter .28s .06s ease-out both}
+}
+@keyframes pro-upgrade-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pro-upgrade-backdrop{from{background:transparent}to{background:rgba(12,8,32,.7)}}
+@keyframes pro-upgrade-emblem{from{opacity:0;transform:scale(.7) rotate(-18deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@media(max-height:620px){.pro-upgrade-hero{padding-bottom:16px}.pro-upgrade-hero .library-heading{margin-bottom:10px}.pro-upgrade-content{padding-top:12px}.pro-upgrade-content>.stock-muted{margin-block:10px}}
+.pro-upgrade-hero .app-close{width:44px;height:44px;min-width:44px;min-height:44px}
+
+.pro-upgrade-hero h2::before{display:none}

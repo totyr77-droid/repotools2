@@ -1,6 +1,12 @@
 {
-  "version": 82,
+  "version": 83,
   "changes": [
+    {
+      "version": 83,
+      "label": "1.78",
+      "date": "2026-10-26",
+      "summary": "Presentación Pro con más presencia y animación accesible"
+    },
     {
       "version": 82,
       "label": "1.77",
@@ -294,15 +300,9 @@
       "label": "1.29",
       "date": "2026-10-19",
       "summary": "Ordenar búsqueda, filtros y etiquetas de coincidencias"
-    },
-    {
-      "version": 33,
-      "label": "1.28",
-      "date": "2026-10-19",
-      "summary": "Centrar escáner y restaurar tamaño de guías QR"
     }
   ],
   "major": 1,
-  "minor": 77,
-  "label": "1.77"
+  "minor": 78,
+  "label": "1.78"
 }
