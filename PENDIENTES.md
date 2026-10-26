@@ -750,3 +750,9 @@ Validación: pro-subscriptions-ui Chromium/WebKit, captura revisada, formulario 
 Usuario autoriza destacar Pro públicamente y en Ajustes. Insignia compacta violeta/dorado con corona SVG junto al nombre en saludo y profile_card público/propio; conserva rango MNG y verificación independientes. Solo aparece con vigencia futura consultada en servidor. Ajustes muestra Free/PRO, vigencia y PRO de prueba para concesión beta_trial. Perfil público no expone vigencia, proveedor ni datos de cobro. Sin permisos nuevos, esquema, pagos ni cambios de producción.
 
 Validación: pro-subscriptions-ui Chromium/WebKit comprueba perfil público Pro sin correo privado, cuenta Free sin insignia, perfil propio y saludo Pro, estado del plan y navegación/transferencias existentes en320/390/1366. Sintaxis PHP y diff. Reversión: restaurar includes/pro-identity.php, perfil/header/cuenta y CSS anterior con caché superior; concesiones de datos se conservan.
+
+## Beta1.85 — recarga sin caché disponible
+
+Usuario informa pantalla interna de error del navegador iPhone al recargar beta. Servicio beta confirmado Free; posible demora de arranque no demuestra causa del dispositivo. Hallazgo concreto: service worker devolvía Response.error si fallaba navegación y faltaba offline.html. Ahora devuelve HTML mínimo autocontenido con aviso español y Reintentar al mismo enlace escapado; también tolera caché rechazada/no disponible. Conserva shell offline normal, límite de espera, datos locales, sesiones y estado del servidor. No promete cubrir primera visita sin worker o errores del navegador antes de interceptar navegación.
+
+Validación: service-worker-offline cubre red caída/caché ausente/caché que falla, enlace de reintento escapado, shell existente y retorno online. Sintaxis JS/diff. Sin cambios de plan ni recursos pagos. Reversión: restaurar sw.js anterior y publicar caché superior. Solo beta; falta confirmar comportamiento en navegador físico del usuario.
