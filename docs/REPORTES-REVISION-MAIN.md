@@ -21,3 +21,7 @@ Pruebas report-approved-edit-ui Chromium/WebKit: nombre actual/propuesta, cantid
 ## v3.17 — editar desde cualquier origen
 
 «Usar actual» y «Usar propuesta» cargan el valor de partida; ambos permiten corregirlo en formulario antes de aprobar. Protocolo field_selection2 conserva edición manual validada por report_fields, permisos y revisión optimista; modo anterior conserva comportamiento para clientes abiertos de v3.16. Prueba API aprueba nombre actual corregido/cantidad y conserva ausencia de notificaciones Excel; UI Chromium/WebKit comprueba campo actual editable. Revertir commit y publicar caché superior; no migración.
+
+## v3.18 — copiar EAN desde el reporte
+
+Área del código de barras copia el EAN exacto con clic, Enter o Espacio, etiqueta accesible, foco visible y toast de éxito/error. Valor capturado por reporte para evitar copiar otro al cambiar de detalle. Mantiene figura/SVG y distribución. Regresión report-approved-edit-ui Chromium/WebKit con clipboard simulado. Reversión: revertir commit/publicar caché superior. Sin datos, permisos ni migración.

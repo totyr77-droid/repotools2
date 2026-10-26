@@ -1,6 +1,12 @@
 {
-  "version": 222,
+  "version": 223,
   "changes": [
+    {
+      "version": 223,
+      "label": "3.18",
+      "date": "2026-10-26",
+      "summary": "Copia el EAN al tocar el código del reporte"
+    },
     {
       "version": 222,
       "label": "3.17",
@@ -294,15 +300,9 @@
       "label": "2.69",
       "date": "2026-10-24",
       "summary": "Opción para incluir productos con stock fuera de la lista comparada"
-    },
-    {
-      "version": 173,
-      "label": "2.68",
-      "date": "2026-10-24",
-      "summary": "Separa el alcance de comparación de los filtros de consulta"
     }
   ],
   "major": 3,
-  "minor": 17,
-  "label": "3.17"
+  "minor": 18,
+  "label": "3.18"
 }

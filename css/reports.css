@@ -148,3 +148,6 @@ body[data-hand=left] .audit-record-actions{flex-direction:row-reverse}.audit-rec
 .audit-filter-fields{max-height:var(--audit-filter-max,65dvh)}.audit-filter-menu[data-placement=up]>.audit-filter-fields{top:auto;bottom:calc(100% + 6px)}.one-hand-sheet .audit-filter-menu[data-placement]>.audit-filter-fields{position:static;max-height:none}
 
 .audit-delta{align-items:center;gap:5px}.audit-delta>svg{width:15px;height:15px;flex:none}
+
+.report-barcode[role=button]{cursor:pointer}
+.report-barcode[role=button]:focus-visible{outline:2px solid #302080;outline-offset:3px}
