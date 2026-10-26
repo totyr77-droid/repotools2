@@ -1,6 +1,12 @@
 {
-  "version": 217,
+  "version": 218,
   "changes": [
+    {
+      "version": 218,
+      "label": "3.13",
+      "date": "2026-10-26",
+      "summary": "Distingue vencidos, vencen hoy y por vencer en los palets"
+    },
     {
       "version": 217,
       "label": "3.12",
@@ -294,15 +300,9 @@
       "label": "2.64",
       "date": "2026-10-24",
       "summary": "Evita que reaparezca la etiqueta anterior al quitarla del palet"
-    },
-    {
-      "version": 168,
-      "label": "2.63",
-      "date": "2026-10-24",
-      "summary": "Actualiza búsquedas y totales filtrados después de eliminar mercadería"
     }
   ],
   "major": 3,
-  "minor": 12,
-  "label": "3.12"
+  "minor": 13,
+  "label": "3.13"
 }
