@@ -40,3 +40,9 @@ Mantener cobro sin configurar o retirar REPOTOOLS_BILLING_MODE; revocar únicame
 - https://www.mercadopago.com.ar/developers/es/docs/subscriptions/additional-content/your-integrations/test/accounts
 - https://www.mercadopago.com.ar/developers/es/docs/subscriptions/integration-test/payment-approval
 - https://www.mercadopago.com.ar/developers/en/docs/subscriptions/additional-content/your-integrations/notifications/webhooks
+
+## Actualización: bloqueo Pro autorizado y cobro pospuesto
+
+El usuario pospone Mercado Pago. Token verificado como vendedor de prueba argentino, identificador guardado y secreto de Webhooks presente; sin correo de comprador ni importe/modo habilitado. Consulta del comprador existente no devolvió correo. Usuario autorizó crear otro comprador por API, pero el proveedor rechazó con403; no se creó cuenta ni pago. No insistir ni pedir credenciales hasta retomar. No exponer secretos/IDs/filas de cuentas en documentación.
+
+El usuario ahora sí autoriza aplicar privilegios PRO solo en beta y mostrar una comparación Free/Pro al intentar usarlos. Esto reemplaza la indicación anterior de enforced=false para privilegios personales; cuotas de capacidad y configuraciones de sucursal/empresa siguen en borrador.

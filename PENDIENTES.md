@@ -686,3 +686,13 @@ Migración47 aditiva, adaptador/API/entrada Mi suscripción solo manager, renova
 Validación: pro-subscriptions PHP y UI Chromium/WebKit aprobadas; commercial-plans-ui aprobado en ambos motores con esquema47, guardas beta aprobadas y sintaxis/diff sin errores. Corregida carga del escáner de Inicio en la nueva página Pro: su script requiere controles que esta página no contiene. Captura revisada de menú con PRO; botones conservan apertura de accesos. Pruebas con datos ficticios y transporte simulado, no acreditan integración con el proveedor.
 
 Publicación comprobada: beta1.76/interna81 live, commit26c7b97; inicio200 con distintivoBETA, health200 ready y APIPro401 anónima. Producción conserva interna214/mainf6f0100. Cobros no configurados ni habilitados. No se usaron sesiones de personas ni se contactó Mercado Pago para crear cargos.
+
+## Beta1.77 — bloqueo de acciones PRO y comparación
+
+Usuario pospone configurar Mercado Pago y autoriza bloquear acciones PRO de cuentas Free solo en beta, con aviso para unirse comparando beneficios. Reglas actuales y reversión: docs/ACCESO-PRO-BETA.md. Pro se consulta por paid_until en servidor, sin excepción de rango ni confusión con sucursal/empresa. Se bloquea transferencia de propiedad/invitación/creación de enlaces y ampliación indirecta de stock compartido. Free conserva gestión propia, movimientos internos, aceptar/revocar/reducir accesos existentes.
+
+Modal Free/Pro reutilizado desde botones y errores API; contratación deshabilitada hasta completar pruebas del proveedor. Sin cobros, migraciones ni cambio en producción. Token de prueba y secreto verificados; creación autorizada de comprador API rechazada403, sin cuenta ni pago. Usuario pide dejar ese tema para después.
+
+Validación: pro-access-ui Chromium/WebKit y pro-subscriptions-ui WebKit aprobados, Stock API y unidad de suscripciones aprobadas. Incluye API directa, permisos/CSRF, vencimiento/cancelación, efectos ausentes en denegaciones, ambas manos/tamaños y cierre/revisión de accesos; captura revisada. No prueba física ni cobro del proveedor.
+
+Regresión adicional: Ajustes Chromium aprobado; estilos de modal cargados antes de ajustes de UX, sin volver a cargar la hoja base al final. Cliente de enlaces comprueba denegación PRO sin usar fallback. Se mantienen tiempos de carga locales del botón al verificar plan.

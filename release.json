@@ -1,6 +1,12 @@
 {
-  "version": 81,
+  "version": 82,
   "changes": [
+    {
+      "version": 82,
+      "label": "1.77",
+      "date": "2026-10-26",
+      "summary": "Protege acciones Pro y muestra comparación de beneficios"
+    },
     {
       "version": 81,
       "label": "1.76",
@@ -294,15 +300,9 @@
       "label": "1.28",
       "date": "2026-10-19",
       "summary": "Centrar escáner y restaurar tamaño de guías QR"
-    },
-    {
-      "version": 32,
-      "label": "1.27",
-      "date": "2026-10-19",
-      "summary": "Compactar sucursal y escaneo con acceso personal independiente"
     }
   ],
   "major": 1,
-  "minor": 76,
-  "label": "1.76"
+  "minor": 77,
+  "label": "1.77"
 }

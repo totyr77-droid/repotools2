@@ -24,7 +24,7 @@ function pro_state(PDO $db,int $user): array {
     $config=pro_config();
     return ['mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
         'status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
-        'paid_until'=>(int)($row['paid_until']??0),'enforced'=>false];
+        'paid_until'=>(int)($row['paid_until']??0),'enforced'=>true];
 }
 final class ProSubscriptions {
     public function __construct(private PDO $db,private array $config,private $transport=null) {}

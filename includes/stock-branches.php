@@ -80,6 +80,7 @@ function branch_assign(PDO $db,int $user,array $input): void {
     if ($branchId) branch_owned($db,$branchId,$user);
     $shares=$branchId ? stock_query($db,'SELECT id FROM stock_shares WHERE owner_id=? AND branch_id=? AND active=1',[$user,$branchId])->fetchAll(PDO::FETCH_COLUMN) : [];
     $changing=(int)($p['branch_id']??0)!==$branchId;
+    if($changing&&$shares&&(string)($input['share_pallet']??'')==='1')pro_require_access($db,$user,'share_stock');
     if(isset($input['share_pallet'])&&!in_array((string)$input['share_pallet'],['0','1'],true))throw new CatalogException('Elegí si querés compartir este palet.',422);
     if($changing&&$shares&&!isset($input['share_pallet']))throw new CatalogException('Esta sucursal tiene un enlace compartido. Volvé a guardar para elegir si mostrar este palet.',409);
     $changed=stock_query($db,'UPDATE pallets SET branch_id=? WHERE id=? AND revision=?',[$branchId?:null,$id,(int)($input['revision']??0)])->rowCount();
@@ -109,10 +110,13 @@ function branch_share_exclusions(PDO $db,int $user,array $input): void {
     $share=stock_query($db,'SELECT id FROM stock_shares WHERE id=? AND owner_id=? AND active=1 AND branch_id IS NOT NULL',[(int)($input['id']??0),$user])->fetchColumn();
     if(!$share)throw new CatalogException('Este enlace no esta disponible en tu cuenta.',404);
     $ids=branch_exclusion_ids($db,$user,$input);
+    $previous=stock_query($db,'SELECT pallet_id FROM stock_share_exclusions WHERE share_id=?',[$share])->fetchAll(PDO::FETCH_COLUMN);
+    if(array_diff(array_map('intval',$previous),$ids))pro_require_access($db,$user,'share_stock');
     stock_query($db,'DELETE FROM stock_share_exclusions WHERE share_id=?',[$share]);
     foreach($ids as $id)stock_query($db,'INSERT INTO stock_share_exclusions(share_id,pallet_id) VALUES(?,?)',[$share,$id]);
 }
 function branch_share_create(PDO $db,int $user,array $input): array {
+    pro_require_access($db,$user,'share_stock');
     $branchId=(int)($input['branch_id']??0); $ids=[];$excluded=$branchId?branch_exclusion_ids($db,$user,$input):[];
     if ($branchId) { $b=branch_owned($db,$branchId,$user);if(!stock_query($db,'SELECT id FROM pallets WHERE owner_id=? AND branch_id=? AND released=0 AND activated=1 LIMIT 1',[$user,$branchId])->fetchColumn())throw new CatalogException('Esta sucursal no tiene palets tuyos cargados para compartir.',422); $title=$b['name']; }
     else {

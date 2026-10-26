@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/catalog.php';
+require_once __DIR__.'/pro-access.php';
 require_once __DIR__ . '/public-names.php';
 require_once __DIR__.'/branch-visibility.php';
 require_once __DIR__.'/branch-team.php';

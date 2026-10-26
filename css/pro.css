@@ -8,3 +8,14 @@
 .pro-actions{display:flex;flex-wrap:wrap;gap:10px;margin-block:16px}
 .pro-actions button{min-height:44px}
 .pro-marked-icon{position:relative}.pro-marked-icon .pro-badge{position:absolute;inset-block-start:-5px;inset-inline-end:-4px;margin:0;pointer-events:none;font-size:8px;padding:1px 4px}
+.pro-upgrade-dialog{width:min(480px,calc(100% - 24px));padding:20px}
+.pro-upgrade-dialog .library-heading h2{font-size:1.15rem;display:flex;gap:8px;align-items:center;margin:0}
+.pro-upgrade-dialog .library-heading h2 svg{width:22px;height:22px;flex:none}
+.pro-upgrade-dialog p{font-size:.9rem;line-height:1.45}
+.pro-comparison{width:100%;border-collapse:collapse;font-size:.85rem;table-layout:fixed}
+.pro-comparison th,.pro-comparison td{padding:9px 4px;border-bottom:1px solid #e6e2ed;text-align:center;overflow-wrap:break-word}
+.pro-comparison th:first-child{width:52%;text-align:start}
+.pro-comparison thead th:last-child{color:#362182}
+.pro-comparison caption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.pro-upgrade-dialog .library-dialog-actions{display:flex;flex-wrap:wrap;gap:8px}
+.pro-upgrade-dialog .library-dialog-actions button{min-height:44px;margin:0}

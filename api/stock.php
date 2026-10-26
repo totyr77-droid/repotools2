@@ -192,6 +192,7 @@ try {
                 stock_editable($db,$id,$uid,true); stock_query($db,'UPDATE pallets SET released=1 WHERE id=?',[$id]);
                 stock_query($db,'UPDATE pallet_labels SET pallet_id=NULL,reserved_by=NULL,reserved_until=0 WHERE pallet_id=?',[$id]); break;
             case 'invite':
+                pro_require_access($db,$uid,'invite');
                 $p=stock_editable($db,$id,$uid,true); $email=strtolower(trim(is_string($_POST['email']??null)?$_POST['email']:''));
                 if (!filter_var($email,FILTER_VALIDATE_EMAIL)) throw new CatalogException('Ingresa el correo de la cuenta que quieres invitar.',422);
                 $invite=stock_query($db,'SELECT id FROM users WHERE email=?',[$email])->fetchColumn();
@@ -234,5 +235,5 @@ try {
     }
     if($method==='POST' && $offlinePayload!==null)$result=stock_offline_confirmation($db,$result,$key,$uid);
     $db->commit();if(isset($result['confirmation']))$result['confirmation']['committed']=true;if($method==='POST'&&$offlinePayload!==null)$result['catalog_reference_saved']=catalog_reference_sync($db,$uid,$result)||!empty($result['catalog_reference_saved']);unset($result['_offline_payload'],$result['_deduct_payload'],$result['_transfer_payload']); $result['csrf']=$csrf; $result['user_id']=$uid; stock_response(200,$result);
-} catch(CatalogException $error) { if($db?->inTransaction())$db->rollBack();if($db&&$method==='POST')audit_denied($db,(int)$uid,(string)($_POST['action']??'stock'),is_string($_POST['operation_key']??null)?$_POST['operation_key']:bin2hex(random_bytes(16)),$error->status,$_POST); stock_response($error->status,['error'=>$error->getMessage()]); }
+} catch(CatalogException $error) { if($db?->inTransaction())$db->rollBack();if($db&&$method==='POST')audit_denied($db,(int)$uid,(string)($_POST['action']??'stock'),is_string($_POST['operation_key']??null)?$_POST['operation_key']:bin2hex(random_bytes(16)),$error->status,$_POST); stock_response($error->status,['error'=>$error->getMessage(),...pro_access_error($error)]); }
 catch(Throwable $error) { if($db?->inTransaction())$db->rollBack(); error_log('Repotools stock error: '.get_class($error).' code='.$error->getCode()); stock_response(503,['error'=>'No pudimos guardar el palet. Tu formulario sigue disponible para reintentar.']); }

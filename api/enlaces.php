@@ -17,7 +17,8 @@ try{
         foreach($codes as $code){$p=stock_detail($db,$code,$uid);$label=stock_label($db,$code);if(!stock_is_admin($db,$uid)&&empty($p['can_edit'])&&(empty($p['available'])||(int)($label['reserved_by']??0)!==$uid)){$allowed=false;break;}}
     }
     if(!$allowed)throw new CatalogException('No podés compartir este enlace.',403);
+    if($kind==='p')pro_require_access($db,$uid,'share_pallet');
     $path=$kind.'/'.public_link_alias($db,$kind,$target);
     $host=strtolower(explode(':',$_SERVER['HTTP_HOST']??'')[0]);
     echo json_encode(['path'=>$path,'url'=>in_array($host,['repotools.online','www.repotools.online'],true)?'https://repotools.online/'.$path:$path]);
-}catch(Throwable $e){http_response_code($e instanceof CatalogException?$e->status:500);echo json_encode(['error'=>$e instanceof CatalogException?$e->getMessage():'No pudimos crear el enlace.']);}
+}catch(Throwable $e){http_response_code($e instanceof CatalogException?$e->status:500);echo json_encode(['error'=>$e instanceof CatalogException?$e->getMessage():'No pudimos crear el enlace.',...pro_access_error($e)]);}

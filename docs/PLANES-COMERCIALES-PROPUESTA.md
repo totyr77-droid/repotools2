@@ -17,3 +17,5 @@ Se conversaron50 palets,200 EAN distintos,2 listas y5 productos por lista para F
 Usuario autorizó preparar Mercado Pago y renovación mensual automática en beta. Todavía no creó la aplicación del proveedor. La integración de esta entrega es privada para managers y solo admite pruebas; cobro desactivado por defecto. No hay precio comercial acordado ni plazo de gracia. Ver MERCADO-PAGO-BETA.md.
 
 Antes de comercializar: confirmar beneficios/cupos, precio, condiciones y transición de usuarios actuales. No eliminar stock por baja; seguridad, privacidad y permisos siguen vigentes para todas las cuentas. Las funciones pendientes no se anuncian como implementadas.
+
+Actualización posterior: usuario autoriza bloquear en beta las acciones Pro y mostrar comparación al intentar continuarlas. Ver ACCESO-PRO-BETA.md. Sucursal/Empresa y cupos siguen pendientes; pagos quedan pospuestos.

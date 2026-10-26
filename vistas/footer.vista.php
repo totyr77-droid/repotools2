@@ -26,6 +26,7 @@
 <?php endif; ?>
 <!-- SCRIPTS: los motores de cámara se cargan al abrir el lector (ean-scanner.js). -->
 
+<?php if(current_user()): include __DIR__.'/pro-upgrade.vista.php'; endif; ?>
 <script src="js/navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/navigation.js'),0,12) ?>"></script>
 <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca)): ?>
 <link rel="stylesheet" href="css/product-crop.css?v=<?= (int)app_release()['version'] ?>">
@@ -33,6 +34,7 @@
 <?php endif; ?>
 <script src="js/one-hand-mode.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/mobile-navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/mobile-navigation.js'),0,12) ?>"></script>
+<?php if(current_user()): ?><script src="js/pro-access.js?v=<?= substr(sha1_file(__DIR__.'/../js/pro-access.js'),0,12) ?>"></script><?php endif; ?>
 <script src="js/account-sharing.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/pwa-install.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/ux-polish.js?v=<?= (int)app_release()['version'] ?>"></script>

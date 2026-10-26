@@ -75,5 +75,5 @@ try {
     if($method==='GET'&&!isset($_GET['token'])&&!isset($_GET['manage'])){$result['can_filter_tags']=true;$result['tags']=stock_user_tags($db,$uid);}
     if(isset($result['shares'])){ $excluded=stock_query($db,'SELECT x.share_id,x.pallet_id FROM stock_share_exclusions x JOIN stock_shares s ON s.id=x.share_id WHERE s.owner_id=? AND s.active=1',[$uid])->fetchAll();foreach($result['shares'] as &$share){$share['excluded_ids']=array_map('intval',array_column(array_filter($excluded,fn($x)=>(int)$x['share_id']===(int)$share['id']),'pallet_id'));}unset($share);}
     $db->commit(); branch_response(200,$result);
-} catch(CatalogException $e) { if($db?->inTransaction())$db->rollBack(); branch_response($e->status,['error'=>$e->getMessage()]); }
+} catch(CatalogException $e) { if($db?->inTransaction())$db->rollBack(); branch_response($e->status,['error'=>$e->getMessage(),...pro_access_error($e)]); }
 catch(Throwable $e) { if($db?->inTransaction())$db->rollBack(); error_log('Repotools branches: '.get_class($e).' code='.$e->getCode()); branch_response(503,['error'=>'No pudimos acceder a las sucursales. Tus datos siguen disponibles para reintentar.']); }

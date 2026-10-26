@@ -12,7 +12,7 @@ function client(owner = 'a'.repeat(64)) {
 }
 
 const a=client(),b=client(),guest=client();let csrfA,csrfB;
-async function register(request,name,company=''){const form=await request('cuenta.php?mode=registro');const csrf=form.text.match(/name="csrf" value="([^"]+)"/)[1];assert.equal((await request('cuenta.php?mode=registro',{name:name+' Apellido',company,email:name+'@example.invalid',password:'stock-test-password',csrf})).status,302);return (await request('api/stock.php')).json().csrf;}
+async function register(request,name,company=''){const form=await request('cuenta.php?mode=registro');const csrf=form.text.match(/name="csrf" value="([^"]+)"/)[1];assert.equal((await request('cuenta.php?mode=registro',{name:name+' Apellido',company,email:name+'@example.invalid',password:'stock-test-password',csrf})).status,302);const seed=spawnSync('C:/xampp/php/php.exe',['-r',`require 'includes/database.php';$db=database();$q=$db->prepare('INSERT INTO pro_subscriptions(reference,user_id,amount_cents,paid_until) SELECT ?,id,10000,? FROM users WHERE LOWER(email)=LOWER(?)');$q->execute([${JSON.stringify("fixture-pro-"+name)},time()+86400,${JSON.stringify(name+"@example.invalid")}]);`],{env,encoding:'utf8'});assert.equal(seed.status,0,seed.stderr);return (await request('api/stock.php')).json().csrf;}
 async function post(request,csrf,data,key=randomUUID()){const r=await request('api/stock.php',{csrf,operation_key:key,...data});return r;}
 (async()=>{
  for(let i=0;i<30;i++){try{await guest('index.php');break;}catch{await new Promise(r=>setTimeout(r,100));}}
