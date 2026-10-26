@@ -24,6 +24,7 @@
 <?php include __DIR__ . '/product-editor.vista.php'; ?>
 <?php include __DIR__ . '/product-report.vista.php'; ?>
 <?php endif; ?>
+<?php if(!empty($paginaReportes)&&!empty($navModerator)): include __DIR__.'/product-editor.vista.php'; endif; ?>
 <!-- SCRIPTS: los motores de cámara se cargan al abrir el lector (ean-scanner.js). -->
 
 <script src="js/navigation.js?v=<?= substr(sha1_file(__DIR__.'/../js/navigation.js'),0,12) ?>"></script>
@@ -55,6 +56,7 @@
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/biblioteca.js?v=<?= substr(sha1_file(__DIR__.'/../js/biblioteca.js'),0,12) ?>"></script>
 <?php elseif (!empty($paginaReportes)): ?>
+<?php if(!empty($navModerator)): ?><script src="js/product-info.js?v=<?= (int)app_release()['version'] ?>"></script><script src="js/product-editor.js?v=<?= (int)app_release()['version'] ?>"></script><?php endif; ?>
 <script src="js/vendor/JsBarcode.ean-upc-3.11.6.min.js"></script>
 <script src="js/product-reports.js?v=<?= (int)app_release()['version'] ?>"></script>
 <script src="js/ean-scanner.js?v=<?= substr(sha1_file(__DIR__.'/../js/ean-scanner.js'),0,12) ?>"></script>

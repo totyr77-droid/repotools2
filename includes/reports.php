@@ -191,7 +191,10 @@ function review_product_report(PDO $db, array $user, int $id, array $input): arr
             $revision = filter_var($input['revision'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
             if ($revision === false) throw new CatalogException('Revisa la versión actual del producto.', 422);
             $photo=$db->prepare("SELECT object_key FROM report_photos WHERE report_id=? AND kind='product'");$photo->execute([$id]);
-            $reviewedProduct=edit_catalog_product($db, $report['ean'], report_fields($input), $revision, (int) $user['id'], $id, $photo->fetchColumn()?:null);
+            $reviewFields=report_fields($input);
+            // Imported names replace existing catalog names only with explicit confirmation.
+            if(report_is_automated_import($report) && trim((string)($report['current']['name']??''))!=='' && ($input['replace_existing_name']??'')!=='1')$reviewFields['name']=$report['current']['name'];
+            $reviewedProduct=edit_catalog_product($db, $report['ean'], $reviewFields, $revision, (int) $user['id'], $id, $photo->fetchColumn()?:null);
             if ($report['user_id'] !== null && !report_is_automated_import($report)) $db->prepare('INSERT INTO report_rewards (report_id, user_id) VALUES (?, ?) ON CONFLICT(report_id) DO NOTHING')->execute([$id, $report['user_id']]);
         }
         $db->prepare('UPDATE product_reports SET status = ?, reviewed_by = ?, review_note = ?, reviewed_at = CURRENT_TIMESTAMP WHERE id = ? AND status = ?')->execute([$decision, $user['id'], trim($note), $id, 'pending']);

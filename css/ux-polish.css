@@ -957,3 +957,35 @@ body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-
 .public-stock-tools .public-stock-search>.product-search-cancel{flex:0 0 44px;width:44px;min-width:44px;height:44px;min-height:44px;padding:11px;margin:0;border:0;background:transparent;color:#27197f;text-decoration:none;box-shadow:none}
 .public-stock-tools .public-stock-search>.product-search-cancel:disabled{opacity:1;cursor:default;color:#626b7a}
 .public-stock-tools .public-stock-search>.product-search-cancel:focus-visible{outline:2px solid #7760b7;outline-offset:-3px;border-radius:8px}
+
+/* Revisión en PC: comparación y edición simultáneas, sin una columna interminable. */
+@media(min-width:1024px){
+ #reviewReportDialog[open]{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);gap:0 20px;width:min(1240px,calc(100vw - 48px));height:min(860px,calc(100dvh - 48px));max-height:calc(100dvh - 48px);padding:20px;box-sizing:border-box;overflow:hidden}
+ #reviewReportDialog>.library-heading{grid-column:1/-1;grid-row:1;margin:0;padding-bottom:12px}
+ #reviewReportDialog>#reviewReportStatus{grid-column:1/-1;grid-row:2;margin:0;padding-block:0 8px}
+ #reviewReportDialog>#reviewReportStatus:empty{display:none}
+ #reviewReportDialog>#reviewReportDetails{display:block;grid-column:1;grid-row:3;min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:16px;border-right:1px solid #e8e4ef;scrollbar-gutter:stable}
+ #reviewReportDialog>#reviewReportForm:not([hidden]){grid-column:2;grid-row:3;display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 4px 0 0;margin:0;scrollbar-gutter:stable}
+ #reviewReportDialog #reviewReportForm>label,#reviewReportDialog #reviewReportForm>p,#reviewReportDialog #reviewReportForm>details{margin:0;flex:none}
+ #reviewReportDialog #reviewReportForm input{min-height:44px;font-size:16px;margin-top:5px}
+ #reviewReportDialog #reviewReportForm textarea{min-height:80px;font-size:16px}
+ #reviewReportDialog #reviewReportForm .library-dialog-actions{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:8px;flex:none;margin:0;padding:12px 0 2px;background:#fff;border-top:1px solid #e8e4ef;z-index:2}
+ #reviewReportDialog .report-barcode{padding:8px;margin-block:0 10px}
+ #reviewReportDialog .report-barcode svg{max-height:76px;max-width:100%}
+ #reviewReportDialog #reviewReportDetails>.report-sender{margin-block:8px;padding:8px}
+ #reviewReportDialog .report-comparison{column-gap:0;margin-block:10px}
+ #reviewReportDialog .report-comparison section{padding:10px}
+ #reviewReportDialog .report-reference-photo{padding:10px}
+ #reviewReportDialog:has(#reviewReportForm[hidden])>#reviewReportDetails{grid-column:1/-1;border:0;padding-right:0}
+ body[data-hand=left] #reviewReportDialog #reviewReportForm .library-dialog-actions{flex-direction:row-reverse}
+}
+@media(min-width:1024px){
+ #reviewReportDialog #reviewReportForm>label,#reviewReportDialog #reviewReportForm>.product-measure-fields{width:100%;max-width:none;box-sizing:border-box}
+ #reviewReportDialog #reviewReportForm input,#reviewReportDialog #reviewReportForm textarea{width:100%;max-width:none;box-sizing:border-box}
+ #reviewReportDialog #reviewReportForm .library-dialog-actions{width:100%;box-sizing:border-box}
+}
+#reviewReportStatus:has(.report-edit-current){display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#reviewReportStatus .report-edit-current{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 12px;margin:0;font-size:.85rem}
+#reviewReportStatus .report-edit-current svg{width:18px;height:18px;flex:none}
+#reviewReportForm .report-name-choice{display:flex;align-items:center;gap:10px;min-height:44px;font-size:.9rem;cursor:pointer}
+#reviewReportForm .report-name-choice input{width:20px;min-height:20px;height:20px;flex:none;margin:0}

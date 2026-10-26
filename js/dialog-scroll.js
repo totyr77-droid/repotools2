@@ -7,7 +7,7 @@ function viewport(reveal=false){revealPending=revealPending||reveal===true;cance
 
 // Snapshot form values on each opening; closing through UI asks before discarding edits.
 const drafts=new WeakMap(),confirming=new WeakSet(),approved=new WeakSet();
-const fields=dialog=>[...dialog.querySelectorAll('form input,form textarea,form select')].filter(field=>!['hidden','submit','button','reset','search'].includes(field.type));
+const fields=dialog=>[...dialog.querySelectorAll('form input,form textarea,form select')].filter(field=>field.closest('dialog')===dialog&&!field.closest('.ean-reader')&&!['hidden','submit','button','reset','search'].includes(field.type));
 const valueOf=field=>field.type==='checkbox'||field.type==='radio'?field.checked:field.type==='select-multiple'?[...field.selectedOptions].map(option=>option.value).join('\u0000'):field.value;
 function snapshot(dialog){drafts.set(dialog,new Map(fields(dialog).map(field=>[field,valueOf(field)])));}
 doc.addEventListener('repotools:form-saved',event=>{const dialog=event.target.closest?.('dialog');if(dialog)snapshot(dialog);},{signal:abort.signal});

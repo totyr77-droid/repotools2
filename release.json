@@ -1,6 +1,12 @@
 {
-  "version": 219,
+  "version": 220,
   "changes": [
+    {
+      "version": 220,
+      "label": "3.15",
+      "date": "2026-10-26",
+      "summary": "Mejora revisión de reportes y confirmación de nombres de Excel"
+    },
     {
       "version": 219,
       "label": "3.14",
@@ -294,15 +300,9 @@
       "label": "2.66",
       "date": "2026-10-24",
       "summary": "Corrige compatibilidad de Excel y títulos, sin columnas preseleccionadas"
-    },
-    {
-      "version": 170,
-      "label": "2.65",
-      "date": "2026-10-24",
-      "summary": "Quita ejemplos de las opciones de columnas al importar Excel"
     }
   ],
   "major": 3,
-  "minor": 14,
-  "label": "3.14"
+  "minor": 15,
+  "label": "3.15"
 }

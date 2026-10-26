@@ -137,7 +137,7 @@
     try {
       const result = await RepoReports.request('?id=' + id); if (attempt !== version || !dialog.open) return;
       active = result.report; csrf = result.csrf; document.getElementById('reviewReportTitle').textContent = `Reporte #${id}`;
-      message.replaceChildren(); badge(message, active.status);const barcode=document.createElementNS('http://www.w3.org/2000/svg','svg'),barcodeBox=document.createElement('figure');barcodeBox.className='report-barcode';barcode.setAttribute('role','img');barcode.setAttribute('aria-label','Código de barras '+active.ean);text('figcaption','EAN del reporte',barcodeBox);barcodeBox.append(barcode);details.append(barcodeBox);try{window.JsBarcode(barcode,active.ean,{format:active.ean.length===8?'EAN8':'EAN13',width:2,height:72,displayValue:true,fontSize:16,margin:12});}catch{barcode.remove();text('p','EAN '+active.ean,barcodeBox);} if (!/^Revisar las fotos adjuntas|^Correcci\u00f3n propuesta:|^Solicitud de alta de producto\./.test(active.description)) text('p', active.description);
+      message.replaceChildren(); badge(message, active.status);if(active.status==='approved'&&result.can_review&&window.RepoProductEditor){const edit=text('button','Editar ficha actual',message);edit.type='button';edit.className='library-secondary report-edit-current';icon(edit,'edit');const code=active.ean;edit.addEventListener('click',()=>window.RepoProductEditor.open(code));}const barcode=document.createElementNS('http://www.w3.org/2000/svg','svg'),barcodeBox=document.createElement('figure');barcodeBox.className='report-barcode';barcode.setAttribute('role','img');barcode.setAttribute('aria-label','Código de barras '+active.ean);text('figcaption','EAN del reporte',barcodeBox);barcodeBox.append(barcode);details.append(barcodeBox);try{window.JsBarcode(barcode,active.ean,{format:active.ean.length===8?'EAN8':'EAN13',width:2,height:72,displayValue:true,fontSize:16,margin:12});}catch{barcode.remove();text('p','EAN '+active.ean,barcodeBox);} if (!/^Revisar las fotos adjuntas|^Correcci\u00f3n propuesta:|^Solicitud de alta de producto\./.test(active.description)) text('p', active.description);
       if (active.review_note) text('p', active.review_note);
       if (result.can_review && active.submitter) {
         const sender = active.submitter, section = document.createElement('section'); section.className = 'report-sender'; details.append(section);
@@ -206,7 +206,17 @@
       }
       if (queue && result.can_review && active.status === 'pending') {
         form.reset(); for (const key of Object.keys(fields)) form.elements[key].value = active.proposed[key] ?? active.current?.[key] ?? '';if(!form.elements.uxb.value&&!Object.hasOwn(active.proposed||{},'uxb'))form.elements.uxb.value=active.proposed.uxc??active.current?.uxc??'';
+        form.querySelector('.report-name-choice')?.remove();
+        if(active.automated_import && active.current?.name?.trim() && changed.includes('name')){
+          const choice=document.createElement('label');choice.className='report-name-choice';
+          const check=document.createElement('input');check.type='checkbox';check.name='replace_existing_name';check.value='1';
+          choice.append(check,document.createTextNode('Cambiar el nombre actual por el del Excel'));
+          const name=form.elements.name;name.value=active.current.name;name.readOnly=true;
+          check.addEventListener('change',()=>{name.readOnly=!check.checked;name.value=check.checked?(active.proposed.name||''):active.current.name;});
+          name.closest('label').before(choice);
+        }else form.elements.name.readOnly=false;
         form.hidden = false;
+        dialog.dispatchEvent(new CustomEvent('repotools:form-saved',{bubbles:true}));
       }
     } catch (error) { if (attempt === version) message.textContent = error.message; } finally { finishLoading?.(); }
   }
