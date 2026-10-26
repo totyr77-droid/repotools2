@@ -25,3 +25,7 @@ Pruebas report-approved-edit-ui Chromium/WebKit: nombre actual/propuesta, cantid
 ## v3.18 — copiar EAN desde el reporte
 
 Área del código de barras copia el EAN exacto con clic, Enter o Espacio, etiqueta accesible, foco visible y toast de éxito/error. Valor capturado por reporte para evitar copiar otro al cambiar de detalle. Mantiene figura/SVG y distribución. Regresión report-approved-edit-ui Chromium/WebKit con clipboard simulado. Reversión: revertir commit/publicar caché superior. Sin datos, permisos ni migración.
+
+## v3.19 — selección compacta
+
+Tocar cualquier parte del recuadro actual/propuesta selecciona ese dato. Se ocultan visualmente radio y fila auxiliar conservando radio nativo, nombre accesible, teclado y foco visible. Borde marca selección. No cambia guardado ni permisos. report-approved-edit-ui Chromium/WebKit valida clic en fila, selección y altura móvil390. Revertir commit y publicar caché superior.

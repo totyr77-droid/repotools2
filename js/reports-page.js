@@ -186,7 +186,7 @@
             const choice=document.createElement('label');choice.className='report-value-choice';
             const radio=document.createElement('input');radio.type='radio';radio.name='select_'+key;radio.value=proposed?'proposed':'current';radio.setAttribute('form','reviewReportForm');
             radio.defaultChecked=radio.checked=proposed?!baseline?.[key]:!!baseline?.[key];
-            choice.append(radio,document.createTextNode(proposed?'Usar propuesta':'Usar actual'));row.append(choice);
+            radio.setAttribute('aria-label',(proposed?'Usar propuesta de ':'Usar dato actual de ')+label);choice.append(radio);row.append(choice);
             radio.addEventListener('change',()=>{const field=form.elements[key];if(field){field.value=product?.[key]||'';field.readOnly=false;}if(key==='uxc'){form.elements.uxb.value=product?.uxc||'';form.elements.uxb.readOnly=false;}});
           }
         }

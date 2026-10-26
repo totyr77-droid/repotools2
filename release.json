@@ -1,6 +1,12 @@
 {
-  "version": 223,
+  "version": 224,
   "changes": [
+    {
+      "version": 224,
+      "label": "3.19",
+      "date": "2026-10-26",
+      "summary": "Compacta selección de datos en reportes"
+    },
     {
       "version": 223,
       "label": "3.18",
@@ -294,15 +300,9 @@
       "label": "2.70",
       "date": "2026-10-24",
       "summary": "Ubica productos fuera de lista junto al contenido, sin filas vacías intermedias"
-    },
-    {
-      "version": 174,
-      "label": "2.69",
-      "date": "2026-10-24",
-      "summary": "Opción para incluir productos con stock fuera de la lista comparada"
     }
   ],
   "major": 3,
-  "minor": 18,
-  "label": "3.18"
+  "minor": 19,
+  "label": "3.19"
 }
