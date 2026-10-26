@@ -94,3 +94,13 @@ body[data-ui-skin="beta"] #shareStockSelection .pro-badge{
 }
 
 body[data-ui-skin="beta"] #shareStockSelection>svg{width:18px;height:18px}
+
+/* Transferencia: destinos claros, con la misma jerarquía y controles amplios. */
+body[data-ui-skin="beta"] #stockTransferOrigin{margin:0 0 16px;padding:8px 12px;border-radius:10px;background:#f5f3fa;color:#625b73;font-size:.85rem}
+body[data-ui-skin="beta"] .stock-transfer-choices{grid-template-columns:minmax(0,1fr);gap:10px}
+body[data-ui-skin="beta"] .stock-transfer-choices button{justify-content:flex-start;text-align:start;gap:12px;padding:12px;min-height:76px;background:#fff;border:1px solid #ded9eb;border-radius:14px;box-shadow:none;white-space:normal}
+body[data-ui-skin="beta"] .transfer-choice-icon{display:grid;place-items:center;width:44px;height:44px;flex:none;border-radius:12px;background:#eee9f8;color:#32217c}
+body[data-ui-skin="beta"] .transfer-choice-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+body[data-ui-skin="beta"] .transfer-choice-copy strong{font-size:1rem;font-weight:600;line-height:1.25}
+body[data-ui-skin="beta"] .transfer-choice-copy small{font-size:.82rem;line-height:1.35;color:#716b7d}
+@media(hover:hover){body[data-ui-skin="beta"] .stock-transfer-choices button:hover{background:#f7f4fd;border-color:#b9a9dc}}

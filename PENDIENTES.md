@@ -738,3 +738,9 @@ A pedido del usuario, habilitado Pro únicamente para su manager de beta durante
 Usuario aclara que ambos destinos son Pro. Transferir único pasa al bloque superior Pro; palet/usuario dentro sin insignia aislada. Preview valida Pro después de propiedad/modo y antes de consultas de destino; confirmación reutiliza preview, incluida expiración entre revisión y confirmación. Conserva permisos, revisión, idempotencia y aceptación/revocación Free. Comparación y documentación actualizadas. Sustituye decisión anterior de permitir traslado interno Free.
 
 Validación: pro-access-ui añade API directa preview/commit de palet Free403 y preview Pro200, conserva usuario/expiración/ausencia de efectos. pro-subscriptions-ui comprueba tres acciones agrupadas y transferencia única. Chromium/WebKit y sintaxis PHP/JS. Reversión: restaurar stock-transfer.php, pro-access.js y vistas anteriores con caché superior; no cambios de esquema/datos ni cobro. Activación manual manager de prueba conservada.
+
+## Beta1.83 — presentación de destinos de transferencia
+
+Dos filas táctiles con SVG existente, título y consecuencia breve: mover toda la mercadería o cambiar propietario. Origen discreto y cabecera con icono de transferencia en lugar del QR automático. Estilos solo beta, conservan botones/IDs, foco, preferencia de mano, formularios, Pro y confirmación. Sin cambios funcionales ni datos.
+
+Validación: pro-subscriptions-ui Chromium/WebKit, captura revisada, formulario de usuario funcional y sin mutación al abrir. Medidas320/390/1366 y destinos mayores44px; sintaxis PHP/diff. Reversión: restaurar vista y reglas finales de css/pro.css con caché superior. Sin servicios pagos adicionales.
