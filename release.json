@@ -1,6 +1,12 @@
 {
-  "version": 215,
+  "version": 216,
   "changes": [
+    {
+      "version": 216,
+      "label": "3.11",
+      "date": "2026-10-26",
+      "summary": "Integra limpiar búsqueda en el icono del buscador del palet"
+    },
     {
       "version": 215,
       "label": "3.10",
@@ -294,15 +300,9 @@
       "label": "2.62",
       "date": "2026-10-24",
       "summary": "Resalta el lote elegido al abrir un palet desde Mercadería"
-    },
-    {
-      "version": 166,
-      "label": "2.61",
-      "date": "2026-10-24",
-      "summary": "Simplifica la opción a Vencimiento en información a descargar"
     }
   ],
   "major": 3,
-  "minor": 10,
-  "label": "3.10"
+  "minor": 11,
+  "label": "3.11"
 }

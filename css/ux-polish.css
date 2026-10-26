@@ -952,3 +952,8 @@ body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-
   #palletDialog .stock-product h3{font-size:1rem}
   #palletDialog .stock-product>div:first-child>p{font-size:.9rem}
 }
+
+/* El buscador del palet limpia el texto desde el mismo icono inicial. */
+.public-stock-tools .public-stock-search>.product-search-cancel{flex:0 0 44px;width:44px;min-width:44px;height:44px;min-height:44px;padding:11px;margin:0;border:0;background:transparent;color:#27197f;text-decoration:none;box-shadow:none}
+.public-stock-tools .public-stock-search>.product-search-cancel:disabled{opacity:1;cursor:default;color:#626b7a}
+.public-stock-tools .public-stock-search>.product-search-cancel:focus-visible{outline:2px solid #7760b7;outline-offset:-3px;border-radius:8px}
