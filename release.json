@@ -1,6 +1,12 @@
 {
-  "version": 218,
+  "version": 219,
   "changes": [
+    {
+      "version": 219,
+      "label": "3.14",
+      "date": "2026-10-26",
+      "summary": "Retira el formulario duplicado de asignación al final de sucursal"
+    },
     {
       "version": 218,
       "label": "3.13",
@@ -294,15 +300,9 @@
       "label": "2.65",
       "date": "2026-10-24",
       "summary": "Quita ejemplos de las opciones de columnas al importar Excel"
-    },
-    {
-      "version": 169,
-      "label": "2.64",
-      "date": "2026-10-24",
-      "summary": "Evita que reaparezca la etiqueta anterior al quitarla del palet"
     }
   ],
   "major": 3,
-  "minor": 13,
-  "label": "3.13"
+  "minor": 14,
+  "label": "3.14"
 }
