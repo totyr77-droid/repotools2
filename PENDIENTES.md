@@ -744,3 +744,9 @@ Validación: pro-access-ui añade API directa preview/commit de palet Free403 y 
 Dos filas táctiles con SVG existente, título y consecuencia breve: mover toda la mercadería o cambiar propietario. Origen discreto y cabecera con icono de transferencia en lugar del QR automático. Estilos solo beta, conservan botones/IDs, foco, preferencia de mano, formularios, Pro y confirmación. Sin cambios funcionales ni datos.
 
 Validación: pro-subscriptions-ui Chromium/WebKit, captura revisada, formulario de usuario funcional y sin mutación al abrir. Medidas320/390/1366 y destinos mayores44px; sintaxis PHP/diff. Reversión: restaurar vista y reglas finales de css/pro.css con caché superior. Sin servicios pagos adicionales.
+
+## Beta1.84 — identidad Pro pública y estado en Ajustes
+
+Usuario autoriza destacar Pro públicamente y en Ajustes. Insignia compacta violeta/dorado con corona SVG junto al nombre en saludo y profile_card público/propio; conserva rango MNG y verificación independientes. Solo aparece con vigencia futura consultada en servidor. Ajustes muestra Free/PRO, vigencia y PRO de prueba para concesión beta_trial. Perfil público no expone vigencia, proveedor ni datos de cobro. Sin permisos nuevos, esquema, pagos ni cambios de producción.
+
+Validación: pro-subscriptions-ui Chromium/WebKit comprueba perfil público Pro sin correo privado, cuenta Free sin insignia, perfil propio y saludo Pro, estado del plan y navegación/transferencias existentes en320/390/1366. Sintaxis PHP y diff. Reversión: restaurar includes/pro-identity.php, perfil/header/cuenta y CSS anterior con caché superior; concesiones de datos se conservan.

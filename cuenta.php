@@ -120,6 +120,8 @@ include __DIR__ . '/vistas/header.vista.php';
     <?php include __DIR__ . '/includes/hand-preference-view.php'; ?><label class="settings-toggle"><span class="settings-toggle-name"><?= stock_icon('settings') ?>Modo de una mano</span><span class="settings-toggle-control"><input id="oneHandMode" type="checkbox" role="switch" aria-label="Modo de una mano"><span class="settings-toggle-track" aria-hidden="true"></span></span></label><p class="settings-hint">Guardado para tu cuenta en este navegador.</p>
 
     </section>
+    <?php $planQuery=database()->prepare('SELECT status,paid_until FROM pro_subscriptions WHERE user_id=?');$planQuery->execute([current_user()['id']]);$identityPlan=$planQuery->fetch();$identityPro=(int)($identityPlan['paid_until']??0)>time(); ?>
+    <section class="settings-group settings-plan" aria-labelledby="settingsPlanTitle"><h2 id="settingsPlanTitle"><?= stock_icon('crown') ?>Tu plan <strong><?= $identityPro?'PRO':'Free' ?></strong></h2><?php if($identityPro): ?><p><?= ($identityPlan['status']??'')==='beta_trial'?'PRO de prueba':'PRO activo' ?> · Hasta <?= date('d/m/Y',(int)$identityPlan['paid_until']) ?></p><?php else: ?><p>Escaneá, consultá y organizá tu stock.</p><?php endif; ?></section>
     <section class="settings-group settings-profile" aria-labelledby="settingsProfileTitle"><h2 id="settingsProfileTitle">Perfil</h2>
     <details id="myProfileQR" class="profile-qr"><summary><?= stock_icon('qr') ?>Mi QR de perfil<span class="profile-chevron"><?= stock_icon('chevron') ?></span></summary><div class="profile-qr-image"></div><p role="status"></p></details>
 
