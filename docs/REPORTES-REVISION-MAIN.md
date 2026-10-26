@@ -11,3 +11,9 @@ El control de cambios pendientes ignora formularios internos del lector EAN y ca
 Validación: reports-api con dos aprobaciones Excel (sin/con confirmación), cambios secundarios y permisos; report-approved-edit-ui en Chromium/WebKit con guardado real, historial/recompensas sin cambios, usuario común rechazado por servidor y selección del nombre; report-review-desktop-ui en ambos motores a1024/1366/1920 y ambas manos, acciones visibles y móvil vertical; dialog-dirty-ui Chromium, cierre X/fondo/Escape, seguir/salir/guardar y formulario del lector sin falso aviso. No equivale a prueba física de cámara/Safari. La antigua prueba dialog-edit-scroll-ui pasó WebKit, pero Chromium tuvo timeout de revelado con teclado simulado; no se declara aprobada.
 
 Reversión: revertir el commit de esta entrega y publicar una versión de caché superior. Sin migración; las ediciones de catálogo hechas por personas no se revierten con el código. No mezclar funciones comerciales de beta.
+
+## Selección por campo y avisos Excel — v3.16
+
+Reemplaza checkbox aislado por opciones «Conservar actual / Usar propuesta» en cada dato diferente, dentro de comparación. Datos existentes seleccionados por defecto; campos sin dato usan propuesta. Selección actual protegida en servidor, formulario permite ajustar valores propuestos. Radios nativos con tamaño acotado y área44px evitan deformación/desborde de captura. Importaciones Excel no envían notificaciones de aprobación ni rechazo; reportes individuales conservan avisos, historial y auditoría intactos. No se borran avisos anteriores.
+
+Pruebas report-approved-edit-ui Chromium/WebKit: nombre actual/propuesta, cantidad nueva seleccionada y ausencia de desborde; reports-api: selección actual de nombre/cantidad, reemplazo explícito y cero nuevas notificaciones al aprobar/rechazar Excel. Reversión: revertir commit y publicar caché superior. Sin migración.

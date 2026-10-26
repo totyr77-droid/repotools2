@@ -987,5 +987,7 @@ body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-
 #reviewReportStatus:has(.report-edit-current){display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 #reviewReportStatus .report-edit-current{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 12px;margin:0;font-size:.85rem}
 #reviewReportStatus .report-edit-current svg{width:18px;height:18px;flex:none}
-#reviewReportForm .report-name-choice{display:flex;align-items:center;gap:10px;min-height:44px;font-size:.9rem;cursor:pointer}
-#reviewReportForm .report-name-choice input{width:20px;min-height:20px;height:20px;flex:none;margin:0}
+
+#reviewReportDialog label.report-value-choice{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-height:44px;width:100%;font-size:.8rem;white-space:normal;cursor:pointer}
+#reviewReportDialog .report-value-choice input[type=radio]{appearance:auto;display:block;flex:0 0 18px;width:18px;min-width:18px;max-width:18px;height:18px;min-height:18px;margin:0;padding:0}
+#reviewReportDialog .report-field:has(input:checked){outline:2px solid var(--primary,#302080);outline-offset:-2px}

@@ -50,14 +50,17 @@ async function create(request,more={}){const c=await config(request),data={...fi
  for(const filter of ['approved','rejected','blocked','unblocked'])assert.ok((await admin('api/reportes.php?view=logs&filter='+filter)).json().items.every(r=>r.action===filter));assert.equal((await admin('api/reportes.php?view=logs&filter[]=edited')).status,422);
  const upgraded=spawnSync(php,['-r',"require 'includes/database.php';database()->exec(\"UPDATE users SET role='manager' WHERE email='administrador@example.invalid'\");"],{env,encoding:'utf8'});assert.equal(upgraded.status,0,upgraded.stderr);const own=(await admin('api/reportes.php?id='+ownAdmin.report.id)).json().report;assert.equal((await admin('api/reportes.php',{...review,id:ownAdmin.report.id,csrf:ac,revision:own.current.revision})).status,200);
  assert.equal((await guest('tops.php?categoria=reportes')).status,200);const rewards=spawnSync(php,['-r',"require 'includes/database.php';echo database()->query('SELECT COUNT(*) FROM report_rewards')->fetchColumn();"],{env,encoding:'utf8'});assert.equal(rewards.stdout,'2');
+ const noticesBeforeExcel=(await user('api/notificaciones.php')).json().notifications.length;
  // Excel names are opt-in even for a direct API request.
  for(const replace of [false,true]){
    const proposal=await create(user,{name:'Nombre largo Excel',quantity:'750 ml',description:'Importado de Excel · Fixture'});
    const current=(await mod('api/reportes.php?id='+proposal.report.id)).json().report.current;
-   const response=await mod('api/reportes.php',{...fields,name:'Nombre largo Excel',quantity:'750 ml',action:'review',id:proposal.report.id,csrf:mc,decision:'approved',revision:current.revision,...(replace?{replace_existing_name:'1'}:{})});
+   const response=await mod('api/reportes.php',{...fields,name:'Nombre largo Excel',quantity:'750 ml',action:'review',id:proposal.report.id,csrf:mc,decision:'approved',revision:current.revision,field_selection:'1',select_name:replace?'proposed':'current',select_quantity:'current'});
    assert.equal(response.status,200,response.text);
    assert.equal(response.json().report.current.name,replace?'Nombre largo Excel':current.name);
-   assert.equal(response.json().report.current.quantity,'750 ml');
+   assert.equal(response.json().report.current.quantity,current.quantity,'Keep selected existing quantity');
  }
+ assert.equal((await user('api/notificaciones.php')).json().notifications.length,noticesBeforeExcel,'Excel approvals send no notification');
+ const deniedImport=await create(user,{description:'Importado de Excel · Fixture rechazo'});assert.equal((await mod('api/reportes.php',{action:'review',id:deniedImport.report.id,decision:'rejected',csrf:mc})).status,200);assert.equal((await user('api/notificaciones.php')).json().notifications.length,noticesBeforeExcel,'Excel rejections send no notification');
  console.log('OK: guest receipt/private401, own reports, CSRF, false photo422, block/mod cannot unblock/admin can, approve/reject idempotency, notifications isolation, resolved changes/logs, manager own report and rewards. Object storage upload requires separate configured environment.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>server.kill());

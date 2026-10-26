@@ -1,6 +1,12 @@
 {
-  "version": 220,
+  "version": 221,
   "changes": [
+    {
+      "version": 221,
+      "label": "3.16",
+      "date": "2026-10-26",
+      "summary": "Permite elegir datos del reporte y evita avisos por Excel"
+    },
     {
       "version": 220,
       "label": "3.15",
@@ -294,15 +300,9 @@
       "label": "2.67",
       "date": "2026-10-24",
       "summary": "Conserva sección y filtros del supervisor al actualizar Mi equipo"
-    },
-    {
-      "version": 171,
-      "label": "2.66",
-      "date": "2026-10-24",
-      "summary": "Corrige compatibilidad de Excel y títulos, sin columnas preseleccionadas"
     }
   ],
   "major": 3,
-  "minor": 15,
-  "label": "3.15"
+  "minor": 16,
+  "label": "3.16"
 }
