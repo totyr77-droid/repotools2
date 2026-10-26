@@ -5,7 +5,7 @@
   <table class="pro-comparison"><caption class="sr-only">Comparación de Free y Pro</caption><thead><tr><th>Función</th><th>Free</th><th>Pro</th></tr></thead><tbody>
     <tr><th>Gestionar tu stock</th><td>Incluido</td><td class="pro-included"><?= stock_icon('check') ?><span class="pro-included-label">Incluido</span></td></tr>
     <tr><th>Compartir palets y stock</th><td>—</td><td class="pro-included"><?= stock_icon('check') ?><span class="pro-included-label">Incluido</span></td></tr>
-    <tr><th>Transferir propiedad</th><td>—</td><td class="pro-included"><?= stock_icon('check') ?><span class="pro-included-label">Incluido</span></td></tr>
+    <tr><th>Transferir a palet o usuario</th><td>—</td><td class="pro-included"><?= stock_icon('check') ?><span class="pro-included-label">Incluido</span></td></tr>
     <tr><th>Invitar a otras cuentas</th><td>—</td><td class="pro-included"><?= stock_icon('check') ?><span class="pro-included-label">Incluido</span></td></tr>
   </tbody></table>
   <p class="stock-muted">Tus invitados pueden participar con Free, según el acceso que les des.</p>

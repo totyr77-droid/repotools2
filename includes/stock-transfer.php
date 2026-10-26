@@ -6,10 +6,10 @@ function stock_transfer_preview(PDO $db,int $user,array $input): array {
     $source=stock_editable($db,(int)($input['pallet_id']??0),$user);
     if((int)$source['owner_id']!==$user)throw new CatalogException('Solo el propietario puede transferir este palet o su mercadería.',403);
     $mode=$input['mode']??'';if(!in_array($mode,['pallet','user'],true))throw new CatalogException('Elegí el destino de la transferencia.',422);
+    pro_require_access($db,$user,'transfer');
     $rows=stock_query($db,'SELECT * FROM pallet_products WHERE pallet_id=? ORDER BY id',[$source['id']])->fetchAll();
     $result=['mode'=>$mode,'source_id'=>(int)$source['id'],'source_code'=>$source['code'],'source_revision'=>(int)$source['revision'],'products'=>count($rows),'units'=>array_sum(array_column($rows,'units'))];
     if($mode==='user'){
-        pro_require_access($db,$user,'transfer_owner');
         if((int)$source['owner_id']!==$user)throw new CatalogException('Solo el dueño puede transferir la propiedad.',403);
         $email=$input['email']??'';if(!is_string($email)||!filter_var(trim($email),FILTER_VALIDATE_EMAIL))throw new CatalogException('Ingresá un correo válido.',422);
         $target=stock_query($db,'SELECT id,public_name FROM users WHERE LOWER(email)=LOWER(?)',[trim($email)])->fetch();

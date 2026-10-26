@@ -728,3 +728,13 @@ Publicación comprobada: beta1.80/interna85, commit78d0f16 live, salud200. Produ
 Corrección solicitada: quitar el acceso duplicado Transferir propiedad y colocar el bloque Pro primero. Compartir palet y Gestionar accesos quedan agrupados arriba; después Transferir, Descripción, Reimprimir y Eliminar. Transferir conserva sus destinos y el guard Pro al elegir usuario; movimiento interno conserva permisos existentes. Sin cambios de datos, cobro ni producción.
 
 Validación: pro-subscriptions-ui Chromium/WebKit,320/390/1366 y ambas manos; comprueba grupo primero, ausencia del duplicado, destinos visibles y apertura de formulario sin cambiar propietario. La prueba espera fin de animación de entrada antes de medir para evitar una lectura transitoria. Sintaxis PHP/JS aprobada. Reversión: restaurar vista, stock.js y pro-access.js anteriores y publicar caché superior en beta.
+
+## Activación manual Pro de prueba —26/10
+
+A pedido del usuario, habilitado Pro únicamente para su manager de beta durante30 días. Verificado paid_until futuro y sin vínculo con proveedor: no cobro ni renovación. Sin modificar roles, código ni producción. Estado anterior y referencia de reversión guardados fuera de Git en respaldo privado. Revertir solo la concesión manual identificada allí, sin tocar suscripciones posteriores o pagos.
+
+## Beta1.82 — toda transferencia requiere Pro
+
+Usuario aclara que ambos destinos son Pro. Transferir único pasa al bloque superior Pro; palet/usuario dentro sin insignia aislada. Preview valida Pro después de propiedad/modo y antes de consultas de destino; confirmación reutiliza preview, incluida expiración entre revisión y confirmación. Conserva permisos, revisión, idempotencia y aceptación/revocación Free. Comparación y documentación actualizadas. Sustituye decisión anterior de permitir traslado interno Free.
+
+Validación: pro-access-ui añade API directa preview/commit de palet Free403 y preview Pro200, conserva usuario/expiración/ausencia de efectos. pro-subscriptions-ui comprueba tres acciones agrupadas y transferencia única. Chromium/WebKit y sintaxis PHP/JS. Reversión: restaurar stock-transfer.php, pro-access.js y vistas anteriores con caché superior; no cambios de esquema/datos ni cobro. Activación manual manager de prueba conservada.
