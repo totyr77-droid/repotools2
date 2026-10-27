@@ -168,3 +168,4 @@ body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:64px 20px
 @media(max-width:360px){.pro-plan-card .pro-upgrade-content{padding-inline:14px}.pro-plan-card .pro-upgrade-hero h2{font-size:1.25rem}.pro-plan-card .pro-plan-benefits{font-size:.82rem}.pro-plan-card p{font-size:.82rem}}
 @media(prefers-reduced-motion:reduce){.pro-plan-card{transition:none}}
 @media(max-width:360px){.pro-plan-card .pro-upgrade-brand{font-size:.7rem;gap:4px}.pro-plan-card .pro-upgrade-brand strong{font-size:.6rem;letter-spacing:.03em;padding:4px}.pro-plan-card .pro-upgrade-brand>svg{width:16px;height:16px}}
+.pro-plan-card{transition:transform 280ms cubic-bezier(.25,.8,.25,1);backface-visibility:hidden}

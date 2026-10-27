@@ -1,6 +1,12 @@
 {
-  "version": 108,
+  "version": 109,
   "changes": [
+    {
+      "version": 109,
+      "label": "2.04",
+      "date": "2026-10-27",
+      "summary": "Transición de planes sin cruces ni movimientos encimados."
+    },
     {
       "version": 108,
       "label": "2.03",
@@ -294,15 +300,9 @@
       "label": "1.55",
       "date": "2026-10-19",
       "summary": "Flecha violeta y botón flotante Ver en Stock según mano"
-    },
-    {
-      "version": 59,
-      "label": "1.54",
-      "date": "2026-10-19",
-      "summary": "Accesos a Stock, confirmación de invitación y navegación de Mi equipo"
     }
   ],
   "major": 2,
-  "minor": 3,
-  "label": "2.03"
+  "minor": 4,
+  "label": "2.04"
 }
