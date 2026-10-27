@@ -154,3 +154,17 @@ body[data-hand="left"] .pro-upgrade-dialog .pro-deck-close{inset-inline-end:auto
 .pro-upgrade-dialog:has(.pro-plan-navigation[hidden]) .pro-deck-close{top:12px}
 .pro-upgrade-dialog:has(.pro-plan-navigation[hidden]) .pro-deck-window{overflow:hidden;border-radius:18px}
 @media(max-height:600px){.pro-upgrade-dialog .pro-plan-navigation{margin-bottom:6px}.pro-upgrade-dialog .pro-plan-pager{margin-top:6px}.pro-upgrade-dialog .pro-deck-close{top:78px}}
+
+/* Each card owns its close control; only the cards remain on screen. */
+.pro-upgrade-dialog{--plan-width:min(420px,calc(100vw - 80px))}
+.pro-plan-track{display:grid;gap:0;transform:none!important;transition:none}
+.pro-plan-card{grid-area:1/1;transition:transform .32s cubic-bezier(.22,.7,.25,1);will-change:transform;position:relative}
+.pro-plan-card .pro-upgrade-hero{position:relative;padding-inline:20px 64px}
+.pro-plan-card .pro-card-close{position:absolute;top:12px;inset-inline-end:12px}
+body[data-hand="left"] .pro-plan-card .pro-card-close{inset-inline-end:auto;inset-inline-start:12px}
+body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:64px 20px}
+.pro-upgrade-dialog:not(.pro-plans-mode) .pro-deck-window{overflow:hidden;border-radius:18px}
+.pro-upgrade-dialog.pro-plans-mode .pro-deck-window{overflow:visible;border-radius:0}
+@media(max-width:360px){.pro-plan-card .pro-upgrade-content{padding-inline:14px}.pro-plan-card .pro-upgrade-hero h2{font-size:1.25rem}.pro-plan-card .pro-plan-benefits{font-size:.82rem}.pro-plan-card p{font-size:.82rem}}
+@media(prefers-reduced-motion:reduce){.pro-plan-card{transition:none}}
+@media(max-width:360px){.pro-plan-card .pro-upgrade-brand{font-size:.7rem;gap:4px}.pro-plan-card .pro-upgrade-brand strong{font-size:.6rem;letter-spacing:.03em;padding:4px}.pro-plan-card .pro-upgrade-brand>svg{width:16px;height:16px}}
