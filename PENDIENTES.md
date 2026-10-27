@@ -806,3 +806,25 @@ Usuario autoriza explícitamente nueva prueba tras diagnóstico v1.91. Antes de 
 Diagnóstico confirmado por GET users/me: correo buyer configurado coincide exactamente (ignorando mayúsculas) con email del vendedor test_user autenticado. Esta configuración intentaba suscripción a la propia cuenta; no inferir que la clave pública sea incorrecta. Consulta pública al identificador anterior del usuario no devuelve email/tags y no alcanza para configurar comprador. Se solicitó cuenta Comprador distinta/Argentina al usuario. Sin nuevos POST, cobros ni cambios de credenciales.
 
 Guard servidor seller() detecta correo comprador=vendedor antes de crear fila o enviar preapproval, devuelve422 claro. Test unitario confirma soloGET identidad, cero filas y cero creación remota. Próximo paso: configurar correo real de cuenta Comprador de prueba, verificar distinto y recuperar intento rechazado solo después de comprobar búsqueda sin suscripción. No sintetizar email desde ID/usuario. Reversión: revertir commit/publicar caché superior. No migración.
+
+## Comprador actualizado — continuación26/10
+
+Usuario confirma cambio de correo y reintento. Entorno beta actualizado/live, correo buyer distinto del vendedor comprobado por API. Persistía creating del rechazo previo: cambiar entorno no libera estado. Búsqueda por referencia sigue cero, plan activo vendedor/importe correctos. Preparación única de nuevo intento autorizada por continuidad de prueba: referencia nueva/status new, paid_until manual preservado; comprobación privada y diario separado fuera de Git. Sin POST ni cobros enviados. Pendiente confirmar que el correo fue copiado de la cuenta Comprador y observar resultado de autorización desde formulario. No afirmar existencia del comprador solo por formato de correo.
+
+## Cuota encontrada, webhook sin confirmar26/10
+
+Consulta de solo lectura tras captura de panel vacío: suscripción authorized, cuota processed con payment approved; GET payment confirma approved/importe/moneda/vendedor coincidentes, pero live_mode boolean true. Vendedor previamente verificado test_user; tarjeta ficticia usada por usuario. No inferir cobro real de ese indicador ni declarar pago sandbox validado. pro_payments local permanece0; guard invoice exige live_mode=false y se conserva. No se ejecuta conciliación manual ni se concede Pro por ese pago sin aclaración.
+
+Webhook GET público405 esperado; consulta logs POST de ruta no devuelve registros, no prueba concluyente de ausencia universal. Panel usuario sin entregas tanto Productivo como Prueba; filtro no explica todo. Próximo paso verificar URL completa y eventos en la misma aplicación que creó suscripción, ambientes configurados y relación live_mode de pagos de cuentas de prueba. No repetir autorización ni modificar/cancelar pago sin pedido. Respuestas privadas fuera de Git, sin IDs/correos/tarjetas en documentación.
+
+## Verificación posterior a URL productiva26/10
+
+Usuario confirma URL productiva configurada. Nueva lectura: cuota/payment aprobado, local pro_payments0, logs POST consultados0 (limitación de evidencia). Pago live_mode=true confirmado de nuevo; pagador remoto devuelve nickname TESTUSER, paísAR/MLA y email del pago coincide con comprador configurado, pero endpoint público no devuelve tags y user_type=normal; no se usa nickname como validación suficiente ni se retira guard. No nuevas suscripciones ni conciliación manual.
+
+Pendiente simular entrega desde la aplicación correcta en panel Mercado Pago y obtener HTTP; confirmar secreto productivo aplicado en beta. Configurar URL no demuestra reenvío retroactivo. Aclarar validación de pago con proveedor antes de flexibilizar live_mode. No declarar flujo comercial listo.
+
+## Beta1.93 — cuota de cuentas de prueba con live_mode verdadero
+
+Simulación subscription_preapproval con ID real devuelve200, URL/firma/consulta verificadas. Pago de prueba existente aprobado con live_mode=true; GET users/me vendedor test_user, pagador de cuota coincide con payer_id de suscripción y correo configurado, distintos entre sí. Guard invoice ahora admite ese indicador exclusivamente en beta con vendedor test_user verificado por API en cada procesamiento y coincidencia exacta comprador/suscripción/correo. Conserva plan/referencia/vendedor/importe/moneda/id, firmas, idempotencia y validación temporal. No usa nickname ni booleano aislado como prueba. live_mode ausente/inválido rechazado; producción/cobros reales siguen deshabilitados por pro_config.
+
+Unit tests: modo verdadero sin identidad rechazado; vendedor real rechazado; correo/ID comprador equivocados rechazados; combinación verificada acepta sin duplicados. No se procesó manualmente la cuota en esta entrega. Próximo paso simular subscription_authorized_payment con ID de cuota existente, confirmar200 y una fila en pro_payments. No crear otro pago. Reversión: revertir commit/publicar caché superior; no borrar pagos/suscripciones.

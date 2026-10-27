@@ -1,6 +1,12 @@
 {
-  "version": 97,
+  "version": 98,
   "changes": [
+    {
+      "version": 98,
+      "label": "1.93",
+      "date": "2026-10-27",
+      "summary": "Verifica identidad de cuentas de prueba al procesar cuotas"
+    },
     {
       "version": 97,
       "label": "1.92",
@@ -294,15 +300,9 @@
       "label": "1.44",
       "date": "2026-10-19",
       "summary": "QR personal accesible y cámara para seleccionar usuarios"
-    },
-    {
-      "version": 48,
-      "label": "1.43",
-      "date": "2026-10-19",
-      "summary": "Restringir toda transferencia al propietario del palet"
     }
   ],
   "major": 1,
-  "minor": 92,
-  "label": "1.92"
+  "minor": 93,
+  "label": "1.93"
 }

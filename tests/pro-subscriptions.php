@@ -43,7 +43,10 @@ check($db->query('SELECT provider_id FROM pro_subscriptions')->fetchColumn()==='
 check(gmdate('Y-m-d H:i:s',$until)==='2026-02-28 10:30:00','Month end clamped');
 $service->invoice('invoice_fixture');check((int)$db->query('SELECT COUNT(*) FROM pro_payments')->fetchColumn()===1,'Repeated webhook does not duplicate payment');check((int)$db->query('SELECT paid_until FROM pro_subscriptions')->fetchColumn()===$until,'Repeated webhook does not extend period');
 $payment['status']='rejected';$service->invoice('invoice_fixture');check((int)$db->query('SELECT paid_until FROM pro_subscriptions')->fetchColumn()===0,'Rejected payment grants nothing');
-$payment['status']='approved';$payment['live_mode']=true;denied(fn()=>$service->invoice('invoice_fixture'),409);$payment['live_mode']=false;
+$payment['status']='approved';$payment['live_mode']=true;denied(fn()=>$service->invoice('invoice_fixture'),409);
+$remote['payer_id']=789;$payment['payer']=['id'=>789,'email'=>$config['buyer']];$service->invoice('invoice_fixture');check((int)$db->query('SELECT COUNT(*) FROM pro_payments')->fetchColumn()===1,'Verified test seller and matching buyer accepts account test live flag idempotently');
+$testSeller=false;denied(fn()=>$service->invoice('invoice_fixture'),503);$testSeller=true;
+$payment['payer']['email']='other@example.invalid';denied(fn()=>$service->invoice('invoice_fixture'),409);$payment['payer']['email']=$config['buyer'];$payment['payer']['id']=999;denied(fn()=>$service->invoice('invoice_fixture'),409);$payment['payer']['id']=789;$payment['live_mode']=false;
 $payment['transaction_amount']=1;denied(fn()=>$service->invoice('invoice_fixture'),409);$payment['transaction_amount']=100;
 $payment['collector_id']=987;denied(fn()=>$service->invoice('invoice_fixture'),409);$payment['collector_id']=123;
 $service->invoice('invoice_fixture');$cancelConfirmed=false;denied(fn()=>$service->cancel(1),503);$cancelConfirmed=true;$service->cancel(1);

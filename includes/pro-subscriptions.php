@@ -164,11 +164,20 @@ final class ProSubscriptions {
             $current=$this->lock($row['reference']);
             $invoice=$this->request('GET','/authorized_payments/'.rawurlencode($id));
             if((string)($invoice['preapproval_id']??'')!==$current['provider_id']||(string)($invoice['id']??'')!==$id)throw new CatalogException('La cuota no coincide.',409);
-            $this->validate($this->request('GET','/preapproval/'.rawurlencode($current['provider_id'])),$current);
+            $subscription=$this->request('GET','/preapproval/'.rawurlencode($current['provider_id']));$this->validate($subscription,$current);
             $paymentId=(string)($invoice['payment']['id']??'');
             if(!ctype_digit($paymentId))return; // Pending invoice without a payment grants nothing.
             $payment=$this->request('GET','/v1/payments/'.$paymentId);
-            if(($payment['live_mode']??null)!==false||(string)($payment['collector_id']??'')!==$this->config['seller']
+            if(($payment['live_mode']??null)===true){
+                // Test accounts may return live_mode=true: verify identity, never trust that flag alone.
+                $this->seller();
+                if(($this->config['url']??'')!=='https://repotools-desarrollo.onrender.com'
+                    ||!ctype_digit((string)($subscription['payer_id']??''))
+                    ||(string)($payment['payer']['id']??'')!==(string)$subscription['payer_id']
+                    ||(string)$subscription['payer_id']===$this->config['seller']
+                    ||strcasecmp((string)($payment['payer']['email']??''),$this->config['buyer'])!==0)throw new CatalogException('El comprador no corresponde a esta prueba.',409);
+            }elseif(($payment['live_mode']??null)!==false)throw new CatalogException('No pudimos verificar el modo del pago.',409);
+            if((string)($payment['collector_id']??'')!==$this->config['seller']
                 ||($payment['currency_id']??'')!=='ARS'||(int)round((float)($payment['transaction_amount']??0)*100)!==(int)$current['amount_cents']
                 ||(string)($payment['id']??'')!==$paymentId)throw new CatalogException('El pago no corresponde a esta prueba.',409);
             $status=(string)($payment['status']??'');$date=$invoice['debit_date']??null;
