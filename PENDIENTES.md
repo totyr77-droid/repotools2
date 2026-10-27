@@ -920,3 +920,11 @@ Validación: sintaxis PHP/JS y pro-subscriptions-ui Chrome/WebKit (tres cierres 
 Usuario envía grabación con transición poco limpia. Revisado fotograma de video; causa en carrusel circular: vecino que cambia de extremo animaba de-1 a+1 atravesando tarjeta central. Ahora se reposiciona sin animar transform y permanece invisible durante desplazamiento, reaparece suavemente como vecino al finalizar. Las otras dos tarjetas mantienen dirección y separación, transición280ms. Bloqueo breve de nuevas navegaciones evita animaciones encimadas; temporizador se limpia al abrir/salir, movimiento reducido se aplica sin transición. Conserva tres artículos, cierres propios, mano y ausencia de menús/scroll. Sin cambios de pagos/permisos/main.
 
 Validación: pro-subscriptions-ui Chromium/WebKit incluye muestreo de rectángulos visibles por requestAnimationFrame durante animación (sin cruces), entrada repetida no apila desplazamientos, navegación completa/responsive/aislamiento y formulario previos. Reversión: revertir commit y publicar caché superior. Sin datos/migraciones.
+
+## Beta2.05 — Mi suscripción con estado y vigencia claros
+
+Pedido usuario: pantalla sin diseño. Se organiza en una superficie de plan: encabezado violeta sólido con icono existente y estado activo, descripción breve, renovación visible, filas de vigencia/importe mensual y acciones al pie. Información de Mercado Pago discreta debajo, sin certificaciones inventadas; enlace a Ajustes con control táctil44px. Responsive móvil/PC, filas apiladas en320px. Conserva modal/tokenización y controles existentes.
+
+Render adapta texto a estado servidor: cancelada no afirma renovación automática; aclara que no se harán nuevos cobros y conserva acceso hasta fecha si vigente. Pausada/pendiente/verificando/acceso de prueba tienen textos propios. Distinción entre PRO vigente y autorización de renovación. No reactivación ni cambios de permisos/cobros/main.
+
+Validación: PHP/JS sintaxis y pro-subscriptions-ui Chromium/WebKit; cancelada muestra badge activo/fecha y oculta cancelar, texto sin renovación automática, superficie sin overflow320/390/1366, pago token-only y aislamiento previos. Captura de cancelada revisada. Reversión: revertir commit/publicar caché superior; sin migración/datos.

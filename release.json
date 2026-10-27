@@ -1,6 +1,12 @@
 {
-  "version": 109,
+  "version": 110,
   "changes": [
+    {
+      "version": 110,
+      "label": "2.05",
+      "date": "2026-10-27",
+      "summary": "Mi suscripción con plan, vigencia y renovación claramente organizados."
+    },
     {
       "version": 109,
       "label": "2.04",
@@ -294,15 +300,9 @@
       "label": "1.56",
       "date": "2026-10-19",
       "summary": "Invitaciones y tokens de equipo, acceso opcional por 7 horas y ubicación con radio configurable."
-    },
-    {
-      "version": 60,
-      "label": "1.55",
-      "date": "2026-10-19",
-      "summary": "Flecha violeta y botón flotante Ver en Stock según mano"
     }
   ],
   "major": 2,
-  "minor": 4,
-  "label": "2.04"
+  "minor": 5,
+  "label": "2.05"
 }

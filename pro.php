@@ -8,14 +8,19 @@ $publicPageTitle='Mi suscripción Pro';
 include __DIR__.'/vistas/header.vista.php';
 ?>
 <main class="library-main pro-main" id="proSubscription" data-csrf="<?= escape(csrf_token()) ?>">
-  <h1><?= stock_icon('user') ?> Mi suscripción <span class="pro-badge">PRO</span></h1>
-  <p class="pro-description">Compartí palets y stock, transferí entre palets o usuarios y gestioná accesos.</p>
-  <p id="proStatus" class="pro-state" role="status">Consultando suscripción…</p>
-  <p id="proPrice" hidden></p>
-  <p id="proTerms" hidden>Renovación automática mensual. Podés cancelarla y conservar el período ya pagado.</p>
-  <div class="pro-actions"><button id="proCheckout" class="library-primary" type="button" hidden>Probar suscripción</button><button id="proCancel" class="library-secondary" type="button" hidden>Cancelar renovación</button></div>
-  <p class="pro-payment-note">El formulario de tarjeta lo procesa Mercado Pago. RepoTools no recibe el número ni el código de seguridad de tu tarjeta.</p>
-  <a class="help-back" href="cuenta.php">Volver a Ajustes</a>
+  <h1>Mi suscripción</h1>
+  <section class="pro-account-plan" aria-label="Detalle de tu plan">
+    <div class="pro-account-heading"><span class="pro-account-emblem"><?= stock_icon('crown') ?></span><div><span class="pro-account-eyebrow">Tu plan</span><h2 id="proPlanName">Consultando…</h2></div><span id="proActiveBadge" class="pro-account-active" hidden><?= stock_icon('check') ?>Activo</span></div>
+    <div class="pro-account-body">
+      <p class="pro-description">Compartí stock, transferí palets y gestioná accesos.</p>
+      <p id="proStatus" class="pro-state" role="status">Consultando suscripción…</p>
+      <dl class="pro-account-details"><div id="proValidityRow" hidden><dt>Acceso incluido hasta</dt><dd id="proValidity"></dd></div><div id="proPriceRow" hidden><dt>Importe mensual</dt><dd id="proPrice"></dd></div></dl>
+      <p id="proTerms" class="pro-account-terms" hidden></p>
+      <div class="pro-actions"><button id="proCheckout" class="library-primary" type="button" hidden>Unirme a PRO</button><button id="proCancel" class="library-secondary" type="button" hidden>Cancelar renovación</button></div>
+    </div>
+  </section>
+  <p class="pro-payment-note"><?= stock_icon('shield') ?><span>Pagos gestionados por Mercado Pago. Los datos de tu tarjeta se ingresan en sus campos seguros; RepoTools no recibe el número ni el código de seguridad.</span></p>
+  <a class="help-back pro-account-back" href="cuenta.php"><?= stock_icon('chevron') ?>Volver a Ajustes</a>
 </main>
 <dialog id="proPaymentDialog" class="library-dialog pro-payment-dialog" aria-labelledby="proPaymentTitle">
 <div class="library-heading"><h2 id="proPaymentTitle"><?= stock_icon('crown') ?>Unirme a <span class="pro-badge">PRO</span></h2><button type="button" class="app-close" id="closeProPayment" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>

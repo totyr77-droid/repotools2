@@ -169,3 +169,34 @@ body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:64px 20px
 @media(prefers-reduced-motion:reduce){.pro-plan-card{transition:none}}
 @media(max-width:360px){.pro-plan-card .pro-upgrade-brand{font-size:.7rem;gap:4px}.pro-plan-card .pro-upgrade-brand strong{font-size:.6rem;letter-spacing:.03em;padding:4px}.pro-plan-card .pro-upgrade-brand>svg{width:16px;height:16px}}
 .pro-plan-card{transition:transform 280ms cubic-bezier(.25,.8,.25,1);backface-visibility:hidden}
+/* Subscription account: one plan surface, clear state and billing details. */
+.pro-main{max-width:680px;padding-top:24px;text-align:start}
+.pro-main h1{font-size:1.35rem;margin:0 0 18px;line-height:1.25}
+.pro-account-plan{overflow:hidden;border:1px solid #e1ddec;border-radius:16px;background:#fff}
+.pro-account-heading{display:flex;align-items:center;gap:12px;padding:20px;background:#27197f;color:#fff}
+.pro-account-emblem{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:12px;background:#ffffff18}
+.pro-account-emblem svg{width:24px;height:24px}
+.pro-account-eyebrow{display:block;font-size:.76rem;color:#e2dcfa;margin-bottom:3px}
+.pro-account-heading h2{margin:0;color:inherit;font-size:1.5rem;line-height:1.2}
+.pro-account-heading h2::before{display:none}
+.pro-account-active{display:inline-flex;align-items:center;gap:4px;margin-inline-start:auto;padding:5px 8px;border-radius:6px;background:#ffffff18;font-size:.75rem}
+.pro-account-active svg{width:14px;height:14px}
+.pro-account-body{padding:18px 20px 20px}
+.pro-account-body .pro-description{font-size:.88rem;line-height:1.5;margin:0 0 16px;color:#625b73}
+.pro-account-body .pro-state{border:0;padding:0;margin:0 0 16px;font-size:.9rem;color:#27197f;font-weight:600;line-height:1.4}
+.pro-account-details{margin:0;border-top:1px solid #e9e5ef}
+.pro-account-details>div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #e9e5ef}
+.pro-account-details dt{font-size:.82rem;color:#716b7d;flex:1}
+.pro-account-details dd{margin:0;font-size:.9rem;font-weight:600;text-align:end;color:#29233d;overflow-wrap:anywhere}
+.pro-account-body .pro-account-terms{font-size:.82rem;line-height:1.5;color:#625b73;margin:14px 0 0}
+.pro-account-body .pro-actions{margin:18px 0 0;gap:8px}
+.pro-account-body .pro-actions:has(button:not([hidden])){display:flex}
+.pro-account-body .pro-actions:not(:has(button:not([hidden]))){display:none}
+.pro-account-body .pro-actions button{flex:1;min-height:44px;font-size:.9rem}
+.pro-main>.pro-payment-note{margin:18px 2px 0;font-size:.77rem;line-height:1.5;color:#716b7d}
+.pro-main>.pro-payment-note svg{width:18px;height:18px;margin-top:2px}
+.pro-main>.pro-account-back{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:.88rem;text-decoration:none;color:#27197f}
+.pro-account-back svg{width:16px;height:16px;transform:rotate(90deg)}
+.pro-main[data-subscription-status=cancelled] .pro-state,.pro-main[data-subscription-status=paused] .pro-state{color:#625b73}
+.pro-main [hidden]{display:none!important}
+@media(max-width:360px){.pro-account-heading{padding:16px}.pro-account-body{padding:16px}.pro-account-details>div{flex-direction:column;gap:5px}.pro-account-details dd{text-align:start}}
