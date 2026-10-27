@@ -24,6 +24,7 @@ function branch_event(PDO $db,int $user,string $action,?array $before,?array $af
 }
 function branch_management(PDO $db,int $user,array $query): array {
     if (!stock_is_admin($db,$user)) throw new CatalogException('Solo administradores y managers pueden gestionar sucursales.',403);
+    if(($query['view']??'')==='pallets')return branch_management_pallets($db,$user,$query);
     if(isset($query['id'])) { if(!is_string($query['id'])||!preg_match('/^[0-9]{1,15}$/D',$query['id']))throw new CatalogException('Sucursal no valida.',422);return ['branch'=>array_intersect_key(branch_owned($db,(int)$query['id'],$user),array_flip(['id','name','address','locality','province','description','latitude','longitude','revision']))]; }
     $page=filter_var($query['page']??0,FILTER_VALIDATE_INT,['options'=>['min_range'=>0,'max_range'=>10000]]);$q=$query['q']??'';
     if($page===false||!is_string($q)||mb_strlen($q)>160)throw new CatalogException('Busqueda no valida.',422);
@@ -174,4 +175,13 @@ function branch_public(PDO $db,string $token,int $page=0,?int $viewer=null,array
     }
     $result=['owner_name'=>get_public_user_name(stock_query($db,'SELECT id,name,public_name FROM users WHERE id=?',[(int)$share['owner_id']])->fetch()?:['id'=>(int)$share['owner_id']]),'title'=>$branch['name']??$share['title'],'branch'=>$branch?array_intersect_key($branch,array_flip(['name','address','locality','province','description'])):null,'pallets'=>$pallets,'has_more'=>$hasMore,'page'=>$page,'summary'=>$summary];
     if($filterOptions!==null)$result['filters']=$filterOptions;return $result;
+}
+
+function branch_management_pallets(PDO $db,int $user,array $query): array {
+    if(!stock_is_admin($db,$user))throw new CatalogException('No tenés permiso para consultar estos palets.',403);
+    foreach(['id','cursor'] as $field)if(!is_string($query[$field]??'0')||!preg_match('/^[0-9]{1,15}$/D',$query[$field]??'0'))throw new CatalogException('Selección no válida.',422);
+    $branch=branch_owned($db,(int)($query['id']??0),$user);$cursor=(int)($query['cursor']??0);
+    $rows=stock_query($db,'SELECT p.id,p.code,p.description,u.public_name,u.name,(SELECT COUNT(*) FROM pallet_products pp WHERE pp.pallet_id=p.id) AS products FROM pallets p JOIN users u ON u.id=p.owner_id WHERE p.branch_id=? AND p.released=0 AND p.id>? ORDER BY p.id LIMIT 31',[$branch['id'],$cursor])->fetchAll();
+    $more=count($rows)>30;$rows=array_slice($rows,0,30);foreach($rows as &$row){$row['owner_name']=get_public_user_name($row);unset($row['name'],$row['public_name']);}unset($row);
+    return ['branch'=>['id'=>$branch['id'],'name'=>$branch['name']],'pallets'=>$rows,'next_cursor'=>$more?(int)end($rows)['id']:null];
 }
