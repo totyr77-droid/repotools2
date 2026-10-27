@@ -894,3 +894,11 @@ Usuario indica100/200/300 para testear; se asignan por orden de opciones a PRO10
 Compra Supervisión aún no habilitada: no reutilizar importe/provider plan PRO. Falta catálogo de cobro/entitlement de Supervisión y definición de alcance antes de activar su botón; precios temporales no son prueba de esa integración. Texto ya no pide precio que fue respondido; indica contratación en preparación. No inventar cuotas ni asignar acceso a locales por selección de plan. Main intacto.
 
 Validación: unit quotes/pro-subscriptions y UI Chromium/WebKit con textos100/200/300, navegación responsive y formulario anterior sin regresiones. Sin solicitudes de cobro ni suscripciones remotas creadas. Reversión: revertir commit/publicar caché superior. Sin esquema/datos.
+
+## Beta2.01 — planes como tarjetas deslizables
+
+Pedido del usuario: tres div/tarjetas independientes, contiguas, que se desplacen completas y sin scroll interno. Catálogo reorganizado en tres article con encabezado/importe/beneficios/acción propios; pista flex desplazada horizontalmente con transición y alternativa sin movimiento según preferencia del sistema. Navegación por selector, flechas, teclado, gesto táctil y arrastre con mouse. Tarjetas fuera de selección inert/aria-hidden para no recibir foco. Cierre respeta mano. Textos resumidos para lectura inmediata y altura móvil; no scroll vertical dentro del diálogo ni de tarjetas.
+
+Supervisión indica200ARS por mes por cuenta, según aclaración del usuario. Su contratación permanece deshabilitada: pendiente integración independiente de cobro/entitlement, no cobrar plan PRO como Supervisión. Supermercado permanece solo contacto. No cambios de permisos, datos ni main.
+
+Validación: PHP/JS sintaxis; pro-subscriptions-ui Chromium/WebKit con tres tarjetas, una interactiva, navegación, aislamiento/API/formulario anteriores y medidas320x568,390x664,1366x768: diálogo completo dentro del viewport sin scroll vertical. Captura WebKit revisada. Reversión: revertir este commit y publicar caché superior; sin migración ni datos que revertir.

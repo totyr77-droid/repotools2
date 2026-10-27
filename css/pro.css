@@ -119,3 +119,25 @@ body[data-ui-skin="beta"] .transfer-choice-copy small{font-size:.82rem;line-heig
 .pro-plan-navigation{display:flex;gap:4px;margin:12px 0}.pro-plan-navigation button{flex:1;min-width:0;min-height:44px;padding:8px 4px;border:0;border-radius:8px;background:#eeebf7;color:#4b3b76;font-size:.8rem}.pro-plan-navigation button[aria-pressed=true]{background:#27197f;color:white}.pro-plan-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;color:#716b7d;font-size:.85rem}.pro-plan-pager button{display:grid;place-items:center;min-height:44px;width:44px;padding:12px}.pro-plan-pager svg{width:18px;height:18px;transform:rotate(-90deg)}.pro-plan-pager #proPlanPrevious svg{transform:rotate(90deg)}.pro-plan-benefits{padding-inline-start:20px;line-height:1.6;font-size:.9rem}.pro-team-option>.library-primary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px}.pro-plan-navigation[hidden],.pro-plan-pager[hidden],#proPersonalPanel[hidden],#proSupervisionPanel[hidden],#proSupermarketPanel[hidden]{display:none!important}.pro-upgrade-brand strong{white-space:nowrap}
 
 .pro-upgrade-dialog .pro-catalog-price{font-size:1.35rem;font-weight:700;color:#27197f;margin:12px 0}.pro-catalog-price small{font-size:.8rem;font-weight:400;color:#716b7d}
+/* Three independent cards move as one deck; inactive cards cannot receive focus. */
+.pro-upgrade-dialog{width:min(460px,calc(100% - 24px));max-height:none;overflow:hidden;padding:0;border:0;background:#fff}
+.pro-deck-close{position:absolute;z-index:3;inset-inline-end:12px;top:68px;width:44px;height:44px;background:#ffffff20;color:white;border:0}
+.pro-plan-navigation{margin:0;padding:8px 12px;background:#fff;gap:4px}
+.pro-deck-window{overflow:hidden;touch-action:pan-y;isolation:isolate}
+.pro-plan-track{display:flex;align-items:stretch;transition:transform .32s cubic-bezier(.22,.7,.25,1);will-change:transform}
+.pro-plan-card{flex:0 0 100%;min-width:0;box-sizing:border-box;padding:0;border:0;margin:0;background:white;overflow:hidden}
+.pro-plan-card .pro-upgrade-hero{padding:14px 62px 16px 20px;min-height:100px;box-sizing:border-box}
+.pro-plan-card .pro-upgrade-hero h2{font-size:1.55rem;margin-top:12px}
+.pro-plan-card .pro-upgrade-content{padding:12px 20px 16px;animation:none!important}
+.pro-plan-card .pro-catalog-price{margin:0 0 8px;font-size:1.4rem}
+.pro-plan-card p{margin:8px 0;line-height:1.35;font-size:.87rem}
+.pro-plan-card #proUpgradeReason{margin:8px 0}
+.pro-plan-card .pro-plan-benefits{padding-inline-start:20px;margin:12px 0;line-height:1.5;font-size:.88rem}
+.pro-plan-card .stock-muted{font-size:.76rem;line-height:1.35;margin:10px 0}
+.pro-plan-card .library-primary{display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;min-height:44px;padding:10px 12px}
+.pro-plan-pager{margin:0;padding:0 16px 10px}
+.pro-upgrade-dialog:has(.pro-plan-navigation[hidden]) .pro-deck-close{top:12px}
+@media(max-height:600px){.pro-plan-card .pro-upgrade-hero{min-height:80px;padding-top:10px;padding-bottom:10px}.pro-plan-card .pro-upgrade-hero h2{font-size:1.25rem;margin-top:6px}.pro-plan-card .pro-upgrade-content{padding-block:8px}.pro-plan-card .pro-plan-benefits{margin:8px 0;line-height:1.35}.pro-plan-card .stock-muted{margin:6px 0}.pro-plan-card p{margin:6px 0}.pro-plan-pager{padding-bottom:6px}}
+@media(prefers-reduced-motion:reduce){.pro-plan-track{transition:none}}
+body[data-hand="left"] .pro-upgrade-dialog .pro-deck-close{inset-inline-end:auto;inset-inline-start:12px}
+body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:62px 20px}
