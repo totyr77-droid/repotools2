@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=48;
+const REPOTOOLS_SCHEMA_VERSION=49;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -388,6 +388,14 @@ function initialize_database(PDO $db): void {
             $db->exec('CREATE INDEX support_tickets_status ON support_tickets(status,updated_at)');
             $db->exec('CREATE INDEX support_messages_ticket ON support_messages(ticket_id,id)');
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(48)');
+        }
+        if(!isset($applied[49])){
+            $db->exec("CREATE TABLE supervision_subscriptions(reference TEXT PRIMARY KEY,user_id {$ref} NOT NULL UNIQUE REFERENCES users(id),provider_id TEXT UNIQUE,status TEXT NOT NULL DEFAULT 'new',checkout_url TEXT NOT NULL DEFAULT '',amount_cents INTEGER NOT NULL CHECK(amount_cents>0),paid_until BIGINT NOT NULL DEFAULT 0,updated_at BIGINT NOT NULL DEFAULT 0)");
+            $db->exec("CREATE TABLE supervision_payments(provider_id TEXT PRIMARY KEY,reference TEXT NOT NULL REFERENCES supervision_subscriptions(reference),status TEXT NOT NULL,period_end BIGINT NOT NULL,updated_at BIGINT NOT NULL)");
+            $db->exec('CREATE INDEX supervision_payments_reference ON supervision_payments(reference,status,period_end)');
+            $db->exec('ALTER TABLE supervisor_teams ADD COLUMN billing_required INTEGER NOT NULL DEFAULT 0 CHECK(billing_required IN (0,1))');
+            $db->exec("CREATE TABLE billing_webhook_receipts(request_key TEXT PRIMARY KEY,event_type TEXT NOT NULL,resource_key TEXT NOT NULL,received_at BIGINT NOT NULL)");
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(49)');
         }
         $db->commit();
     } catch (Throwable $error) {

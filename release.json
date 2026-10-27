@@ -1,6 +1,12 @@
 {
-  "version": 111,
+  "version": 112,
   "changes": [
+    {
+      "version": 112,
+      "label": "2.07",
+      "date": "2026-10-27",
+      "summary": "Compra de Supervisión independiente y validación de pagos y renovaciones."
+    },
     {
       "version": 111,
       "label": "2.06",
@@ -294,15 +300,9 @@
       "label": "1.58",
       "date": "2026-10-19",
       "summary": "Lectura EAN con intentos más rápidos y tolerancia según rendimiento."
-    },
-    {
-      "version": 62,
-      "label": "1.57",
-      "date": "2026-10-19",
-      "summary": "Corrige confirmación del lector EAN alternativo en envases difíciles."
     }
   ],
   "major": 2,
-  "minor": 6,
-  "label": "2.06"
+  "minor": 7,
+  "label": "2.07"
 }

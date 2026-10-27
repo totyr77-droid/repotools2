@@ -9,14 +9,14 @@ if($method==='POST'&&!valid_csrf())pro_response(403,['error'=>'La sesión venci�
 if((int)($_SERVER['CONTENT_LENGTH']??0)>2048)pro_response(413,['error'=>'Solicitud demasiado grande.']);
 $csrf=csrf_token();session_write_close();
 try{
-    $db=database();pro_require_tester($db,(int)$user['id']);
+    $product=billing_product(($method==='POST'?$_POST:$_GET)['product']??'pro');$db=database();pro_require_tester($db,(int)$user['id']);
     if($method==='POST'){
-        $action=$_POST['action']??'';$service=new ProSubscriptions($db,pro_config());
-        if($action==='checkout'){if(!is_string($_POST['card_token']??''))throw new CatalogException('Token no válido.',422);$url=$service->checkout((int)$user['id'],$_POST['card_token']??'');pro_response(200,['checkout_url'=>$url,'subscription'=>pro_state($db,(int)$user['id']),'csrf'=>$csrf]);}
+        $action=$_POST['action']??'';$service=new ProSubscriptions($db,pro_config($product));
+        if(in_array($action,['checkout','checkout_hosted'],true)){if(!is_string($_POST['card_token']??''))throw new CatalogException('Token no válido.',422);$url=$service->checkout((int)$user['id'],$_POST['card_token']??'',$action==='checkout_hosted');pro_response(200,['checkout_url'=>$url,'subscription'=>pro_state($db,(int)$user['id'],$product),'csrf'=>$csrf]);}
         elseif($action==='refresh')$service->reconcile((int)$user['id']);
         elseif($action==='cancel')$service->cancel((int)$user['id']);
         else pro_response(422,['error'=>'Acción no válida.']);
     }
-    pro_response(200,['subscription'=>pro_state($db,(int)$user['id']),'csrf'=>$csrf]);
+    pro_response(200,['subscription'=>pro_state($db,(int)$user['id'],$product),'csrf'=>$csrf]);
 }catch(CatalogException $e){pro_response($e->status,['error'=>$e->getMessage()]);}
 catch(Throwable $e){error_log('RepoTools Pro: '.get_class($e));pro_response(503,['error'=>'No pudimos consultar tu suscripción. Volvé a intentar.']);}

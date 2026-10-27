@@ -33,5 +33,6 @@ doc.addEventListener('click',async event=>{const button=event.target.closest?.('
 doc.addEventListener('repotools:pro-required',event=>show(event.detail?.feature),{signal:abort.signal});
 dialog.addEventListener('click',event=>{if(ignoreClick)return;if(event.target.closest('[data-pro-close]'))dialog.close();else if(plansMode&&!event.target.closest('button,a,input,select,textarea')){const rect=doc.getElementById('proPlanTrack').getBoundingClientRect();if(event.clientX<rect.left)selectPlan(planIndex-1);else if(event.clientX>rect.right)selectPlan(planIndex+1);}},{signal:abort.signal});
 review.addEventListener('click',()=>{const button=reviewButton;dialog.close();if(button){skip=button;button.click();}},{signal:abort.signal});
+doc.getElementById('proSupervisionJoin').addEventListener('click',()=>{if(!doc.getElementById('proSupervisionJoin').disabled)location.assign('pro.php?product=supervision&join=1');},{signal:abort.signal});
 join.addEventListener('click',()=>{if(!join.disabled)location.assign('pro.php?join=1');},{signal:abort.signal});
 window.RepoProAccess={require:allowed,show};page?.onLeave(()=>{clearTimeout(motionTimer);abort.abort();if(window.RepoProAccess?.require===allowed)delete window.RepoProAccess;});})();

@@ -3,7 +3,12 @@ declare(strict_types=1);
 require_once __DIR__.'/stock.php';
 
 // Test integration only. Live credentials cannot enable live billing in this release.
-function pro_config(): array {
+function billing_product(mixed $value='pro'): string {
+    if(!is_string($value)||!in_array($value,['pro','supervision'],true))throw new CatalogException('Plan no válido.',422);
+    return $value;
+}
+function pro_config(string $product='pro'): array {
+    $product=billing_product($product);
     $amount=getenv('REPOTOOLS_MP_TEST_AMOUNT_CENTS')?:'';
     $url=rtrim(getenv('APP_URL')?:'','/');
     $config=['token'=>getenv('REPOTOOLS_MP_ACCESS_TOKEN')?:'', 'secret'=>getenv('REPOTOOLS_MP_WEBHOOK_SECRET')?:'',
@@ -14,6 +19,9 @@ function pro_config(): array {
         &&$config['token']!==''&&strlen($config['secret'])>=16&&ctype_digit($config['seller'])
         &&preg_match('/^test_user_[a-z0-9_]+@testuser\.com$/iD',$config['buyer'])===1
         &&$config['amount']>0&&$config['amount']<=100000000;
+    $config['hosted_enabled']=getenv('REPOTOOLS_MP_HOSTED_ENABLED')==='1';
+    $config['product']=$product;
+    if($product==='supervision'){$config['amount']=20000;$config['plan']=trim(getenv('REPOTOOLS_MP_TEST_SUPERVISION_PLAN_ID')?:'');$config['enabled']=$config['enabled']&&$config['plan']!=='';}
     return $config;
 }
 // Temporary monthly quotes for the beta catalogue. Team quotes never alter PRO billing.
@@ -25,11 +33,12 @@ function pro_require_tester(PDO $db,int $user): void {
     $role=stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn();
     if(!$role||($role!=='manager'&&rtrim(getenv('APP_URL')?:'','/')!=='https://repotools-desarrollo.onrender.com'))throw new CatalogException('Las pruebas de suscripción están disponibles en beta.',403);
 }
-function pro_state(PDO $db,int $user): array {
-    $row=stock_query($db,'SELECT status,paid_until FROM pro_subscriptions WHERE user_id=?',[$user])->fetch();
-    $config=pro_config();
-    return ['mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
-        'card_required'=>($config['plan']??'')!=='','public_key'=>$config['enabled']?($config['public_key']??''):'','test_buyer'=>$config['enabled']?$config['buyer']:'','status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
+function pro_state(PDO $db,int $user,string $product='pro'): array {
+    $product=billing_product($product);$table=$product==='supervision'?'supervision_subscriptions':'pro_subscriptions';
+    $row=stock_query($db,"SELECT status,paid_until FROM $table WHERE user_id=?",[$user])->fetch();
+    $config=pro_config($product);
+    return ['product'=>$product,'mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
+        'hosted_enabled'=>$config['enabled']&&$config['hosted_enabled'],'card_required'=>($config['plan']??'')!==''&&($row['status']??'')!=='pending','public_key'=>$config['enabled']?($config['public_key']??''):'','test_buyer'=>$config['enabled']?$config['buyer']:'','status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
         'paid_until'=>(int)($row['paid_until']??0),'enforced'=>true];
 }
 function pro_provider_failure(int $status,?array $data,int $network=0): array {
@@ -54,7 +63,12 @@ function pro_provider_failure(int $status,?array $data,int $network=0): array {
     return ['category'=>$kind,'message'=>$notice.' Código HTTP '.$status.'.'];
 }
 final class ProSubscriptions {
-    public function __construct(private PDO $db,private array $config,private $transport=null) {}
+    public function __construct(private PDO $db,private array $config,private $transport=null) {billing_product($config['product']??'pro');}
+    private function query(string $sql,array $args=[]): PDOStatement {
+        if(($this->config['product']??'pro')==='supervision')$sql=str_replace(['pro_subscriptions','pro_payments'],['supervision_subscriptions','supervision_payments'],$sql);
+        return stock_query($this->db,$sql,$args);
+    }
+    public function reconcileProvider(string $provider): void {$row=$this->query('SELECT user_id FROM pro_subscriptions WHERE provider_id=?',[$provider])->fetch();if($row)$this->reconcile((int)$row['user_id']);}
     private function request(string $method,string $path,?array $body=null,string $key=''): array {
         if(!$this->config['enabled'])throw new CatalogException('Las pruebas de pago todavía no están habilitadas.',503);
         if($this->transport)return ($this->transport)($method,$path,$body,$key);
@@ -75,12 +89,12 @@ final class ProSubscriptions {
         if(!empty($seller['email'])&&strcasecmp(trim($seller['email']),trim($this->config['buyer']))===0)throw new CatalogException('El comprador de prueba debe ser una cuenta distinta del vendedor. Revisá el correo configurado.',422);
     }
     private function row(int $user): array|false {
-        return stock_query($this->db,'SELECT * FROM pro_subscriptions WHERE user_id=?',[$user])->fetch();
+        return $this->query('SELECT * FROM pro_subscriptions WHERE user_id=?',[$user])->fetch();
     }
     private function lock(string $reference): array {
         // Serialize provider reads and local transitions, including duplicate/out-of-order webhooks.
-        stock_query($this->db,'UPDATE pro_subscriptions SET updated_at=updated_at WHERE reference=?',[$reference]);
-        $row=stock_query($this->db,'SELECT * FROM pro_subscriptions WHERE reference=?',[$reference])->fetch();
+        $this->query('UPDATE pro_subscriptions SET updated_at=updated_at WHERE reference=?',[$reference]);
+        $row=$this->query('SELECT * FROM pro_subscriptions WHERE reference=?',[$reference])->fetch();
         if(!$row)throw new CatalogException('Suscripción no encontrada.',404);
         return $row;
     }
@@ -105,32 +119,34 @@ final class ProSubscriptions {
         if(!in_array($status,['pending','authorized','paused','cancelled'],true))throw new CatalogException('Estado de suscripción no reconocido.',409);
         $checkout=$remote['init_point']??$row['checkout_url'];
         if($checkout!==''&&(parse_url($checkout,PHP_URL_SCHEME)!=='https'||parse_url($checkout,PHP_URL_HOST)!=='www.mercadopago.com.ar'))throw new CatalogException('Enlace de pago no válido.',503);
-        stock_query($this->db,'UPDATE pro_subscriptions SET provider_id=?,status=?,checkout_url=?,updated_at=? WHERE reference=?',[$remote['id'],$status,$checkout,time(),$row['reference']]);
+        $this->query('UPDATE pro_subscriptions SET provider_id=?,status=?,checkout_url=?,updated_at=? WHERE reference=?',[$remote['id'],$status,$checkout,time(),$row['reference']]);
     }
-    public function checkout(int $user,string $cardToken=''): string {
-        if(($this->config['plan']??'')!==''&&!preg_match('/^[a-zA-Z0-9_-]{16,256}$/D',$cardToken))throw new CatalogException('Completá la tarjeta de prueba para continuar.',422);
+    public function checkout(int $user,string $cardToken='',bool $hosted=false): string {
+        if($hosted&&empty($this->config['hosted_enabled']))throw new CatalogException('El pago en el sitio de Mercado Pago todavía no está habilitado para esta aplicación.',503);
+        $pending=$this->row($user);$resuming=$pending&&$pending['status']==='pending'&&$pending['checkout_url']!=='';
+        if(!$hosted&&!$resuming&&($this->config['plan']??'')!==''&&!preg_match('/^[a-zA-Z0-9_-]{16,256}$/D',$cardToken))throw new CatalogException('Completá la tarjeta de prueba para continuar.',422);
         $this->seller();
         // A persistent reference/idempotency key survives network timeouts and repeated clicks.
         $ref=bin2hex(random_bytes(24));
-        stock_query($this->db,"INSERT INTO pro_subscriptions(reference,user_id,amount_cents) VALUES(?,?,?) ON CONFLICT(user_id) DO NOTHING",[$ref,$user,$this->config['amount']]);
+        $this->query("INSERT INTO pro_subscriptions(reference,user_id,amount_cents) VALUES(?,?,?) ON CONFLICT(user_id) DO NOTHING",[$ref,$user,$this->config['amount']]);
         $create=$this->transaction(function()use($user){
             $row=$this->lock($this->row($user)['reference']);
-            if($row['status']==='beta_trial'&&$row['provider_id']===null&&$row['checkout_url']===''){stock_query($this->db,"UPDATE pro_subscriptions SET status='new',amount_cents=? WHERE reference=?",[$this->config['amount'],$row['reference']]);$row['status']='new';$row['amount_cents']=$this->config['amount'];}
+            if($row['status']==='beta_trial'&&$row['provider_id']===null&&$row['checkout_url']===''){$this->query("UPDATE pro_subscriptions SET status='new',amount_cents=? WHERE reference=?",[$this->config['amount'],$row['reference']]);$row['status']='new';$row['amount_cents']=$this->config['amount'];}
             if(in_array($row['status'],['cancelled','paused'],true))throw new CatalogException('La suscripción está cancelada o pausada. Revisala antes de contratar nuevamente.',409);
             if($row['status']==='authorized')throw new CatalogException('Ya tenés una suscripción autorizada.',409);
             if($row['checkout_url']!=='')return ['url'=>$row['checkout_url']];
             $first=$row['status']==='new';
-            if($first)stock_query($this->db,"UPDATE pro_subscriptions SET status='creating',updated_at=? WHERE reference=?",[time(),$row['reference']]);
+            if($first)$this->query("UPDATE pro_subscriptions SET status='creating',updated_at=? WHERE reference=?",[time(),$row['reference']]);
             return ['row'=>$row,'first'=>$first];
         });
         if(isset($create['url']))return $create['url'];
         $row=$create['row'];
         if($create['first']){
             $remote=$this->request('POST','/preapproval',[
-                ...(($this->config['plan']??'')!==''?['preapproval_plan_id'=>$this->config['plan'],'card_token_id'=>$cardToken]:[]),
-                'reason'=>'RepoTools Pro · prueba','external_reference'=>$row['reference'],'payer_email'=>$this->config['buyer'],
+                ...(($this->config['plan']??'')!==''?['preapproval_plan_id'=>$this->config['plan'],...(!$hosted?['card_token_id'=>$cardToken]:[])]:[]),
+                'reason'=>(($this->config['product']??'pro')==='supervision'?'RepoTools Supervisión':'RepoTools PRO').' · prueba','external_reference'=>$row['reference'],'payer_email'=>$this->config['buyer'],
                 'auto_recurring'=>['frequency'=>1,'frequency_type'=>'months','transaction_amount'=>(int)$row['amount_cents']/100,'currency_id'=>'ARS'],
-                'back_url'=>$this->config['url'].'/pro.php','status'=>($this->config['plan']??'')!==''?'authorized':'pending'
+                'back_url'=>$this->config['url'].'/pro.php?product='.($this->config['product']??'pro'),'status'=>!$hosted&&($this->config['plan']??'')!==''?'authorized':'pending'
             ],$row['reference']);
         }else{
             // Do not repeat POST after an ambiguous timeout: recover by reference instead.
@@ -155,8 +171,8 @@ final class ProSubscriptions {
         });
     }
     public function subscription(string $id): void {
-        $row=stock_query($this->db,'SELECT reference FROM pro_subscriptions WHERE provider_id=?',[$id])->fetch();
-        if(!$row){$remote=$this->request('GET','/preapproval/'.rawurlencode($id));$row=stock_query($this->db,'SELECT reference FROM pro_subscriptions WHERE reference=?',[(string)($remote['external_reference']??'')])->fetch();if(!$row)return;}
+        $row=$this->query('SELECT reference FROM pro_subscriptions WHERE provider_id=?',[$id])->fetch();
+        if(!$row){$remote=$this->request('GET','/preapproval/'.rawurlencode($id));$row=$this->query('SELECT reference FROM pro_subscriptions WHERE reference=?',[(string)($remote['external_reference']??'')])->fetch();if(!$row)return;}
         $this->transaction(function()use($row,$id){$current=$this->lock($row['reference']);$this->apply($this->request('GET','/preapproval/'.rawurlencode($id)),$current);});
     }
     public function reconcile(int $user): void {
@@ -177,7 +193,7 @@ final class ProSubscriptions {
         if($expectedParent!==null&&$parent!==$expectedParent)throw new CatalogException('La cuota no corresponde a tu suscripción.',409);
         if(!preg_match('/^[a-zA-Z0-9_-]{1,100}$/D',$parent))throw new CatalogException('Suscripción no válida.',409);
         $this->subscription($parent); // Recover webhooks arriving before the checkout response was saved.
-        $row=stock_query($this->db,'SELECT reference FROM pro_subscriptions WHERE provider_id=?',[(string)($invoice['preapproval_id']??'')])->fetch();
+        $row=$this->query('SELECT reference FROM pro_subscriptions WHERE provider_id=?',[(string)($invoice['preapproval_id']??'')])->fetch();
         if(!$row)return;
         $this->transaction(function()use($row,$id){
             $current=$this->lock($row['reference']);
@@ -203,9 +219,10 @@ final class ProSubscriptions {
             if(!is_string($date)||!strtotime($date))throw new CatalogException('La cuota no tiene una fecha válida.',409);
             $start=new DateTimeImmutable($date);$next=$start->modify('first day of next month');
             $end=$next->setDate((int)$next->format('Y'),(int)$next->format('m'),min((int)$start->format('d'),(int)$next->format('t')))->getTimestamp();
-            stock_query($this->db,'INSERT INTO pro_payments(provider_id,reference,status,period_end,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(provider_id) DO UPDATE SET status=excluded.status,period_end=excluded.period_end,updated_at=excluded.updated_at',[$paymentId,$current['reference'],$status,$end,time()]);
-            $until=(int)stock_query($this->db,"SELECT COALESCE(MAX(period_end),0) FROM pro_payments WHERE reference=? AND status='approved'",[$current['reference']])->fetchColumn();
-            stock_query($this->db,'UPDATE pro_subscriptions SET paid_until=?,updated_at=? WHERE reference=?',[$until,time(),$current['reference']]);
+            $this->query('INSERT INTO pro_payments(provider_id,reference,status,period_end,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(provider_id) DO UPDATE SET status=excluded.status,period_end=excluded.period_end,updated_at=excluded.updated_at',[$paymentId,$current['reference'],$status,$end,time()]);
+            $until=(int)$this->query("SELECT COALESCE(MAX(period_end),0) FROM pro_payments WHERE reference=? AND status='approved'",[$current['reference']])->fetchColumn();
+            $this->query('UPDATE pro_subscriptions SET paid_until=?,updated_at=? WHERE reference=?',[$until,time(),$current['reference']]);
+            if(($this->config['product']??'pro')==='supervision'&&$until>time())$this->query("INSERT INTO supervisor_teams(owner_id,name,billing_required) VALUES(?,'Mi equipo',1) ON CONFLICT(owner_id) DO NOTHING",[$current['user_id']]);
         });
     }
 }
