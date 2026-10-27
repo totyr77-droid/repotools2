@@ -112,8 +112,8 @@ final class ProSubscriptions {
         $this->seller();
         $remote=$this->request('GET','/preapproval/'.rawurlencode($row['provider_id']));$this->validate($remote,$row);
         if(($remote['status']??'')!=='cancelled')throw new CatalogException('Mercado Pago todavía no confirmó la cancelación.',409);
-        $invoices=$this->request('GET','/authorized_payments/search?preapproval_id='.rawurlencode($row['provider_id']).'&limit=100&offset=0');
-        if(!isset($invoices['results'])||!is_array($invoices['results'])||count($invoices['results'])>=100||(int)($invoices['paging']['total']??0)>count($invoices['results']))throw new CatalogException('No pudimos verificar el intento anterior.',409);
+        $invoices=$this->request('GET','/authorized_payments/search?preapproval_id='.rawurlencode($row['provider_id']).'&limit=5&offset=0');
+        if(!isset($invoices['results'])||!is_array($invoices['results'])||count($invoices['results'])>=5||(int)($invoices['paging']['total']??0)>count($invoices['results']))throw new CatalogException('No pudimos verificar el intento anterior.',409);
         foreach($invoices['results'] as $invoice)if((string)($invoice['preapproval_id']??'')!==$row['provider_id']||!in_array($invoice['payment']['status']??'',['rejected','cancelled'],true))throw new CatalogException('El intento anterior tiene un pago que debe verificarse.',409);
         $this->transaction(function()use($row){$current=$this->lock($row['reference']);
             if($current['status']!=='cancelled'||(int)$current['paid_until']>0||$current['provider_id']!==$row['provider_id']||(int)$this->query('SELECT COUNT(*) FROM pro_payments WHERE reference=?',[$row['reference']])->fetchColumn()>0)throw new CatalogException('El historial de este plan debe conservarse.',409);

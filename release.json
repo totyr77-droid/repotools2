@@ -1,6 +1,12 @@
 {
-  "version": 115,
+  "version": 116,
   "changes": [
+    {
+      "version": 116,
+      "label": "2.11",
+      "date": "2026-10-27",
+      "summary": "Corrige la consulta a Mercado Pago al volver a contratar."
+    },
     {
       "version": 115,
       "label": "2.10",
@@ -294,15 +300,9 @@
       "label": "1.62",
       "date": "2026-10-20",
       "summary": "Palets del equipo en Inicio, permisos de traslado y controles compactos."
-    },
-    {
-      "version": 66,
-      "label": "1.61",
-      "date": "2026-10-20",
-      "summary": "Oculta ingreso manual de equipo cuando la ubicación no permite escanear."
     }
   ],
   "major": 2,
-  "minor": 10,
-  "label": "2.10"
+  "minor": 11,
+  "label": "2.11"
 }

@@ -982,3 +982,9 @@ Migración50 aditiva: archivo de intentos y name_pending en equipos. Respaldo pr
 Validación: billing-retry (cancelación remota/pagos pendientes o aprobados, referencia independiente, archivo, idempotencia, sin cargos, nombres propios/acceso vigente), supervision-billing (onboarding solo tras pago y nombre conservado), pro-subscriptions, billing-renewal, supervision y UI móvil/PC de pagos/nombre/reintento. No prueba de cobro nuevo real ni solución de rechazo del proveedor; webhook automático sigue pendiente de configuración.
 
 Reversión: revertir commit y publicar caché superior; conservar tabla/columna nuevas y archivo de intentos. No restaurar respaldo sobre pagos posteriores ni reactivar cancelados. No guardar credenciales, IDs de proveedor ni datos privados en documentación.
+
+## Beta2.11 — consulta compatible para volver a contratar
+
+HTTP400 al reintentar era originado por GET de cuotas con limit100, antes de cualquier nueva suscripción. Consulta de solo lectura confirma respuesta del proveedor Invalid value for limit; el mismo recurso con limit5 funciona. Corregido a5, manteniendo rechazo seguro si la página está completa o el total indica resultados faltantes. No se borra historial ni se omite revisar pagos. Sin reintentar cargos automáticamente ni cambios de datos/migración/main.
+
+Validación: proveedor real GET únicamente, billing-retry exige limit5/offset0 y bloquea respuesta incompleta; pro-subscriptions, supervision-billing y sintaxis PHP pasan. Reversión por revert y caché superior. El arreglo de la consulta no equivale a nueva compra aprobada ni confirma webhook automático.
