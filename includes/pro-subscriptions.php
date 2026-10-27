@@ -17,7 +17,8 @@ function pro_config(): array {
     return $config;
 }
 function pro_require_tester(PDO $db,int $user): void {
-    if(stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn()!=='manager')throw new CatalogException('La suscripción está en pruebas privadas.',403);
+    $role=stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn();
+    if(!$role||($role!=='manager'&&rtrim(getenv('APP_URL')?:'','/')!=='https://repotools-desarrollo.onrender.com'))throw new CatalogException('Las pruebas de suscripción están disponibles en beta.',403);
 }
 function pro_state(PDO $db,int $user): array {
     $row=stock_query($db,'SELECT status,paid_until FROM pro_subscriptions WHERE user_id=?',[$user])->fetch();

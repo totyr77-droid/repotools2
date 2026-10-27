@@ -1,6 +1,12 @@
 {
-  "version": 100,
+  "version": 101,
   "changes": [
+    {
+      "version": 101,
+      "label": "1.96",
+      "date": "2026-10-27",
+      "summary": "Habilita unirse a Pro de prueba para cuentas de beta"
+    },
     {
       "version": 100,
       "label": "1.95",
@@ -294,15 +300,9 @@
       "label": "1.47",
       "date": "2026-10-19",
       "summary": "Perfil público desde QR con invitación y selección de usuario"
-    },
-    {
-      "version": 51,
-      "label": "1.46",
-      "date": "2026-10-19",
-      "summary": "Despliegue suave del QR personal y tirador más oculto"
     }
   ],
   "major": 1,
-  "minor": 95,
-  "label": "1.95"
+  "minor": 96,
+  "label": "1.96"
 }
