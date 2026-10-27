@@ -954,3 +954,11 @@ Diagnóstico de webhook: registros reales muestran firmas401; plan consultado pe
 Validación: pro-subscriptions + supervision + supervision-billing + billing-renewal + hosted-checkout PHP; UI Chrome/WebKit compra PRO/Supervisión token-only con SDK/proveedor simulados, aislamiento y responsive. Renovación cubre calendario, duplicado, rechazo, reembolso y fuera de orden; NO renovación real acelerada ni entrega automática todavía. iPhone: main3.22 ya publicado, audición física pendiente de usuario.
 
 Reversión: revertir código/publicar caché superior; conservar tablas nuevas y pagos existentes. No DROP ni restaurar backup sobre pagos posteriores sin conciliación. Plan remoto de prueba no se cancela ni se cambia automáticamente; conservar ID/journal privados. No guardar credenciales/identidades en Git.
+
+### Verificación desplegada2.07
+
+Dos simulaciones firmadas propias sobre cuota ya existente reciben200; pro_payments mantiene una fila para esa suscripción y estado cancelled/período activo intactos. Migración49 y recibos hash presentes en beta. Sin crear suscripciones ni cargos de prueba adicionales. No confundir estas entregas propias con entrega automática del proveedor.
+
+## Beta2.08 — validación de selección de plan
+
+Selección inválida en página Mi plan responde422 claro, igual que API; evita excepción no controlada por parámetro de URL. UI comprueba producto Supervisión e importe20000 del API real de fixture además del checkout simulado. Sin cambios de facturación ni datos. Reversión mediante revert/caché superior.

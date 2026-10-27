@@ -2,8 +2,8 @@
 require_once __DIR__.'/includes/auth.php';
 require_once __DIR__.'/includes/pro-subscriptions.php';
 if(!current_user()){header('Location: cuenta.php');exit;}
-try{pro_require_tester(database(),(int)current_user()['id']);}catch(CatalogException $e){http_response_code(403);exit('La suscripción está en pruebas privadas.');}
-$product=billing_product($_GET['product']??'pro');$planLabel=$product==='supervision'?'Supervisión':'PRO';
+try{pro_require_tester(database(),(int)current_user()['id']);$product=billing_product($_GET['product']??'pro');}catch(CatalogException $e){http_response_code($e->status);exit($e->status===422?'Plan no válido.':'La suscripción está en pruebas privadas.');}
+$planLabel=$product==='supervision'?'Supervisión':'PRO';
 $paginaPro=true;
 $publicPageTitle='Mi plan';
 include __DIR__.'/vistas/header.vista.php';
