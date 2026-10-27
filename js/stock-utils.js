@@ -19,7 +19,12 @@
 })();
 // Quantity editing is shared by connected/offline forms; identifiers keep leading zeros.
 (()=>{if(typeof document==='undefined'||window.RepoQuantityInputs)return;window.RepoQuantityInputs=true;
-const editable=node=>node?.matches?.('#stockAmount,#deductAmount,#offlineAmount,#stockPackSize,#deductPackSize,#offlinePackSize,#deductPack,#offlinePack,#labelCount')&&!node.readOnly&&!node.disabled;
-document.addEventListener('focusin',event=>{if(editable(event.target)&&event.target.value==='0'){try{event.target.select();}catch{}};});
-document.addEventListener('input',event=>{const field=event.target;if(editable(field)&&!event.isComposing&&/^0+\d+$/.test(field.value))field.value=field.value.replace(/^0+(?=\d)/,'');},true);
+const editable=node=>node?.matches?.('#stockAmount,#deductAmount,#offlineAmount,#stockPackSize,#stockInnerCount,#stockInnerUnits,#deductPackSize,#offlinePackSize,#deductPack,#offlinePack,#labelCount')&&!node.readOnly&&!node.disabled;
+const replaceDefault=new WeakSet();
+document.addEventListener('focusin',event=>{const field=event.target;if(!editable(field))return;if(field.value==='1')replaceDefault.add(field);if(field.value==='0'||field.value==='1'){try{field.select();}catch{}};});
+// Number inputs cannot reliably select text on iOS. Replace only the untouched default,
+// immediately before native insertion; entering/leaving or using steppers changes nothing.
+document.addEventListener('beforeinput',event=>{const field=event.target;if(!editable(field)||!replaceDefault.has(field)||event.isComposing||!event.inputType?.startsWith('insert'))return;replaceDefault.delete(field);if(field.value==='1'&&event.cancelable&&typeof event.data==='string'&&/^\d+$/.test(event.data)){event.preventDefault();field.value=event.data;try{field.setSelectionRange(field.value.length,field.value.length);}catch{}field.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:event.inputType,data:event.data}));}},true);
+document.addEventListener('focusout',event=>replaceDefault.delete(event.target));
+document.addEventListener('input',event=>{const field=event.target;replaceDefault.delete(field);if(editable(field)&&!event.isComposing&&/^0+\d+$/.test(field.value))field.value=field.value.replace(/^0+(?=\d)/,'');},true);
 })();

@@ -1,6 +1,12 @@
 {
-  "version": 224,
+  "version": 225,
   "changes": [
+    {
+      "version": 225,
+      "label": "3.20",
+      "date": "2026-10-27",
+      "summary": "Reemplaza el 1 inicial al escribir cantidades de bultos cerrados."
+    },
     {
       "version": 224,
       "label": "3.19",
@@ -294,15 +300,9 @@
       "label": "2.71",
       "date": "2026-10-24",
       "summary": "Completa descripción y UXB de productos agregados usando catálogo y consulta API"
-    },
-    {
-      "version": 175,
-      "label": "2.70",
-      "date": "2026-10-24",
-      "summary": "Ubica productos fuera de lista junto al contenido, sin filas vacías intermedias"
     }
   ],
   "major": 3,
-  "minor": 19,
-  "label": "3.19"
+  "minor": 20,
+  "label": "3.20"
 }
