@@ -141,3 +141,16 @@ body[data-ui-skin="beta"] .transfer-choice-copy small{font-size:.82rem;line-heig
 @media(prefers-reduced-motion:reduce){.pro-plan-track{transition:none}}
 body[data-hand="left"] .pro-upgrade-dialog .pro-deck-close{inset-inline-end:auto;inset-inline-start:12px}
 body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:62px 20px}
+
+/* Keep neighboring cards outside the central card, clipped only at the screen edge. */
+.pro-upgrade-dialog{--plan-width:min(420px,calc(100vw - 48px));width:100vw;max-width:100vw;background:transparent;box-shadow:none;border-radius:0;overflow:clip}
+.pro-upgrade-dialog .pro-deck-window{width:var(--plan-width);margin-inline:auto;overflow:visible}
+.pro-plan-track{gap:24px}
+.pro-plan-card{border-radius:18px;box-shadow:0 12px 32px #170f5130}
+.pro-upgrade-dialog .pro-plan-navigation{width:var(--plan-width);box-sizing:border-box;margin:0 auto 10px;border-radius:12px;background:#ffffffed}
+.pro-upgrade-dialog .pro-plan-pager{width:var(--plan-width);box-sizing:border-box;margin:10px auto 0;padding:0;color:#fff}
+.pro-upgrade-dialog .pro-deck-close{inset-inline-end:calc((100vw - var(--plan-width))/2 + 12px);top:82px}
+body[data-hand="left"] .pro-upgrade-dialog .pro-deck-close{inset-inline-end:auto;inset-inline-start:calc((100vw - var(--plan-width))/2 + 12px)}
+.pro-upgrade-dialog:has(.pro-plan-navigation[hidden]) .pro-deck-close{top:12px}
+.pro-upgrade-dialog:has(.pro-plan-navigation[hidden]) .pro-deck-window{overflow:hidden;border-radius:18px}
+@media(max-height:600px){.pro-upgrade-dialog .pro-plan-navigation{margin-bottom:6px}.pro-upgrade-dialog .pro-plan-pager{margin-top:6px}.pro-upgrade-dialog .pro-deck-close{top:78px}}

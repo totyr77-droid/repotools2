@@ -902,3 +902,9 @@ Pedido del usuario: tres div/tarjetas independientes, contiguas, que se desplace
 Supervisión indica200ARS por mes por cuenta, según aclaración del usuario. Su contratación permanece deshabilitada: pendiente integración independiente de cobro/entitlement, no cobrar plan PRO como Supervisión. Supermercado permanece solo contacto. No cambios de permisos, datos ni main.
 
 Validación: PHP/JS sintaxis; pro-subscriptions-ui Chromium/WebKit con tres tarjetas, una interactiva, navegación, aislamiento/API/formulario anteriores y medidas320x568,390x664,1366x768: diálogo completo dentro del viewport sin scroll vertical. Captura WebKit revisada. Reversión: revertir este commit y publicar caché superior; sin migración ni datos que revertir.
+
+## Beta2.02 — tarjetas contiguas recortadas por la pantalla
+
+Usuario aclara con imagen: tarjetas separadas a los lados, ocultas parcialmente por no entrar en pantalla, no dentro del recuadro central. Diálogo transparente ocupa ancho de pantalla; ventana central permite ver tarjetas vecinas, cada artículo tiene borde redondeado propio y24px de separación. Pista desplaza ancho de tarjeta más separación, centra selección; recorte únicamente al borde del diálogo/pantalla. Selector/paginación exteriores, cierre sigue tarjeta central y mano. Upsell de una sola función conserva recorte a su única tarjeta. Sin scroll interno, sin cambio de contratación/permisos/main.
+
+Validación completada: pro-subscriptions-ui Chromium/WebKit, tarjeta seleccionada dentro de viewport320/390/1366, tres artículos/una tarjeta interactiva, sin scroll vertical; inspección visual de captura. Reversión: revertir commit y publicar caché superior. Sin datos/migraciones.

@@ -1,6 +1,12 @@
 {
-  "version": 106,
+  "version": 107,
   "changes": [
+    {
+      "version": 107,
+      "label": "2.02",
+      "date": "2026-10-27",
+      "summary": "Tarjetas de planes separadas y recortadas en los bordes de la pantalla."
+    },
     {
       "version": 106,
       "label": "2.01",
@@ -294,15 +300,9 @@
       "label": "1.53",
       "date": "2026-10-19",
       "summary": "Pendientes en modal, confirmaciones centradas y controles de invitación integrados"
-    },
-    {
-      "version": 57,
-      "label": "1.52",
-      "date": "2026-10-19",
-      "summary": "Simplificar invitación y corregir aviso al cerrar después de guardar"
     }
   ],
   "major": 2,
-  "minor": 1,
-  "label": "2.01"
+  "minor": 2,
+  "label": "2.02"
 }
