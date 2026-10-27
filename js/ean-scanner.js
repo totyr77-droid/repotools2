@@ -4,7 +4,19 @@
   if (window.RepoScanFeedback) return;
   let audioContext = window.RepoScannerAudioContext || null, audioPrimed = false;
   let playbackUsers=0, playbackPrevious, playbackSession;
+  const ios=/iPad|iPhone|iPod/i.test(window.navigator?.userAgent||'')||(window.navigator?.platform==='MacIntel'&&window.navigator?.maxTouchPoints>1);
+  let mediaTone=null,mediaReady=false,mediaRevision=0,mediaPlaying=false,mediaRestore=null;
+  function prepareMedia(){
+    if(!ios||!window.Audio||mediaPlaying)return;
+    try{
+      if(!mediaTone){mediaTone=new window.Audio('audio/scan-confirm.wav');mediaTone.preload='auto';}
+      const revision=++mediaRevision;mediaTone.currentTime=0;
+      // The local file starts with silence: unlock in the tap without an early confirmation.
+      Promise.resolve(mediaTone.play()).then(()=>{if(revision!==mediaRevision||mediaPlaying)return;mediaTone.pause();mediaTone.currentTime=.25;mediaReady=true;}).catch(()=>{if(revision===mediaRevision)mediaReady=false;});
+    }catch{mediaReady=false;}
+  }
   function prepareSound() {
+    prepareMedia();
     try {
       try { if (!playbackUsers && window.navigator?.audioSession) window.navigator.audioSession.type = 'ambient'; } catch {}
       const Context = window.AudioContext || window.webkitAudioContext;
@@ -20,7 +32,8 @@
   }
   async function beep(preferences = {}, onScheduled = () => {}) {
     if (preferences.vibration !== false) { try { window.navigator?.vibrate?.(60); } catch {} }
-    if (preferences.sound === false || !audioContext) return;
+    if (preferences.sound === false || (!audioContext&&!mediaReady)) return;
+    if(mediaPlaying){mediaRevision++;mediaTone.pause();mediaPlaying=false;mediaRestore?.();mediaRestore=null;}
     let restoreSession = () => {}, scheduled = false;
     try {
       // Ambient obeys the iPhone Silent switch. Request playback only for
@@ -42,6 +55,16 @@
           };
         } catch {}
       }
+      if(mediaTone&&mediaReady){
+        const revision=++mediaRevision;mediaPlaying=true;mediaRestore=restoreSession;
+        try{
+          mediaTone.currentTime=.25;mediaTone.onended=()=>{if(revision===mediaRevision){mediaPlaying=false;restoreSession();}};
+          let timer;try{await Promise.race([Promise.resolve(mediaTone.play()),new Promise((resolve,reject)=>{timer=setTimeout(()=>reject(Error('Audio timeout')),200);})]);}finally{clearTimeout(timer);}onScheduled();scheduled=true;
+          setTimeout(()=>{if(revision===mediaRevision){mediaTone.pause();mediaPlaying=false;restoreSession();}},500);
+          return;
+        }catch{mediaPlaying=false;mediaReady=false;mediaTone.pause();}
+      }
+      if(!audioContext)return;
       if (audioContext.state !== 'running') {
         let timer;
         try { await Promise.race([audioContext.resume(),new Promise(resolve=>{timer=setTimeout(resolve,200);})]); }

@@ -1,6 +1,12 @@
 {
-  "version": 226,
+  "version": 227,
   "changes": [
+    {
+      "version": 227,
+      "label": "3.22",
+      "date": "2026-10-27",
+      "summary": "Audio local preparado desde el primer escaneo en iPhone."
+    },
     {
       "version": 226,
       "label": "3.21",
@@ -294,15 +300,9 @@
       "label": "2.73",
       "date": "2026-10-24",
       "summary": "Unifica unidades por bulto y elimina controles duplicados conservando subcajas"
-    },
-    {
-      "version": 177,
-      "label": "2.72",
-      "date": "2026-10-24",
-      "summary": "Reduce a 15 segundos la espera entre revisiones de notificaciones"
     }
   ],
   "major": 3,
-  "minor": 21,
-  "label": "3.21"
+  "minor": 22,
+  "label": "3.22"
 }
