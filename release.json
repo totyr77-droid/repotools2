@@ -1,6 +1,12 @@
 {
-  "version": 114,
+  "version": 115,
   "changes": [
+    {
+      "version": 115,
+      "label": "2.10",
+      "date": "2026-10-27",
+      "summary": "Permite volver a contratar tras un intento cancelado y nombrar el equipo al confirmar el pago."
+    },
     {
       "version": 114,
       "label": "2.09",
@@ -294,15 +300,9 @@
       "label": "1.61",
       "date": "2026-10-20",
       "summary": "Oculta ingreso manual de equipo cuando la ubicación no permite escanear."
-    },
-    {
-      "version": 65,
-      "label": "1.60",
-      "date": "2026-10-19",
-      "summary": "Mapa de seguridad con punto compacto y zona del radio permitido."
     }
   ],
   "major": 2,
-  "minor": 9,
-  "label": "2.09"
+  "minor": 10,
+  "label": "2.10"
 }

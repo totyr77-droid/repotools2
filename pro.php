@@ -17,6 +17,7 @@ include __DIR__.'/vistas/header.vista.php';
       <p id="proStatus" class="pro-state" role="status">Consultando suscripción…</p>
       <dl class="pro-account-details"><div id="proValidityRow" hidden><dt>Acceso incluido hasta</dt><dd id="proValidity"></dd></div><div id="proPriceRow" hidden><dt>Importe mensual</dt><dd id="proPrice"></dd></div></dl>
       <p id="proTerms" class="pro-account-terms" hidden></p>
+      <form id="proTeamNameForm" hidden><label for="proTeamName">¿Cómo se llama tu equipo?</label><input id="proTeamName" name="name" type="text" maxlength="100" autocomplete="organization" required placeholder="Ej.: Equipo Centro"><p class="stock-muted">El pago está confirmado. Elegí el nombre que verán tus integrantes.</p><button class="library-primary" type="submit">Guardar y abrir mi equipo</button></form>
       <div class="pro-actions"><a id="proOpenTeam" href="supervision.php" class="library-primary" hidden>Ir a mi equipo</a><button id="proRefresh" class="library-secondary" type="button" hidden>Comprobar pago</button><button id="proCheckout" class="library-primary" type="button" hidden>Unirme a <?= escape($planLabel) ?></button><button id="proCancel" class="library-secondary" type="button" hidden>Cancelar renovación</button></div>
     </div>
   </section>

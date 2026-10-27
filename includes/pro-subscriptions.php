@@ -35,9 +35,12 @@ function pro_require_tester(PDO $db,int $user): void {
 }
 function pro_state(PDO $db,int $user,string $product='pro'): array {
     $product=billing_product($product);$table=$product==='supervision'?'supervision_subscriptions':'pro_subscriptions';
-    $row=stock_query($db,"SELECT status,paid_until FROM $table WHERE user_id=?",[$user])->fetch();
+    $row=stock_query($db,"SELECT reference,status,paid_until FROM $table WHERE user_id=?",[$user])->fetch();
     $config=pro_config($product);
+    $team=$product==='supervision'?stock_query($db,'SELECT name,name_pending FROM supervisor_teams WHERE owner_id=?',[$user])->fetch():false;
     return ['product'=>$product,'mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
+        'can_restart'=>($row['status']??'')==='cancelled'&&(int)($row['paid_until']??0)===0&&(int)stock_query($db,'SELECT COUNT(*) FROM '.($product==='supervision'?'supervision_payments':'pro_payments').' WHERE reference=?',[$row['reference']])->fetchColumn()===0,
+        'team_name'=>$team['name']??'','team_name_required'=>(int)($row['paid_until']??0)>time()&&!empty($team['name_pending']),
         'hosted_enabled'=>$config['enabled']&&$config['hosted_enabled'],'card_required'=>($config['plan']??'')!==''&&($row['status']??'')!=='pending','public_key'=>$config['enabled']?($config['public_key']??''):'','test_buyer'=>$config['enabled']?$config['buyer']:'','status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
         'paid_until'=>(int)($row['paid_until']??0),'enforced'=>true];
 }
@@ -101,6 +104,30 @@ final class ProSubscriptions {
     private function transaction(callable $fn): mixed {
         $this->db->beginTransaction();try{$value=$fn();$this->db->commit();return $value;}
         catch(Throwable $e){if($this->db->inTransaction())$this->db->rollBack();throw $e;}
+    }
+    public function restart(int $user): void {
+        $row=$this->row($user);
+        if(!$row||$row['status']==='new')return;
+        if($row['status']!=='cancelled'||(int)$row['paid_until']>0||!$row['provider_id'])throw new CatalogException('Este plan tiene un período o un intento que debe conservarse.',409);
+        $this->seller();
+        $remote=$this->request('GET','/preapproval/'.rawurlencode($row['provider_id']));$this->validate($remote,$row);
+        if(($remote['status']??'')!=='cancelled')throw new CatalogException('Mercado Pago todavía no confirmó la cancelación.',409);
+        $invoices=$this->request('GET','/authorized_payments/search?preapproval_id='.rawurlencode($row['provider_id']).'&limit=100&offset=0');
+        if(!isset($invoices['results'])||!is_array($invoices['results'])||count($invoices['results'])>=100||(int)($invoices['paging']['total']??0)>count($invoices['results']))throw new CatalogException('No pudimos verificar el intento anterior.',409);
+        foreach($invoices['results'] as $invoice)if((string)($invoice['preapproval_id']??'')!==$row['provider_id']||!in_array($invoice['payment']['status']??'',['rejected','cancelled'],true))throw new CatalogException('El intento anterior tiene un pago que debe verificarse.',409);
+        $this->transaction(function()use($row){$current=$this->lock($row['reference']);
+            if($current['status']!=='cancelled'||(int)$current['paid_until']>0||$current['provider_id']!==$row['provider_id']||(int)$this->query('SELECT COUNT(*) FROM pro_payments WHERE reference=?',[$row['reference']])->fetchColumn()>0)throw new CatalogException('El historial de este plan debe conservarse.',409);
+            stock_query($this->db,'INSERT INTO billing_cancelled_attempts(reference,user_id,product,snapshot,archived_at) VALUES(?,?,?,?,?)',[$current['reference'],$current['user_id'],$this->config['product']??'pro',json_encode($current,JSON_THROW_ON_ERROR),time()]);
+            $this->query('DELETE FROM pro_subscriptions WHERE reference=?',[$current['reference']]);
+            $this->query('INSERT INTO pro_subscriptions(reference,user_id,amount_cents) VALUES(?,?,?)',[bin2hex(random_bytes(24)),$current['user_id'],$this->config['amount']]);
+        });
+    }
+    public function nameTeam(int $user,string $name): void {
+        if(($this->config['product']??'pro')!=='supervision')throw new CatalogException('Plan no válido.',422);
+        require_once __DIR__.'/supervision.php';
+        $team=supervisor_require($this->db,$user);if(mb_strlen(trim($name))>100)throw new CatalogException('Escribí un nombre de hasta 100 caracteres.',422);$name=catalog_text($name,100);
+        if($name===''||mb_strlen($name)>100)throw new CatalogException('Escribí un nombre de hasta 100 caracteres.',422);
+        stock_query($this->db,'UPDATE supervisor_teams SET name=?,name_pending=0,revision=revision+1 WHERE id=? AND owner_id=?',[$name,$team['id'],$user]);
     }
     private function validate(array $remote,array $row): void {
         if(($this->config['plan']??'')!==''&&($remote['preapproval_plan_id']??'')!==$this->config['plan'])throw new CatalogException('El plan de suscripción no coincide.',409);
@@ -226,7 +253,7 @@ final class ProSubscriptions {
             $this->query('INSERT INTO pro_payments(provider_id,reference,status,period_end,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(provider_id) DO UPDATE SET status=excluded.status,period_end=excluded.period_end,updated_at=excluded.updated_at',[$paymentId,$current['reference'],$status,$end,time()]);
             $until=(int)$this->query("SELECT COALESCE(MAX(period_end),0) FROM pro_payments WHERE reference=? AND status='approved'",[$current['reference']])->fetchColumn();
             $this->query('UPDATE pro_subscriptions SET paid_until=?,updated_at=? WHERE reference=?',[$until,time(),$current['reference']]);
-            if(($this->config['product']??'pro')==='supervision'&&$until>time())$this->query("INSERT INTO supervisor_teams(owner_id,name,billing_required) VALUES(?,'Mi equipo',1) ON CONFLICT(owner_id) DO NOTHING",[$current['user_id']]);
+            if(($this->config['product']??'pro')==='supervision'&&$until>time())$this->query("INSERT INTO supervisor_teams(owner_id,name,billing_required,name_pending) VALUES(?,'Mi equipo',1,1) ON CONFLICT(owner_id) DO NOTHING",[$current['user_id']]);
         });
     }
 }

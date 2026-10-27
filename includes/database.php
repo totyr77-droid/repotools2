@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/public-names.php';
 // Increment together with the next app_schema_migrations block.
-const REPOTOOLS_SCHEMA_VERSION=49;
+const REPOTOOLS_SCHEMA_VERSION=50;
 
 function postgres_connection(string $url): array {
     $parts = parse_url($url);
@@ -396,6 +396,11 @@ function initialize_database(PDO $db): void {
             $db->exec('ALTER TABLE supervisor_teams ADD COLUMN billing_required INTEGER NOT NULL DEFAULT 0 CHECK(billing_required IN (0,1))');
             $db->exec("CREATE TABLE billing_webhook_receipts(request_key TEXT PRIMARY KEY,event_type TEXT NOT NULL,resource_key TEXT NOT NULL,received_at BIGINT NOT NULL)");
             $db->exec('INSERT INTO app_schema_migrations(version) VALUES(49)');
+        }
+        if(!isset($applied[50])){
+            $db->exec("CREATE TABLE billing_cancelled_attempts(reference TEXT PRIMARY KEY,user_id {$ref} NOT NULL REFERENCES users(id),product TEXT NOT NULL,snapshot TEXT NOT NULL,archived_at BIGINT NOT NULL)");
+            $db->exec('ALTER TABLE supervisor_teams ADD COLUMN name_pending INTEGER NOT NULL DEFAULT 0 CHECK(name_pending IN (0,1))');
+            $db->exec('INSERT INTO app_schema_migrations(version) VALUES(50)');
         }
         $db->commit();
     } catch (Throwable $error) {

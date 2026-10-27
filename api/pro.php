@@ -13,6 +13,8 @@ try{
     if($method==='POST'){
         $action=$_POST['action']??'';$service=new ProSubscriptions($db,pro_config($product));
         if(in_array($action,['checkout','checkout_hosted'],true)){if(!is_string($_POST['card_token']??''))throw new CatalogException('Token no válido.',422);$url=$service->checkout((int)$user['id'],$_POST['card_token']??'',$action==='checkout_hosted');pro_response(200,['checkout_url'=>$url,'subscription'=>pro_state($db,(int)$user['id'],$product),'csrf'=>$csrf]);}
+        elseif($action==='restart')$service->restart((int)$user['id']);
+        elseif($action==='name_team'){if(!is_string($_POST['name']??null))throw new CatalogException('Nombre no válido.',422);$service->nameTeam((int)$user['id'],$_POST['name']);}
         elseif($action==='refresh')$service->reconcile((int)$user['id']);
         elseif($action==='cancel')$service->cancel((int)$user['id']);
         else pro_response(422,['error'=>'Acción no válida.']);
