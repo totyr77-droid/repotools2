@@ -962,3 +962,13 @@ Dos simulaciones firmadas propias sobre cuota ya existente reciben200; pro_payme
 ## Beta2.08 — validación de selección de plan
 
 Selección inválida en página Mi plan responde422 claro, igual que API; evita excepción no controlada por parámetro de URL. UI comprueba producto Supervisión e importe20000 del API real de fixture además del checkout simulado. Sin cambios de facturación ni datos. Reversión mediante revert/caché superior.
+
+## Beta2.09 — estado cancelado sin enlace de pago
+
+Captura usuario muestra enlace no recibido al enviar tarjeta. Consulta de solo lectura a proveedor: intento de Supervisión cancelado y cuota con rechazo genérico cc_rejected_other_reason, sin cuota aprobada. No se crea ni repite un cobro ni se restablece el intento. No atribuir causa específica a la tarjeta con ese código genérico.
+
+Se guarda el estado validado del proveedor antes de informar ausencia de enlace; antes la excepción dentro de transacción deshacía provider_id/status y dejaba creating. Cancelado/pausado informan su estado y nunca redirigen aunque exista URL. API de error devuelve estado de la propia cuenta autenticada; UI lo refleja y cierra formulario ante estado terminal. Sin acceso concedido por error y sin reinicio de suscripciones canceladas.
+
+Validación: regresiones PHP cancelado/pausado/pendiente sin URL conservan estado, sin acceso ni POST duplicado; pro-subscriptions y supervision-billing; UI de pagos Chromium. Reversión: revertir commit/publicar caché superior, sin migración ni borrar historial. Cambios exclusivos de beta.
+
+Conciliación controlada del intento existente: guardado local confirmado cancelled y plan/importe correctos, sin borrar historial ni nueva autorización. La entrega propia devolvió503 durante procesamiento de cuota rechazada/scheduled (recurso409); no se presenta como prueba de webhook automático exitoso. Las entregas automáticas reales siguen mostrando firma401 y requieren corregir la aplicación/secretos en Developers.

@@ -18,5 +18,5 @@ try{
         else pro_response(422,['error'=>'Acción no válida.']);
     }
     pro_response(200,['subscription'=>pro_state($db,(int)$user['id'],$product),'csrf'=>$csrf]);
-}catch(CatalogException $e){pro_response($e->status,['error'=>$e->getMessage()]);}
+}catch(CatalogException $e){pro_response($e->status,['error'=>$e->getMessage(),...(isset($db,$product)?['subscription'=>pro_state($db,(int)$user['id'],$product),'csrf'=>$csrf]:[])]);}
 catch(Throwable $e){error_log('RepoTools Pro: '.get_class($e));pro_response(503,['error'=>'No pudimos consultar tu suscripción. Volvé a intentar.']);}

@@ -1,6 +1,12 @@
 {
-  "version": 113,
+  "version": 114,
   "changes": [
+    {
+      "version": 114,
+      "label": "2.09",
+      "date": "2026-10-27",
+      "summary": "Corrige el estado de los intentos de pago cancelados sin enlace."
+    },
     {
       "version": 113,
       "label": "2.08",
@@ -294,15 +300,9 @@
       "label": "1.60",
       "date": "2026-10-19",
       "summary": "Mapa de seguridad con punto compacto y zona del radio permitido."
-    },
-    {
-      "version": 64,
-      "label": "1.59",
-      "date": "2026-10-19",
-      "summary": "Configuración de equipo, accesos por QR y actualización automática de integrantes."
     }
   ],
   "major": 2,
-  "minor": 8,
-  "label": "2.08"
+  "minor": 9,
+  "label": "2.09"
 }

@@ -155,11 +155,15 @@ final class ProSubscriptions {
             if(count($matches)!==1)throw new CatalogException('Estamos verificando el intento anterior. Volvé a intentar más tarde.',409);
             $remote=$this->request('GET','/preapproval/'.rawurlencode((string)$matches[0]['id']));
         }
-        return $this->transaction(function()use($row,$remote){$current=$this->lock($row['reference']);
+        $result=$this->transaction(function()use($row,$remote){$current=$this->lock($row['reference']);
             $remote=$this->request('GET','/preapproval/'.rawurlencode((string)$remote['id']));$this->apply($remote,$current);
-            if(($remote['status']??'')==='authorized')return '';
-            if(empty($remote['init_point']))throw new CatalogException('No recibimos el enlace de pago.',503);
-            return $remote['init_point'];});
+            return ['status'=>$remote['status'],'url'=>$remote['init_point']??''];});
+        // Commit the verified provider state even when there is no checkout to open.
+        if($result['status']==='authorized')return '';
+        if($result['status']==='cancelled')throw new CatalogException('Mercado Pago canceló el intento de suscripción. No se activó el plan.',409);
+        if($result['status']==='paused')throw new CatalogException('Mercado Pago dejó la suscripción pausada. Revisá su estado antes de continuar.',409);
+        if($result['url']==='')throw new CatalogException('Mercado Pago todavía no tiene un enlace para este intento. Comprobá su estado antes de volver a intentar.',503);
+        return $result['url'];
     }
     public function cancel(int $user): void {
         $this->seller();$row=$this->row($user);if(!$row||!$row['provider_id'])throw new CatalogException('No hay una suscripción para cancelar.',409);
