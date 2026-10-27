@@ -1,6 +1,12 @@
 {
-  "version": 99,
+  "version": 100,
   "changes": [
+    {
+      "version": 100,
+      "label": "1.95",
+      "date": "2026-10-27",
+      "summary": "Ordena ayuda con preguntas frecuentes y bandeja de soporte en Moderación"
+    },
     {
       "version": 99,
       "label": "1.94",
@@ -294,15 +300,9 @@
       "label": "1.46",
       "date": "2026-10-19",
       "summary": "Despliegue suave del QR personal y tirador más oculto"
-    },
-    {
-      "version": 50,
-      "label": "1.45",
-      "date": "2026-10-19",
-      "summary": "Flecha de QR discreta integrada al encabezado"
     }
   ],
   "major": 1,
-  "minor": 94,
-  "label": "1.94"
+  "minor": 95,
+  "label": "1.95"
 }

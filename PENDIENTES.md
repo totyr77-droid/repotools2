@@ -844,3 +844,11 @@ Alcance: cancelación efectiva de renovación por API proveedor, sincronización
 ## Beta1.94 — insignias PRO sólidas
 
 Pedido del usuario: volver a etiqueta PRO sólida y acomodar línea de identidad. PRO violeta liso/texto blanco, sin degradado ni borde dorado en cuenta pública/Ajustes/saludo; marcador funcional comparte base sólida y compartir stock conserva posición interna. Línea perfil agrupa con gap4px; PRO/rol altura20px e iconos12px alineados, conserva controles de verificación/compartir y wrap de nombres. Solo CSS, sin datos/permisos ni main. Validación pro-subscriptions-ui Chromium (responsive320/390/1366, ambas manos, identidad pública/ajustes y acciones). Reversión: revertir commit/publicar caché superior.
+
+## Beta1.95 — ayuda ordenada y reportes de soporte
+
+Ayuda y soporte: preguntas frecuentes con acordeones antes de contacto; Free/PRO, cancelación, escáner, reportar producto y sincronización. Formulario «Contactar soporte» progresivo, abre ante error conservando texto y desde consulta PRO con tema preseleccionado. Mis consultas muestra solo propias también para manager. Sin tarjetas decorativas, controles44px y adaptación móvil/PC.
+
+Moderación incorpora enlace Reportes de soporte al inbox dedicado; manager conserva permiso servidor, usuarios comunes reciben403 al intentar inbox y404 ante consulta ajena. Filtros Todos/Abiertos/Resueltos y paginación conservan contexto. Conversación/responder/resolver/reabrir conserva controles existentes. No migración, datos ni notificaciones nuevas. Contratación PRO sigue privada de beta; pendiente decisión del usuario sobre abrir pruebas a otras cuentas, no habilitar cobros reales.
+
+Pruebas help-desk-ui Chromium/WebKit: FAQ antes de formulario/cerrado por defecto, tema PRO preseleccionado,320/390/1366, ambas manos, permisos, CSRF, aislamiento, idempotencia, respuesta/cierre/reapertura y texto escapado. Reversión: revertir commit y publicar caché superior; consultas existentes se conservan. Main intacto.
