@@ -16,6 +16,11 @@ function pro_config(): array {
         &&$config['amount']>0&&$config['amount']<=100000000;
     return $config;
 }
+// Temporary monthly quotes for the beta catalogue. Team quotes never alter PRO billing.
+function pro_beta_plan_quotes(): array {
+    $config=pro_config();
+    return ['pro'=>(int)($config['amount']?:10000),'supervision'=>20000,'supermercado'=>30000];
+}
 function pro_require_tester(PDO $db,int $user): void {
     $role=stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn();
     if(!$role||($role!=='manager'&&rtrim(getenv('APP_URL')?:'','/')!=='https://repotools-desarrollo.onrender.com'))throw new CatalogException('Las pruebas de suscripción están disponibles en beta.',403);

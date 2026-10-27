@@ -886,3 +886,11 @@ Usuario redefine equipos: Supervisión con compra directa a futuro, Supermercado
 Supermercado solo contacto a soporte con tema/asunto precargados; temas anteriores se conservan por compatibilidad. Sin cambio de datos/permisos ni backend de cobros. No habilitada compra de Supervisión: requiere precio mensual, cantidad de sucursales/supervisores, entitlement y validación de proveedor por plan. Mantener pendiente, no afirmar completada.
 
 Pruebas pro-subscriptions-ui Chromium/WebKit: tres paneles, flechas/selector en320/390/1366 sin overflow, CTA mercado→contacto y supervisor sin cobro prematuro; teclado/gesto simulado adicionales. Help-desk WebKit valida preselección supermercado y aislamiento/CSRF. Reversión: revertir commit/caché superior, consultas existentes conservadas. Main intacto.
+
+## Beta2.00 — importes temporales del catálogo
+
+Usuario indica100/200/300 para testear; se asignan por orden de opciones a PRO100ARS, Supervisión200ARS y Supermercado300ARS mensuales. Cotizador del catálogo centralizado en servidor: PRO toma importe configurado del checkout (fallback visual100ARS si no configurado), Supervisión200 y Supermercado300 de referencia. No modifica precios del proveedor, filas de suscripción ni pagos. Supermercado permanece por contacto.
+
+Compra Supervisión aún no habilitada: no reutilizar importe/provider plan PRO. Falta catálogo de cobro/entitlement de Supervisión y definición de alcance antes de activar su botón; precios temporales no son prueba de esa integración. Texto ya no pide precio que fue respondido; indica contratación en preparación. No inventar cuotas ni asignar acceso a locales por selección de plan. Main intacto.
+
+Validación: unit quotes/pro-subscriptions y UI Chromium/WebKit con textos100/200/300, navegación responsive y formulario anterior sin regresiones. Sin solicitudes de cobro ni suscripciones remotas creadas. Reversión: revertir commit/publicar caché superior. Sin esquema/datos.
