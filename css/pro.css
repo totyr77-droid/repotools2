@@ -1,4 +1,4 @@
-.pro-badge{display:inline-flex;align-items:center;justify-content:center;flex:none;vertical-align:middle;white-space:nowrap;padding:2px 6px;border-radius:5px;background:#eee9fb;color:#362182;font:700 10px/1.4 sans-serif;letter-spacing:.04em}
+.pro-badge{display:inline-flex;align-items:center;justify-content:center;flex:none;vertical-align:middle;white-space:nowrap;padding:2px 6px;border-radius:5px;background:#27197f;color:#fff;font:700 10px/1.4 sans-serif;letter-spacing:.04em}
 .library-secondary .pro-badge{margin-inline-start:6px}
 .pro-main{max-width:640px;margin-inline:auto;padding:20px 16px 130px}
 .pro-main h1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:1.5rem}
@@ -86,7 +86,7 @@ body[data-ui-skin="beta"] #shareStockSelection.pro-marked-icon{
 }
 body[data-ui-skin="beta"] #shareStockSelection .pro-badge{
   position:static;inset:auto;margin:0;padding:3px 5px;border-radius:5px;
-  background:linear-gradient(110deg,#281778,#5734b2);color:#fff;font-size:9px;line-height:1.2;
+  background:#27197f;color:#fff;font-size:9px;line-height:1.2;
 }
 @media(hover:hover){
   body[data-ui-skin="beta"] #palletTools .library-settings-menu :is(button,a).library-secondary:hover{background:#ece7f6}
@@ -105,7 +105,7 @@ body[data-ui-skin="beta"] .transfer-choice-copy strong{font-size:1rem;font-weigh
 body[data-ui-skin="beta"] .transfer-choice-copy small{font-size:.82rem;line-height:1.35;color:#716b7d}
 @media(hover:hover){body[data-ui-skin="beta"] .stock-transfer-choices button:hover{background:#f7f4fd;border-color:#b9a9dc}}
 
-.account-pro{display:inline-flex;align-items:center;gap:4px;flex:none;vertical-align:middle;white-space:nowrap;padding:3px 7px;border:1px solid #d9b96b;border-radius:7px;background:linear-gradient(115deg,#302079,#5832a3);color:#fff3c4;font-size:.65rem;font-weight:700;line-height:1.3;letter-spacing:.04em}
+.account-pro{display:inline-flex;align-items:center;gap:4px;flex:none;vertical-align:middle;white-space:nowrap;padding:3px 7px;border:0;border-radius:5px;background:#27197f;color:#fff;font-size:.65rem;font-weight:700;line-height:1.3;letter-spacing:.04em}
 .account-pro svg{width:13px;height:13px;flex:none}
 .account-greeting .account-pro{margin-inline-start:5px}
 .settings-plan h2{display:flex;align-items:center;gap:8px}.settings-plan h2>svg{width:20px;height:20px}.settings-plan h2 strong{margin-inline-start:auto;font-size:.85rem;color:#4f2c96}.settings-plan p{margin:6px 0 0;font-size:.85rem;color:#716b7d}

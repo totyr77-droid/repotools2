@@ -30,3 +30,7 @@
 @media(prefers-reduced-motion:reduce){.profile-badge-aura{animation:none!important}}
 
 .profile-showcase-compact{display:block}.profile-activity{margin-top:12px}.profile-activity>summary{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 0;border-bottom:1px solid #e6e2ed;color:#62577e;font-size:.88rem;list-style:none;cursor:pointer}.profile-activity>summary::-webkit-details-marker{display:none}.profile-activity>summary>svg{width:20px;height:20px;flex:none}.profile-activity>summary>svg:last-child{margin-inline-start:auto;width:16px;height:16px}.profile-activity[open]>summary>svg:last-child{transform:rotate(180deg)}.profile-activity .profile-achievements{margin-top:0;border-top:0}
+
+.profile-name-line{column-gap:4px;row-gap:2px}
+.profile-name-line .account-pro,.profile-name-line .account-role{box-sizing:border-box;height:20px;align-items:center;padding:3px 6px;line-height:1;align-self:center}
+.profile-name-line .account-pro svg,.profile-name-line .account-role svg{width:12px;height:12px;flex:none}

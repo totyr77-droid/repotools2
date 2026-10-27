@@ -1,6 +1,12 @@
 {
-  "version": 98,
+  "version": 99,
   "changes": [
+    {
+      "version": 99,
+      "label": "1.94",
+      "date": "2026-10-27",
+      "summary": "Restaura insignia Pro sólida y alinea identificación del perfil"
+    },
     {
       "version": 98,
       "label": "1.93",
@@ -294,15 +300,9 @@
       "label": "1.45",
       "date": "2026-10-19",
       "summary": "Flecha de QR discreta integrada al encabezado"
-    },
-    {
-      "version": 49,
-      "label": "1.44",
-      "date": "2026-10-19",
-      "summary": "QR personal accesible y cámara para seleccionar usuarios"
     }
   ],
   "major": 1,
-  "minor": 93,
-  "label": "1.93"
+  "minor": 94,
+  "label": "1.94"
 }
