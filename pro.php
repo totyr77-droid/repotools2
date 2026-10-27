@@ -10,11 +10,20 @@ include __DIR__.'/vistas/header.vista.php';
 <main class="library-main pro-main" id="proSubscription" data-csrf="<?= escape(csrf_token()) ?>">
   <h1><?= stock_icon('user') ?> Mi suscripción <span class="pro-badge">PRO</span></h1>
   <p class="stock-muted">Pruebas de beta · sin cobros reales.</p>
-  <p>Compartí palets y tu stock, transferí la propiedad y gestioná accesos.</p>
-  <p id="proStatus" role="status">Consultando suscripción…</p>
+  <p class="pro-description">Compartí palets y stock, transferí entre palets o usuarios y gestioná accesos.</p>
+  <p id="proStatus" class="pro-state" role="status">Consultando suscripción…</p>
   <p id="proPrice" hidden></p>
   <p id="proTerms" hidden>Renovación automática mensual. Podés cancelarla y conservar el período ya pagado.</p>
   <div class="pro-actions"><button id="proCheckout" class="library-primary" type="button" hidden>Probar suscripción</button><button id="proCancel" class="library-secondary" type="button" hidden>Cancelar renovación</button></div>
-  <a class="library-secondary" href="cuenta.php">Volver a Ajustes</a>
+  <p class="pro-payment-note">El formulario de tarjeta lo procesa Mercado Pago. RepoTools no recibe el número ni el código de seguridad de tu tarjeta.</p><a class="pro-provider-link" href="https://www.mercadopago.com.ar/" target="_blank" rel="noopener noreferrer">Abrir mi cuenta de Mercado Pago ↗</a><p class="stock-muted pro-link-note">Abre Mercado Pago en otra pestaña; no inicia un pago.</p>
+  <a class="help-back" href="cuenta.php">Volver a Ajustes</a>
 </main>
+<dialog id="proPaymentDialog" class="library-dialog pro-payment-dialog" aria-labelledby="proPaymentTitle">
+<div class="library-heading"><h2 id="proPaymentTitle"><?= stock_icon('crown') ?>Unirme a <span class="pro-badge">PRO</span></h2><button type="button" class="app-close" id="closeProPayment" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>
+<p class="pro-test-note">Beta · usá solo una tarjeta de prueba</p><p id="proPaymentPrice" class="pro-payment-price"></p><p class="pro-payment-terms">Renovación mensual automática. Podés cancelarla y conservar el período vigente.</p>
+<div id="proPaymentSummary"><ul class="pro-benefits"><li>Compartí palets y stock.</li><li>Transferí a otro palet o usuario.</li><li>Gestioná accesos para colaborar.</li></ul><button id="proContinueCard" type="button" class="library-primary">Continuar con tarjeta</button></div>
+<p class="pro-payment-note"><?= stock_icon('shield') ?>Ingresás la tarjeta en campos de Mercado Pago. RepoTools no recibe tu número ni código de seguridad.</p>
+<p id="proPaymentStatus" class="stock-muted" role="status"></p><div id="proCardSlot"></div>
+<a class="pro-provider-link" href="https://www.mercadopago.com.ar/" target="_blank" rel="noopener noreferrer">Abrir Mercado Pago en otra pestaña ↗</a>
+</dialog>
 <?php include __DIR__.'/vistas/footer.vista.php'; ?>
