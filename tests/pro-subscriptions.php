@@ -71,3 +71,24 @@ $identityDb=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE
 putenv('APP_URL=https://repotools-desarrollo.onrender.com');pro_require_tester($db,2);denied(fn()=>pro_require_tester($db,99999),403);putenv('APP_URL=https://www.repotools.online');denied(fn()=>pro_require_tester($db,2),403);putenv('APP_URL=');
 
 $quotes=pro_beta_plan_quotes();check($quotes['pro']===10000&&$quotes['supervision']===20000&&$quotes['supermercado']===30000,'Temporary catalogue monthly quotes');
+
+// Recover an approved invoice only for the signed-in subscription; never grant by authorization alone.
+$recoveryDb=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);initialize_database($recoveryDb);
+$recoveryDb->exec("INSERT INTO users(name,email,password_hash,role) VALUES('One','one@example.invalid','fixture','usuario'),('Two','two@example.invalid','fixture','usuario')");
+$recoveryDb->exec("INSERT INTO pro_subscriptions(reference,user_id,provider_id,status,amount_cents) VALUES('recover-one',1,'recover-sub-one','authorized',10000),('recover-two',2,'recover-sub-two','authorized',10000)");
+$wrongParent=false;$wrongSearch=false;
+$recovery=new ProSubscriptions($recoveryDb,$config,function($method,$path)use(&$wrongParent,&$wrongSearch){
+ check($method==='GET','Recovery must not create or charge anything');
+ if(str_starts_with($path,'/authorized_payments/search?')){check(str_contains($path,'preapproval_id=recover-sub-two'),'Only own subscription searched');return ['results'=>[['id'=>'recover-invoice','preapproval_id'=>$wrongSearch?'recover-sub-one':'recover-sub-two','payment'=>['id'=>987]]]];}
+ if($path==='/authorized_payments/recover-invoice')return ['id'=>'recover-invoice','preapproval_id'=>$wrongParent?'recover-sub-one':'recover-sub-two','debit_date'=>gmdate('c'),'payment'=>['id'=>987]];
+ if($path==='/preapproval/recover-sub-two')return ['id'=>'recover-sub-two','external_reference'=>'recover-two','collector_id'=>123,'status'=>'authorized','auto_recurring'=>['currency_id'=>'ARS','frequency'=>1,'frequency_type'=>'months','transaction_amount'=>100]];
+ if($path==='/v1/payments/987')return ['id'=>987,'status'=>'approved','live_mode'=>false,'collector_id'=>123,'transaction_amount'=>100,'currency_id'=>'ARS'];
+ throw new RuntimeException('Unexpected recovery resource');
+});
+$wrongSearch=true;denied(fn()=>$recovery->reconcile(2),409);$wrongSearch=false;$wrongParent=true;denied(fn()=>$recovery->reconcile(2),409);$wrongParent=false;
+$recovery->reconcile(2);$recovery->reconcile(2);
+check((int)$recoveryDb->query('SELECT paid_until FROM pro_subscriptions WHERE user_id=2')->fetchColumn()>time(),'Verified recovery activates own account');
+check((int)$recoveryDb->query('SELECT paid_until FROM pro_subscriptions WHERE user_id=1')->fetchColumn()===0,'Other account stays unchanged');
+check((int)$recoveryDb->query('SELECT COUNT(*) FROM pro_payments')->fetchColumn()===1,'Recovery is idempotent');
+check($recoveryDb->query('SELECT role FROM users WHERE id=2')->fetchColumn()==='usuario','PRO does not grant management role');
+echo "OK: own-account payment recovery, provider parent isolation, idempotence and unchanged role.\n";

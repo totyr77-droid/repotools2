@@ -159,9 +159,22 @@ final class ProSubscriptions {
         if(!$row){$remote=$this->request('GET','/preapproval/'.rawurlencode($id));$row=stock_query($this->db,'SELECT reference FROM pro_subscriptions WHERE reference=?',[(string)($remote['external_reference']??'')])->fetch();if(!$row)return;}
         $this->transaction(function()use($row,$id){$current=$this->lock($row['reference']);$this->apply($this->request('GET','/preapproval/'.rawurlencode($id)),$current);});
     }
-    public function invoice(string $id): void {
+    public function reconcile(int $user): void {
+        $row=$this->row($user);
+        if(!$row||!$row['provider_id'])return;
+        $result=$this->request('GET','/authorized_payments/search?preapproval_id='.rawurlencode($row['provider_id']).'&limit=5&offset=0');
+        if(!isset($result['results'])||!is_array($result['results']))throw new CatalogException('No pudimos comprobar los pagos.',503);
+        foreach(array_slice($result['results'],0,5) as $invoice){
+            if((string)($invoice['preapproval_id']??'')!==$row['provider_id'])throw new CatalogException('La cuota no corresponde a tu suscripción.',409);
+            $id=(string)($invoice['id']??'');
+            if(!preg_match('/^[a-zA-Z0-9_-]{1,100}$/D',$id))throw new CatalogException('Cuota no válida.',409);
+            if(!empty($invoice['payment']['id']))$this->invoice($id,(string)$row['provider_id']);
+        }
+    }
+    public function invoice(string $id,?string $expectedParent=null): void {
         $invoice=$this->request('GET','/authorized_payments/'.rawurlencode($id));
         $parent=(string)($invoice['preapproval_id']??'');
+        if($expectedParent!==null&&$parent!==$expectedParent)throw new CatalogException('La cuota no corresponde a tu suscripción.',409);
         if(!preg_match('/^[a-zA-Z0-9_-]{1,100}$/D',$parent))throw new CatalogException('Suscripción no válida.',409);
         $this->subscription($parent); // Recover webhooks arriving before the checkout response was saved.
         $row=stock_query($this->db,'SELECT reference FROM pro_subscriptions WHERE provider_id=?',[(string)($invoice['preapproval_id']??'')])->fetch();

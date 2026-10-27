@@ -200,3 +200,24 @@ body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:64px 20px
 .pro-main[data-subscription-status=cancelled] .pro-state,.pro-main[data-subscription-status=paused] .pro-state{color:#625b73}
 .pro-main [hidden]{display:none!important}
 @media(max-width:360px){.pro-account-heading{padding:16px}.pro-account-body{padding:16px}.pro-account-details>div{flex-direction:column;gap:5px}.pro-account-details dd{text-align:start}}
+/* Payment form uses the same hierarchy as the plan, with provider-hosted card fields. */
+.pro-checkout-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px;background:#f3f0fb;border:1px solid #e5dff2;border-radius:12px;margin:16px 0 10px}
+.pro-checkout-summary>div>span{font-size:.8rem;color:#625b73}
+.pro-checkout-summary .pro-payment-price{margin:4px 0 0;font-size:1.25rem}
+.pro-checkout-provider{display:flex;align-items:center;gap:5px;font-size:.76rem;color:#51466c;white-space:nowrap}
+.pro-checkout-provider svg{width:16px;height:16px}
+.pro-payment-dialog #mpTestCardForm{border-top:1px solid #e8e3f0;padding-top:16px;gap:14px 12px}
+.pro-payment-dialog #mpTestCardForm>.pro-card-heading{grid-column:1/-1;margin:0 0 2px;font-size:.95rem;font-weight:600;color:#29233d}
+.pro-payment-dialog #mpTestCardForm>label{font-size:.82rem;gap:7px;color:#514960}
+.pro-payment-dialog #mpTestCardForm .pro-card-frame{height:48px;padding:13px 12px;box-sizing:border-box;border:1px solid #cfc8de;border-radius:10px;background:#fff}
+.pro-payment-dialog #mpTestCardForm .pro-card-frame:focus-within{border-color:#58409b;box-shadow:0 0 0 3px #58409b14}
+.pro-payment-dialog #mpTestCardForm :is(input,select){min-height:48px;border-color:#cfc8de;border-radius:10px;padding:12px;font-size:1rem}
+.pro-payment-dialog #mpTestCardForm input[readonly]{background:#f7f5fa;color:#716b7d;font-size:.85rem}
+.pro-payment-dialog #mpTestCardForm label small{font-size:.73rem;line-height:1.35;color:#716b7d;font-weight:400}
+.pro-payment-dialog #mpTestCardForm>label:is([data-card-field=identificationType],[data-card-field=identificationNumber],[data-card-field=issuer],[data-card-field=installments]){grid-column:auto}
+.pro-payment-dialog #mpTestCardForm>button{min-height:48px;margin-top:4px;border-radius:10px}
+.pro-payment-dialog .pro-test-note{font-size:.75rem;margin-top:8px}
+@media(max-width:360px){.pro-checkout-summary{align-items:flex-start;flex-direction:column;gap:8px}.pro-payment-dialog #mpTestCardForm>label[data-card-field=issuer]{grid-column:1/-1}}
+.pro-payment-dialog #proPaymentStatus:empty{display:none}
+.pro-payment-dialog:has(#mpTestCardForm) .pro-payment-terms{font-size:.78rem;margin-block:8px}
+.pro-payment-dialog:has(#mpTestCardForm)>.pro-payment-note{font-size:.76rem;line-height:1.4;margin-block:10px}

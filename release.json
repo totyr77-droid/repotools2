@@ -1,6 +1,12 @@
 {
-  "version": 110,
+  "version": 111,
   "changes": [
+    {
+      "version": 111,
+      "label": "2.06",
+      "date": "2026-10-27",
+      "summary": "Mi plan, recuperación de pagos confirmados y formulario de tarjeta más claro."
+    },
     {
       "version": 110,
       "label": "2.05",
@@ -294,15 +300,9 @@
       "label": "1.57",
       "date": "2026-10-19",
       "summary": "Corrige confirmación del lector EAN alternativo en envases difíciles."
-    },
-    {
-      "version": 61,
-      "label": "1.56",
-      "date": "2026-10-19",
-      "summary": "Invitaciones y tokens de equipo, acceso opcional por 7 horas y ubicación con radio configurable."
     }
   ],
   "major": 2,
-  "minor": 5,
-  "label": "2.05"
+  "minor": 6,
+  "label": "2.06"
 }
