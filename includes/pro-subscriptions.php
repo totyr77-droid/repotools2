@@ -37,10 +37,10 @@ function pro_state(PDO $db,int $user,string $product='pro'): array {
     $product=billing_product($product);$table=$product==='supervision'?'supervision_subscriptions':'pro_subscriptions';
     $row=stock_query($db,"SELECT reference,status,paid_until FROM $table WHERE user_id=?",[$user])->fetch();
     $config=pro_config($product);
-    $team=$product==='supervision'?stock_query($db,'SELECT name,name_pending FROM supervisor_teams WHERE owner_id=?',[$user])->fetch():false;
+    $team=$product==='supervision'?stock_query($db,'SELECT name,name_pending,active FROM supervisor_teams WHERE owner_id=?',[$user])->fetch():false;
     return ['product'=>$product,'mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
         'can_restart'=>($row['status']??'')==='cancelled'&&(int)($row['paid_until']??0)===0&&(int)stock_query($db,'SELECT COUNT(*) FROM '.($product==='supervision'?'supervision_payments':'pro_payments').' WHERE reference=?',[$row['reference']])->fetchColumn()===0,
-        'team_name'=>$team['name']??'','team_name_required'=>(int)($row['paid_until']??0)>time()&&!empty($team['name_pending']),
+        'team_name'=>$team['name']??'','team_name_required'=>(int)($row['paid_until']??0)>time()&&(!$team||!empty($team['name_pending'])||!(int)$team['active']),
         'hosted_enabled'=>$config['enabled']&&$config['hosted_enabled'],'card_required'=>($config['plan']??'')!==''&&($row['status']??'')!=='pending','public_key'=>$config['enabled']?($config['public_key']??''):'','test_buyer'=>$config['enabled']?$config['buyer']:'','status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
         'paid_until'=>(int)($row['paid_until']??0),'enforced'=>true];
 }
@@ -124,10 +124,17 @@ final class ProSubscriptions {
     }
     public function nameTeam(int $user,string $name): void {
         if(($this->config['product']??'pro')!=='supervision')throw new CatalogException('Plan no válido.',422);
-        require_once __DIR__.'/supervision.php';
-        $team=supervisor_require($this->db,$user);if(mb_strlen(trim($name))>100)throw new CatalogException('Escribí un nombre de hasta 100 caracteres.',422);$name=catalog_text($name,100);
-        if($name===''||mb_strlen($name)>100)throw new CatalogException('Escribí un nombre de hasta 100 caracteres.',422);
-        stock_query($this->db,'UPDATE supervisor_teams SET name=?,name_pending=0,revision=revision+1 WHERE id=? AND owner_id=?',[$name,$team['id'],$user]);
+        if(mb_strlen(trim($name))>100)throw new CatalogException('Escribí un nombre de hasta 100 caracteres.',422);$name=catalog_text($name,100);
+        if($name==='')throw new CatalogException('Escribí el nombre del equipo.',422);
+        $this->transaction(function()use($user,$name){
+            $row=$this->row($user);if(!$row)throw new CatalogException('El pago de Supervisión todavía no está confirmado.',403);
+            $row=$this->lock($row['reference']);if((int)$row['paid_until']<=time())throw new CatalogException('El pago de Supervisión todavía no está confirmado.',403);
+            stock_query($this->db,'UPDATE supervisor_teams SET revision=revision WHERE owner_id=?',[$user]);
+            $team=stock_query($this->db,'SELECT id,active FROM supervisor_teams WHERE owner_id=?',[$user])->fetch();
+            if($team&&!(int)$team['active']&&(int)stock_query($this->db,"SELECT COUNT(*) FROM supervisor_members WHERE team_id=? AND status IN ('pending','accepted')",[$team['id']])->fetchColumn()>0)throw new CatalogException('Este equipo tiene accesos anteriores que deben revisarse antes de habilitarlo.',409);
+            if(!$team)stock_query($this->db,'INSERT INTO supervisor_teams(owner_id,name,billing_required,name_pending) VALUES(?,?,1,0)',[$user,$name]);
+            else stock_query($this->db,'UPDATE supervisor_teams SET name=?,name_pending=0,active=1,billing_required=CASE WHEN active=0 THEN 1 ELSE billing_required END,revision=revision+1 WHERE id=? AND owner_id=?',[$name,$team['id'],$user]);
+        });
     }
     private function validate(array $remote,array $row): void {
         if(($this->config['plan']??'')!==''&&($remote['preapproval_plan_id']??'')!==$this->config['plan'])throw new CatalogException('El plan de suscripción no coincide.',409);

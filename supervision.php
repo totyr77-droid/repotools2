@@ -1,7 +1,10 @@
 <?php
 require_once __DIR__.'/includes/auth.php';require_once __DIR__.'/includes/supervision.php';require_once __DIR__.'/includes/stock-icons.php';
 if(!current_user()){header('Location: cuenta.php?next=supervision');exit;}
-header('Cache-Control: no-store');$paginaSupervision=true;$uid=(int)current_user()['id'];$companyTeam=supervisor_team(database(),$uid);$publicPageTitle=$companyTeam?'Mi equipo - '.$companyTeam['name']:'Mis supervisores';include __DIR__.'/vistas/header.vista.php';
+header('Cache-Control: no-store');$paginaSupervision=true;$uid=(int)current_user()['id'];
+require_once __DIR__.'/includes/pro-subscriptions.php';
+if(pro_state(database(),$uid,'supervision')['team_name_required']){header('Location: pro.php?product=supervision');exit;}
+$companyTeam=supervisor_team(database(),$uid);$publicPageTitle=$companyTeam?'Mi equipo - '.$companyTeam['name']:'Mis supervisores';include __DIR__.'/vistas/header.vista.php';
 ?>
 <main class="library-main team-page supervision-page" data-supervision data-csrf="<?= escape(csrf_token()) ?>">
 <div class="team-page-title"><h1><?= stock_icon('users') ?><span id="supervisionCompany"><?= $companyTeam?'Mi equipo - '.escape($companyTeam['name']):'Mis supervisores' ?></span></h1><button type="button" class="team-text" id="supervisionRefresh" aria-label="Actualizar equipo"<?= $companyTeam?'':' hidden' ?>><?= stock_icon('refresh') ?></button></div>

@@ -1,6 +1,12 @@
 {
-  "version": 119,
+  "version": 120,
   "changes": [
+    {
+      "version": 120,
+      "label": "2.15",
+      "date": "2026-10-27",
+      "summary": "Lleva la compra de Supervisión a configurar el nombre y abrir el equipo correcto."
+    },
     {
       "version": 119,
       "label": "2.14",
@@ -294,15 +300,9 @@
       "label": "1.66",
       "date": "2026-10-20",
       "summary": "Perfiles compactos e insignias con brillo e inclinación interactiva."
-    },
-    {
-      "version": 70,
-      "label": "1.65",
-      "date": "2026-10-20",
-      "summary": "Insignias más grandes, colección y niveles en modales; perfil más compacto."
     }
   ],
   "major": 2,
-  "minor": 14,
-  "label": "2.14"
+  "minor": 15,
+  "label": "2.15"
 }
