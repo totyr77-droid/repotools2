@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/stock.php';
+require_once __DIR__.'/supervision-context.php';
 
 // Test integration only. Live credentials cannot enable live billing in this release.
 function billing_product(mixed $value='pro'): string {
@@ -33,12 +34,12 @@ function pro_require_tester(PDO $db,int $user): void {
     $role=stock_query($db,'SELECT role FROM users WHERE id=?',[$user])->fetchColumn();
     if(!$role||($role!=='manager'&&rtrim(getenv('APP_URL')?:'','/')!=='https://repotools-desarrollo.onrender.com'))throw new CatalogException('Las pruebas de suscripción están disponibles en beta.',403);
 }
-function pro_state(PDO $db,int $user,string $product='pro'): array {
-    $product=billing_product($product);$table=$product==='supervision'?'supervision_subscriptions':'pro_subscriptions';
-    $row=stock_query($db,"SELECT reference,status,paid_until FROM $table WHERE user_id=?",[$user])->fetch();
+function pro_state(PDO $db,int $user,string $product='pro',int $teamId=0): array {
+    $product=billing_product($product);if($product==='supervision')$teamId=supervision_billing_team($db,$user,$teamId);$table=$product==='supervision'?'supervision_subscriptions':'pro_subscriptions';
+    $row=stock_query($db,"SELECT reference,status,paid_until FROM $table WHERE user_id=?".($product==='supervision'&&$teamId?' AND team_id=?':''),$product==='supervision'&&$teamId?[$user,$teamId]:[$user])->fetch();
     $config=pro_config($product);
-    $team=$product==='supervision'?stock_query($db,'SELECT name,name_pending,active FROM supervisor_teams WHERE owner_id=?',[$user])->fetch():false;
-    return ['product'=>$product,'mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
+    $team=$product==='supervision'?stock_query($db,'SELECT name,name_pending,active FROM supervisor_teams WHERE owner_id=? AND id=?',[$user,$teamId])->fetch():false;
+    return ['team_id'=>$teamId,'member_limit'=>10,'product'=>$product,'mode'=>'test','enabled'=>(bool)$config['enabled'],'amount_cents'=>$config['amount'],
         'can_restart'=>($row['status']??'')==='cancelled'&&(int)($row['paid_until']??0)===0&&(int)stock_query($db,'SELECT COUNT(*) FROM '.($product==='supervision'?'supervision_payments':'pro_payments').' WHERE reference=?',[$row['reference']])->fetchColumn()===0,
         'team_name'=>$team['name']??'','team_name_required'=>(int)($row['paid_until']??0)>time()&&(!$team||!empty($team['name_pending'])||!(int)$team['active']),
         'hosted_enabled'=>$config['enabled']&&$config['hosted_enabled'],'card_required'=>($config['plan']??'')!==''&&($row['status']??'')!=='pending','public_key'=>$config['enabled']?($config['public_key']??''):'','test_buyer'=>$config['enabled']?$config['buyer']:'','status'=>$row['status']??'free','pro'=>(int)($row['paid_until']??0)>time(),
@@ -71,7 +72,21 @@ final class ProSubscriptions {
         if(($this->config['product']??'pro')==='supervision')$sql=str_replace(['pro_subscriptions','pro_payments'],['supervision_subscriptions','supervision_payments'],$sql);
         return stock_query($this->db,$sql,$args);
     }
-    public function reconcileProvider(string $provider): void {$row=$this->query('SELECT user_id FROM pro_subscriptions WHERE provider_id=?',[$provider])->fetch();if($row)$this->reconcile((int)$row['user_id']);}
+    public function reconcileProvider(string $provider): void {$row=$this->query('SELECT * FROM pro_subscriptions WHERE provider_id=?',[$provider])->fetch();if($row){if(($this->config['product']??'pro')==='supervision')$this->config['team_id']=(int)$row['team_id'];$this->reconcile((int)$row['user_id']);}}
+    private array $resolvedTeams=[];
+    private function teamId(int $user): int {return supervision_billing_team($this->db,$user,(int)($this->config['team_id']??$this->resolvedTeams[$user]??0));}
+    private function insertRow(int $user,string $reference): void {
+        $ownTransaction=!$this->db->inTransaction();if($ownTransaction)$this->db->beginTransaction();try{
+            // Also serialize with the manager's account-wide plan reset.
+            stock_query($this->db,'UPDATE users SET name=name WHERE id=?',[$user]);
+            if(($this->config['product']??'pro')!=='supervision')$this->query('INSERT INTO pro_subscriptions(reference,user_id,amount_cents) VALUES(?,?,?) ON CONFLICT(user_id) DO NOTHING',[$reference,$user,$this->config['amount']]);
+            else{
+                $team=$this->teamId($user);if(!$team)$team=supervision_prepare_team($this->db,$user);$this->resolvedTeams[$user]=$team;
+                stock_query($this->db,'INSERT INTO supervision_subscriptions(reference,user_id,team_id,amount_cents) VALUES(?,?,?,?) ON CONFLICT(team_id) DO NOTHING',[$reference,$user,$team,$this->config['amount']]);
+            }
+            if($ownTransaction)$this->db->commit();
+        }catch(Throwable $e){if($ownTransaction&&$this->db->inTransaction())$this->db->rollBack();throw $e;}
+    }
     private function request(string $method,string $path,?array $body=null,string $key=''): array {
         if(!$this->config['enabled'])throw new CatalogException('Las pruebas de pago todavía no están habilitadas.',503);
         if($this->transport)return ($this->transport)($method,$path,$body,$key);
@@ -92,6 +107,7 @@ final class ProSubscriptions {
         if(!empty($seller['email'])&&strcasecmp(trim($seller['email']),trim($this->config['buyer']))===0)throw new CatalogException('El comprador de prueba debe ser una cuenta distinta del vendedor. Revisá el correo configurado.',422);
     }
     private function row(int $user): array|false {
+        if(($this->config['product']??'pro')==='supervision'){$team=$this->teamId($user);return stock_query($this->db,'SELECT * FROM supervision_subscriptions WHERE user_id=?'.($team?' AND team_id=?':''),$team?[$user,$team]:[$user])->fetch();}
         return $this->query('SELECT * FROM pro_subscriptions WHERE user_id=?',[$user])->fetch();
     }
     private function lock(string $reference): array {
@@ -119,7 +135,7 @@ final class ProSubscriptions {
             if($current['status']!=='cancelled'||(int)$current['paid_until']>0||$current['provider_id']!==$row['provider_id']||(int)$this->query('SELECT COUNT(*) FROM pro_payments WHERE reference=?',[$row['reference']])->fetchColumn()>0)throw new CatalogException('El historial de este plan debe conservarse.',409);
             stock_query($this->db,'INSERT INTO billing_cancelled_attempts(reference,user_id,product,snapshot,archived_at) VALUES(?,?,?,?,?)',[$current['reference'],$current['user_id'],$this->config['product']??'pro',json_encode($current,JSON_THROW_ON_ERROR),time()]);
             $this->query('DELETE FROM pro_subscriptions WHERE reference=?',[$current['reference']]);
-            $this->query('INSERT INTO pro_subscriptions(reference,user_id,amount_cents) VALUES(?,?,?)',[bin2hex(random_bytes(24)),$current['user_id'],$this->config['amount']]);
+            $this->insertRow((int)$current['user_id'],bin2hex(random_bytes(24)));
         });
     }
     public function nameTeam(int $user,string $name): void {
@@ -129,10 +145,10 @@ final class ProSubscriptions {
         $this->transaction(function()use($user,$name){
             $row=$this->row($user);if(!$row)throw new CatalogException('El pago de Supervisión todavía no está confirmado.',403);
             $row=$this->lock($row['reference']);if((int)$row['paid_until']<=time())throw new CatalogException('El pago de Supervisión todavía no está confirmado.',403);
-            stock_query($this->db,'UPDATE supervisor_teams SET revision=revision WHERE owner_id=?',[$user]);
-            $team=stock_query($this->db,'SELECT id,active FROM supervisor_teams WHERE owner_id=?',[$user])->fetch();
+            stock_query($this->db,'UPDATE supervisor_teams SET revision=revision WHERE owner_id=? AND id=?',[$user,$row['team_id']]);
+            $team=stock_query($this->db,'SELECT id,active FROM supervisor_teams WHERE owner_id=? AND id=?',[$user,$row['team_id']])->fetch();
             if($team&&!(int)$team['active']&&(int)stock_query($this->db,"SELECT COUNT(*) FROM supervisor_members WHERE team_id=? AND status IN ('pending','accepted')",[$team['id']])->fetchColumn()>0)throw new CatalogException('Este equipo tiene accesos anteriores que deben revisarse antes de habilitarlo.',409);
-            if(!$team)stock_query($this->db,'INSERT INTO supervisor_teams(owner_id,name,billing_required,name_pending) VALUES(?,?,1,0)',[$user,$name]);
+            if(!$team)throw new CatalogException('El equipo cambió. Volvé a consultar el plan.',409);
             else stock_query($this->db,'UPDATE supervisor_teams SET name=?,name_pending=0,active=1,billing_required=CASE WHEN active=0 THEN 1 ELSE billing_required END,revision=revision+1 WHERE id=? AND owner_id=?',[$name,$team['id'],$user]);
         });
     }
@@ -162,7 +178,7 @@ final class ProSubscriptions {
         $this->seller();
         // A persistent reference/idempotency key survives network timeouts and repeated clicks.
         $ref=bin2hex(random_bytes(24));
-        $this->query("INSERT INTO pro_subscriptions(reference,user_id,amount_cents) VALUES(?,?,?) ON CONFLICT(user_id) DO NOTHING",[$ref,$user,$this->config['amount']]);
+        $this->insertRow($user,$ref);
         $create=$this->transaction(function()use($user){
             $row=$this->lock($this->row($user)['reference']);
             if($row['status']==='beta_trial'&&$row['provider_id']===null&&$row['checkout_url']===''){$this->query("UPDATE pro_subscriptions SET status='new',amount_cents=? WHERE reference=?",[$this->config['amount'],$row['reference']]);$row['status']='new';$row['amount_cents']=$this->config['amount'];}
@@ -180,7 +196,7 @@ final class ProSubscriptions {
                 ...(($this->config['plan']??'')!==''?['preapproval_plan_id'=>$this->config['plan'],...(!$hosted?['card_token_id'=>$cardToken]:[])]:[]),
                 'reason'=>(($this->config['product']??'pro')==='supervision'?'RepoTools Supervisión':'RepoTools PRO').' · prueba','external_reference'=>$row['reference'],'payer_email'=>$this->config['buyer'],
                 'auto_recurring'=>['frequency'=>1,'frequency_type'=>'months','transaction_amount'=>(int)$row['amount_cents']/100,'currency_id'=>'ARS'],
-                'back_url'=>$this->config['url'].'/pro.php?product='.($this->config['product']??'pro'),'status'=>!$hosted&&($this->config['plan']??'')!==''?'authorized':'pending'
+                'back_url'=>$this->config['url'].'/pro.php?product='.($this->config['product']??'pro').(!empty($row['team_id'])?'&team_id='.$row['team_id']:''),'status'=>!$hosted&&($this->config['plan']??'')!==''?'authorized':'pending'
             ],$row['reference']);
         }else{
             // Do not repeat POST after an ambiguous timeout: recover by reference instead.
@@ -272,7 +288,10 @@ final class ProSubscriptions {
             $this->query('INSERT INTO pro_payments(provider_id,reference,status,period_end,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(provider_id) DO UPDATE SET status=excluded.status,period_end=excluded.period_end,updated_at=excluded.updated_at',[$paymentId,$current['reference'],$status,$end,time()]);
             $until=(int)$this->query("SELECT COALESCE(MAX(period_end),0) FROM pro_payments WHERE reference=? AND status='approved'",[$current['reference']])->fetchColumn();
             $this->query('UPDATE pro_subscriptions SET paid_until=?,updated_at=? WHERE reference=?',[$until,time(),$current['reference']]);
-            if(($this->config['product']??'pro')==='supervision'&&$until>time())$this->query("INSERT INTO supervisor_teams(owner_id,name,billing_required,name_pending) VALUES(?,'Mi equipo',1,1) ON CONFLICT(owner_id) DO NOTHING",[$current['user_id']]);
+            if(($this->config['product']??'pro')==='supervision'&&$until>time()&&empty($current['team_id'])){
+                $team=(int)stock_query($this->db,"INSERT INTO supervisor_teams(owner_id,name,billing_required,name_pending) VALUES(?,'Mi equipo',1,1) RETURNING id",[$current['user_id']])->fetchColumn();
+                $this->query('UPDATE pro_subscriptions SET team_id=? WHERE reference=?',[$team,$current['reference']]);
+            }
         });
     }
 }

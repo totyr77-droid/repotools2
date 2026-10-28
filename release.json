@@ -1,6 +1,12 @@
 {
-  "version": 123,
+  "version": 124,
   "changes": [
+    {
+      "version": 124,
+      "label": "2.19",
+      "date": "2026-10-28",
+      "summary": "Supervisión por equipo con suscripción independiente y hasta 10 integrantes."
+    },
     {
       "version": 123,
       "label": "2.18",
@@ -294,15 +300,9 @@
       "label": "1.70",
       "date": "2026-10-20",
       "summary": "Avisos de insignias compactos, compartir perfil y acceso a Mi equipo movible."
-    },
-    {
-      "version": 74,
-      "label": "1.69",
-      "date": "2026-10-19",
-      "summary": "Mi equipo: orden por vencimiento, movimientos y accesos más claros."
     }
   ],
   "major": 2,
-  "minor": 18,
-  "label": "2.18"
+  "minor": 19,
+  "label": "2.19"
 }

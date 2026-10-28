@@ -239,3 +239,7 @@ body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:64px 20px
  #proPaymentDialog #mpTestCardForm{gap:12px}
  #proPaymentDialog .pro-checkout-provider{font-size:.72rem}
 }
+
+.pro-team-context{margin:0 0 20px}.pro-team-context label{display:block;margin-bottom:12px}.pro-team-context select{display:block;width:100%;min-height:48px;margin-top:6px}.pro-team-context button{min-height:44px}.pro-team-context .stock-muted{margin:10px 0}
+
+.pro-team-context button{display:inline-flex;align-items:center;gap:7px;max-width:100%;box-sizing:border-box}.pro-team-context button svg{width:18px;height:18px;flex:none}.pro-team-context select{box-sizing:border-box;font:inherit;padding:10px 12px}

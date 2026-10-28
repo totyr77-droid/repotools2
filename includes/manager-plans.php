@@ -6,19 +6,19 @@ require_once __DIR__.'/audit.php';
 function manager_plan_rows(PDO $db,int $user): array {
     $rows=[];
     foreach(['pro'=>'pro_subscriptions','supervision'=>'supervision_subscriptions'] as $product=>$table){
-        $rows[$product]=stock_query($db,"SELECT * FROM $table WHERE user_id=?",[$user])->fetch()?:null;
+        $all=stock_query($db,"SELECT * FROM $table WHERE user_id=? ORDER BY reference",[$user])->fetchAll();$rows[$product]=array_shift($all)?:null;foreach($all as $row)$rows[$product.':'.$row['reference']]=$row;
     }
     return $rows;
 }
 function manager_plan_version(int $user,array $rows): string {
     $identity=[];
-    foreach($rows as $product=>$row)$identity[$product]=$row?[$row['reference'],$row['provider_id'],(int)$row['amount_cents']]:null;
+    foreach($rows as $product=>$row)$identity[$product]=$row?[$row['reference'],$row['provider_id'],(int)$row['amount_cents'],(int)($row['team_id']??0)]:null;
     return hash('sha256',json_encode([$user,$identity],JSON_THROW_ON_ERROR));
 }
 function manager_plan_controls(PDO $db,array $actor,int $target): array {
     if($actor['role']!=='manager'||(function_exists('support_active')&&support_active())||!pro_config()['enabled'])return ['can_reset_plans'=>false];
     $rows=manager_plan_rows($db,$target);$plans=[];
-    foreach($rows as $product=>$row)if($row)$plans[]=['product'=>$product,'status'=>$row['status'],'active'=>(int)$row['paid_until']>time()];
+    foreach($rows as $product=>$row)if($row)$plans[]=['team_name'=>!empty($row['team_id'])?(stock_query($db,'SELECT name FROM supervisor_teams WHERE id=? AND owner_id=?',[$row['team_id'],$target])->fetchColumn()?:''):'','product'=>explode(':',$product)[0],'status'=>$row['status'],'active'=>(int)$row['paid_until']>time()];
     return ['can_reset_plans'=>true,'plans'=>$plans,'plans_version'=>manager_plan_version($target,$rows)];
 }
 function manager_plan_require(PDO $db,int $actor): void {
@@ -37,11 +37,11 @@ function manager_remove_plans(PDO $db,int $actor,int $target,string $version,?ar
     // Preflight every product before making any remote cancellation.
     foreach($rows as $product=>$row)if($row){
         if($row['provider_id']===null&&!in_array($row['status'],['new','beta_trial','creating'],true))throw new CatalogException('Hay un intento en verificación. Comprobá el pago antes de quitar los planes.',409);
-        if(($row['provider_id']!==null||$row['status']==='creating')&&empty($settings[$product]['enabled']))throw new CatalogException('Falta configurar la cancelación de uno de los planes.',503);
+        if(($row['provider_id']!==null||$row['status']==='creating')&&empty($settings[explode(':',$product)[0]]['enabled']))throw new CatalogException('Falta configurar la cancelación de uno de los planes.',503);
     }
     $original=$rows;
     foreach($rows as $product=>$row)if($row&&$row['provider_id']===null&&$row['status']==='creating'){
-        (new ProSubscriptions($db,$settings[$product],$transport))->reconcile($target);
+        (new ProSubscriptions($db,[...$settings[explode(':',$product)[0]],'team_id'=>(int)($row['team_id']??0)],$transport))->reconcile($target);
     }
     $rows=manager_plan_rows($db,$target);
     foreach($rows as $product=>$row){
@@ -49,7 +49,7 @@ function manager_remove_plans(PDO $db,int $actor,int $target,string $version,?ar
         if($row&&$row['provider_id']===null&&$row['status']==='creating')throw new CatalogException('El proveedor todavía no identificó el intento. No quitamos los planes para evitar una renovación sin cancelar.',409);
     }
     $resolvedVersion=manager_plan_version($target,$rows);
-    try{foreach($rows as $product=>$row)if($row&&$row['provider_id']!==null)(new ProSubscriptions($db,$settings[$product],$transport))->cancel($target,$row['reference']);}
+    try{foreach($rows as $product=>$row)if($row&&$row['provider_id']!==null)(new ProSubscriptions($db,[...$settings[explode(':',$product)[0]],'team_id'=>(int)($row['team_id']??0)],$transport))->cancel($target,$row['reference']);}
     catch(CatalogException $e){if($e->status===409)throw $e;throw new CatalogException('No pudimos confirmar todas las cancelaciones. Los planes todavía no se quitaron. Volvé a intentar.',503);}
     $db->beginTransaction();
     try{
@@ -61,12 +61,12 @@ function manager_remove_plans(PDO $db,int $actor,int $target,string $version,?ar
         if(!array_filter($current)){$db->commit();return false;}
         if(!hash_equals(manager_plan_version($target,$current),$resolvedVersion))throw new CatalogException('Los planes cambiaron durante la cancelación. Volvé a abrir la cuenta.',409);
         $before=[];
-        foreach(['pro'=>['pro_subscriptions','pro_payments'],'supervision'=>['supervision_subscriptions','supervision_payments']] as $product=>[$subscriptions,$payments]){
-            $row=$current[$product];if(!$row)continue;
+        foreach($current as $key=>$row){
+            if(!$row)continue;$product=explode(':',$key)[0];[$subscriptions,$payments]=$product==='pro'?['pro_subscriptions','pro_payments']:['supervision_subscriptions','supervision_payments'];
             if($row['provider_id']!==null&&$row['status']!=='cancelled')throw new CatalogException('La cancelación todavía no está confirmada.',409);
             $history=stock_query($db,"SELECT * FROM $payments WHERE reference=?",[$row['reference']])->fetchAll();
             stock_query($db,'INSERT INTO billing_cancelled_attempts(reference,user_id,product,snapshot,archived_at) VALUES(?,?,?,?,?)',[$row['reference'],$target,$product,json_encode(['reason'=>'manager_requested_plan_reset','actor_id'=>$actor,'subscription'=>$row,'payments'=>$history],JSON_THROW_ON_ERROR),time()]);
-            $before[$product]=['status'=>$row['status'],'active'=>(int)$row['paid_until']>time()];
+            $before[$key]=['status'=>$row['status'],'active'=>(int)$row['paid_until']>time()];
             stock_query($db,"DELETE FROM $payments WHERE reference=?",[$row['reference']]);
             stock_query($db,"DELETE FROM $subscriptions WHERE reference=? AND user_id=?",[$row['reference'],$target]);
         }
