@@ -1091,3 +1091,12 @@ Reversión: revertir este commit y publicar caché superior; mantener esquema51 
 ## Beta2.21 — lector y buscador de Supervisión
 
 Cámara integrada en el borde del buscador, reutilizando el componente de equipos; controles44px/foco y mano elegida en buscadores equivalentes de Stock/palets. Supervisión carga ean-scanner.css, que faltaba y dejaba crecer el video vertical. Mismo arreglo aislado en main3.24. Validación, alcance y reversión en docs/SUPERVISION-LECTOR-BUSCADOR.md. Sin migración, datos, permisos ni cambios de reconocimiento.
+
+
+## Beta2.22 — cabecera compacta de Supervisión
+
+Pedido usuario: cupos solo dentro de Integrantes; selector con Nuevo equipo/Ver suscripción al costado; descarga y rango junto al subtítulo; reducir separaciones y evitar Actualizar recortado. Se mueve supervisionCapacity al panel Integrantes sin cambiar cálculo ni límite; las otras pestañas no muestran el mensaje. Selector conserva nombre/selector nativo y usa botones laterales con iconos existentes, títulos y etiquetas accesibles,44px y estado de carga previo. Descarga y Supervisor · Consulta quedan en la fila Equipo de trabajo, conservando su visibilidad según acceso. Sin duplicar botones ni alterar las acciones de pago/equipo.
+
+Se eliminan márgenes del bloque de selector en esta vista y se mantiene una fila de controles incluso320px; mano izquierda invierte selector/acciones y metadatos. Actualizar define caja44px con border-box, padding10px y SVG22px no reducible/overflow visible; evita comprimir el dibujo dentro de padding y ancho anteriores. Estilos acotados a Supervisión, sin cambiar Mi plan, main, permisos, cupos, datos ni backend.
+
+Validación: supervision-teams-ui con sesión/API local confirma cupos ocultos en Palets y visibles en Integrantes, selector y acciones en la misma fila320/390/1366 con ambas manos, título/subtítulo sin margen extra, descarga en subtítulo y SVG de Actualizar dentro del botón. Conserva cambio de equipo, permisos/CSRF, invitaciones/cupos y creación sin cargo. WebKit y Chromium; captura móvil revisada. Sintaxis PHP/JS y diff sin errores. Reversión: revertir este commit y publicar caché superior; sin migración ni cambios de datos.

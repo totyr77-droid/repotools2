@@ -1,6 +1,12 @@
 {
-  "version": 126,
+  "version": 127,
   "changes": [
+    {
+      "version": 127,
+      "label": "2.22",
+      "date": "2026-10-28",
+      "summary": "Cabecera de Supervisión compacta y cupos solo en Integrantes."
+    },
     {
       "version": 126,
       "label": "2.21",
@@ -294,15 +300,9 @@
       "label": "1.73",
       "date": "2026-10-25",
       "summary": "Prepara planes por usuario sucursal y empresa en beta con base independiente"
-    },
-    {
-      "version": 77,
-      "label": "1.72",
-      "date": "2026-10-25",
-      "summary": "Actualiza beta desde main y prepara conexión exclusiva para desarrollo comercial"
     }
   ],
   "major": 2,
-  "minor": 21,
-  "label": "2.21"
+  "minor": 22,
+  "label": "2.22"
 }
