@@ -1086,3 +1086,8 @@ Revisión de demora: autorización y acreditación son estados distintos; la UI 
 Validación: supervision-teams añade presupuesto exacto4 llamadas por conciliación y cuota con padre conocido ajeno rechazada409; pasan pro-subscriptions, supervision-billing, billing-renewal, billing-retry, hosted-checkout y manager-plan-reset. supervision-teams-ui WebKit/Chromium verifica controles táctiles/anchos de selección,320/390/1366 y ambas manos, scopes/CSRF/cupos y creación directa desde Supervisión más reutilización desde Mi plan sin cobro. Captura móvil revisada. Proveedor simulado; ninguna cuota/cancelación real usada para probar. Sin migración/escrituras de datos existentes/main.
 
 Reversión: revertir este commit y publicar caché superior; mantener esquema51 y equipos/suscripciones independientes. No restaurar datos ni cancelar planes al revertir estilos/optimización.
+
+
+## Beta2.21 — lector y buscador de Supervisión
+
+Cámara integrada en el borde del buscador, reutilizando el componente de equipos; controles44px/foco y mano elegida en buscadores equivalentes de Stock/palets. Supervisión carga ean-scanner.css, que faltaba y dejaba crecer el video vertical. Mismo arreglo aislado en main3.24. Validación, alcance y reversión en docs/SUPERVISION-LECTOR-BUSCADOR.md. Sin migración, datos, permisos ni cambios de reconocimiento.
