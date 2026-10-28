@@ -1,6 +1,12 @@
 {
-  "version": 120,
+  "version": 121,
   "changes": [
+    {
+      "version": 121,
+      "label": "2.16",
+      "date": "2026-10-27",
+      "summary": "Espera las cuotas pendientes y confirma el pago antes de configurar el equipo."
+    },
     {
       "version": 120,
       "label": "2.15",
@@ -294,15 +300,9 @@
       "label": "1.67",
       "date": "2026-10-20",
       "summary": "Sucursal como etiqueta en Inicio y acciones de equipo más ordenadas."
-    },
-    {
-      "version": 71,
-      "label": "1.66",
-      "date": "2026-10-20",
-      "summary": "Perfiles compactos e insignias con brillo e inclinación interactiva."
     }
   ],
   "major": 2,
-  "minor": 15,
-  "label": "2.15"
+  "minor": 16,
+  "label": "2.16"
 }

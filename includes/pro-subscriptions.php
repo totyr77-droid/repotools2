@@ -228,9 +228,12 @@ final class ProSubscriptions {
         if(!isset($result['results'])||!is_array($result['results']))throw new CatalogException('No pudimos comprobar los pagos.',503);
         foreach(array_slice($result['results'],0,5) as $invoice){
             if((string)($invoice['preapproval_id']??'')!==$row['provider_id'])throw new CatalogException('La cuota no corresponde a tu suscripción.',409);
+            // Provider search can expose a scheduled entry before its resource/payment exists.
+            if(empty($invoice['payment']['id']))continue;
             $id=(string)($invoice['id']??'');
+            if($id==='')continue;
             if(!preg_match('/^[a-zA-Z0-9_-]{1,100}$/D',$id))throw new CatalogException('Cuota no válida.',409);
-            if(!empty($invoice['payment']['id']))$this->invoice($id,(string)$row['provider_id']);
+            $this->invoice($id,(string)$row['provider_id']);
         }
     }
     public function invoice(string $id,?string $expectedParent=null): void {
