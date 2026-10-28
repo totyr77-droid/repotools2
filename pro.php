@@ -26,10 +26,12 @@ include __DIR__.'/vistas/header.vista.php';
 </main>
 <dialog id="proPaymentDialog" class="library-dialog pro-payment-dialog" aria-labelledby="proPaymentTitle">
 <div class="library-heading"><h2 id="proPaymentTitle"><?= stock_icon('crown') ?>Unirme a <span class="pro-badge"><?= escape($planLabel) ?></span></h2><button type="button" class="app-close" id="closeProPayment" aria-label="Cerrar"><?= stock_icon('close') ?></button></div>
+<div class="pro-payment-content">
 <div class="pro-checkout-summary"><div><span>Plan <?= escape($planLabel) ?> · mensual</span><p id="proPaymentPrice" class="pro-payment-price"></p></div><span class="pro-checkout-provider"><?= stock_icon('shield') ?>Mercado Pago</span></div><p class="pro-test-note">Pago de prueba · usá una tarjeta ficticia</p><p class="pro-payment-terms">Renovación mensual. Cancelá cuando quieras y conservá el período vigente.</p>
 <div id="proPaymentSummary"><ul class="pro-benefits"><?php if($product==='supervision'): ?><li>Una cuenta de supervisor.</li><li>Stock y movimientos del equipo.</li><li>Cada integrante autoriza el acceso a su stock.</li><?php else: ?><li>Compartí palets y stock.</li><li>Transferí a otro palet o usuario.</li><li>Gestioná accesos para colaborar.</li><?php endif; ?></ul><button id="proContinueMercadoPago" type="button" class="library-primary" hidden>Pagar en Mercado Pago</button><button id="proContinueCard" type="button" class="library-primary">Continuar con tarjeta</button></div>
 <p class="pro-payment-note"><?= stock_icon('shield') ?>Ingresás la tarjeta en campos de Mercado Pago. RepoTools no recibe tu número ni código de seguridad.</p>
 <p id="proPaymentStatus" class="stock-muted" role="status"></p><div id="proCardSlot"></div>
 
+</div>
 </dialog>
 <?php include __DIR__.'/vistas/footer.vista.php'; ?>
