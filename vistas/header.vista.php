@@ -72,6 +72,7 @@ $roleLabels = ['manager' => ['MNG', 'Manager', 'fa-crown'], 'administrador' => [
     <?php if (!empty($paginaInicio) || !empty($paginaBiblioteca) || !empty($stockEmbedded)): ?><link href="css/product-info.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaInicio)): ?><link href="css/scan-result.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if(!empty($paginaGestionEmpresas)||!empty($paginaSupervision)): ?><?php if(!empty($paginaGestionEmpresas)): ?><link href="css/stock-branches.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
+    <?php if(!empty($paginaSupervision)): ?><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaBiblioteca) || !empty($paginaInicio) || !empty($paginaEquipo)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
     <?php if (!empty($paginaStock)): ?><link href="css/library.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><link href="css/ean-scanner.css?v=<?= (int)app_release()['version'] ?>" rel="stylesheet" type="text/css"><?php endif; ?>
 

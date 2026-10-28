@@ -993,3 +993,11 @@ body[data-hand=left] #palletDialog .stock-product>div:first-child>.stock-expiry-
 #reviewReportDialog .report-value-choice input[type=radio]{position:absolute;opacity:0;width:18px;min-width:18px;max-width:18px;height:18px;min-height:18px;margin:0;padding:0}
 #reviewReportDialog .report-field:has(input:focus-visible){box-shadow:0 0 0 3px #a798e0}
 #reviewReportDialog .report-field:has(input:checked){outline:2px solid var(--primary,#302080);outline-offset:-2px}
+
+/* Search cameras share the input border in team, pallet and stock views. */
+.supervision-toolbar>.supervision-search.team-inventory-query{border:1px solid #d8d4e3;border-radius:12px;background:#fff;padding:0 2px;box-sizing:border-box;gap:4px}
+.supervision-toolbar>.supervision-search.team-inventory-query>input{border:0;border-radius:0;background:transparent;box-shadow:none;padding:9px 2px;outline:none}
+.supervision-search.team-inventory-query>svg{margin-inline-start:8px}
+.team-inventory-query:focus-within,.public-stock-tools .public-stock-search:focus-within{border-color:#7464bb;box-shadow:0 0 0 2px #7464bb33}
+.team-page .team-inventory-query>button,.public-stock-tools .public-stock-search>.product-search-camera,.public-stock-tools .public-stock-search>#scanPublicStockSearch{flex:0 0 44px;box-sizing:border-box;width:44px;min-width:44px;height:44px;min-height:44px;margin:0;padding:10px;border:0;background:transparent;box-shadow:none}
+body[data-hand=left] .public-stock-tools .public-stock-search{flex-direction:row-reverse}

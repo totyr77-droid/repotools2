@@ -1,6 +1,12 @@
 {
-  "version": 228,
+  "version": 229,
   "changes": [
+    {
+      "version": 229,
+      "label": "3.24",
+      "date": "2026-10-28",
+      "summary": "Lector de Supervisión sin cámara desbordada y cámara integrada en el buscador."
+    },
     {
       "version": 228,
       "label": "3.23",
@@ -294,15 +300,9 @@
       "label": "2.75",
       "date": "2026-10-24",
       "summary": "Acomoda integrantes en una fila con acciones compactas según mano hábil"
-    },
-    {
-      "version": 179,
-      "label": "2.74",
-      "date": "2026-10-24",
-      "summary": "Mejora listas del equipo, búsqueda y orden de stock; unifica bultos"
     }
   ],
   "major": 3,
-  "minor": 23,
-  "label": "3.23"
+  "minor": 24,
+  "label": "3.24"
 }
