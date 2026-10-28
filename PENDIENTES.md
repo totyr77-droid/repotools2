@@ -1036,3 +1036,9 @@ Reconciliación ignora entradas propias que aún no tienen pago o identificador 
 Cuota existente de la cuenta de prueba conciliada mediante entrega firmada propia:200, una fila de pago, período activo y equipo con nombre pendiente, sin nueva compra. Esto no prueba entrega automática del proveedor. Historial de reinicio anterior y pagos ajenos intactos.
 
 Validación: pro-subscriptions añade búsquedas temporales ID/pago nulos sin acceso ni error, y luego aprobación válida/idempotente; supervision-billing pasa. UI WebKit simula autorización, primera comprobación pendiente, segunda acreditada y aparición automática del nombre; conserva API/auth/CSRF/propiedad previas. Sin migración/main. Revertir commit/caché superior; no borrar cuota ya confirmada ni equipo del usuario.
+
+## Beta2.17 — título Mi plan
+
+Pedido usuario: título con iconografía y color. H1 incorpora corona SVG del sistema y violeta existente, conservando tamaño, espaciado, adaptación y preferencia de mano. No icono nuevo, tarjeta decorativa ni cambios de planes/pagos.
+
+Validación: sintaxis PHP y vista móvil WebKit: un SVG, color rgb39/25/127, sin overflow390px; captura revisada. Sin migración/datos/main. Revertir commit/caché superior para revertir.

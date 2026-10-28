@@ -1,7 +1,7 @@
 .pro-badge{display:inline-flex;align-items:center;justify-content:center;flex:none;vertical-align:middle;white-space:nowrap;padding:2px 6px;border-radius:5px;background:#27197f;color:#fff;font:700 10px/1.4 sans-serif;letter-spacing:.04em}
 .library-secondary .pro-badge{margin-inline-start:6px}
 .pro-main{max-width:640px;margin-inline:auto;padding:20px 16px 130px}
-.pro-main h1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:1.5rem}
+.pro-main h1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:1.5rem;color:#27197f}
 .pro-main h1>svg{width:24px;height:24px;flex:none}
 .pro-main p{line-height:1.5}
 .pro-main>a{display:inline-flex;margin-top:20px;min-height:44px;align-items:center}

@@ -9,7 +9,7 @@ $publicPageTitle='Mi plan';
 include __DIR__.'/vistas/header.vista.php';
 ?>
 <main class="library-main pro-main" id="proSubscription" data-product="<?= escape($product) ?>" data-csrf="<?= escape(csrf_token()) ?>">
-  <h1>Mi plan</h1>
+  <h1><?= stock_icon('crown') ?>Mi plan</h1>
   <section class="pro-account-plan" aria-label="Detalle de tu plan">
     <div class="pro-account-heading"><span class="pro-account-emblem"><?= stock_icon('crown') ?></span><div><span class="pro-account-eyebrow">Tu plan</span><h2 id="proPlanName">Consultando…</h2></div><span id="proActiveBadge" class="pro-account-active" hidden><?= stock_icon('check') ?>Activo</span></div>
     <div class="pro-account-body">
