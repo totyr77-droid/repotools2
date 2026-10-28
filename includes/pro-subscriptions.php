@@ -208,6 +208,14 @@ final class ProSubscriptions {
     }
     public function reconcile(int $user): void {
         $row=$this->row($user);
+        if($row&&!$row['provider_id']&&$row['status']==='creating'){
+            $search=$this->request('GET','/preapproval/search?external_reference='.rawurlencode($row['reference']));
+            $matches=array_values(array_filter($search['results']??[],fn($remote)=>($remote['external_reference']??'')===$row['reference']));
+            if(count($matches)!==1)return;
+            $id=(string)($matches[0]['id']??'');if(!preg_match('/^[a-zA-Z0-9_-]{1,100}$/D',$id))throw new CatalogException('Suscripción no válida.',409);
+            $this->subscription($id);$row=$this->row($user);
+            if($row['status']==='cancelled')return;
+        }
         if(!$row||!$row['provider_id'])return;
         $result=$this->request('GET','/authorized_payments/search?preapproval_id='.rawurlencode($row['provider_id']).'&limit=5&offset=0');
         if(!isset($result['results'])||!is_array($result['results']))throw new CatalogException('No pudimos comprobar los pagos.',503);

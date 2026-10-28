@@ -1002,3 +1002,11 @@ Validación: pro-subscriptions-ui WebKit (flujo/token-only/CSRF/planes), pro-key
 Captura usuario revela vacío excesivo antes de abrir tarjeta. Altura móvil completa se aplica solamente cuando existe formulario de tarjeta; resumen previo usa su altura de contenido con el mismo límite del viewport y cierre visible. Sin cambios de campos, proveedor, teclado, pagos ni main.
 
 Validación: pro-keyboard-ui WebKit/Chromium verifica resumen compacto al retirar formulario y luego restaura campos para probar teclado, foco/documento, manos y PC. Reversión por revert/caché superior, sin datos/migración.
+
+## Beta2.14 — titular de prueba y recuperación del rechazo
+
+Usuario confirma que escribió otro nombre como titular. Tarjeta ficticia usa APRO para simular aprobación; placeholder y ayuda breve lo indican solo en modo test, sin sustituir valor ni bloquear otros escenarios de prueba. No guardar nombre/tarjeta/token. Consulta real de solo lectura confirma nuevo intento remoto cancelado con pago rechazado cc_rejected_other_reason; POST400 había dejado ficha local creating.
+
+Comprobar pago ahora recupera por referencia propia una ficha creating sin provider_id usando GET búsqueda/recurso; valida la suscripción con reglas existentes y guarda el estado remoto. Si ya está cancelada termina sin tratar una cuota rechazada/scheduled como aprobada. Carga inicial hace una comprobación limitada para creating; nunca repite POST de creación ni concede acceso por recuperar estado. Tras cancelar sin pagos aparece el reintento existente. No reiniciar ni borrar fichas automáticamente.
+
+Validación: billing-retry cubre recuperación por referencia cancelada sin acceso/POST proveedor; pro-subscriptions y supervision-billing pasan; UI WebKit comprueba APRO en placeholder/ayuda con SDK simulado y flujo token-only. Sin nueva compra real ni corrección de credenciales/webhook automático. Reversión por revert/caché superior; sin migración ni cambios main.

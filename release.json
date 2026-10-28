@@ -1,6 +1,12 @@
 {
-  "version": 118,
+  "version": 119,
   "changes": [
+    {
+      "version": 119,
+      "label": "2.14",
+      "date": "2026-10-27",
+      "summary": "Aclara el titular de prueba y recupera el estado de intentos rechazados."
+    },
     {
       "version": 118,
       "label": "2.13",
@@ -294,15 +300,9 @@
       "label": "1.65",
       "date": "2026-10-20",
       "summary": "Insignias más grandes, colección y niveles en modales; perfil más compacto."
-    },
-    {
-      "version": 69,
-      "label": "1.64",
-      "date": "2026-10-20",
-      "summary": "Perfil renovado, preferencias compactas y 72 insignias con progreso desde cero."
     }
   ],
   "major": 2,
-  "minor": 13,
-  "label": "2.13"
+  "minor": 14,
+  "label": "2.14"
 }
