@@ -996,3 +996,9 @@ Captura de iPhone muestra campos dentro de modal pequeño al abrir teclado. Pago
 El revelado existente de foco ahora respeta los límites del contenedor que realmente desplaza, además del viewport, para no esconder campos detrás del encabezado. Scroll manual y cambios asíncronos no reposicionan el formulario. Sin un segundo controlador de teclado ni otra librería.
 
 Validación: pro-subscriptions-ui WebKit (flujo/token-only/CSRF/planes), pro-keyboard-ui WebKit/Chromium (320/390, manos, viewport simulado360px con offset, titular/documento visibles, PC sin overflow), dialog-edit-scroll-ui ambos motores. Prueba de scroll espera estado real de layout en lugar de demora fija para primer foco. Capturas revisadas. Teclado iPhone real pendiente de prueba del usuario; no afirmar validación física. Sin migración/datos; revertir commit y publicar caché superior para revertir.
+
+## Beta2.13 — resumen de pago compacto
+
+Captura usuario revela vacío excesivo antes de abrir tarjeta. Altura móvil completa se aplica solamente cuando existe formulario de tarjeta; resumen previo usa su altura de contenido con el mismo límite del viewport y cierre visible. Sin cambios de campos, proveedor, teclado, pagos ni main.
+
+Validación: pro-keyboard-ui WebKit/Chromium verifica resumen compacto al retirar formulario y luego restaura campos para probar teclado, foco/documento, manos y PC. Reversión por revert/caché superior, sin datos/migración.

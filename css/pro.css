@@ -232,7 +232,8 @@ body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:64px 20px
 #proPaymentDialog:has(#mpTestCardForm) .pro-payment-content>.pro-payment-note{display:none}
 #proPaymentDialog #mpTestCardForm{margin-bottom:0}
 @media(max-width:600px){
- #proPaymentDialog[open],html.dialog-keyboard-open #proPaymentDialog[open]{position:fixed;top:calc(var(--dialog-visible-top,0px) + 8px)!important;bottom:auto!important;margin:0 auto!important;width:calc(100% - 16px);height:calc(var(--dialog-visible-height,100dvh) - 16px);max-height:calc(var(--dialog-visible-height,100dvh) - 16px)!important;border-radius:16px}
+ #proPaymentDialog[open],html.dialog-keyboard-open #proPaymentDialog[open]{position:fixed;top:calc(var(--dialog-visible-top,0px) + 8px)!important;bottom:auto!important;margin:0 auto!important;width:calc(100% - 16px);height:auto;max-height:calc(var(--dialog-visible-height,100dvh) - 16px)!important;border-radius:16px}
+ #proPaymentDialog[open]:has(#mpTestCardForm){height:calc(var(--dialog-visible-height,100dvh) - 16px)}
  #proPaymentDialog>.library-heading{padding:10px 14px}
  #proPaymentDialog>.pro-payment-content{padding:0 14px max(16px,env(safe-area-inset-bottom,0px))}
  #proPaymentDialog #mpTestCardForm{gap:12px}

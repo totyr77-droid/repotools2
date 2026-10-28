@@ -1,10 +1,16 @@
 {
-  "version": 117,
+  "version": 118,
   "changes": [
+    {
+      "version": 118,
+      "label": "2.13",
+      "date": "2026-10-27",
+      "summary": "Reduce el resumen del pago y reserva el espacio amplio para completar la tarjeta."
+    },
     {
       "version": 117,
       "label": "2.12",
-      "date": "2026-10-28",
+      "date": "2026-10-27",
       "summary": "Mejora el formulario de pago móvil y su espacio al abrir el teclado."
     },
     {
@@ -294,15 +300,9 @@
       "label": "1.64",
       "date": "2026-10-20",
       "summary": "Perfil renovado, preferencias compactas y 72 insignias con progreso desde cero."
-    },
-    {
-      "version": 68,
-      "label": "1.63",
-      "date": "2026-10-20",
-      "summary": "Inventario y movimientos de equipo con filtros; sucursal como etiqueta sin casita."
     }
   ],
   "major": 2,
-  "minor": 12,
-  "label": "2.12"
+  "minor": 13,
+  "label": "2.13"
 }
