@@ -199,8 +199,9 @@ final class ProSubscriptions {
         if($result['url']==='')throw new CatalogException('Mercado Pago todavía no tiene un enlace para este intento. Comprobá su estado antes de volver a intentar.',503);
         return $result['url'];
     }
-    public function cancel(int $user): void {
+    public function cancel(int $user,?string $expectedReference=null): void {
         $this->seller();$row=$this->row($user);if(!$row||!$row['provider_id'])throw new CatalogException('No hay una suscripción para cancelar.',409);
+        if($expectedReference!==null&&!hash_equals($row['reference'],$expectedReference))throw new CatalogException('La suscripción cambió. Volvé a abrir la cuenta.',409);
         $this->transaction(function()use($row){$current=$this->lock($row['reference']);
             $remote=$this->request('GET','/preapproval/'.rawurlencode($current['provider_id']));$this->validate($remote,$current);
             if(($remote['status']??'')!=='cancelled')$remote=$this->request('PUT','/preapproval/'.rawurlencode($current['provider_id']),['status'=>'cancelled']);

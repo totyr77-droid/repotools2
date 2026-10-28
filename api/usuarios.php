@@ -30,7 +30,13 @@ try {
     }
     if ($method==='POST') {
         $action=$_POST['action']??'';
-        if ($action==='role') profile_change_role($db,(int)$actor['id'],(int)($_POST['id']??0),(string)($_POST['role']??''));
+        if($action==='reset_plans'){
+            manager_plan_require($db,(int)$actor['id']);
+            $id=filter_var($_POST['id']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);
+            if($id===false||!is_string($_POST['plans_version']??null))throw new CatalogException('Cuenta o planes no válidos.',422);
+            manager_remove_plans($db,(int)$actor['id'],$id,$_POST['plans_version']);
+        }
+        elseif ($action==='role') profile_change_role($db,(int)$actor['id'],(int)($_POST['id']??0),(string)($_POST['role']??''));
         elseif ($action==='profile') profile_update_information($db,(int)$actor['id'],(int)($_POST['id']??0),$_POST);
         elseif (in_array($action,['block_reports','unblock_reports'],true)) profile_block_reports($db,(int)$actor['id'],(int)($_POST['id']??0),$action==='block_reports');
         else throw new CatalogException('Solicitud no válida.',422);

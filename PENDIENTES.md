@@ -1042,3 +1042,21 @@ Validación: pro-subscriptions añade búsquedas temporales ID/pago nulos sin ac
 Pedido usuario: título con iconografía y color. H1 incorpora corona SVG del sistema y violeta existente, conservando tamaño, espaciado, adaptación y preferencia de mano. No icono nuevo, tarjeta decorativa ni cambios de planes/pagos.
 
 Validación: sintaxis PHP y vista móvil WebKit: un SVG, color rgb39/25/127, sin overflow390px; captura revisada. Sin migración/datos/main. Revertir commit/caché superior para revertir.
+
+## Preferencia y operación beta — 28/10/2026
+
+Usuario aclara que al pedir reiniciar/quitar a la cuenta de prueba indicada se refiere siempre solo a planes. Conservar equipo, integrantes, listas, alcances, identidad y stock salvo pedido explícito distinto. No volver a ampliar el alcance a datos/equipo por inferencia.
+
+Aplicado reinicio exclusivo de planes en repotools_beta: respaldo privado previo, renovación de Supervisión confirmada cancelled en proveedor test y retirada de fichas/cuotas actuales con archivo histórico. PRO ya ausente. Cuenta queda Free/sin Supervisión comprada. Equipo/configuración se conservan; verificadas comparaciones canónicas completas de equipo/integrantes/listas/alcances y hashes de7 palets/13 registros de productos sin cambios. No nuevo cargo ni cambio main/código/publicación.
+
+Reversión selectiva desde journal/copia privados, sin restaurar tablas ajenas ni reactivar renovación remota. La cancelación del proveedor requiere nueva contratación explícita si se desea renovar. No documentar correo, IDs o credenciales. Journal del reinicio marcado verified para evitar repetirlo accidentalmente.
+
+## Beta2.18 — quitar planes desde Moderación → Usuarios
+
+Pedido usuario: botón exclusivo de manager. La ficha muestra Planes contratados y Quitar planes cuando hay fichas de PRO/Supervisión, con SVG existente, control44px y confirmación reutilizada que aclara cancelación y conservación de equipo/palets/productos. Admin/moderador/usuario no reciben la capacidad; servidor valida rango fresco, CSRF, cuenta/versión y excluye acceso como otro usuario. Disponible exclusivamente en beta con facturación test configurada, sin cambiar main.
+
+Servicio reutiliza cancelación segura de proveedor, verificando vendedor/plan/referencia/importe. Prevalida ambos productos y, si un intento creando aún no tiene ID, lo recupera por referencia propia mediante GET; si no puede identificarse, no elimina nada. Cancela solo la ficha revisada, sin POST de contratación. Tras confirmar todas las cancelaciones, transacción bloquea identidad/fichas, revalida manager y versión, archiva suscripciones/cuotas completas y retira únicamente sus registros actuales. Equipo, integrantes, listas, alcances, stock, identidad/rango y otras cuentas intactos. Fallo parcial de cancelación conserva acceso/historial local y permite volver a intentar; una renovación puede haber quedado ya cancelada. Solicitudes repetidas sin planes no generan cambios ni auditorías duplicadas. Registro plans_removed identifica manager/cuenta y aparece con etiqueta legible en Moderación.
+
+Validación: manager-plan-reset PHP (roles/support/versión/entorno, fallos y cancelación no confirmada, recuperación creating, archivo/idempotencia/auditoría y preservación completa de equipo/stock); user-profiles, pro-subscriptions, billing-retry, supervision-billing, audit-records y API de perfiles existentes. manager-plan-reset-ui WebKit/Chromium usa API real local sin llamadas a proveedor: guest/roles/CSRF/versión, cancelación de confirmación, éxito/auditoría, permisos frescos tras degradación y320/390/1366 con ambas manos. Captura móvil revisada. Transportes externos simulados, no se quitaron planes reales al publicar.
+
+Reversión: revertir commit/publicar caché superior; no migración nueva. Las acciones de managers ya ejecutadas no se revierten al revertir código: recuperar selectivamente sus archivos históricos si el usuario lo pide, sin restaurar tablas completas ni reactivar renovaciones del proveedor. Nunca borrar equipo/stock como parte de quitar planes. Credenciales/IDs privados no documentados.

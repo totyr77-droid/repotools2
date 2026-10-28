@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/reports.php';
 require_once __DIR__.'/audit.php';
+require_once __DIR__.'/manager-plans.php';
 
 function profile_user(PDO $db, int $id, bool $lock = false): array {
     $s = $db->prepare('SELECT id,name,email,company,role,created_at FROM users WHERE id=?'.($lock && $db->getAttribute(PDO::ATTR_DRIVER_NAME)==='pgsql'?' FOR UPDATE':'')); $s->execute([$id]);
@@ -114,5 +115,5 @@ function profile_detail(PDO $db, array $actor, array $target, int $page = 0, str
     $params=array_fill(0,11,$id);if($activity!=='')$params[]=$activity;$s->execute($params);$events=$s->fetchAll();
     $blocked=report_is_blocked($db,$target);
     $editFields=profile_edit_fields($actor,$target);
-    return ['user'=>$target,'is_current_user'=>(int)$actor['id']===(int)$target['id'],'stats'=>$stats,'roles'=>profile_roles($actor,$target),'can_edit_profile'=>(bool)$editFields,'editable_fields'=>$editFields,'reports_blocked'=>$blocked,'can_manage_reports'=>report_can_manage_sender($actor['role'],(int)$actor['id'],$target,!$blocked),'activity_filters'=>$available,'events'=>array_slice($events,0,30),'has_more'=>count($events)>30];
+    return ['user'=>$target,'is_current_user'=>(int)$actor['id']===(int)$target['id'],'stats'=>$stats,'roles'=>profile_roles($actor,$target),'can_edit_profile'=>(bool)$editFields,'editable_fields'=>$editFields,'reports_blocked'=>$blocked,'can_manage_reports'=>report_can_manage_sender($actor['role'],(int)$actor['id'],$target,!$blocked),'activity_filters'=>$available,'events'=>array_slice($events,0,30),'has_more'=>count($events)>30]+manager_plan_controls($db,$actor,$id);
 }
