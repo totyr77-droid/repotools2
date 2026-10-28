@@ -240,6 +240,22 @@ body[data-hand="left"] .pro-plan-card .pro-upgrade-hero{padding-inline:64px 20px
  #proPaymentDialog .pro-checkout-provider{font-size:.72rem}
 }
 
-.pro-team-context{margin:0 0 20px}.pro-team-context label{display:block;margin-bottom:12px}.pro-team-context select{display:block;width:100%;min-height:48px;margin-top:6px}.pro-team-context button{min-height:44px}.pro-team-context .stock-muted{margin:10px 0}
-
-.pro-team-context button{display:inline-flex;align-items:center;gap:7px;max-width:100%;box-sizing:border-box}.pro-team-context button svg{width:18px;height:18px;flex:none}.pro-team-context select{box-sizing:border-box;font:inherit;padding:10px 12px}
+/* Shared team selector: native control and existing secondary actions. */
+.team-switcher{display:grid;gap:10px;margin:14px 0 20px;min-width:0}
+.team-switcher>label{display:block;width:100%;min-width:0;margin:0}
+.team-switcher .team-switcher-label{display:block;margin:0 0 6px;color:#716b7d;font-size:.8rem;font-weight:500}
+.team-switcher .team-switcher-field{display:flex;align-items:center;gap:8px;box-sizing:border-box;min-width:0;min-height:50px;padding:0 12px;border:1px solid #d9d2e9;border-radius:12px;background:#fff;color:#27197f;transition:border-color .15s,box-shadow .15s}
+.team-switcher .team-switcher-field>svg{width:20px;height:20px;flex:none;pointer-events:none}
+.team-switcher .team-switcher-field>svg:last-child{width:16px;height:16px;color:#716b7d}
+.team-switcher .team-switcher-field>select{appearance:none;-webkit-appearance:none;display:block;flex:1;box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:48px;padding:10px 0;margin:0;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;outline:none}
+.team-switcher .team-switcher-field:focus-within{border-color:#5b43ac;box-shadow:0 0 0 3px #eee9fa}
+.team-switcher-actions{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+.team-switcher .team-switcher-action{display:inline-flex;align-items:center;justify-content:center;gap:7px;box-sizing:border-box;min-width:0;max-width:100%;min-height:44px;padding:10px 12px;border:1px solid #ddd6ed;border-radius:10px;background:#f1edf9;color:#34217f;font:inherit;font-size:.85rem;font-weight:600;line-height:1.3;text-align:center;text-decoration:none;cursor:pointer}
+.team-switcher .team-switcher-action>svg{width:18px;height:18px;flex:none}
+.team-switcher .team-switcher-action:hover{background:#e9e2f6;border-color:#bdb0df}
+.team-switcher .team-switcher-action:focus-visible{outline:2px solid #5b43ac;outline-offset:2px}
+.team-switcher .team-switcher-action:disabled{opacity:.65;cursor:wait}
+.team-switcher .stock-muted{margin:0;font-size:.8rem;line-height:1.45}
+body[data-hand=left] .team-switcher-actions{flex-direction:row-reverse}
+.supervision-team-context .team-switcher-action{flex:1 1 130px}
+@media(prefers-reduced-motion:reduce){.team-switcher .team-switcher-field{transition:none}}

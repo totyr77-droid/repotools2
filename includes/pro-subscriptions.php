@@ -254,18 +254,27 @@ final class ProSubscriptions {
         }
     }
     public function invoice(string $id,?string $expectedParent=null): void {
-        $invoice=$this->request('GET','/authorized_payments/'.rawurlencode($id));
-        $parent=(string)($invoice['preapproval_id']??'');
-        if($expectedParent!==null&&$parent!==$expectedParent)throw new CatalogException('La cuota no corresponde a tu suscripción.',409);
+        // Reconciliation already knows the parent. Read the invoice only under
+        // its local lock, rather than fetching the same invoice and parent twice.
+        $row=$expectedParent!==null?$this->query('SELECT reference FROM pro_subscriptions WHERE provider_id=?',[$expectedParent])->fetch():false;
+        $parent=$expectedParent??'';
+        if(!$row){
+            $invoice=$this->request('GET','/authorized_payments/'.rawurlencode($id));
+            $parent=(string)($invoice['preapproval_id']??'');
+            if($expectedParent!==null&&$parent!==$expectedParent)throw new CatalogException('La cuota no corresponde a tu suscripción.',409);
+        }
         if(!preg_match('/^[a-zA-Z0-9_-]{1,100}$/D',$parent))throw new CatalogException('Suscripción no válida.',409);
-        $this->subscription($parent); // Recover webhooks arriving before the checkout response was saved.
-        $row=$this->query('SELECT reference FROM pro_subscriptions WHERE provider_id=?',[(string)($invoice['preapproval_id']??'')])->fetch();
+        if(!$row)$row=$this->query('SELECT reference FROM pro_subscriptions WHERE provider_id=?',[$parent])->fetch();
+        if(!$row){
+            $this->subscription($parent); // Recover a webhook arriving before the checkout response was saved.
+            $row=$this->query('SELECT reference FROM pro_subscriptions WHERE provider_id=?',[$parent])->fetch();
+        }
         if(!$row)return;
         $this->transaction(function()use($row,$id){
             $current=$this->lock($row['reference']);
             $invoice=$this->request('GET','/authorized_payments/'.rawurlencode($id));
             if((string)($invoice['preapproval_id']??'')!==$current['provider_id']||(string)($invoice['id']??'')!==$id)throw new CatalogException('La cuota no coincide.',409);
-            $subscription=$this->request('GET','/preapproval/'.rawurlencode($current['provider_id']));$this->validate($subscription,$current);
+            $subscription=$this->request('GET','/preapproval/'.rawurlencode($current['provider_id']));$this->apply($subscription,$current);
             $paymentId=(string)($invoice['payment']['id']??'');
             if(!ctype_digit($paymentId))return; // Pending invoice without a payment grants nothing.
             $payment=$this->request('GET','/v1/payments/'.$paymentId);

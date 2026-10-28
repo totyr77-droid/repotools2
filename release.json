@@ -1,6 +1,12 @@
 {
-  "version": 124,
+  "version": 125,
   "changes": [
+    {
+      "version": 125,
+      "label": "2.20",
+      "date": "2026-10-28",
+      "summary": "Selector de equipos integrado y comprobación de pagos con menos consultas."
+    },
     {
       "version": 124,
       "label": "2.19",
@@ -294,15 +300,9 @@
       "label": "1.71",
       "date": "2026-10-20",
       "summary": "Palets dentro de Mi equipo, sucursal visible y etiquetas del propietario como filtro."
-    },
-    {
-      "version": 75,
-      "label": "1.70",
-      "date": "2026-10-20",
-      "summary": "Avisos de insignias compactos, compartir perfil y acceso a Mi equipo movible."
     }
   ],
   "major": 2,
-  "minor": 19,
-  "label": "2.19"
+  "minor": 20,
+  "label": "2.20"
 }
