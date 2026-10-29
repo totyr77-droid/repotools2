@@ -1118,3 +1118,16 @@ Usuario informa dos equipos visibles tras quitar planes. Lectura acotada en beta
 Consulta de gestión y selector exponen acceso efectivo calculado con el mismo criterio del servidor: equipo activo y concesión manual o período propio vigente. Moderación distingue Habilitado por manager, Suscripción vigente, Sin suscripción vigente y Deshabilitado. Selector conserva equipos para su recuperación pero marca Sin acceso; al abrir uno sin acceso oculta stock/acciones y conserva su nombre con enlace a suscripción, sin confundirse con Mis supervisores. No se borran equipos, consentimientos, listas, stock ni historial; main intacto.
 
 Validación: supervision-teams comprueba retiro de varias fichas, denegación de stock/invitaciones/listas de los equipos comprados, concesión manual intacta y estados efectivos de gestión/selector. Regresiones manager-plan-reset y supervision pasan. UI con API local verifica equipo sin plan, controles ocultos, respuesta403, vuelta a manual y etiquetas en Moderación. Proveedor simulado; sin cobros ni cambios de cuenta. Reversión: revertir commit y publicar caché superior; sin migración ni datos que restaurar.
+
+## Operación beta — limpieza de accesos de prueba 29/10/2026
+
+Usuario solicita limpiar los accesos restantes de la cuenta de prueba tras quitar planes. Se retira habilitación administrativa de sus dos equipos propios, incluida concesión manual; sin borrar equipos, integrantes, alcances, listas, identidad ni stock. Antes de actualizar se comprueba que no hay fichas PRO/Supervisión nuevas, se respalda la cuenta afectada fuera de Git y se valida cantidad/revisión/origen de los dos equipos bajo transacción y bloqueo de identidad.
+
+Resultado comprobado: cero equipos propios habilitados, sin planes contratados, dos equipos conservados. Comparación completa de integrantes/alcances/listas y hashes de palets/productos sin cambios. Journal privado marcado verified, no se repite el reinicio; no nuevos cobros, cancelaciones ni cambios main. Los equipos conservados pueden seguir listados como Sin acceso; no equivalen a habilitación. Reversión selectiva de active/revision desde journal privado requiere pedido explícito y comprobar cambios posteriores; no restaurar tablas completas ni activar planes remotos.
+
+
+## Beta2.25 — ocultar supervisores deshabilitados
+
+Pedido usuario: retirar de la lista de Moderación los equipos deshabilitados, sin borrar su información, antes de nueva compra de prueba. supervisor_managed filtra active1 en servidor antes de paginar; conserva permisos de manager, estados efectivos manual/pago y cursor. No cambia el selector personal ni los datos de equipos, integrantes, listas o stock. No cambios en pagos, credenciales, main ni migración.
+
+Validación: supervision-teams confirma que un equipo deshabilitado desaparece de gestión pero sigue guardado; conservación de permisos, equipos pagados/manuales y retiro de planes. Regresión supervision pasa; sintaxis/diff revisados. Reversión: revertir commit/publicar caché superior, sin restauración de datos.

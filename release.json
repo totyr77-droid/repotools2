@@ -1,6 +1,12 @@
 {
-  "version": 129,
+  "version": 130,
   "changes": [
+    {
+      "version": 130,
+      "label": "2.25",
+      "date": "2026-10-29",
+      "summary": "Ocultar equipos deshabilitados en Moderación."
+    },
     {
       "version": 129,
       "label": "2.24",
@@ -294,15 +300,9 @@
       "label": "1.76",
       "date": "2026-10-25",
       "summary": "Prepara Pro y pagos de prueba con diseño integrado"
-    },
-    {
-      "version": 80,
-      "label": "1.75",
-      "date": "2026-10-25",
-      "summary": "Prepara suscripción Pro de prueba y distintivos en palets"
     }
   ],
   "major": 2,
-  "minor": 24,
-  "label": "2.24"
+  "minor": 25,
+  "label": "2.25"
 }
