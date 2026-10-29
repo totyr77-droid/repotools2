@@ -7,6 +7,11 @@ function supervisor_team(PDO $db,int $user,bool $requireSelection=false): ?array
  if($requireSelection&&!$selected&&count($rows)>1)throw new CatalogException('Elegí el equipo que querés consultar.',409);return $rows[0]??null;
 }
 function supervisor_require(PDO $db,int $user): array {$team=supervisor_team($db,$user,true);if(!$team)throw new CatalogException('No tenés un equipo de empresa habilitado.',403);return $team;}
+/** Administrative state is separate from effective paid/manual access. */
+function supervisor_managed(PDO $db,int $actor,int $cursor=0): array {
+ team_require_assignment($db,$actor);
+ return stock_query($db,'SELECT t.id,t.name,t.active,t.billing_required,t.revision,u.public_name AS owner_name,CASE WHEN t.active=1 AND (t.billing_required=0 OR EXISTS(SELECT 1 FROM supervision_subscriptions s WHERE s.team_id=t.id AND s.user_id=t.owner_id AND s.paid_until>?)) THEN 1 ELSE 0 END AS has_access FROM supervisor_teams t JOIN users u ON u.id=t.owner_id WHERE t.id>? ORDER BY t.id LIMIT 31',[time(),$cursor])->fetchAll();
+}
 function supervisor_links(PDO $db,int $user): array {$rows=stock_query($db,"SELECT m.team_id,m.status,m.revision,t.name,CASE WHEN t.active=1 AND (t.billing_required=0 OR EXISTS(SELECT 1 FROM supervision_subscriptions bs WHERE bs.team_id=t.id AND bs.user_id=t.owner_id AND bs.paid_until>".time().")) THEN 1 ELSE 0 END AS active,u.public_name,u.name AS supervisor_name FROM supervisor_members m JOIN supervisor_teams t ON t.id=m.team_id JOIN users u ON u.id=t.owner_id WHERE m.user_id=? AND m.status IN ('pending','accepted') ORDER BY t.name,t.id",[$user])->fetchAll();foreach($rows as&$r){$r['supervisor_name']=get_public_user_name(['public_name'=>$r['public_name'],'name'=>$r['supervisor_name']]);unset($r['public_name']);}unset($r);return $rows;}
 function supervisor_enable(PDO $db,int $actor,array $input): void {
  team_require_assignment($db,$actor);$email=mb_strtolower(trim($input['email']??''));$name=catalog_text($input['name']??'',100);if(!filter_var($email,FILTER_VALIDATE_EMAIL)||$name==='')throw new CatalogException('Completá la empresa y el correo del supervisor.',422);

@@ -1,6 +1,12 @@
 {
-  "version": 128,
+  "version": 129,
   "changes": [
+    {
+      "version": 129,
+      "label": "2.24",
+      "date": "2026-10-28",
+      "summary": "Estados claros de acceso manual y suscripción por equipo."
+    },
     {
       "version": 128,
       "label": "2.23",
@@ -294,15 +300,9 @@
       "label": "1.75",
       "date": "2026-10-25",
       "summary": "Prepara suscripción Pro de prueba y distintivos en palets"
-    },
-    {
-      "version": 79,
-      "label": "1.74",
-      "date": "2026-10-25",
-      "summary": "Aclara envíos desactivados en beta y documenta propuesta de planes"
     }
   ],
   "major": 2,
-  "minor": 23,
-  "label": "2.23"
+  "minor": 24,
+  "label": "2.24"
 }

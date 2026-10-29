@@ -12,7 +12,7 @@ final class SupervisionContext {
     public static function selected(PDO $db,int $user): int {return self::$scopes[$db][$user]??0;}
 }
 function supervision_owned(PDO $db,int $user): array {
-    return stock_query($db,'SELECT t.id,t.name,t.active,t.name_pending,t.billing_required,t.revision,s.status,s.paid_until,(SELECT COUNT(*) FROM supervisor_members m WHERE m.team_id=t.id AND m.status IN (\'pending\',\'accepted\')) AS occupied FROM supervisor_teams t LEFT JOIN supervision_subscriptions s ON s.team_id=t.id AND s.user_id=t.owner_id WHERE t.owner_id=? ORDER BY t.id',[$user])->fetchAll();
+    return stock_query($db,'SELECT t.id,t.name,t.active,t.name_pending,t.billing_required,t.revision,s.status,s.paid_until,CASE WHEN t.active=1 AND (t.billing_required=0 OR s.paid_until>?) THEN 1 ELSE 0 END AS has_access,(SELECT COUNT(*) FROM supervisor_members m WHERE m.team_id=t.id AND m.status IN (\'pending\',\'accepted\')) AS occupied FROM supervisor_teams t LEFT JOIN supervision_subscriptions s ON s.team_id=t.id AND s.user_id=t.owner_id WHERE t.owner_id=? ORDER BY t.id',[time(),$user])->fetchAll();
 }
 function supervision_billing_team(PDO $db,int $user,int $team=0): int {
     if($team){if(!stock_query($db,'SELECT 1 FROM supervisor_teams WHERE id=? AND owner_id=?',[$team,$user])->fetchColumn())throw new CatalogException('Este equipo no está disponible para tu cuenta.',403);return $team;}
